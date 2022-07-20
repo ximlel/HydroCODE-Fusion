@@ -2,16 +2,15 @@
 #include <stdio.h>
 
 
-
-void Riemann_solver_exact(double * U_star, double * P_star, double gamma, double U_l, double U_r, double P_l, double P_r, double c_l, double c_r, int * CRW, double tol, int N)
+double Riemann_solver_exact(double * U_star, double * P_star, double gamma, double u_L, double u_R, double p_L, double p_R, double c_L, double c_R, int * CRW, double eps, double tol, int N)
 {
   //double zeta_l, zeta_r;
   double mu, nu, sigma;
-  //double c_l, c_r;
-  double delta_P, U_LR, U_RL;
-  double k1, k3, P_int, U_int;
+  //double c_L, c_R;
+  double delta_p, u_LR, u_RL;
+  double k1, k3, p_INT, p_INT0, u_INT;
   double rho_star_l, rho_star_r;
-  double U_temp_l, U_temp_r, gap;
+  double v_L, v_R, gap;
   double temp1, temp2, temp3;
   double dbg = 2;
   int n = 0;
@@ -20,159 +19,170 @@ void Riemann_solver_exact(double * U_star, double * P_star, double gamma, double
   nu = (gamma+1.0) / (2.0*gamma);
   sigma = (gamma - 1.0) / (gamma + 1.0);
 
-  //c_l = sqrt(gamma * P_l / rho_l);
-  //c_r = sqrt(gamma * P_r / rho_r);
+  //c_L = sqrt(gamma * p_L / rho_l);
+  //c_R = sqrt(gamma * p_R / rho_r);
   //rho_l = 1.0 / rho_l;
   //rho_r = 1.0 / rho_r;
 
-  //zeta_l = pow(P_l, (gamma-1.0) / (2.0*gamma));
-  //zeta_r = pow(P_r, (gamma-1.0) / (2.0*gamma));
+  //zeta_l = pow(p_L, (gamma-1.0) / (2.0*gamma));
+  //zeta_r = pow(p_R, (gamma-1.0) / (2.0*gamma));
 
-  //=====find out the kind of 1-wave and 3-wave
-  if(P_r > P_l)
+  //=====find out the kinds of the 1-wave and the 3-wave, page 132 in the GRP book
+  //find out where (u_LR,p_R) lies on the curve of LEFT state
+  if(p_R > p_L) // (u_LR,p_R) lies on the shock branch of I1
   {
-    delta_P = P_r - P_l;
-    U_LR = sqrt(1.0 + nu*delta_P/P_l);
-    U_LR = delta_P * c_l / gamma / P_l / U_LR;
-    U_LR = U_l - U_LR;
+    delta_p = p_R - p_L;
+    u_LR = sqrt(1.0 + nu*delta_p/p_L);
+    u_LR = delta_p * c_L / gamma / p_L / u_LR;
+    u_LR = u_L - u_LR;
   }
-  else
+  else // (u_LR,p_R) lies on the rarefaction branch of I1
   {
-    U_LR = pow(P_r/P_l, mu) - 1.0;
-    U_LR = 2.0 * c_l * U_LR / (gamma-1.0);
-    U_LR = U_l - U_LR;
+    u_LR = pow(p_R/p_L, mu) - 1.0;
+    u_LR = 2.0 * c_L * u_LR / (gamma-1.0);
+    u_LR = u_L - u_LR;
   }
-  if(P_l > P_r)
+  //find out where (u_RL,p_L) lies on the curve of RIGHT state
+  if(p_L > p_R) // (u_RL, p_L) lies on the shock branch of I3
   {
-    delta_P = P_l - P_r;
-    U_RL = sqrt(1.0 + nu*delta_P/P_r);
-    U_RL = delta_P * c_r / gamma / P_r / U_RL;
-    U_RL = U_r + U_RL;
+    delta_p = p_L - p_R;
+    u_RL = sqrt(1.0 + nu*delta_p/p_R);
+    u_RL = delta_p * c_R / gamma / p_R / u_RL;
+    u_RL = u_R + u_RL;
   }
-  else
+  else // (u_RL, p_L) lies on the rarefaction branch of I3
   {
-    U_RL = pow(P_l/P_r, mu) - 1.0;
-    U_RL = 2.0 * c_r * U_RL / (gamma-1.0);
-    U_RL = U_r + U_RL;
+    u_RL = pow(p_L/p_R, mu) - 1.0;
+    u_RL = 2.0 * c_R * u_RL / (gamma-1.0);
+    u_RL = u_R + u_RL;
   }
-  if(U_LR > U_r+tol)
+  if(u_LR > u_R+eps)
     CRW[1] = 0;
   else
     CRW[1] = 1;
-  if(U_RL > U_l-tol)
+  if(u_RL > u_L-eps)
     CRW[0] = 1;
   else
     CRW[0] = 0;
 
-  //======one step of the Newton ietration to get the intersection point of L1 and L3====
-  k1 = c_l / P_l / gamma;
-  k1 = -k1;
-  k3 = c_r / P_r / gamma;
-  P_int = (k1*P_l - k3*P_r - U_l + U_r) / (k1 - k3);
+  //======one step of the Newton ietration to get the intersection point of I1 and I3====
+  k1 = -c_L / p_L / gamma;//the (p,u)-tangent slope on I1 at (u_L,p_L), i.e. [du/dp](p_L)
+  k3 =  c_R / p_R / gamma;//the (p,u)-tangent slope on I3 at (u_R,p_R), i.e. [du/dp](p_R)
+  //the intersect of (u-u_L)=k1*(p-p_L) and (u-u_R)=k3*(p-p_R)
+  p_INT = (k1*p_L - k3*p_R - u_L + u_R) / (k1 - k3);
+  if(p_INT < 0)
+    p_INT = (p_L<p_R)? p_L : p_R;
+  p_INT = 0.5*p_INT;
 
   //=======compute the gap between U^n_R and U^n_L(see Appendix C)=======
-  if(P_int > P_l)
+  if(p_INT > p_L)
   {
-    delta_P = P_int - P_l;
-    U_temp_l = sqrt(1.0 + nu*delta_P/P_l);
-    U_temp_l = delta_P * c_l / gamma / P_l / U_temp_l;
-    U_temp_l = U_l - U_temp_l;
+    delta_p = p_INT - p_L;
+    v_L = sqrt(1.0 + nu*delta_p/p_L);
+    v_L = delta_p * c_L / gamma / p_L / v_L;
+    v_L = u_L - v_L;
   }
   else
   {
-    U_temp_l = pow(P_int/P_l, mu) - 1.0;
-    U_temp_l = 2.0 * c_l * U_temp_l / (gamma-1.0);
-    U_temp_l = U_l - U_temp_l;
+    v_L = pow(p_INT/p_L, mu) - 1.0;
+    v_L = 2.0 * c_L * v_L / (gamma-1.0);
+    v_L = u_L - v_L;
   }
-  if(P_int > P_r)
+  if(p_INT > p_R)
   {
-    delta_P = P_int - P_r;
-    U_temp_r = sqrt(1.0 + nu*delta_P/P_r);
-    U_temp_r = delta_P * c_r / gamma / P_r / U_temp_r;
-    U_temp_r = U_r + U_temp_r;
+    delta_p = p_INT - p_R;
+    v_R = sqrt(1.0 + nu*delta_p/p_R);
+    v_R = delta_p * c_R / gamma / p_R / v_R;
+    v_R = u_R + v_R;
   }
   else
   {
-    dbg = pow(P_int/P_r, mu);
-    U_temp_r = pow(P_int/P_r, mu) - 1.0;
-    U_temp_r = 2.0 * c_r * U_temp_r / (gamma-1.0);
-    U_temp_r = U_r + U_temp_r;
+    //dbg = pow(p_INT/p_R, mu);
+    v_R = pow(p_INT/p_R, mu) - 1.0;
+    v_R = 2.0 * c_R * v_R / (gamma-1.0);
+    v_R = u_R + v_R;
   }
-  gap = fabs(U_temp_l - U_temp_r);
+  gap = fabs(v_L - v_R);
 
 
   //=======THE NEWTON ITERATION=======
   while((gap > tol) && (n != N))
   {
-    //------compute the slope of the tangent of L1 and L3------
-    if(P_int > P_l)
+    //the (p,u)-tangent slope on I1 at (v_L,p_INT), i.e. [du/dp](p_INT)
+    if(p_INT > p_L)
     {
-      delta_P = P_int - P_l;
-      temp1 = 1.0 / sqrt(1.0 + nu*delta_P/P_l);
-      temp2 = c_l / gamma / P_l;
-      temp3 = 0.5 * temp2 * nu / P_l;
-      k1 = temp3*delta_P*pow(temp1,3.0) - temp2*temp1;
+      delta_p = p_INT - p_L;
+      temp1 = 1.0 / sqrt(1.0 + nu*delta_p/p_L);
+      temp2 = c_L / gamma / p_L;
+      temp3 = 0.5 * temp2 * nu / p_L;
+      k1 = temp3*delta_p*pow(temp1,3.0) - temp2*temp1;
     }
     else
     {
-      temp2 = c_l / gamma / P_l;
-      temp1 = 1.0 / pow(P_int/P_l, nu);
-      k1 = temp1 * temp2;
-      k1 = -k1;
+      temp2 = c_L / gamma / p_L;
+      temp1 = 1.0 / pow(p_INT/p_L, nu);
+      k1 = -temp1 * temp2;
     }
-    if(P_int > P_r)
+    //the (p,u)-tangent slope on I3 at (v_R,p_INT), i.e. [du/dp](p_INT)
+    if(p_INT > p_R)
     {
-      delta_P = P_int - P_r;
-      temp1 = 1.0 / sqrt(1.0 + nu*delta_P/P_r);
-      temp2 = c_r / gamma / P_r;
-      temp3 = 0.5 * temp2 * nu / P_r;
-      k3 = temp2*temp1 - temp3*delta_P*pow(temp1,3.0);
+      delta_p = p_INT - p_R;
+      temp1 = 1.0 / sqrt(1.0 + nu*delta_p/p_R);
+      temp2 = c_R / gamma / p_R;
+      temp3 = 0.5 * temp2 * nu / p_R;
+      k3 = temp2*temp1 - temp3*delta_p*pow(temp1,3.0);
     }
     else
     {
-      temp2 = c_r / gamma / P_r;
-      temp1 = 1.0 / pow(P_int/P_r, nu);
+      temp2 = c_R / gamma / p_R;
+      temp1 = 1.0 / pow(p_INT/p_R, nu);
       k3 = temp1 * temp2;
     }
 
-    //------compute the intersetion point of L1 and L3------
-    P_int = P_int + (U_temp_r - U_temp_l) / (k1 - k3);
+    //the intersect of (u-u_L)=k1*(p-p_L) and (u-u_R)=k3*(p-p_R)
+    p_INT0 = p_INT + (v_R - v_L) / (k1 - k3);
+    if(p_INT0 < 0.0)
+      p_INT = 0.5*p_INT;
+    else
+      p_INT = p_INT0;
 
     //------the gap------
     ++n;
-    if(P_int > P_l)
+    if(p_INT > p_L)
     {
-      delta_P = P_int - P_l;
-      U_temp_l = sqrt(1.0 + nu*delta_P/P_l);
-      U_temp_l = delta_P * c_l / gamma / P_l / U_temp_l;
-      U_temp_l = U_l - U_temp_l;
+      delta_p = p_INT - p_L;
+      v_L = sqrt(1.0 + nu*delta_p/p_L);
+      v_L = delta_p * c_L / gamma / p_L / v_L;
+      v_L = u_L - v_L;
     }
     else
     {
-      U_temp_l = pow(P_int/P_l, mu) - 1.0;
-      U_temp_l = 2.0 * c_l * U_temp_l / (gamma-1.0);
-      U_temp_l = U_l - U_temp_l;
+      v_L = pow(p_INT/p_L, mu) - 1.0;
+      v_L = 2.0 * c_L * v_L / (gamma-1.0);
+      v_L = u_L - v_L;
     }
-    if(P_int > P_r)
+    if(p_INT > p_R)
     {
-      delta_P = P_int - P_r;
-      U_temp_r = sqrt(1.0 + nu*delta_P/P_r);
-      U_temp_r = delta_P * c_r / gamma / P_r / U_temp_r;
-      U_temp_r = U_r + U_temp_r;
+      delta_p = p_INT - p_R;
+      v_R = sqrt(1.0 + nu*delta_p/p_R);
+      v_R = delta_p * c_R / gamma / p_R / v_R;
+      v_R = u_R + v_R;
     }
     else
     {
-      U_temp_r = pow(P_int/P_r, mu) - 1.0;
-      U_temp_r = 2.0 * c_r * U_temp_r / (gamma-1.0);
-      U_temp_r = U_r + U_temp_r;
+      v_R = pow(p_INT/p_R, mu) - 1.0;
+      v_R = 2.0 * c_R * v_R / (gamma-1.0);
+      v_R = u_R + v_R;
     }
 
-    gap = fabs(U_temp_l - U_temp_r);
+    gap = fabs(v_L - v_R);
   }
 
 
-  U_int = k1*(U_temp_r-U_temp_l)/(k1-k3)+U_temp_l;
+  u_INT = k1*(v_R-v_L)/(k1-k3)+v_L;
 
-  *P_star = P_int;
-  *U_star = U_int;
+  *P_star = p_INT;
+  *U_star = u_INT;
+
+  return gap;
 }

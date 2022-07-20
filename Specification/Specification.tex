@@ -1,0 +1,74 @@
+\documentclass{article}
+\usepackage{fontspec}
+\setmainfont{微软雅黑}
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+\begin{document}
+\title{程序说明}
+\date{}
+\maketitle
+
+\section{程序结构}
+\ \\
+
+\textbf{data\_in} 文件夹放置输入文件RHO,U,P；
+其中config文件中依次为气体常数，时间步长，网格宽度，可识别的最小非0正数，时间步数。
+
+\textbf{plot} 文件夹输出RHO,U,P变化图。
+
+\textbf{data\_out} 文件夹输出计算过程中RHO,U,P和拉式坐标的变化。
+
+\textbf{file\_io} 为文件处理程序。
+
+\textbf{finite\_difference\_solver} 为算法格式文件。
+
+\textbf{Riemann\_solver} 为精确Riemann解法器。
+
+\textbf{LAG\_source.c} 是主程序。
+
+\textbf{make.sh} 为编译和运行程序的脚本。
+
+在终端下运行make.sh即可，gcc编译，gnuplot画图。
+
+\section{格式}
+\ \\
+
+精确Riemann解法器根据[1]所写，$u^{*},p^{*}$为Rienmann问题$*$区域的解。
+
+格式为向前Euler：(GRP/Gdounov\_solver\_source.c)
+
+$m_i(1/\rho_i^{n+1}-1/\rho_i^{n})-\Delta t(u_{i+1/2}^n-u_{i-1/2}^n)=0$，
+
+$m_i(u_i^{n+1}-u_i^{n})+\Delta t(p_{i+1/2}^n-p_{i-1/2}^n)=0$，
+
+$m_i(e_i^{n+1}-e_i^{n})+\Delta t(p_{i+1/2}^nu_{i+1/2}^n-p_{i-1/2}^nu_{i-1/2}^n)=0$。
+
+接触间断的位置计算：
+
+$x_{i+1/2}^{n+1}=x_{i+1/2}^{n}+\Delta tu_{i+1/2}^{n+1/2}$。
+
+节点$j+1/2$时平均数值通量：
+
+$u_{i+1/2}^{n+1/2}=u_{i+1/2}^{*n}+\frac{\Delta t}{2}(\frac{D u}{D t})_{i+1/2}^{n}$，
+
+$p_{i+1/2}^{n+1/2}=p_{i+1/2}^{*n}+\frac{\Delta t}{2}(\frac{D p}{D t})_{i+1/2}^{n}$。
+
+拉式Gdounov格式$(\frac{D u}{D t})_{i+1/2}^{n}，(\frac{D p}{D t})_{i+1/2}^{n}$取0。
+
+拉式GRP格式由斜率求接触间断处的物质导数(GRP\_solver\_source.c)，由GRP格式算出时间导数(linear\_GRP\_solver\_LAG.c)，向前Euler,再通过斜率限制器得到斜率(GRP\_solver\_source.c)。
+
+\section{算例}
+\ \\
+
+6.1 sod激波管，
+
+6.2.1 Shock-Contact Interaction。
+
+画的图为转换到欧拉坐标下的RHO,U,P以及拉式坐标的图。
+
+
+\section*{Refences}
+[1] E. F. Toro. A Fast Riemann Solver with Constant Covolume Applied to the
+Random Choice Method. Int. J. Numer. Meth. Fluids, 9:1145–1164, 1989.
+
+\end{document}

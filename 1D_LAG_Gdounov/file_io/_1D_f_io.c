@@ -6,6 +6,18 @@
 
 #include <time.h>
 
+#ifdef _WIN32
+#include <direct.h>
+#elif __linux__
+#include <sys/stat.h>
+#endif
+#ifdef _WIN32
+#define MKDIR(a) _mkdir((a))
+#define ISNAN(a) _isnan((a))
+#elif __linux__
+#define MKDIR(a) mkdir((a),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
+#define ISNAN(a) isnan((a))
+#endif
 
 #include "file_io.h"
 

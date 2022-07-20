@@ -8,7 +8,7 @@
 #include "Riemann_solver.h"
 
 /* This function use Godunov scheme to solve 1-D
- * equations of motion On Lagrange coordinate.
+ * equations of motion on Lagrange coordinate.
  *
  *config is the array of configuration data, the detail
  *         could be seen in the comments of the main function.
