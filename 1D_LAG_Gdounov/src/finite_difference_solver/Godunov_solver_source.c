@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-
 #include <time.h>
 
 #include "finite_difference_solver.h"
@@ -10,12 +9,11 @@
 /* This function use Godunov scheme to solve 1-D
  * equations of motion on Lagrange coordinate.
  *
- *config is the array of configuration data, the detail
+ *[config] is the array of configuration data, the detail
  *         could be seen in the comments of the main function.
- *m      is the number of the grids.
+ *[m]      is the number of the grids.
  */
 
-//
 void Godunov_solver_source
 (double * config, int m, 
  double * RHO[], double * U[], double * P[], double * E[], double * X[], double * MASS,
@@ -89,7 +87,7 @@ void Godunov_solver_source
 
 //===============Solve Riemann Problem==============
 
-	Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, 500);
+	Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
 
 	u_mid[j] = u_star;
 	p_mid[j] = p_star;

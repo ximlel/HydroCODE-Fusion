@@ -6,9 +6,9 @@
 #include <math.h>
 #include <string.h>
 
-#include "file_io.h"
-#include "finite_difference_solver.h"
-#include "Riemann_solver.h"
+#include "include/file_io.h"
+#include "include/finite_difference_solver.h"
+#include "include/Riemann_solver.h"
 
 #ifndef N_CONF
 #define N_CONF 5
@@ -148,8 +148,6 @@ int main(int argc, char *argv[])
 
   double UL[N], PL[N], RHOL[N];
   double UR[N], PR[N], RHOR[N];
-  double SUL[N], SPL[N], SRHOL[N];
-  double SUR[N], SPR[N], SRHOR[N];
   double cpu_time[N];
 
   for(k = 0; k < N; ++k)
@@ -160,12 +158,6 @@ int main(int argc, char *argv[])
     PR[k] = P[0][m-1];
     RHOL[k] = RHO[0][0];
     RHOR[k] = RHO[0][m-1];
-    SUL[k] = 0.0;
-    SUR[k] = 0.0;
-    SPL[k] = 0.0;
-    SPR[k] = 0.0;
-    SRHOL[k] = 0.0;
-    SRHOR[k] = 0.0;
   }
 
 
@@ -250,8 +242,8 @@ int main(int argc, char *argv[])
 		  E[0][j] = 0.5*U[0][j]*U[0][j] + P[0][j]/(config[0] - 1.0)/RHO[0][j]; /* initialize the values of mass,coordinate and energy.
 											*/
 
-  GRP_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, SRHOL, SUL, SPL, SRHOR, SUR, SPR, cpu_time);
-  /* use GRP scheme to solve it on Lagrange coordinate. */
+  Godunov_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, cpu_time);
+  /* use Godunov scheme to solve it on Lagrange coordinate. */
 
   _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[5]); /*write the final data down.
  								      */ 																								

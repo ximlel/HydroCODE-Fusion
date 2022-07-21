@@ -28,7 +28,7 @@ void linear_GRP_solver_LAG
   g_L = rho_L*c_L;
   g_R = rho_R*c_R;
 
-  Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, 500);
+  Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
   
   if(p_star > p_L)
     rho_star_L = rho_L*(p_star+zeta*p_L)/(p_L+zeta*p_star);

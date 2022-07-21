@@ -7,7 +7,7 @@
 #include <time.h>
 
 
-#include "file_io.h"
+#include "../include/file_io.h"
 
 
 #ifndef N_CONF

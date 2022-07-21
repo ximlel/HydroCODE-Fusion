@@ -15,7 +15,7 @@
  * Published by NUMERITEK LTD
  */
 
-double Riemann_solver_exact(double * U_star, double * P_star,double gamma, double U_l, double U_r, double P_l, double P_r, double c_l, double c_r, int * CRW, double eps, double tol, int N)
+double Riemann_solver_exact_Toro(double * U_star, double * P_star, double gamma, double U_l, double U_r, double P_l, double P_r, double c_l, double c_r, int * CRW, double eps, double tol, int N)
 {
     int n = 0;		
     double gap;//relative pressure change
