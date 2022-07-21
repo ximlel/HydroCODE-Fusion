@@ -254,7 +254,7 @@ void _1D_configurate(double * config, char * name, char * add)
 /* This function write the solution into an output file.
  * It is quite simple so there will be no more comments.
  */
-void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], double * Ene[], double * X[], double * cpu_time, double * config, char * scheme)
+void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P[], double * Ene[], double * X[], double * cpu_time, double * config, char * scheme)
 {
   FILE * fp_write;
   char file_data[100] = "";
@@ -387,7 +387,7 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
     exit(1);
   }
 
-  double sum[N+1];
+  double* sum = calloc(N + 1, sizeof(double));
   sum[0] = 0.0;
 
   fprintf(fp_write, "%s initialized with %d grids.\n\n", scheme, m);
@@ -410,5 +410,6 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   for(n = 1; n <= N; ++n)
     fprintf(fp_write, "%.18lf  ", sum[n]);
 
+  free(sum);
   fclose(fp_write);
 }

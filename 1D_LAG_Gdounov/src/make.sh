@@ -16,6 +16,6 @@ ranlib finite_difference_solver.a
 
 cd ../
 gcc -c ./LAG_source.c -g
-gcc -o LAG_source ./LAG_source.o ./file_io/file_io.a ./finite_difference_solver/finite_difference_solver.a ./Riemann_solver/Riemann_solver_exact.o -lm
+gcc -o LAG_source.out ./LAG_source.o ./file_io/file_io.a ./finite_difference_solver/finite_difference_solver.a ./Riemann_solver/Riemann_solver_exact.o -lm
 
 exit 0

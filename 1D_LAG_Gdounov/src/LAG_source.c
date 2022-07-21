@@ -59,7 +59,8 @@ int main(int argc, char *argv[])
   
   double h = config[2], gamma = config[0];
 
-  double * RHO[N];
+  double** RHO;
+  RHO = (double **)malloc(N * sizeof(double *));
   RHO[0] = RHO0 + 1;
   for(k = 1; k < N; ++k)
   {
@@ -82,7 +83,8 @@ int main(int argc, char *argv[])
       exit(5);
     }
   }
-  double * U[N];
+  double** U;
+  U = (double**)malloc(N * sizeof(double*));
   U[0] = U0 + 1;
   for(k = 1; k < N; ++k)
   {
@@ -112,7 +114,8 @@ int main(int argc, char *argv[])
     }
   }
   
-  double * P[N];
+  double** P;
+  P = (double**)malloc(N * sizeof(double*));
   P[0] = P0 + 1;
   for(k = 1; k < N; ++k)
   {
@@ -146,9 +149,9 @@ int main(int argc, char *argv[])
   }
 
 
-  double UL[N], PL[N], RHOL[N];
-  double UR[N], PR[N], RHOR[N];
-  double cpu_time[N];
+  double *UL = malloc(N * sizeof(double)), *PL = malloc(N * sizeof(double)), *RHOL = malloc(N * sizeof(double));
+  double *UR = malloc(N * sizeof(double)), *PR = malloc(N * sizeof(double)), *RHOR = malloc(N * sizeof(double));
+  double *cpu_time = malloc(N * sizeof(double));
 
   for(k = 0; k < N; ++k)
   {
@@ -161,7 +164,8 @@ int main(int argc, char *argv[])
   }
 
 
-  double * E[N];
+  double** E;
+  E = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
     E[k] = (double *)malloc(m * sizeof(double));
@@ -195,7 +199,8 @@ int main(int argc, char *argv[])
     }
   }
 
-  double * X[N];
+  double** X;
+  X = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
     X[k] = (double *)malloc((m+1) * sizeof(double));
@@ -232,8 +237,7 @@ int main(int argc, char *argv[])
   }
 
 
-  double MASS[m];
-
+  double *MASS=malloc(m * sizeof(double));
   for(j = 0; j < m; ++j)
 		  MASS[j]=config[2]*RHO[0][j];                                               
   for(j = 0; j <= m; ++j)

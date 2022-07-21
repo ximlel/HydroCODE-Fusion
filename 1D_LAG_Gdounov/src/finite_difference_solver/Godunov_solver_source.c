@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "finite_difference_solver.h"
-#include "Riemann_solver.h"
+#include "../include/finite_difference_solver.h"
+#include "../include/Riemann_solver.h"
 
 /* This function use Godunov scheme to solve 1-D
  * equations of motion on Lagrange coordinate.
@@ -41,7 +41,8 @@ void Godunov_solver_source
   double c_L, c_R;               // the speed of sound
   double c_star_L,c_star_R;
   double u_star, p_star;
-  double u_mid[m+1], p_mid[m+1]; // the Riemann solutions
+  double *u_mid = malloc((m + 1) * sizeof(double)); // the Riemann solutions
+  double *p_mid = malloc((m + 1) * sizeof(double));
   int CRW[2];
 
 //------------THE MAIN LOOP-------------
@@ -123,6 +124,9 @@ printf("%.18lf\n",p_star);
     cpu_time[k] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
     sum += cpu_time[k];
   }
+
+  free(u_mid);
+  free(p_mid);
 
   printf("The cost of CPU time for 1D-Godunov scheme for this problem is %g seconds.\n", sum);
 //------------END OF THE MAIN LOOP-------------
