@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifdef _WIN32
+#define ISNAN(a) _isnan((a))
+#elif __linux__
+#define ISNAN(a) isnan((a))
+#endif
+
 #include "../include/finite_difference_solver.h"
 #include "../include/Riemann_solver.h"
 
@@ -83,7 +89,7 @@ void Godunov_solver_source
       c_L = sqrt(gamma * p_L / rho_L);
       c_R = sqrt(gamma * p_R / rho_R);
 
-      if((p_L < eps) || (p_R < eps) || (rho_L < eps) || (rho_R < eps)||isnan(p_L)||isnan(p_R)||isnan(u_L)||isnan(u_R)||isnan(rho_L)||isnan(rho_R))
+      if((p_L < eps) || (p_R < eps) || (rho_L < eps) || (rho_R < eps)||ISNAN(p_L)||ISNAN(p_R)||ISNAN(u_L)||ISNAN(u_R)||ISNAN(rho_L)||ISNAN(rho_R))
 		  printf("error on %d\t%d(t_n,x)\n", k, j);
 
 //===============Solve Riemann Problem==============
@@ -92,11 +98,6 @@ void Godunov_solver_source
 
 	u_mid[j] = u_star;
 	p_mid[j] = p_star;
-if(k==1)
-{
-printf("%.18lf\n",u_star);
-printf("%.18lf\n",p_star);
-}
 
 //==================================================
 

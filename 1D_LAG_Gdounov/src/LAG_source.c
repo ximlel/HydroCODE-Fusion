@@ -11,7 +11,7 @@
 #include "include/Riemann_solver.h"
 
 #ifndef N_CONF
-#define N_CONF 5
+#define N_CONF 6
 #endif /* N_CONF */
 
 double * U0 = NULL;
@@ -20,18 +20,20 @@ double * RHO0 = NULL;
 
 int main(int argc, char *argv[])
 {
-  _1D_initialize(argv[0], argv[1], argv[2], argv[3]);  /* Firstly we read the initial
-							* data file. The function 
-							* initialize return a point
-							* pointing to the position
-							* of a block of memory
-							* consisting (m+1) variables
-							* of type double.
-							* The value of first of these
-							* variables is m. The
-							* following m variables
-							* are the initial value.
-							*/
+    char add[FILENAME_MAX];
+    example_io(argv[1], add, 1);
+    _1D_initialize(argv[1], add);  /* Firstly we read the initial
+				       * data file. The function 
+				       * initialize return a point
+				       * pointing to the position
+				       * of a block of memory
+				       * consisting (m+1) variables
+				       * of type double.
+				       * The value of first of these
+				       * variables is m. The
+				       * following m variables
+				       * are the initial value.
+				       */
   int m = (int)U0[0];  /* m is the number of initial value
 			* as well as the number of grids.
 			* As m is frequently use to
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
 			   *           seen as zero
 			   * config[4] is the number of time steps
 			   */
-  _1D_configurate(config, argv[0], argv[4]); /* Read the config-
+  _1D_configurate(config, argv[1], add); /* Read the config-
 					      * uration data.
 					      * The detail could
 					      * be seen in the
@@ -249,7 +251,8 @@ int main(int argc, char *argv[])
   Godunov_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, cpu_time);
   /* use Godunov scheme to solve it on Lagrange coordinate. */
 
-  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[5]); /*write the final data down.
+  example_io(argv[1], add, 0);
+  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[1], add); /*write the final data down.
  								      */ 																								
 
   for(k = 1; k < N; ++k)
