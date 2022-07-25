@@ -25,7 +25,7 @@
 
 
 #ifndef N_CONF
-#define N_CONF 6
+#define N_CONF 7
 #endif /* N_CONF */
 
 
@@ -219,6 +219,7 @@ void _1D_initialize(char * name, char * add_in)
  * config[3] is the largest value can be seen as zero
  * config[4] is the maximal number of time steps
  * config[5] is the total time
+ * config[6] is the CFL number
  */
 void _1D_configurate(double * config, char * name, char * add_in)
 {
@@ -285,6 +286,7 @@ void _1D_configurate(double * config, char * name, char * add_in)
   printf("eps        = %g\n", config[3]);
   printf("time step  = %d\n", (int)config[4]);
   printf("total time = %g\n", config[5]);
+  printf("CFL number = %g\n", config[6]);
 }
 
 
@@ -439,9 +441,11 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
   fprintf(fp_write, "h   = %g\n", config[2]);
   fprintf(fp_write, "eps = %g\n", config[3]);
   fprintf(fp_write, "tim = %d\n", (int)config[4]);
-  fprintf(fp_write, "T_d = %d\n\n", config[5]);
+  fprintf(fp_write, "T_d = %g\n\n", config[5]);
+  fprintf(fp_write, "CFL = %g\n\n", config[6]);
 
   fprintf(fp_write, "%d time steps computed.\n", N);
+  /*
   fprintf(fp_write, "CPU time for each step:");
   for(n = 1; n <= N; ++n)
   {
@@ -451,6 +455,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
   fprintf(fp_write, "\nTotal CPU time at each step:");
   for(n = 1; n <= N; ++n)
     fprintf(fp_write, "%.18lf  ", sum[n]);
+  */
 
   free(sum);
   fclose(fp_write);

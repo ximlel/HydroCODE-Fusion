@@ -11,7 +11,7 @@
 #include "include/Riemann_solver.h"
 
 #ifndef N_CONF
-#define N_CONF 6
+#define N_CONF 7
 #endif /* N_CONF */
 
 double * U0 = NULL;
@@ -240,6 +240,7 @@ int main(int argc, char *argv[])
 
 
   double *MASS=malloc(m * sizeof(double));
+
   for(j = 0; j < m; ++j)
 		  MASS[j]=config[2]*RHO[0][j];                                               
   for(j = 0; j <= m; ++j)

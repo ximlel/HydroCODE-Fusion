@@ -2,6 +2,14 @@
 #include <stdio.h>
 
 
+/**
+ * @brief      EXACT RIEMANN SOLVER FOR THE EULER EQUATIONS
+ * @details    
+ * @param[in]  U_star, P_star Velocity and Pressure values in the star region
+ *             gamma          specific heat ratio
+ */
+
+
 double Riemann_solver_exact(double * U_star, double * P_star, double gamma, double u_L, double u_R, double p_L, double p_R, double c_L, double c_R, int * CRW, double eps, double tol, int N)
 {
   //double zeta_l, zeta_r;

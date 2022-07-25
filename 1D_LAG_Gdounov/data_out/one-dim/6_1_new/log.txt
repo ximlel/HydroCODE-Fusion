@@ -1,0 +1,13 @@
+6_1_new initialized with 100 grids.
+
+Configurated:
+q   = 1.4
+tau = 0.16
+h   = 1
+eps = 1e-09
+tim = 125
+T_d = 20
+
+CFL = 0.9
+
+125 time steps computed.

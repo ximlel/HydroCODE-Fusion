@@ -3,17 +3,21 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifdef _WIN32
+#define ISNAN(a) _isnan((a))
+#elif __linux__
+#define ISNAN(a) isnan((a))
+#endif
 
-#include "finite_difference_solver.h"
-
+#include "../include/finite_difference_solver.h"
 
 
 /* This function use GRP scheme to solve 1-D
  * equations of motion On Lagrange coordinate.
  *
- *config is the array of configuration data, the detail
+ *[config] is the array of configuration data, the detail
  *         could be seen in the comments of the main function.
- *m      is the number of the grids.
+ *[m]      is the number of the grids.
  */
 
 void GRP_solver_source
@@ -38,14 +42,16 @@ void GRP_solver_source
   double const eps = config[3];    // the largest value could be
                                    // seen as zero
   double const h = config[2];      // the length of the initial spatial grids
-  double const tau = config[1];    // the length of the time step
+  double tau = config[1];    // the length of the time step
   double const gamma = config[0];      // the constant of the perfect gas
-
+  double const t_all = config[5];      // the total time
+  double const CFL   = config[6];      // the CFL number
 
   double s_rho[m], s_u[m], s_p[m];
   double s_L, s_R;
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
+  double c_L, c_R;
   double t_u_L, t_p_L, t_rho_L;
   double t_u_R, t_p_R, t_rho_R;
   double dire[4], mid[4];  //RHO_L_t,U_t,P_t,RHO_R_t.
@@ -59,7 +65,10 @@ void GRP_solver_source
   
   double U_F[m+1], P_F[m+1];// the numerical flux at t_{n+1/2}
 
-  double s_time = 1.9; // the paramater in slope limiters
+  double s_time = 0.0;//1.9; // the paramater in slope limiters
+
+  double h_L, h_R;
+  double h_S_max, time_n = 0.0;
 
 //=============initialize the values===========
 
@@ -117,7 +126,7 @@ void GRP_solver_source
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; ++k)
   {
-    
+      h_S_max = 1.0/0.0;
     tic = clock();
 
     for(j = 0; j <= m; ++j)
@@ -131,24 +140,33 @@ void GRP_solver_source
       { rho_L = RHO[k-1][j-1] + 0.5*(X[k-1][j]-X[k-1][j-1])*s_rho[j-1];
 	u_L   =   U[k-1][j-1] + 0.5*(X[k-1][j]-X[k-1][j-1])*s_u[j-1];
 	p_L   =   P[k-1][j-1] + 0.5*(X[k-1][j]-X[k-1][j-1])*s_p[j-1];
+	h_L   = X[k-1][j] - X[k-1][j-1];
       }
       else
       { rho_L = RHOL[k-1];
 	u_L = UL[k-1];
 	p_L = PL[k-1];
+	h_L   = h;
       }
 
       if(j < m)
       { rho_R = RHO[k-1][j] - 0.5*(X[k-1][j+1]-X[k-1][j])*s_rho[j];
 	u_R   =   U[k-1][j] - 0.5*(X[k-1][j+1]-X[k-1][j])*s_u[j];
 	p_R   =   P[k-1][j] - 0.5*(X[k-1][j+1]-X[k-1][j])*s_p[j];
-      }
+ 	h_R   = X[k-1][j+1] - X[k-1][j];
+     }
       else
       { rho_R = RHOR[k-1];
 	u_R = UR[k-1];
 	p_R = PR[k-1];
-      }
+ 	h_R = h;
+     }
 
+      c_L = sqrt(gamma * p_L / rho_L);
+      c_R = sqrt(gamma * p_R / rho_R);
+
+      h_S_max = fmin(h_S_max,h_L/c_L);
+      h_S_max = fmin(h_S_max,h_R/c_R);
 
       if(j)
       { t_u_L   = s_u[j-1]/rho_L;
@@ -172,26 +190,36 @@ void GRP_solver_source
 	t_p_R = SPR[k-1]/rho_R;
       }//calculate the material derivative
 
-      if((p_L < eps) || (p_R < eps) || (rho_L < eps) || (rho_R < eps)||isnan(p_L)||isnan(p_R)||isnan(u_L)||isnan(u_R)||isnan(rho_L)||isnan(rho_R))		  printf("error on (%d,%d) (t_n,x)\n", k, j);
-      
+      if((p_L < eps) || (p_R < eps) || (rho_L < eps) || (rho_R < eps)||ISNAN(p_L)||ISNAN(p_R)||ISNAN(u_L)||ISNAN(u_R)||ISNAN(rho_L)||ISNAN(rho_R))
+	  printf("error on (%d,%d) (t_n,x)\n", k, j);
+
 //===============GRP scheme======================
 
       linear_GRP_solver_LAG(dire, mid, rho_L, rho_R, t_rho_L, t_rho_R, u_L, u_R, t_u_L, t_u_R, p_L, p_R, t_p_L, t_p_R, gamma, 1e-9);
+    }
+    
+    tau = CFL*h_S_max;
+    //printf("tau=%g\n",tau);
+    if ((time_n + tau) >= t_all)
+        tau = t_all - time_n + eps;
+    
+    for(j = 0; j <= m; ++j)
+	{
+	    U_F[j] = mid[1] + 0.5*tau*dire[1];
+	    P_F[j] = mid[2] + 0.5*tau*dire[2];         
 
-      U_F[j] = mid[1] + 0.5*tau*dire[1];
-      P_F[j] = mid[2] + 0.5*tau*dire[2];         
+	    X[k][j] = X[k-1][j] + tau*U_F[j];
 
-      X[k][j] = X[k-1][j] + tau*U_F[j];
-
-      RHO_next_L[j] = mid[0] + tau*dire[0];
-      RHO_next_R[j] = mid[3] + tau*dire[3];
-      U_next[j] = mid[1] + tau*dire[1];
-      P_next[j] = mid[2] + tau*dire[2];
+	    RHO_next_L[j] = mid[0] + tau*dire[0];
+	    RHO_next_R[j] = mid[3] + tau*dire[3];
+	    U_next[j] = mid[1] + tau*dire[1];
+	    P_next[j] = mid[2] + tau*dire[2];
 
 //===============================================
  
-   if(j) X_mass[j-1] = 0.5*(X[k][j-1]+X[k][j]);
-   }
+	    if(j)
+		X_mass[j-1] = 0.5*(X[k][j-1]+X[k][j]);
+	}
 
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
@@ -274,13 +302,19 @@ void GRP_solver_source
       }
     }
 
-//---------------------------------------------------------------------------
 
 //==================================================
 
     toc = clock();
     cpu_time[k] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
     sum += cpu_time[k];
+
+    time_n += tau;
+    if(time_n > t_all)
+	{
+	    printf("Time is up in time step %d.\n", k);
+	    break;
+	}
   }
 
   printf("The cost of CPU time for 1D-GRP scheme for this problem is %g seconds.\n", sum);

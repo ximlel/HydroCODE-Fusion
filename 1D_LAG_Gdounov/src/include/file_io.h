@@ -1,18 +1,5 @@
 //extern double * U0;
 
-double str2num(const char * number);
-
-
-/* This function examine whether a string
- * represents a real number.
- * Transform the string represents a
- * negtive number into a string represents
- * a positive one and return its' sign.
- * It returns 0 if the string do not
- * represents a real number.
- */
-int format_string(char * str);
-
 
 /* This function reads the initial data file
  * to generate the initial data.

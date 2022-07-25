@@ -3,15 +3,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
 
 #include <time.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <direct.h>
+#include <io.h>
+#define MKDIR(a)  _mkdir((a))
+#define ACCESS(a) _access((a),0)
+#elif __linux__
+#include <sys/stat.h>
+#include <unistd.h>
+#define MKDIR(a)  mkdir((a),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
+#define ACCESS(a) access((a),0)
+#endif
 
 #include "../include/file_io.h"
 
 
 #ifndef N_CONF
-#define N_CONF 5
+#define N_CONF 7
 #endif /* N_CONF */
 
 
@@ -19,102 +33,132 @@ extern double * U0;
 extern double * P0;
 extern double * RHO0;
 
-
-
-/* this function counts how many numbers are there
- * the initial data file.
- */
-int _1D_file_pre_read(FILE * fp)
+/**
+  * @brief      This function counts how many numbers are there in the initial data file. 
+  * @param[in]  fp:  The pointer of the file to read in.
+  * @param[in]  add: The address of the file to read in.
+  * @return     The number of the numbers in the initial data file.
+  *    @retval  -1: If the given number of column is not coincided with that in the data file
+  */
+static int flu_var_count(FILE * fp, const char * add)
 {
-  int num = 0;
-  int flag = 0;  /* We need to know how many numbers are there in
-		  * the initial data. "flag" helps us to count.
-		  * We read characters one by one from the data
-		  * file. The value of "flag" is 1 when read a
-		  * number-using character (i.e. 0, 1, 2, and so
-		  * on and the dot), while is 0 when read a 
-		  * non-number-using character. 
-		  */
-  char ch;
+    int num = 0;  // Data number.
+    int flg = 0; /* We read characters one by one from the data file.
+		   * "flg" helps us to count.
+		   * -# 1: when read a number-using character (0, 1, 2, ..., e, E, minus sign and dot).
+		   * -# 0: when read a non-number-using character. 
+		   */
+    int ch;
 
   while((ch = getc(fp)) != EOF)
   {
-    //if(((ch < 45) || ((ch > 57) && (ch != 69) && (ch != 101)) || (ch == 47)) && (flag))
-    if(((ch == ' ') || (ch == '\t') || (ch == '\n')) && (flag))
-    {
-      ++num;
-      flag = 0;
-    }
-    else if( ((ch == 46)||(ch == 45)||(ch == 69)||(ch == 101)||((ch > 47) && (ch < 58))) && (!flag) )
-      flag = 1;
-    else if(((ch == ' ') || (ch == '\t') || (ch == '\n')) && (!flag))
-      continue;
-    else if( ((ch == 46)||(ch == 45)||(ch == 69)||(ch == 101)||((ch > 47) && (ch < 58))) && (flag) )
-      continue;
-    else
-    {
-      printf("Input contains illigal character(ASCII=%d, flag=%d)!\n", (int)ch, flag);
-      if(!U0)
-	free(U0);
-      exit(1);
-    }
+      // Count the data number.
+      if (ch == 45 || ch == 46 || ch == 69 || ch == 101 || isdigit(ch))
+	  flg = 1;
+      else if (!isspace(ch))
+	  {
+	      fprintf(stderr, "Input contains illegal character(ASCII=%d) in the file '%s'!\n", ch, add);
+	      return 0;
+	  }
+      else if (flg)
+	  {
+	      num++;
+	      flg = 0;
+	  }
   }
+
+  rewind(fp);
 
   return num;
 }
 
 
-/* This function reads the initial data file. The function 
- * initialize return a pointer pointing to the position of
- * a block of memory consisting (m+1) variables* of type
- * double. The value of first of these variables is m.
- * The following m variables are the initial value.
- */
-void _1D_initialize(char * name, char * addRHO, char * addU, char * addP)
+void example_io(const char *name, char *add_mkdir, const int i_or_o)
+{	
+    if (i_or_o == 0)
+	strcpy(add_mkdir, "../data_out/one-dim/");
+    else
+	strcpy(add_mkdir, "../data_in/one-dim/");
+    strcat(add_mkdir, name);
+	printf("%s\n",add_mkdir);
+    if (ACCESS(add_mkdir)==-1) // 文件夹不存在
+	{
+	    if (i_or_o == 0)
+		{
+		    if(MKDIR(add_mkdir))
+			{
+			    fprintf(stderr, "Output directory '%s' construction failed.\n", add_mkdir);
+			    exit(1);
+			}
+		    else
+			printf("Output directory '%s' constructed.\n", add_mkdir);				
+		}
+	    else
+		{
+		    fprintf(stderr, "Input directory is not exist!\n");
+		    exit(1);
+		}
+	}
+    strcat(add_mkdir, "/");
+}
+
+
+/** 
+  * @brief      This function reads the initial data file of velocity/pressure/density.
+  * @detail     The function initialize the extern pointer RHO0/U0/P0 pointing to the
+  *             position of a block of memory consisting (m+1) variables* of type double.
+  *             The value of first of these variables is m.
+  *             The following m variables are the initial value.
+  * param[in]   name: Name of the test example.
+  * param[in]   add:  Adress of the initial data file of the test example
+  */
+void _1D_initialize(char * name, char * add_in)
 {
-  FILE * fp_U, * fp_P, * fp_rho;
-  int num_U = 0, num_P = 0, num_rho = 0;  
-  char  ch;
-  int file_read_state;
-  //double * U0;
-
-
+    char addRHO[FILENAME_MAX], addU[FILENAME_MAX], addP[FILENAME_MAX];
+    FILE * fp_U, * fp_P, * fp_rho; //The pointer of the velocity/pressure/density file to read in.
+    int num_U = 0, num_P = 0, num_rho = 0;  //The number of the numbers in the above data files.
+    char  ch;
+    int file_read_state;
+    
+    strcpy(addRHO, add_in);
+    strcat(addRHO, "RHO.txt");
+    strcpy(addU, add_in);
+    strcat(addU, "U.txt");
+    strcpy(addP, add_in);
+    strcat(addP, "P.txt");
+    
+    printf("%s\n",addRHO);
   //open the initial data file
   if((fp_rho = fopen(addRHO, "r")) == 0)
   {
-    printf("Cannot open initial data file rho!\n");
+    printf("Cannot open initial data file RHO!\n");
     exit(1);
   }
-  num_rho = _1D_file_pre_read(fp_rho);
-  fseek(fp_rho, 0L, SEEK_SET);
+  num_rho = flu_var_count(fp_rho, addRHO);
 
   if((fp_U = fopen(addU, "r")) == 0)
   {
     printf("Cannot open initial data file U!\n");
     exit(1);
   }
-  num_U = _1D_file_pre_read(fp_U);
+  num_U = flu_var_count(fp_U, addU);
   if(num_U != num_rho)
   {
     printf("U:Unequal! num_U=%d  num_rho=%d\n", num_rho, num_U);
-    printf("Unequal!\n");
     exit(3);
   }
-  fseek(fp_U, 0L, SEEK_SET);
 
   if((fp_P = fopen(addP, "r")) == 0)
   {
     printf("Cannot open initial data file P!\n");
     exit(1);
   }
-  num_P = _1D_file_pre_read(fp_P);
+  num_P = flu_var_count(fp_P, addP);
   if(num_P != num_rho)
   {
     printf("P:Unequal! num_rho=%d  num_P=%d\n", num_rho, num_P);
     exit(3);
   }
-  fseek(fp_P, 0L, SEEK_SET);
-
 
   RHO0 = (double *)malloc((num_rho + 1) * sizeof(double));
   RHO0[0] = (double)num_rho;
@@ -173,12 +217,17 @@ void _1D_initialize(char * name, char * addRHO, char * addU, char * addP)
  * config[1] is the length of the time step
  * config[2] is the spatial grid size
  * config[3] is the largest value can be seen as zero
- * config[4] is the number of time steps
+ * config[4] is the maximal number of time steps
+ * config[5] is the total time
+ * config[6] is the CFL number
  */
-void _1D_configurate(double * config, char * name, char * add)
+void _1D_configurate(double * config, char * name, char * add_in)
 {
-  FILE * fp_data;
-
+    FILE * fp_data;
+    char add[FILENAME_MAX];
+    strcpy(add, add_in);
+    strcat(add, "config.txt");
+    
   //open the configuration data file
   //printf("%s will open the cinfiguration data file: ", name);
   //printf("%s\n\n", add);
@@ -194,7 +243,7 @@ void _1D_configurate(double * config, char * name, char * add)
   int n_conf, state;
 
   //read the configuration data file
-  if((n_conf = _1D_file_pre_read(fp_data)) != N_CONF)
+  if((n_conf = flu_var_count(fp_data, add)) != N_CONF)
   {
     printf("Configuration data file error, n_config=%d.\n", n_conf);
     free(U0);
@@ -231,30 +280,32 @@ void _1D_configurate(double * config, char * name, char * add)
   }
 
   printf("%s configurated:\n", name);
-  printf("gamma = %g\n", config[0]);
-  printf("tau   = %g\n", config[1]);
-  printf("h     = %g\n", config[2]);
-  printf("eps   = %g\n", config[3]);
-  printf("time  = %d\n", (int)config[4]);
+  printf("gamma      = %g\n", config[0]);
+  printf("delta_t    = %g\n", config[1]);
+  printf("delta_x    = %g\n", config[2]);
+  printf("eps        = %g\n", config[3]);
+  printf("time step  = %d\n", (int)config[4]);
+  printf("total time = %g\n", config[5]);
+  printf("CFL number = %g\n", config[6]);
 }
 
 
 /* This function write the solution into an output file.
  * It is quite simple so there will be no more comments.
  */
-void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], double * Ene[], double * X[], double * cpu_time, double * config, char * scheme)
+void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P[], double * Ene[], double * X[], double * cpu_time, double * config, char * name, char * add_out)
 {
   FILE * fp_write;
-  char file_data[100] = "";
-  char str_time[100];
+  char file_data[FILENAME_MAX] = "";
+  char str_time[FILENAME_MAX];
 
   struct tm * local_time;
   time_t t;
   t=time(NULL);
   local_time=localtime(&t);
 
-  strcat(file_data, "./data_out/RHO_");
-  strcat(file_data, scheme);
+  strcpy(file_data, add_out);
+  strcat(file_data, "/RHO");
   sprintf(str_time, "_%02d%02d%02d%02d%02d%02d", local_time->tm_year-100, local_time->tm_mon+1, local_time->tm_mday, local_time->tm_hour, local_time->tm_min, local_time->tm_sec);
   //strcat(file_data, str_time);
   strcat(file_data, ".txt");
@@ -278,10 +329,9 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   fclose(fp_write);
 
 
-
-  file_data[11] = 'U';
-  file_data[12] = '_';
-  file_data[13] = '_';
+  strcpy(file_data, add_out);
+  strcat(file_data, "/U");
+  strcat(file_data, ".txt");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -295,7 +345,9 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   }
   fclose(fp_write);
 
-  file_data[11] = 'P';
+  strcpy(file_data, add_out);
+  strcat(file_data, "/P");
+  strcat(file_data, ".txt");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -310,7 +362,9 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   fclose(fp_write);
 
 
-  file_data[11] = 'E';
+  strcpy(file_data, add_out);
+  strcat(file_data, "/E");
+  strcat(file_data, ".txt");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -324,7 +378,9 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   }
   fclose(fp_write);
 
-  file_data[11] = 'X';
+  strcpy(file_data, add_out);
+  strcat(file_data, "/X");
+  strcat(file_data, ".txt");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -338,9 +394,9 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   }
   fclose(fp_write);
 
-  file_data[11] = 'A';
-  file_data[12] = 'L';
-  file_data[13] = 'L';
+  strcpy(file_data, add_out);
+  strcat(file_data, "/ALL");
+  strcat(file_data, ".txt");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -364,10 +420,9 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
 
 
 //===================Write LOG File=========================
-  file_data[11] = 'l';
-  file_data[12] = 'o';
-  file_data[13] = 'g';
-
+  strcpy(file_data, add_out);
+  strcat(file_data, "/log");
+  strcat(file_data, ".txt");
 
   if((fp_write = fopen(file_data, "w")) == 0)
   {
@@ -375,19 +430,22 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
     exit(1);
   }
 
-  double sum[N+1];
+  double* sum = calloc(N + 1, sizeof(double));
   sum[0] = 0.0;
 
-  fprintf(fp_write, "%s initialized with %d grids.\n\n", scheme, m);
+  fprintf(fp_write, "%s initialized with %d grids.\n\n", name, m);
 
   fprintf(fp_write, "Configurated:\n");
   fprintf(fp_write, "q   = %g\n", config[0]);
   fprintf(fp_write, "tau = %g\n", config[1]);
   fprintf(fp_write, "h   = %g\n", config[2]);
   fprintf(fp_write, "eps = %g\n", config[3]);
-  fprintf(fp_write, "tim = %d\n\n", (int)config[4]);
+  fprintf(fp_write, "tim = %d\n", (int)config[4]);
+  fprintf(fp_write, "T_d = %g\n\n", config[5]);
+  fprintf(fp_write, "CFL = %g\n\n", config[6]);
 
   fprintf(fp_write, "%d time steps computed.\n", N);
+  /*
   fprintf(fp_write, "CPU time for each step:");
   for(n = 1; n <= N; ++n)
   {
@@ -397,6 +455,8 @@ void _1D_file_write(int m, int N, double * RHO[], double * U[], double * P[], do
   fprintf(fp_write, "\nTotal CPU time at each step:");
   for(n = 1; n <= N; ++n)
     fprintf(fp_write, "%.18lf  ", sum[n]);
+  */
 
+  free(sum);
   fclose(fp_write);
 }

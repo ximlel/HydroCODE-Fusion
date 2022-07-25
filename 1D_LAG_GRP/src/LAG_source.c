@@ -11,7 +11,7 @@
 #include "include/Riemann_solver.h"
 
 #ifndef N_CONF
-#define N_CONF 5
+#define N_CONF 7
 #endif /* N_CONF */
 
 double * U0 = NULL;
@@ -20,18 +20,20 @@ double * RHO0 = NULL;
 
 int main(int argc, char *argv[])
 {
-  _1D_initialize(argv[0], argv[1], argv[2], argv[3]);  /* Firstly we read the initial
-							* data file. The function 
-							* initialize return a point
-							* pointing to the position
-							* of a block of memory
-							* consisting (m+1) variables
-							* of type double.
-							* The value of first of these
-							* variables is m. The
-							* following m variables
-							* are the initial value.
-							*/
+    char add[FILENAME_MAX];
+    example_io(argv[1], add, 1);
+    _1D_initialize(argv[1], add);  /* Firstly we read the initial
+				       * data file. The function 
+				       * initialize return a point
+				       * pointing to the position
+				       * of a block of memory
+				       * consisting (m+1) variables
+				       * of type double.
+				       * The value of first of these
+				       * variables is m. The
+				       * following m variables
+				       * are the initial value.
+				       */
   int m = (int)U0[0];  /* m is the number of initial value
 			* as well as the number of grids.
 			* As m is frequently use to
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
 			   *           seen as zero
 			   * config[4] is the number of time steps
 			   */
-  _1D_configurate(config, argv[0], argv[4]); /* Read the config-
+  _1D_configurate(config, argv[1], add); /* Read the config-
 					      * uration data.
 					      * The detail could
 					      * be seen in the
@@ -59,7 +61,8 @@ int main(int argc, char *argv[])
   
   double h = config[2], gamma = config[0];
 
-  double * RHO[N];
+  double** RHO;
+  RHO = (double **)malloc(N * sizeof(double *));
   RHO[0] = RHO0 + 1;
   for(k = 1; k < N; ++k)
   {
@@ -82,7 +85,8 @@ int main(int argc, char *argv[])
       exit(5);
     }
   }
-  double * U[N];
+  double** U;
+  U = (double**)malloc(N * sizeof(double*));
   U[0] = U0 + 1;
   for(k = 1; k < N; ++k)
   {
@@ -112,7 +116,8 @@ int main(int argc, char *argv[])
     }
   }
   
-  double * P[N];
+  double** P;
+  P = (double**)malloc(N * sizeof(double*));
   P[0] = P0 + 1;
   for(k = 1; k < N; ++k)
   {
@@ -146,11 +151,11 @@ int main(int argc, char *argv[])
   }
 
 
-  double UL[N], PL[N], RHOL[N];
-  double UR[N], PR[N], RHOR[N];
-  double SUL[N], SPL[N], SRHOL[N];
-  double SUR[N], SPR[N], SRHOR[N];
-  double cpu_time[N];
+  double *UL = malloc(N * sizeof(double)), *PL = malloc(N * sizeof(double)), *RHOL = malloc(N * sizeof(double));
+  double *UR = malloc(N * sizeof(double)), *PR = malloc(N * sizeof(double)), *RHOR = malloc(N * sizeof(double));
+  double *SUL = malloc(N * sizeof(double)), *SPL = malloc(N * sizeof(double)), *SRHOL = malloc(N * sizeof(double));
+  double *SUR = malloc(N * sizeof(double)), *SPR = malloc(N * sizeof(double)), *SRHOR = malloc(N * sizeof(double));
+  double *cpu_time = malloc(N * sizeof(double));
 
   for(k = 0; k < N; ++k)
   {
@@ -169,7 +174,8 @@ int main(int argc, char *argv[])
   }
 
 
-  double * E[N];
+  double** E;
+  E = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
     E[k] = (double *)malloc(m * sizeof(double));
@@ -203,7 +209,8 @@ int main(int argc, char *argv[])
     }
   }
 
-  double * X[N];
+  double** X;
+  X = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
     X[k] = (double *)malloc((m+1) * sizeof(double));
@@ -240,7 +247,7 @@ int main(int argc, char *argv[])
   }
 
 
-  double MASS[m];
+  double *MASS=malloc(m * sizeof(double));
 
   for(j = 0; j < m; ++j)
 		  MASS[j]=config[2]*RHO[0][j];                                               
@@ -253,7 +260,8 @@ int main(int argc, char *argv[])
   GRP_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, SRHOL, SUL, SPL, SRHOR, SUR, SPR, cpu_time);
   /* use GRP scheme to solve it on Lagrange coordinate. */
 
-  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[5]); /*write the final data down.
+  example_io(argv[1], add, 0);
+  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[1], add); /*write the final data down.
  								      */ 																								
 
   for(k = 1; k < N; ++k)

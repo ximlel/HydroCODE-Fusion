@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <ctype.h>
 
 
 
@@ -20,7 +20,7 @@
  * there can be only one dot in the string
  * and the only position for it in before 'e'.
  */
-int format_string(char * str)
+static int format_string(char * str)
 {
   int i = 0, length = 0, j = 0;
   int sign = 1;
@@ -118,7 +118,7 @@ int format_string(char * str)
  * consisting '1', '2', ..., and '.'
  * into the real number it represent
  */
-double str2num(char * number)
+static double str2num(char * number)
 {
   double result = 0.0, super_script = 0.0;
   int idx = 0, dot = -2;
@@ -196,8 +196,7 @@ int file_read(FILE * fp, double * U, int num)
 
   while((ch = getc(fp)) != EOF)
   {
-    //if(((ch <45) || ((ch > 57) && (ch != 69) && (ch != 101)) || (ch == 47)) && (idx))
-    if(((ch == ' ') || (ch == '\t') || (ch == '\n')) && (idx))
+    if(isspace(ch) && idx)
     {
       number[idx] = 0;
       idx = 0;
@@ -213,9 +212,10 @@ int file_read(FILE * fp, double * U, int num)
 //printf("%d\t%s\n", sign, number);
 
       U[j] = sign * str2num(number);
+      // U[j] = strtod(number,NULL);
       ++j;
     }
-    else if((ch == 46) || (ch == 45) || ((ch > 47) && (ch < 58)) || (ch == 69) || (ch == 101))
+    else if((ch == 46) || (ch == 45) || (ch == 69) || (ch == 101) || isdigit(ch))
       number[idx++] = ch;
   }
 
