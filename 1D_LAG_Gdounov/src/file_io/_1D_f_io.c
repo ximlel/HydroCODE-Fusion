@@ -1,13 +1,25 @@
+/**
+ * @file  _1D_f_io.c
+ * @brief This is a set of functions which control the reading and readout of
+ *        one-dimensional data.
+ */
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-
 #include <time.h>
 
+#include "../include/file_io.h"
+
+
+/*
+ * To realize cross-platform programming.
+ * MKDIR:  Create a subdirectory.
+ * ACCESS: Determine access permissions for files or folders.
+ */
 #ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
@@ -21,71 +33,74 @@
 #define ACCESS(a) access((a),0)
 #endif
 
-#include "../include/file_io.h"
 
-
+//! Define the number of configuration parameters.
 #ifndef N_CONF
 #define N_CONF 7
-#endif /* N_CONF */
+#endif
 
 
-extern double * U0;
-extern double * P0;
-extern double * RHO0;
+extern double * U0;   //!< Initial velocity data array pointer.
+extern double * P0;   //!< Initial pressure data array pointer.
+extern double * RHO0; //!< Initial density  data array pointer.
 
 /**
-  * @brief      This function counts how many numbers are there in the initial data file. 
-  * @param[in]  fp:  The pointer of the file to read in.
-  * @param[in]  add: The address of the file to read in.
-  * @return     The number of the numbers in the initial data file.
-  *    @retval  -1: If the given number of column is not coincided with that in the data file
-  */
+ * @brief      This function counts how many numbers are there in the initial data file. 
+ * @param[in]  fp:  The pointer to the input file.
+ * @param[in]  add: The address of the input file.
+ * @return     The number of the numbers in the initial data file.
+ *    @retval  -1: If the given number of column is not coincided with that in the data file.
+ */
 static int flu_var_count(FILE * fp, const char * add)
 {
     int num = 0;  // Data number.
     int flg = 0; /* We read characters one by one from the data file.
-		   * "flg" helps us to count.
-		   * -# 1: when read a number-using character (0, 1, 2, ..., e, E, minus sign and dot).
-		   * -# 0: when read a non-number-using character. 
-		   */
+		  * "flg" helps us to count.
+		  * -# 1: when read a number-using character (0, 1, 2, ..., e, E, minus sign and dot).
+		  * -# 0: when read a non-number-using character. 
+		  */
     int ch;
 
-  while((ch = getc(fp)) != EOF)
-  {
-      // Count the data number.
-      if (ch == 45 || ch == 46 || ch == 69 || ch == 101 || isdigit(ch))
-	  flg = 1;
-      else if (!isspace(ch))
-	  {
-	      fprintf(stderr, "Input contains illegal character(ASCII=%d) in the file '%s'!\n", ch, add);
-	      return 0;
-	  }
-      else if (flg)
-	  {
-	      num++;
-	      flg = 0;
-	  }
-  }
-
-  rewind(fp);
-
-  return num;
+    while((ch = getc(fp)) != EOF) // Count the data number.
+	{
+	    if (ch == 45 || ch == 46 || ch == 69 || ch == 101 || isdigit(ch))
+		flg = 1;
+	    else if (!isspace(ch))
+		{
+		    fprintf(stderr, "Input contains illegal character(ASCII=%d) in the file '%s'!\n", ch, add);
+		    return 0;
+		}
+	    else if (flg) // Read in the space.
+		{
+		    num++;
+		    flg = 0;
+		}
+	}
+    
+    rewind(fp);
+    return num;
 }
 
-
-void example_io(const char *name, char *add_mkdir, const int i_or_o)
+/** @brief This function produces folder path for data input or output.
+ *  @param[in]  name:      Name of the test example.
+ *  @param[out] add_mkdir: Folder path for data input or output.
+ *  @param[in]  i_or_o:    Conversion parameters for data input/output.
+ *                         - 0:             data output.
+ *                         - else (e.g. 1): data input.
+ */
+void example_io(const char * name, char * add_mkdir, const int i_or_o)
 {	
     if (i_or_o == 0)
 	strcpy(add_mkdir, "../data_out/one-dim/");
     else
 	strcpy(add_mkdir, "../data_in/one-dim/");
     strcat(add_mkdir, name);
-	printf("%s\n",add_mkdir);
-    if (ACCESS(add_mkdir)==-1) // 文件夹不存在
+
+    if (ACCESS(add_mkdir) == -1) // Folder does not exist.
 	{
 	    if (i_or_o == 0)
 		{
-		    if(MKDIR(add_mkdir))
+		    if(MKDIR(add_mkdir)) // Creat a new folder.
 			{
 			    fprintf(stderr, "Output directory '%s' construction failed.\n", add_mkdir);
 			    exit(1);
@@ -105,30 +120,30 @@ void example_io(const char *name, char *add_mkdir, const int i_or_o)
 
 /** 
   * @brief      This function reads the initial data file of velocity/pressure/density.
-  * @detail     The function initialize the extern pointer RHO0/U0/P0 pointing to the
+  * @details    The function initialize the extern pointer RHO0/U0/P0 pointing to the
   *             position of a block of memory consisting (m+1) variables* of type double.
   *             The value of first of these variables is m.
   *             The following m variables are the initial value.
-  * param[in]   name: Name of the test example.
-  * param[in]   add:  Adress of the initial data file of the test example
+  * @param[in]   name: Name of the test example.
+  * @param[in]   add:  Adress of the initial data file of the test example
   */
-void _1D_initialize(char * name, char * add_in)
+void _1D_initialize(const char * name, const char * add_in)
 {
     char addRHO[FILENAME_MAX], addU[FILENAME_MAX], addP[FILENAME_MAX];
-    FILE * fp_U, * fp_P, * fp_rho; //The pointer of the velocity/pressure/density file to read in.
-    int num_U = 0, num_P = 0, num_rho = 0;  //The number of the numbers in the above data files.
-    char  ch;
-    int file_read_state;
-    
+    // The address of the velocity/pressure/density file to read in.
     strcpy(addRHO, add_in);
     strcat(addRHO, "RHO.txt");
     strcpy(addU, add_in);
     strcat(addU, "U.txt");
     strcpy(addP, add_in);
     strcat(addP, "P.txt");
+
+    FILE * fp_U, * fp_P, * fp_rho; // The pointer to the above data files.
+    int num_U = 0, num_P = 0, num_rho = 0;  // The number of the numbers in the above data files.
+    char ch;
+    int file_read_state;
     
-    printf("%s\n",addRHO);
-  //open the initial data file
+    //open the initial data file
   if((fp_rho = fopen(addRHO, "r")) == 0)
   {
     printf("Cannot open initial data file RHO!\n");
@@ -221,7 +236,7 @@ void _1D_initialize(char * name, char * add_in)
  * config[5] is the total time
  * config[6] is the CFL number
  */
-void _1D_configurate(double * config, char * name, char * add_in)
+void _1D_configurate(double * config, const char * name, const char * add_in)
 {
     FILE * fp_data;
     char add[FILENAME_MAX];
@@ -293,7 +308,9 @@ void _1D_configurate(double * config, char * name, char * add_in)
 /* This function write the solution into an output file.
  * It is quite simple so there will be no more comments.
  */
-void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P[], double * Ene[], double * X[], double * cpu_time, double * config, char * name, char * add_out)
+void _1D_file_write(const int m, const int N, 
+                    double * RHO[], double * U[], double * P[], double * Ene[], double * X[], 
+                    const double * cpu_time, const double * config, const char * name, const char * add_out)
 {
   FILE * fp_write;
   char file_data[FILENAME_MAX] = "";
@@ -308,7 +325,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
   strcat(file_data, "/RHO");
   sprintf(str_time, "_%02d%02d%02d%02d%02d%02d", local_time->tm_year-100, local_time->tm_mon+1, local_time->tm_mday, local_time->tm_hour, local_time->tm_min, local_time->tm_sec);
   //strcat(file_data, str_time);
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
 
   //printf("%s\n", str_time);
 
@@ -331,7 +348,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
 
   strcpy(file_data, add_out);
   strcat(file_data, "/U");
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -347,7 +364,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
 
   strcpy(file_data, add_out);
   strcat(file_data, "/P");
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -364,7 +381,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
 
   strcpy(file_data, add_out);
   strcat(file_data, "/E");
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -380,7 +397,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
 
   strcpy(file_data, add_out);
   strcat(file_data, "/X");
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -396,7 +413,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
 
   strcpy(file_data, add_out);
   strcat(file_data, "/ALL");
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
   if((fp_write = fopen(file_data, "w")) == 0)
   {
     printf("Cannot open solution output file!\n");
@@ -422,7 +439,7 @@ void _1D_file_write(int m, const int N, double * RHO[], double * U[], double * P
 //===================Write LOG File=========================
   strcpy(file_data, add_out);
   strcat(file_data, "/log");
-  strcat(file_data, ".txt");
+  strcat(file_data, ".dat");
 
   if((fp_write = fopen(file_data, "w")) == 0)
   {

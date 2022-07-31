@@ -6,31 +6,29 @@
 #include <ctype.h>
 
 
-
-/* This function examine whether a string
- * represents a real number.
- * Transform the string represents a
- * negtive number into a string represents
- * a positive one and return its' sign.
- * It returns 0 if the string do not
- * represents a real number.
- * After calling this function, there will
- * be only one 'e' in the string, and the
- * only position for '-' is behind 'e', and
- * there can be only one dot in the string
- * and the only position for it in before 'e'.
+/**
+ * @brief   This function examine whether a string represents a real number.
+ * @details Transform the string represents a negtive number into a string
+ *          represents a positive one and return its' sign.
+ *          It returns 0 if the string do not represents a real number.
+ *          After calling this function, there will be only one 'e' in
+ *          the string, and the only position for '-' is behind 'e', and
+ *          there can be only one dot in the string and the only position
+ *          for it in before 'e'.
+ * @param[in]  str:  String to be examined.
+ * @return     The sign of the number represented by the string.
+ *    @retval   1: Positive number.
+ *    @retval  -1: Negative number.
+ *    @retval   0: Not a number.
  */
 static int format_string(char * str)
 {
   int i = 0, length = 0, j = 0;
   int sign = 1;
-  int flag_dot = 0; //the number of dots in the string
-                    //should be at most one
+  int flag_dot = 0; // The number of dots in the string should be at most one.
   int pos_dot = 0;
   int flag_e = 0;
   int pos_e = 0;
-
-  //printf("%send\n", str);
 
   length = strlen(str);
 
@@ -44,17 +42,17 @@ static int format_string(char * str)
     }
   }
 
-  //there could not be more than one 'e' in one number
+  // There could not be more than one 'e' in one number.
   if(flag_e > 1)
     return 0;
   if((flag_e) && (pos_e == 0))
     return 0;
   if((flag_e) && (pos_e == length-1))
     return 0;
-  // a dot only could not be a number
+  // A dot only could not be a number.
   if((str[0] == 46) && (length == 1))
     return 0;
-  // a '-' only could not be a number
+  // A '-' only could not be a number.
   if(str[0] == 45)
   {
     if(length == 1)
@@ -62,7 +60,7 @@ static int format_string(char * str)
     sign = -1;
   }
 
-  // eliminate '-' from the string and return -1
+  // Eliminate '-' from the string and return -1.
   if(sign < 0)
   {
     for(i = 0; i < length; ++i)
@@ -79,14 +77,13 @@ static int format_string(char * str)
     {
       if(str[i] == 45)
       {
-      // after eliminate '-', the only possible position for '-'
-      // is behind 'e'
+      // After eliminate '-', the only possible position for '-' is behind 'e'
         if((i-pos_e) != 1)
 	  return 0;
 	else if(i == length-1)
 	  return 0;
       }
-      //there could not be two dots in one number
+      // There could not be two dots in one number.
       else if((str[i] == 46) && (flag_dot > 0))
         return 0;
       else if(str[i] == 46)
@@ -114,9 +111,13 @@ static int format_string(char * str)
   return sign;
 }
 
-/* this function trans form a string
- * consisting '1', '2', ..., and '.'
- * into the real number it represent
+/**
+ * @brief This function transform a string consisting '1', '2',
+ *        ..., and '.' into the real number that it represents.
+ * @param[in]  number: String of the real number.
+ * @return     The real number that the string represents.
+ * @deprecated This function has been replaced by the 'strtod()'
+ *             function in the standard Library <stdio.h>.
  */
 static double str2num(char * number)
 {
@@ -133,12 +134,6 @@ static double str2num(char * number)
   for(j = 0; j < length; ++j)
     if(number[j] == 101)
       pos_e = j;
-
-  /*
-  for(k = 0; k < length; ++k)
-    printf("%c", number[k]);
-  printf("\t");
-  */
 
   if(pos_e)
   {
@@ -182,15 +177,18 @@ static double str2num(char * number)
 }
 
 
-/* This function reads the initial data file
- * to generate the initial data.
- * It returns 0 if successfully read the file,
- * while returns the index of the wrong entry.
+/**
+ * @brief This function reads the initial data file to generate the initial data.
+ * @param[in]  fp: The pointer to the input file.
+ * @param[out]  U: The pointer to the data array.
+ * @param[in] num: The number of the numbers in the input file. 
+ * @return It returns 0 if successfully read the file,
+ *         while returns the index of the wrong entry.
  */
-int file_read(FILE * fp, double * U, int num)
+int file_read(FILE * fp, double * U, const int num)
 {
-  int idx = 0, j = 0; //j is a frequently used index for spatial variables
-  char number[100];
+  int idx = 0, j = 0; // j is a frequently used index for spatial variables.
+  char number[100]; // A string that stores a number.
   char ch;
   int sign = 1;
 
@@ -201,18 +199,14 @@ int file_read(FILE * fp, double * U, int num)
       number[idx] = 0;
       idx = 0;
       
-//printf("%s\t",number);
-
       sign = format_string(number);
       if(!sign)
 	return j+1;
       if(j == num)
 	return j;
 
-//printf("%d\t%s\n", sign, number);
-
-      U[j] = sign * str2num(number);
-      // U[j] = strtod(number,NULL);
+      // U[j] = sign * str2num(number);
+      U[j] = strtod(number,NULL);
       ++j;
     }
     else if((ch == 46) || (ch == 45) || (ch == 69) || (ch == 101) || isdigit(ch))

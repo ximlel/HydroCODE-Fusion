@@ -1,7 +1,7 @@
-N_STEP=62;
-load RHO.txt
-load U.txt
-load X.txt
+N_STEP=48;
+load RHO.dat
+load U.dat
+load X.dat
 rho_p=RHO(N_STEP,:);
 u_p  =U(N_STEP,:);
 x_p  =X(N_STEP,:);
