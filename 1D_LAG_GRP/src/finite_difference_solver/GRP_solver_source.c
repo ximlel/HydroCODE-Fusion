@@ -12,7 +12,7 @@
 #include "../include/finite_difference_solver.h"
 
 
-/* This function use GRP scheme to solve 1-D
+/* This function use GRP scheme to solve 1-D Euler
  * equations of motion On Lagrange coordinate.
  *
  *[config] is the array of configuration data, the detail

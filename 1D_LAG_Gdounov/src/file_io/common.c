@@ -1,8 +1,12 @@
+/**
+ * @file  common.c
+ * @brief This is a set of common functions for string and number processing.
+ */
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 
 

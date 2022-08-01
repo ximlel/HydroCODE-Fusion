@@ -1,9 +1,9 @@
 #!/bin/bash
 
 cd ./file_io/
-gcc -c ./comman.c
+gcc -c ./common.c
 gcc -c ./_1D_f_io.c -I ../
-ar crv file_io.a comman.o _1D_f_io.o
+ar crv file_io.a common.o _1D_f_io.o
 
 cd ../Riemann_solver/
 gcc -c ./Riemann_solver_exact.c -g

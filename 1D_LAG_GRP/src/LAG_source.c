@@ -1,5 +1,5 @@
 /* 
- * This is a implementation of fully explict forward Euler scheme for 1-D equations of motion on Lagrange coordinate
+ * This is an implementation of fully explict forward Euler scheme for 1-D equations of motion on Lagrange coordinate
  */
 #include <stdio.h>
 #include <stdlib.h>

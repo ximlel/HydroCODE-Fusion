@@ -12,7 +12,7 @@
 #include "../include/finite_difference_solver.h"
 #include "../include/Riemann_solver.h"
 
-/* This function use Godunov scheme to solve 1-D
+/* This function use Godunov scheme to solve 1-D Euler
  * equations of motion on Lagrange coordinate.
  *
  *[config] is the array of configuration data, the detail
@@ -38,7 +38,7 @@ void Godunov_solver_source
   double const eps = config[3];    // the largest value could be
                                    // seen as zero
   double const h = config[2];      // the length of the initial spatial grids
-  double tau = config[1];    // the length of the time step
+  double tau = config[1];          // the length of the time step
   double const gamma = config[0];      // the constant of the perfect gas
   double const t_all = config[5];      // the total time
   double const CFL   = config[6];      // the CFL number

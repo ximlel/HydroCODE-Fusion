@@ -1,20 +1,33 @@
-#include <math.h>
+  #include <math.h>
 #include <stdio.h>
 
 
 /**
- * @brief      EXACT RIEMANN SOLVER FOR THE EULER EQUATIONS
- * @details    
- * @param[in]  U_star, P_star Velocity and Pressure values in the star region
- *             gamma          specific heat ratio
+ * @brief EXACT RIEMANN SOLVER FOR A \gamma-Law Gas
+ * @details The purpose of this function is to solve the Riemann problem exactly,
+ *          for the time dependent one dimensional Euler equations for a \gamma-law gas.
+ * @param[out] U_star, P_star: Velocity/Pressure in star region.
+ * @param[in]  u_L, p_L, c_L: Initial Velocity/Pressure/sound_speed on left  state.
+ * @param[in]  u_R, p_R, c_R: Initial Velocity/Pressure/sound_speed on right state.
+ * @param[in]  gamma: Ratio of specific heats.
+ * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
+ *                  - 1: CRW
+ *                  - 0: Shock wave
+ * @param[in]  eps: The largest value can be seen as zero.
+ * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
+ * @param[in]  N:   Maximum iteration step.
+ * @return \b gap: Relative pressure change after the last iteration.
+ * @par  Reference
+ *       Theory is found in Appendix C of Reference [1]. \n
+ *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
+ *           Cambridge University Press, 2003
  */
-
-
-double Riemann_solver_exact(double * U_star, double * P_star, double gamma, double u_L, double u_R, double p_L, double p_R, double c_L, double c_R, int * CRW, double eps, double tol, int N)
+double Riemann_solver_exact(double * U_star, double * P_star, const double gamma,
+			    const double u_L, const double u_R, const double p_L, const double p_R,
+			    const double c_L, const double c_R, int * CRW,
+			    const double eps, const double tol, const int N)
 {
-  //double zeta_l, zeta_r;
   double mu, nu, sigma;
-  //double c_L, c_R;
   double delta_p, u_LR, u_RL;
   double k1, k3, p_INT, p_INT0, u_INT;
   double rho_star_l, rho_star_r;
@@ -26,14 +39,6 @@ double Riemann_solver_exact(double * U_star, double * P_star, double gamma, doub
   mu = (gamma-1.0) / (2.0*gamma);
   nu = (gamma+1.0) / (2.0*gamma);
   sigma = (gamma - 1.0) / (gamma + 1.0);
-
-  //c_L = sqrt(gamma * p_L / rho_l);
-  //c_R = sqrt(gamma * p_R / rho_r);
-  //rho_l = 1.0 / rho_l;
-  //rho_r = 1.0 / rho_r;
-
-  //zeta_l = pow(p_L, (gamma-1.0) / (2.0*gamma));
-  //zeta_r = pow(p_R, (gamma-1.0) / (2.0*gamma));
 
   //=====find out the kinds of the 1-wave and the 3-wave, page 132 in the GRP book
   //find out where (u_LR,p_R) lies on the curve of LEFT state
