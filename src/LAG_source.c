@@ -27,13 +27,15 @@
  *          - Winodws: Visual Studio, MATLAB
  *
  * @section Usage_description Usage description
- *          - Store input files in folder '/data_in/one-dim/name_of_test_example'.
+ *          - Input files are stored in folder '/data_in/one-dim/name_of_test_example'.
  *          - Input files may be produced by MATLAB script 'value_start.m'.
  *          - Description of configuration file 'config.txt' refers to '_1D_configurate()'.
  *          - Run program:
- *            - Linux/Unix: Run 'LAG_source.out name_of_test_example' command on the terminal.
+ *            - Linux/Unix: Run 'LAG_source.out name_of_test_example order' command on the terminal. \n
+ *                          e.g. 'LAG_source.out 6_1 2' (second-order GRP scheme)
  *            - Windows:
- *          - Input files may be visualized by MATLAB script 'value_plot.m'.
+ *          - Output files can be found in folder '/data_out/one-dim/'.
+ *          - Output files may be visualized by MATLAB script 'value_plot.m'.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,52 +46,30 @@
 #include "include/finite_difference_solver.h"
 #include "include/Riemann_solver.h"
 
-#ifndef N_CONF
-#define N_CONF 7
-#endif /* N_CONF */
-
-double * U0 = NULL;
-double * P0 = NULL;
-double * RHO0 = NULL;
 
 int main(int argc, char *argv[])
 {
     char add[FILENAME_MAX];
     example_io(argv[1], add, 1);
-    _1D_initialize(argv[1], add);  /* Firstly we read the initial
-				       * data file. The function 
-				       * initialize return a point
-				       * pointing to the position
-				       * of a block of memory
-				       * consisting (m+1) variables
-				       * of type double.
-				       * The value of first of these
-				       * variables is m. The
-				       * following m variables
-				       * are the initial value.
-				       */
-  int m = (int)U0[0];  /* m is the number of initial value
-			* as well as the number of grids.
-			* As m is frequently use to
-			* represent the number of grids,
-			* we do not use the name such as
-			* num_grid here to correspond to
-			* notation in the math theory.
-			*/
-  double config[N_CONF];  /* config[0] is the constant of the perfect gas
-                           * config[1] is the length of the time step
-			   * config[2] is the spatial grid size
-			   * config[3] is the largest value can be
-			   *           seen as zero
-			   * config[4] is the number of time steps
-			   */
-  _1D_configurate(config, argv[1], add); /* Read the config-
-					      * uration data.
-					      * The detail could
-					      * be seen in the
-					      * definition of
-					      * array config.
-					      */
+    /* Firstly we read the initial data file.
+     * The function initialize return a point pointing to the position
+     * of a block of memory consisting (m+1) variables of type double.
+     * The value of first of these variables is m.
+     * The following m variables are the initial value.
+     */
+    _1D_initialize(argv[1], add); 
+    /* m is the number of initial value as well as the number of grids.
+     * As m is frequently use to represent the number of grids,
+     * we do not use the name such as num_grid here to correspond to
+     * notation in the math theory.
+     */
+    int m = (int)U0[0];
+    
+  double config[N_CONF];
+  /* Read the configuration data.
+   * The detail could be seen in the definition of array config.
+   */
+  _1D_configurate(config, argv[1], add); 
 
   int j = 0, k = 0, N = (int)(config[4]) + 1, i = 0;
   int order;
@@ -185,7 +165,6 @@ int main(int argc, char *argv[])
     }
   }
 
-
   double *UL = malloc(N * sizeof(double)), *PL = malloc(N * sizeof(double)), *RHOL = malloc(N * sizeof(double));
   double *UR = malloc(N * sizeof(double)), *PR = malloc(N * sizeof(double)), *RHOR = malloc(N * sizeof(double));
   double *SUL, *SPL, *SRHOL;
@@ -280,19 +259,18 @@ int main(int argc, char *argv[])
     }
   }
 
-
   double *MASS=malloc(m * sizeof(double));
 
+  // Initialize the values of mass,coordinate and energy.
   for(j = 0; j < m; ++j)
 		  MASS[j]=config[2]*RHO[0][j];                                               
   for(j = 0; j <= m; ++j)
 		  X[0][j] = config[2]*j;
   for(j = 0; j < m; ++j)
-		  E[0][j] = 0.5*U[0][j]*U[0][j] + P[0][j]/(config[0] - 1.0)/RHO[0][j]; /* initialize the values of mass,coordinate and energy.
-											*/
+		  E[0][j] = 0.5*U[0][j]*U[0][j] + P[0][j]/(config[0] - 1.0)/RHO[0][j]; 
 
 
-  /* use GRP/Godunov scheme to solve it on Lagrange coordinate. */
+  // use GRP/Godunov scheme to solve it on Lagrange coordinate. 
   if (order == 2)
       GRP_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, SRHOL, SUL, SPL, SRHOR, SUR, SPR, cpu_time);
   else
@@ -305,8 +283,8 @@ int main(int argc, char *argv[])
   strcat(name_out, "Order");
   printf("%s\n",add);
   example_io(name_out, add, 0);
-  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[1], add); /*write the final data down.
- 								      */ 																								
+  // Write the final data down.
+  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[1], add);
 
   for(k = 1; k < N; ++k)
   {
@@ -334,7 +312,6 @@ int main(int argc, char *argv[])
   E[0] = NULL;
   free(X[0]);
   X[0] = NULL;
-
 
   printf("\n");
   return 0;

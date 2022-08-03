@@ -9,7 +9,6 @@
 #define ISNAN(a) isnan((a))
 #endif
 
-#include "../include/finite_difference_solver.h"
 #include "../include/Riemann_solver.h"
 
 /* This function use Godunov scheme to solve 1-D Euler

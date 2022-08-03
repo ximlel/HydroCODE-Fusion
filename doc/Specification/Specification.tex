@@ -1,16 +1,16 @@
-\documentclass{article}
+\documentclass[CJK]{ctexart}
+
 \usepackage{fontspec}
+\usepackage{amsmath}
 \usepackage[hmargin=1.25in,vmargin=1in]{geometry}
-\setmainfont{微软雅黑}
-\XeTeXlinebreaklocale "zh"
-\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+
 \begin{document}
 \title{程序说明}
 \date{}
 \maketitle
 
 \section{程序结构}
-\ \\
+
 \begin{table}[htbp]
 \begin{tabular}{|l|l|}
 \hline
@@ -31,47 +31,55 @@
 \end{tabular}
 \end{table}
 
-在终端下运行make.sh即可使用gcc编译，使用MATLAB程序画图。
+在Linux终端下运行make.sh即可使用gcc编译程序, 使用MATLAB软件画图.
 
-\section{格式}
-\ \\
+具体如何查看程序的使用指南, 请参考README.md中的介绍.
 
-精确Riemann解法器根据[1]所写，$u^{*},p^{*}$为Rienmann问题$*$区域的解。
+\section{数值格式}
 
-格式为向前Euler：(GRP/Gdounov\_solver\_source.c)
+精确Riemann解法器根据【1】或者【2】(Appendix C)所写.
 
-$m_i(1/\rho_i^{n+1}-1/\rho_i^{n})-\Delta t(u_{i+1/2}^n-u_{i-1/2}^n)=0$，
+向前Euler格式 (GRP/Gdounov\_solver\_source.c):
+\begin{align*}
+& m_i(1/\rho_i^{n+1}-1/\rho_i^{n})-\Delta t(u_{i+1/2}^{n+1/2}-u_{i-1/2}^{n+1/2})=0,\\
+& m_i(u_i^{n+1}-u_i^{n})+\Delta t(p_{i+1/2}^{n+1/2}-p_{i-1/2}^{n+1/2})=0,\\
+& m_i(e_i^{n+1}-e_i^{n})+\Delta t(p_{i+1/2}^{n+1/2} u_{i+1/2}^{n+1/2}-p_{i-1/2}^{n+1/2} u_{i-1/2}^{n+1/2})=0.
+\end{align*}
+接触间断的位置计算:
+$$
+x_{i+1/2}^{n+1}=x_{i+1/2}^{n}+\Delta t u_{i+1/2}^{n+1/2}.
+$$
+网格节点$i+1/2$处的平均数值通量:
+\begin{align*}
+& u_{i+1/2}^{n+1/2}=u_{i+1/2}^{*,n}+\frac{\Delta t}{2}\left(\frac{D u}{D t}\right)_{i+1/2}^{n}, \\
+& p_{i+1/2}^{n+1/2}=p_{i+1/2}^{*,n}+\frac{\Delta t}{2}\left(\frac{D p}{D t}\right)_{i+1/2}^{n}.
+\end{align*}
+其中$u^{*},p^{*}$为Rienmann问题中$*$区域内的解.
 
-$m_i(u_i^{n+1}-u_i^{n})+\Delta t(p_{i+1/2}^n-p_{i-1/2}^n)=0$，
+\begin{itemize}
+\item 拉式Gdounov格式 (Gdounov\_solver\_source.c)
+$$
+\left(\frac{D u}{D t}\right)_{i+1/2}^{n}=0, \quad \left(\frac{D p}{D t}\right)_{i+1/2}^{n}=0
+$$. 
 
-$m_i(e_i^{n+1}-e_i^{n})+\Delta t(p_{i+1/2}^nu_{i+1/2}^n-p_{i-1/2}^nu_{i-1/2}^n)=0$。
+\item 拉式GRP格式 (GRP\_solver\_source.c)
 
-接触间断的位置计算：
+通过斜率限制器重构得到的斜率求出接触间断处的物质导数, 由GRP解法器 (linear\_GRP\_solver\_LAG.c) 计算出时间导数, 通过完全显式向前Euler格式更新, 再计算出斜率.
+\end{itemize}
 
-$x_{i+1/2}^{n+1}=x_{i+1/2}^{n}+\Delta tu_{i+1/2}^{n+1/2}$。
+\section{数值算例}
 
-节点$j+1/2$时平均数值通量：
+\subsection*{6.1 Sod激波管}
 
-$u_{i+1/2}^{n+1/2}=u_{i+1/2}^{*n}+\frac{\Delta t}{2}(\frac{D u}{D t})_{i+1/2}^{n}$，
+\subsection*{6.2.1 Shock-Contact相互作用}
 
-$p_{i+1/2}^{n+1/2}=p_{i+1/2}^{*n}+\frac{\Delta t}{2}(\frac{D p}{D t})_{i+1/2}^{n}$。
+\section*{References}
 
-拉式Gdounov格式$(\frac{D u}{D t})_{i+1/2}^{n}，(\frac{D p}{D t})_{i+1/2}^{n}$取0。
-
-拉式GRP格式由斜率求接触间断处的物质导数(GRP\_solver\_source.c)，由GRP格式算出时间导数(linear\_GRP\_solver\_LAG.c)，向前Euler,再通过斜率限制器得到斜率(GRP\_solver\_source.c)。
-
-\section{算例}
-\ \\
-
-6.1 sod激波管，
-
-6.2.1 Shock-Contact Interaction。
-
-画的图为转换到欧拉坐标下的RHO,U,P以及拉式坐标的图。
-
-
-\section*{Refences}
-[1] E. F. Toro. A Fast Riemann Solver with Constant Covolume Applied to the
+\begin{itemize}
+\item[【1】] E. F. Toro, A Fast Riemann Solver with Constant Covolume Applied to the
 Random Choice Method. Int. J. Numer. Meth. Fluids, 9:1145–1164, 1989.
+
+\item[【2】] M. Ben-Artzi \& J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", Cambridge University Press, 2003.
+\end{itemize}
 
 \end{document}

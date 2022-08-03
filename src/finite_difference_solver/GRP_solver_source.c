@@ -9,11 +9,11 @@
 #define ISNAN(a) isnan((a))
 #endif
 
-#include "../include/finite_difference_solver.h"
+#include "../include/Riemann_solver.h"
 
 
 /* This function use GRP scheme to solve 1-D Euler
- * equations of motion On Lagrange coordinate.
+ * equations of motion on Lagrange coordinate.
  *
  *[config] is the array of configuration data, the detail
  *         could be seen in the comments of the main function.
