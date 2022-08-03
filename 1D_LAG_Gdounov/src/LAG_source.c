@@ -14,11 +14,11 @@
  * @section Program_structure Program structure
  * <table>
  * <tr><th> include/                   <td> Header files
- * <tr><th> file_io/                   <td> Program reads and writes files.
- * <tr><th> finite_difference_solver/  <td> Lagrangian finite volume scheme program.
- * <tr><th> Riemann_solver/            <td> Riemann solver programs.
+ * <tr><th> file_io/                   <td> Program reads and writes files
+ * <tr><th> finite_difference_solver/  <td> Lagrangian finite volume scheme program
+ * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> LAG_source.c               <td> Main program
- * <tr><th> make.sh                    <td> Bash script compiles and runs programs.
+ * <tr><th> make.sh                    <td> Bash script compiles and runs programs
  * </table>
  * 
  * @section Compile_environment Compile environment
@@ -27,8 +27,13 @@
  *          - Winodws: Visual Studio, MATLAB
  *
  * @section Usage_description Usage description
- *          - Linux/Unix: Run 'LAG_source.out name_of_test_example' command on the terminal.
- *          - Windows:
+ *          - Store input files in folder '/data_in/one-dim/name_of_test_example'.
+ *          - Input files may be produced by MATLAB script 'value_start.m'.
+ *          - Description of configuration file 'config.txt' refers to '_1D_configurate()'.
+ *          - Run program:
+ *            - Linux/Unix: Run 'LAG_source.out name_of_test_example' command on the terminal.
+ *            - Windows:
+ *          - Input files may be visualized by MATLAB script 'value_plot.m'.
  */
 #include <stdio.h>
 #include <stdlib.h>

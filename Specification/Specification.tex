@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{fontspec}
+\usepackage[hmargin=1.25in,vmargin=1in]{geometry}
 \setmainfont{微软雅黑}
 \XeTeXlinebreaklocale "zh"
 \XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
@@ -10,25 +11,27 @@
 
 \section{程序结构}
 \ \\
+\begin{table}[htbp]
+\begin{tabular}{|l|l|}
+\hline
+\textbf{data\_in}  & 放置输入初始数据文件RHO,U,P,config的文件夹\\
+\hline
+\textbf{data\_out} & 放置输出计算过程中RHO,U,P,E和拉式坐标X变化结果的文件夹\\
+\hline
+\textbf{file\_io}  & 数据文件读入与读出的程序\\
+\hline
+\textbf{finite\_difference\_solver} & 有限格式的算法程序\\
+\hline
+\textbf{Riemann\_solver} & 精确Riemann解法器\\
+\hline
+\textbf{LAG\_source.c}   & 主程序\\
+\hline
+\textbf{make.sh}         & 编译和运行程序的脚本\\
+\hline
+\end{tabular}
+\end{table}
 
-\textbf{data\_in} 文件夹放置输入文件RHO,U,P；
-其中config文件中依次为气体常数，时间步长，网格宽度，可识别的最小非0正数，时间步数。
-
-\textbf{plot} 文件夹输出RHO,U,P变化图。
-
-\textbf{data\_out} 文件夹输出计算过程中RHO,U,P和拉式坐标的变化。
-
-\textbf{file\_io} 为文件处理程序。
-
-\textbf{finite\_difference\_solver} 为算法格式文件。
-
-\textbf{Riemann\_solver} 为精确Riemann解法器。
-
-\textbf{LAG\_source.c} 是主程序。
-
-\textbf{make.sh} 为编译和运行程序的脚本。
-
-在终端下运行make.sh即可，gcc编译，gnuplot画图。
+在终端下运行make.sh即可使用gcc编译，使用MATLAB程序画图。
 
 \section{格式}
 \ \\

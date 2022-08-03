@@ -17,7 +17,7 @@ end
 for i=(interface+1):column
     rho(i)=rho_2;
 end
-fid = fopen('RHO.txt','wt');
+fid = fopen('RHO.dat','wt');
 for j=1:line
 fprintf(fid,'%12.10f\t',rho);
 fprintf(fid,'\n');
@@ -31,7 +31,7 @@ end
 for i=(interface+1):column
     u(i)=u_2;
 end
-fid = fopen('U.txt','wt');
+fid = fopen('U.dat','wt');
 for j=1:line
 fprintf(fid,'%12.10f\t',u);
 fprintf(fid,'\n');
@@ -45,7 +45,7 @@ end
 for i=(interface+1):column
     p(i)=p_2;
 end
-fid = fopen('P.txt','wt');
+fid = fopen('P.dat','wt');
 for j=1:line
 fprintf(fid,'%12.10f\t',p);
 fprintf(fid,'\n');

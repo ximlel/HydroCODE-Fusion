@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 #include <time.h>
 
@@ -33,16 +32,6 @@
 #define ACCESS(a) access((a),0)
 #endif
 
-
-//! Define the number of configuration parameters.
-#ifndef N_CONF
-#define N_CONF 7
-#endif
-
-
-extern double * U0;   //!< Initial velocity data array pointer.
-extern double * P0;   //!< Initial pressure data array pointer.
-extern double * RHO0; //!< Initial density  data array pointer.
 
 /**
  * @brief      This function counts how many numbers are there in the initial data file. 

@@ -10,9 +10,10 @@ gcc -c ./Riemann_solver_exact.c -g
 
 
 cd ../finite_difference_solver/
+gcc -c ./Godunov_solver_source.c -I ../ -g
 gcc -c ./GRP_solver_source.c -I ../ -g
 gcc -c ./linear_GRP_solver_LAG.c -I ../ -g
-ar crv finite_difference_solver.a GRP_solver_source.o linear_GRP_solver_LAG.o
+ar crv finite_difference_solver.a Godunov_solver_source.o GRP_solver_source.o linear_GRP_solver_LAG.o
 ranlib finite_difference_solver.a
 
 cd ../
