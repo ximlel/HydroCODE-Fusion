@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -13,8 +14,10 @@
 
 #ifdef _WIN32
 #define ISNAN(a) _isnan((a))
+#define ISERR(a) !_finite((a))
 #elif __linux__
-#define ISNAN(a) isnan((a))
+#define ISNAN(a)    isnan((a))
+#define ISERR(a) !isfinite((a))
 #endif
 
 /**
@@ -58,7 +61,7 @@ void Godunov_solver_source
   double *p_mid = malloc((m + 1) * sizeof(double));
   if(u_mid == NULL || p_mid == NULL)
       {
-	  printf("NOT enough memory! mid variables\n");
+	  printf("NOT enough memory! Mid Variables\n");
 	  goto _END_;
       }
 
@@ -66,13 +69,14 @@ void Godunov_solver_source
   double time_c = 0.0; // the current time
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL; // Left  boundary condition
-  double UR, PR, RHOR; // Right boundary condition
+  double UL, PL, RHOL, HL; // Left  boundary condition
+  double UR, PR, RHOR, HR; // Right boundary condition
   if (bound == -1) // initial boudary conditions
       {
 	  UL   =   U[0][0]; UR   =   U[0][m-1];
 	  PL   =   P[0][0]; PR   =   P[0][m-1];
 	  RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
+	  HL  = h; HR = h;
       }
 
 //-----------------------THE MAIN LOOP--------------------------------
@@ -86,18 +90,24 @@ void Godunov_solver_source
 	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	  }
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
+	}
       if (bound == -4) // free boundary conditions
 	  {
 	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
 	  }
       if (bound == -5) // periodic boundary conditions
 	  {
 	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
+	      HL = X[n-1][m] - X[n-1][m-1];
+	      HR = X[n-1][1] - X[n-1][0];
 	  }
       
       for(j = 0; j <= m; ++j)
@@ -115,7 +125,7 @@ void Godunov_solver_source
 		  }
 	      else
 		  {
-		      h_L   =    h;
+		      h_L   =   HL;
 		      rho_L = RHOL;
 		      u_L   =   UL;
 		      p_L   =   PL;
@@ -129,7 +139,7 @@ void Godunov_solver_source
 		  }
 	      else
 		  {
-		      h_R   =    h;
+		      h_R   =   HR;
 		      rho_R = RHOR;
 		      u_R   =   UR;
 		      p_R   =   PR;
@@ -146,12 +156,12 @@ void Godunov_solver_source
 
 	      if(p_star < eps)
 		  {
-		      printf("<0.0 error on %d \t %d (t_n, x) STAR\n", k, j);
+		      printf("<0.0 error on [%d, %d] (t_n, x) STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(ISNAN(p_star)||ISNAN(u_star))
+	      if(ISERR(p_star)||ISERR(u_star))
 		  {
-		      printf("NAN error on %d \t %d (t_n, x) STAR\n", k, j); 
+		      printf("NAN or INFinite error on [%d, %d] (t_n, x) STAR\n", k, j); 
 		      time_c = t_all;
 		  }
 	      u_mid[j] = u_star;
@@ -164,10 +174,7 @@ void Godunov_solver_source
         tau = t_all - time_c;
     
     for(j = 0; j <= m; ++j)
-	{
-	    X[n][j] = X[n-1][j] + tau * u_mid[j]; // motion along the contact discontinuity
-	    X[n-1][j] = X[n][j];
-	}
+	X[n][j] = X[n-1][j] + tau * u_mid[j]; // motion along the contact discontinuity
 
 //======================THE CORE ITERATION=========================(On Lagrange Coordinate)
     for(j = 0; j < m; ++j) // forward Euler
@@ -179,21 +186,17 @@ void Godunov_solver_source
 	    RHO[n][j] = 1 / (1/RHO[n-1][j] + tau/MASS[j]*(u_mid[j+1] - u_mid[j]));
 	    U[n][j]   = U[n-1][j] - tau/MASS[j]*(p_mid[j+1] - p_mid[j]);
 	    E[n][j]   = E[n-1][j] - tau/MASS[j]*(p_mid[j+1]*u_mid[j+1] - p_mid[j]*u_mid[j]);
-	    P[n][j]   = (E[n][j] - 0.5*U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
+	    P[n][j]   = (E[n][j] - 0.5 * U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
 	    if(P[n][j] < eps || RHO[n][j] < eps)
 		{
-		    printf("<0.0 error on %d \t %d (t_n, x)\n", k, j);
+		    printf("<0.0 error on [%d, %d] (t_n, x)\n", k, j);
 		    time_c = t_all;
 		}
-	    if(ISNAN(P[n][j])||ISNAN(U[n][j])||ISNAN(RHO[n][j]))
+	    if(ISERR(P[n][j])||ISERR(U[n][j])||ISERR(RHO[n][j]))
 		{
-		    printf("NAN error on %d \t %d (t_n, x)\n", k, j); 
+		    printf("NAN or INFinite error on [%d, %d] (t_n, x)\n", k, j); 
 		    time_c = t_all;
 		}
-	    RHO[n-1][j] = RHO[n][j];
-	    U[n-1][j]   =   U[n][j];
-	    E[n-1][j]   =   E[n][j];  
-	    P[n-1][j]   =   P[n][j];  
 	}
 
 //============================Time update=======================
@@ -208,6 +211,17 @@ void Godunov_solver_source
 	    printf("Time is up in time step %d.\n", k);
 	    break;
 	}
+
+//===========================Fixed variable location=======================	
+    for(j = 0; j <= m; ++j)
+	X[n-1][j] = X[n][j];
+    for(j = 0; j < m; ++j)
+	{
+	    RHO[n-1][j] = RHO[n][j];
+	    U[n-1][j]   =   U[n][j];
+	    E[n-1][j]   =   E[n][j];  
+	    P[n-1][j]   =   P[n][j];
+	}	
   }
 
   printf("The cost of CPU time for 1D-Godunov scheme for this problem is %g seconds.\n", cpu_time_sum);

@@ -67,7 +67,7 @@ static int format_string(char * str)
   // Eliminate '-' from the string and return -1.
   if(sign < 0)
   {
-    for(i = 0; i < length; ++i)
+    for(i = 0; i < length; ++i) // Eliminate '-'
       str[i] = str[i+1];
     length -= 1;
     pos_e -= 1;
@@ -210,7 +210,7 @@ int file_read(FILE * fp, double * U, const int num)
 	return j;
 
       // U[j] = sign * str2num(number);
-      U[j] = strtod(number,NULL);
+      U[j] = sign * strtod(number,NULL);
       ++j;
     }
     else if((ch == 46) || (ch == 45) || (ch == 69) || (ch == 101) || isdigit(ch))

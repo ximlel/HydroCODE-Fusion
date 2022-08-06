@@ -7,6 +7,7 @@
  * @mainpage 1D Godunov/GRP scheme for Lagrangian hydrodynamics
  * @brief This is an implementation of fully explict forward Euler scheme
  *        for 1-D Euler equations of motion on Lagrange coordinate.
+ * @version 0.1
  *
  * @section File_directory File directory
  * <table>
@@ -199,7 +200,6 @@ int main(int argc, char *argv[])
   strcat(name_out, "_");
   strcat(name_out, argv[2]);
   strcat(name_out, "Order");
-  printf("%s\n",add);
   example_io(name_out, add, 0);
   // Write the final data down.
   _1D_file_write(m, N, RHO, U, P, E, X, cpu_time, config, argv[1], add);

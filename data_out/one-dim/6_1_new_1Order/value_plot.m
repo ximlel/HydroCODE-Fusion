@@ -1,4 +1,4 @@
-N_STEP=48;
+N_STEP=2;
 load RHO.dat
 load U.dat
 load X.dat

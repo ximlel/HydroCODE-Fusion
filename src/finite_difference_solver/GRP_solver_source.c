@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -13,8 +14,10 @@
 
 #ifdef _WIN32
 #define ISNAN(a) _isnan((a))
+#define ISERR(a) !_finite((a))
 #elif __linux__
-#define ISNAN(a) isnan((a))
+#define ISNAN(a)    isnan((a))
+#define ISERR(a) !isfinite((a))
 #endif
 
 /**
@@ -85,13 +88,21 @@ void GRP_solver_source
   double s_u_R, s_p_R, s_rho_R;
   double t_u_L, t_p_L, t_rho_L;
   double t_u_R, t_p_R, t_rho_R;
-  double dire[4], mid[4];  //RHO_L_t,U_t,P_t,RHO_R_t.  double slope_temp;
-  // the paramater in slope limiters
+  /*
+   * dire: the temporal derivative of fluid variables.
+   *       \frac{\partial [rho_L, u, p, rho_R]}{\partial t}
+   * mid:  the Riemann solutions.
+   *       [rho_star_L, u_star, p_star, rho_star_R]
+   */
+  double dire[4], mid[4];
+  // the paramater in slope limiters.
   double alpha = 0.0; //1.9;
 
+  // the slopes of variable values
   double *s_rho, *s_u, *s_p;
+  // the variable values at (x_{j-1/2}, t_{n+1}).
   double *U_next, *P_next, *RHO_next_L, *RHO_next_R;
-  double *U_F, *P_F; // the numerical flux at t_{n+1/2}  
+  double *U_F, *P_F; // the numerical flux at (x_{j-1/2}, t_{n+1/2}).
   s_rho = calloc(m, sizeof(double));
   s_u   = calloc(m, sizeof(double));
   s_p   = calloc(m, sizeof(double));
@@ -121,8 +132,8 @@ void GRP_solver_source
   double time_c = 0.0; // the current time
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, SUL, SPL, SRHOL, HL; // Left  boundary condition
-  double UR, PR, RHOR, SUR, SPR, SRHOR, HR; // Right boundary condition
+  double UL, PL, RHOL, HL, SUL, SPL, SRHOL; // Left  boundary condition
+  double UR, PR, RHOR, HR, SUR, SPR, SRHOR; // Right boundary condition
   if (bound == -1) // initial boudary conditions
       {
 	  UL   =   U[0][0]; UR   =   U[0][m-1];
@@ -147,7 +158,7 @@ void GRP_solver_source
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
+	}
       if (bound == -4) // free boundary conditions
 	  {
 	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
@@ -166,7 +177,7 @@ void GRP_solver_source
 	  }
       
 //=================Initialize slopes=====================
-      for(j = 0; j < m; ++j)
+      for(j = 0; j < m; ++j) // Reconstruct slopes
 	  { /*
 	     *  j-1          j          j+1
 	     * j-1/2  j-1  j+1/2   j   j+3/2  j+1
@@ -217,7 +228,7 @@ void GRP_solver_source
 	  {
 	      SUL = - s_u[0]; SUR = - s_u[m-1];
 	  }
-      if (bound == -4) // free boundary conditions
+      if (bound == -5) // periodic boundary conditions
 	  {
 	      SUL   =   s_u[m-1]; SUR   =   s_u[0];
 	      SPL   =   s_p[m-1]; SPR   =   s_p[0];
@@ -239,10 +250,10 @@ void GRP_solver_source
 		  }
 	      else
 		  {
-		      h_L   =    h;
-		      rho_L = RHOL;
-		      u_L   =   UL;
-		      p_L   =   PL;
+		      h_L   =   HL;
+		      rho_L = RHOL + 0.5*h_L*SRHOL;
+		      u_L   =   UL + 0.5*h_L*SUL;
+		      p_L   =   PL + 0.5*h_L*SPL;
 		  }
 	      if(j < m)
 		  {
@@ -253,21 +264,22 @@ void GRP_solver_source
 		  }
 	      else
 		  {
-		      h_R   =    h;
-		      rho_R = RHOR;
-		      u_R   =   UR;
-		      p_R   =   PR;
+		      h_R   =   HR;
+		      rho_R = RHOR + 0.5*h_R*SRHOR;
+		      u_R   =   UR + 0.5*h_R*SUR;
+		      p_R   =   PR + 0.5*h_R*SPR;
 		  }
 	      if(p_L < eps || p_R < eps || rho_L < eps || rho_R < eps)
 		  {
-		      printf("<0.0 error on %d \t %d (t_n, x) - Reconstruction\n", k, j);
+		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
 		      goto _END_;
 		  }
-	      if(ISNAN(p_L)||ISNAN(p_R)||ISNAN(u_L)||ISNAN(u_R)||ISNAN(rho_L)||ISNAN(rho_R))
+	      if(ISERR(p_L)||ISERR(p_R)||ISERR(u_L)||ISERR(u_R)||ISERR(rho_L)||ISERR(rho_R))
 		  {
-		      printf("NAN error on %d \t %d (t_n, x) - Reconstruction\n", k, j); 
+		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Reconstruction\n", k, j); 
 		      goto _END_;
 		  }
+
 	      c_L = sqrt(gamma * p_L / rho_L);
 	      c_R = sqrt(gamma * p_R / rho_R);
 	      h_S_max = fmin(h_S_max, h_L/c_L);
@@ -299,17 +311,16 @@ void GRP_solver_source
 		  }
 
 //========================Solve GRP========================
-
 	      linear_GRP_solver_LAG(dire, mid, rho_L, rho_R, t_rho_L, t_rho_R, u_L, u_R, t_u_L, t_u_R, p_L, p_R, t_p_L, t_p_R, gamma, eps);
 
 	      if(mid[2] < eps)
 		  {
-		      printf("<0.0 error on %d \t %d (t_n, x) STAR\n", k, j);
+		      printf("<0.0 error on [%d, %d] (t_n, x) STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(ISNAN(mid[1])||ISNAN(mid[2]))
+	      if(ISERR(mid[1])||ISERR(mid[2]))
 		  {
-		      printf("NAN error on %d \t %d (t_n, x) STAR\n", k, j); 
+		      printf("NAN or INFinite error on [%d, %d] (t_n, x) STAR\n", k, j); 
 		      time_c = t_all;
 		  }
 	  }
@@ -326,11 +337,10 @@ void GRP_solver_source
 
 	    RHO_next_L[j] = mid[0] + tau*dire[0];
 	    RHO_next_R[j] = mid[3] + tau*dire[3];
-	    U_next[j] = mid[1] + tau*dire[1];
-	    P_next[j] = mid[2] + tau*dire[2];
+	    U_next[j]     = mid[1] + tau*dire[1];
+	    P_next[j]     = mid[2] + tau*dire[2];
 
 	    X[n][j] = X[n-1][j] + tau * U_F[j]; // motion along the contact discontinuity
-	    X[n-1][j] = X[n][j];
 	}
 
 //======================THE CORE ITERATION=========================(On Lagrange Coordinate)
@@ -343,23 +353,19 @@ void GRP_solver_source
 	    RHO[n][j] = 1 / (1/RHO[n-1][j] + tau/MASS[j]*(U_F[j+1] - U_F[j]));
 	    U[n][j]   = U[n-1][j] - tau/MASS[j]*(P_F[j+1] - P_F[j]);
 	    E[n][j]   = E[n-1][j] - tau/MASS[j]*(P_F[j+1]*U_F[j+1] - P_F[j]*U_F[j]);
-	    P[n][j]   = (E[n][j] - 0.5*U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
+	    P[n][j]   = (E[n][j] - 0.5 * U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
 	    if(P[n][j] < eps || RHO[n][j] < eps)
 		{
-		    printf("<0.0 error on %d \t %d (t_n, x)\n", k, j);
+		    printf("<0.0 error on [%d, %d] (t_n, x)\n", k, j);
 		    time_c = t_all;
 		}
-	    if(ISNAN(P[n][j])||ISNAN(U[n][j])||ISNAN(RHO[n][j]))
+	    if(ISERR(P[n][j])||ISERR(U[n][j])||ISERR(RHO[n][j]))
 		{
-		    printf("NAN error on %d \t %d (t_n, x)\n", k, j); 
+		    printf("NAN or INFinite error on [%d, %d] (t_n, x)\n", k, j); 
 		    time_c = t_all;
 		}
-	    RHO[n-1][j] = RHO[n][j];
-	    U[n-1][j]   =   U[n][j];
-	    E[n-1][j]   =   E[n][j];  
-	    P[n-1][j]   =   P[n][j];  
-	    //-----------------------determind the slope-----------------------------
-
+	    
+//============================compute the slope============================
 	    s_u[j]   = (    U_next[j+1] -     U_next[j])/(X[n][j+1]-X[n][j]);
 	    s_p[j]   = (    P_next[j+1] -     P_next[j])/(X[n][j+1]-X[n][j]);
 	    s_rho[j] = (RHO_next_L[j+1] - RHO_next_R[j])/(X[n][j+1]-X[n][j]);
@@ -377,6 +383,17 @@ void GRP_solver_source
 	    printf("Time is up in time step %d.\n", k);
 	    break;
 	}
+
+//===========================Fixed variable location=======================	
+    for(j = 0; j <= m; ++j)
+	X[n-1][j] = X[n][j];
+    for(j = 0; j < m; ++j)
+	{
+	    RHO[n-1][j] = RHO[n][j];
+	    U[n-1][j]   =   U[n][j];
+	    E[n-1][j]   =   E[n][j];  
+	    P[n-1][j]   =   P[n][j];
+	}	
   }
 
   printf("The cost of CPU time for 1D-GRP scheme for this problem is %g seconds.\n", cpu_time_sum);

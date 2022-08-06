@@ -464,6 +464,7 @@ void _1D_file_write(const int m, const int N,
   fprintf(fp_write, "N_t   = %d\n", (int)config[4]);
   fprintf(fp_write, "t_all = %g\n", config[5]);
   fprintf(fp_write, "CFL   = %g\n", config[6]);
+  fprintf(fp_write, "bond  = %d\n", (int)config[7]);
 
   // fprintf(fp_write, "%d time steps computed.\n", N-1);
   /*
