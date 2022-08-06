@@ -1,3 +1,8 @@
+/**
+ * @file  LAG_source.c
+ * @brief This is a C file of the main function.
+ */
+
 /** 
  * @mainpage 1D Godunov/GRP scheme for Lagrangian hydrodynamics
  * @brief This is an implementation of fully explict forward Euler scheme
@@ -46,19 +51,40 @@
 #include "include/finite_difference_solver.h"
 #include "include/Riemann_solver.h"
 
+double * U0;   //!< Initial velocity data array pointer.
+double * P0;   //!< Initial pressure data array pointer.
+double * RHO0; //!< Initial density  data array pointer.
+
+/**
+ * @brief This is the main function which constructs the
+ *        main structure of the Lagrangian hydrocode.
+ * @param[in] argv[1]: Name of test example.
+ * @param[in] argv[2]: Order of numerical scheme (= 1 or 2).
+ * @return ARGuments state of the program.
+ *     @retval 0: ARGuments counter is 3.
+ *     @retval 1: ARGuments counter is not 3.
+ */
 
 int main(int argc, char *argv[])
 {
+    if (argc!=3)
+	{
+	    printf("ARGuments counter is %d not equal to 3!\n", argc);
+	    return 1;
+	}
     char add[FILENAME_MAX];
+    // Get the address of initial data files.
     example_io(argv[1], add, 1);
-    /* Firstly we read the initial data file.
+    /* 
+     * We read the initial data files.
      * The function initialize return a point pointing to the position
      * of a block of memory consisting (m+1) variables of type double.
-     * The value of first of these variables is m.
+     * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
     _1D_initialize(argv[1], add); 
-    /* m is the number of initial value as well as the number of grids.
+    /* 
+     * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
@@ -66,17 +92,21 @@ int main(int argc, char *argv[])
     int m = (int)U0[0];
     
   double config[N_CONF];
-  /* Read the configuration data.
-   * The detail could be seen in the definition of array config.
+  /* 
+   * Read the configuration data.
+   * The detail could be seen in the definition of array config
+   * referring to file '_1D_f_io.c'.
    */
   _1D_configurate(config, argv[1], add); 
 
-  int j = 0, k = 0, N = (int)(config[4]) + 1, i = 0;
-  int order;
-  order = atoi(argv[2]);
+  int k;
+  // The number of times steps of the fluid data stored for plotting.
+  int N = 2; // (int)(config[4]) + 1;
   double h = config[2], gamma = config[0];
-
-  double** RHO;
+  
+  // Initialize arrays of fluid variables.
+  double ** RHO, ** U, ** P, ** E, ** X;
+  double * MASS, * cpu_time;
   RHO = (double **)malloc(N * sizeof(double *));
   RHO[0] = RHO0 + 1;
   for(k = 1; k < N; ++k)
@@ -84,23 +114,10 @@ int main(int argc, char *argv[])
     RHO[k] = (double *)malloc(m * sizeof(double));
     if(RHO[k] == NULL)
     {
-      for(i = 1; i < k; ++i)
-      {
-	free(RHO[i]);
-	RHO[i] = NULL;
-      }
-      free(RHO0);
-      free(U0);
-      free(P0);
-      RHO[0] = NULL;
-      RHO0 = NULL;
-      U0 = NULL;
-      P0 = NULL;
       printf("NOT enough memory! RHO[%d]\n", k);
-      exit(5);
+      goto _END_;
     }
   }
-  double** U;
   U = (double**)malloc(N * sizeof(double*));
   U[0] = U0 + 1;
   for(k = 1; k < N; ++k)
@@ -108,30 +125,10 @@ int main(int argc, char *argv[])
     U[k] = (double *)malloc(m * sizeof(double));
     if(U[k] == NULL)
     {
-      for(i = 1; i < k; ++i)
-      {
-	free(U[i]);
-	U[i] = NULL;
-      }
-      for(i = 1; i < N; ++i)
-      {
-	free(RHO[i]);
-	RHO[i] = NULL;
-      }
-      free(RHO0);
-      free(U0);
-      free(P0);
-      RHO[0] = NULL;
-      U[0] = NULL;
-      RHO0 = NULL;
-      U0 = NULL;
-      P0 = NULL;
       printf("NOT enough memory! U[%d]\n", k);
-      exit(5);
+      goto _END_;
     }
-  }
-  
-  double** P;
+  } 
   P = (double**)malloc(N * sizeof(double*));
   P[0] = P0 + 1;
   for(k = 1; k < N; ++k)
@@ -139,143 +136,64 @@ int main(int argc, char *argv[])
     P[k] = (double *)malloc(m * sizeof(double));
     if(P[k] == NULL)
     {
-      for(i = 1; i < k; ++i)
-      {
-	free(P[i]);
-	P[i] = NULL;
-      }
-      for(i = 1; i < N; ++i)
-      {
-	free(RHO[i]);
-	RHO[i] = NULL;
-	free(U[i]);
-	P[i] = NULL;
-      }
-      free(RHO0);
-      free(U0);
-      free(P0);
-      RHO[0] = NULL;
-      U[0] = NULL;
-      P[0] = NULL;
-      RHO0 = NULL;
-      U0 = NULL;
-      P0 = NULL;
       printf("NOT enough memory! P[%d]\n", k);
-      exit(5);
+      goto _END_;
     }
   }
-
-  double *UL = malloc(N * sizeof(double)), *PL = malloc(N * sizeof(double)), *RHOL = malloc(N * sizeof(double));
-  double *UR = malloc(N * sizeof(double)), *PR = malloc(N * sizeof(double)), *RHOR = malloc(N * sizeof(double));
-  double *SUL, *SPL, *SRHOL;
-  double *SUR, *SPR, *SRHOR;
-  if (order == 2)
-      {
-	  SUL = calloc(N, sizeof(double)), SPL = calloc(N, sizeof(double)), SRHOL = calloc(N, sizeof(double));
-	  SUR = calloc(N, sizeof(double)), SPR = calloc(N, sizeof(double)), SRHOR = calloc(N, sizeof(double));
-      }
-  double *cpu_time = malloc(N * sizeof(double));
-
-  for(k = 0; k < N; ++k)
-  {
-    UL[k] = U[0][0];
-    UR[k] = U[0][m-1];
-    PL[k] = P[0][0];
-    PR[k] = P[0][m-1];
-    RHOL[k] = RHO[0][0];
-    RHOR[k] = RHO[0][m-1];
-  }
-
-
-  double** E;
   E = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
     E[k] = (double *)malloc(m * sizeof(double));
     if(E[k] == NULL)
     {
-      for(i = 0; i < k; ++i)
-      {
-	free(E[i]);
-	E[i] = NULL;
-      }
-      for(i = 1; i < N; ++i)
-      {
-	free(RHO[i]);
-	RHO[i] = NULL;
-	free(U[i]);
-	U[i] = NULL;
-	free(P[i]);
-	P[i] = NULL;
-      }
-      free(RHO0);
-      free(U0);
-      free(P0);
-      RHO[0] = NULL;
-      U[0] = NULL;
-      P[0] = NULL;
-      RHO0 = NULL;
-      U0 = NULL;
-      P0 = NULL;
       printf("NOT enough memory! E[%d]\n", k);
-      exit(5);
+      goto _END_;
     }
   }
-
-  double** X;
   X = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
     X[k] = (double *)malloc((m+1) * sizeof(double));
     if(X[k] == NULL)
     {
-      for(i = 0; i < k; ++i)
-      {
-	free(X[i]);
-	X[i] = NULL;
-      }
-      for(i = 1; i < N; ++i)
-      {
-	free(RHO[i]);
-	RHO[i] = NULL;
-	free(U[i]);
-	U[i] = NULL;
-	free(P[i]);
-	P[i] = NULL;
-	free(E[i]);
-	E[i] = NULL;
-      }
-      free(RHO0);
-      free(U0);
-      free(P0);
-      RHO[0] = NULL;
-      U[0] = NULL;
-      P[0] = NULL;
-      RHO0 = NULL;
-      U0 = NULL;
-      P0 = NULL;
       printf("NOT enough memory! X[%d]\n", k);
-      exit(5);
+      goto _END_;
     }
   }
+  MASS=malloc(m * sizeof(double));
+  if(MASS == NULL)
+      {
+	  printf("NOT enough memory! MASS\n");
+	  goto _END_;
+      }
+  // Initialize the values of mass, energy in computational cells and x-coordinate of the cell interfaces.
+  for(k = 0; k < m; ++k)
+		  MASS[k] = h * RHO[0][k];
+  for(k = 0; k < m; ++k)
+		  E[0][k] = 0.5*U[0][k]*U[0][k] + P[0][k]/(gamma - 1.0)/RHO[0][k]; 
+  for(k = 0; k <= m; ++k)
+		  X[0][k] = h * k;
 
-  double *MASS=malloc(m * sizeof(double));
-
-  // Initialize the values of mass,coordinate and energy.
-  for(j = 0; j < m; ++j)
-		  MASS[j]=config[2]*RHO[0][j];                                               
-  for(j = 0; j <= m; ++j)
-		  X[0][j] = config[2]*j;
-  for(j = 0; j < m; ++j)
-		  E[0][j] = 0.5*U[0][j]*U[0][j] + P[0][j]/(config[0] - 1.0)/RHO[0][j]; 
-
-
-  // use GRP/Godunov scheme to solve it on Lagrange coordinate. 
-  if (order == 2)
-      GRP_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, SRHOL, SUL, SPL, SRHOR, SUR, SPR, cpu_time);
+  cpu_time = malloc(N * sizeof(double));
+  if(cpu_time == NULL)
+      {
+	  printf("NOT enough memory! CPU_time\n");
+	  goto _END_;
+      }
+      
+  int order; // 1-Godunov, 2-GRP
+  order = atoi(argv[2]);
+  // Use GRP/Godunov scheme to solve it on Lagrange coordinate.
+  if (order == 1)
+      Godunov_solver_source(config, m, RHO, U, P, E, X, MASS, cpu_time);
+  else if (order == 2)
+      GRP_solver_source(config, m, RHO, U, P, E, X, MASS, cpu_time);
   else
-      Godunov_solver_source(config, m, RHO, U, P, E, X, MASS, RHOL, UL, PL, RHOR, UR, PR, cpu_time);
-
+      {
+	  printf("NOT appropriate order of the scheme! The order is %d\n", order);
+	  goto _END_;
+      }
+  
   char name_out[200];
   strcpy(name_out, argv[1]);  
   strcat(name_out, "_");
@@ -284,8 +202,9 @@ int main(int argc, char *argv[])
   printf("%s\n",add);
   example_io(name_out, add, 0);
   // Write the final data down.
-  _1D_file_write(m, N-1, RHO, U, P, E, X, cpu_time, config, argv[1], add);
+  _1D_file_write(m, N, RHO, U, P, E, X, cpu_time, config, argv[1], add);
 
+ _END_:
   for(k = 1; k < N; ++k)
   {
     free(RHO[k]);
@@ -309,10 +228,13 @@ int main(int argc, char *argv[])
   U[0] = NULL;
   P[0] = NULL;
   free(E[0]);
-  E[0] = NULL;
   free(X[0]);
+  E[0] = NULL;
   X[0] = NULL;
-
-  printf("\n");
+  free(MASS);
+  MASS = NULL;
+  free(cpu_time);
+  cpu_time = NULL;
+  
   return 0;
 }

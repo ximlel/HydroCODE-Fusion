@@ -1,3 +1,8 @@
+/**
+ * @file  Riemann_solver_exact_Toro.c
+ * @brief This is an exact Riemann solver in Toro's book.
+ */
+
 #include <math.h>
 #include <stdio.h>
 

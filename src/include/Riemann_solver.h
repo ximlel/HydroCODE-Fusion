@@ -18,7 +18,7 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 
 void linear_GRP_solver_LAG
 (double * direvative, double * mid,
- double rho_L, double rho_R, double s_rho_L, double s_rho_R,
- double   u_L, double   u_R, double   s_u_L, double   s_u_R,
- double   p_L, double   p_R, double   s_p_L, double   s_p_R,
- double gamma, double eps);
+ const double rho_L, const double rho_R, const double s_rho_L, const double s_rho_R,
+ const double   u_L, const double   u_R, const double   s_u_L, const double   s_u_R,
+ const double   p_L, const double   p_R, const double   s_p_L, const double   s_p_R,
+ const double gamma, const double eps);

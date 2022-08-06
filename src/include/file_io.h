@@ -10,7 +10,7 @@ extern double * RHO0; //!< Initial density  data array pointer.
 
 //! Define the number of configuration parameters.
 #ifndef N_CONF
-#define N_CONF 7
+#define N_CONF 8
 #endif
 
 int file_read(FILE * fp, double * U, const int num);

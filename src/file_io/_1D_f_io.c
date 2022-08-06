@@ -232,13 +232,20 @@ void _1D_initialize(const char * name, const char * add_in)
  * @brief This function read the configuration data file, and
  *        store the configuration data in the array "config".
  * @details The parameters in the configuration data file are as follows.
- *          - config[0] is the constant of the perfect gas
+ *          - config[0] is the constant of the perfect gas (> 1.0)
  *          - config[1] is the length of the time step
  *          - config[2] is the spatial grid size
- *          - config[3] is the largest value can be seen as zero
+ *          - config[3] is the largest value can be seen as zero (> 0.0)
  *          - config[4] is the maximal number of time steps
  *          - config[5] is the total time
- *          - config[6] is the CFL number
+ *          - config[6] is the CFL number (< 1.0)
+ *          - config[7] is the boudary conditions
+ *            - -1: initial boundary conditions
+ *            - -2: reflective boundary conditions
+ *            - -3: prescribed boundary conditions
+ *            - -4: free boundary conditions
+ *            - -5: periodic boundary conditions
+ * 
  * @param[out] config: Array of the configuration data.
  * @param[in]  name:   Name of the test example.
  * @param[in]  add_in: Adress of the initial data folder of the test example.
@@ -301,7 +308,7 @@ void _1D_configurate(double * config, const char * name, const char * add_in)
     free(RHO0);
     exit(2);
   }
-  if(config[3] < 0)
+  if(config[3] < 0.0)
   {
     printf("eps(%lf) should be positive.\n", config[3]);
     free(U0);
@@ -318,6 +325,7 @@ void _1D_configurate(double * config, const char * name, const char * add_in)
   printf("time step  = %d\n", (int)config[4]);
   printf("total time = %g\n", config[5]);
   printf("CFL number = %g\n", config[6]);
+  printf("bondary    = %d\n", (int)config[7]);
 }
 
 
@@ -326,7 +334,7 @@ void _1D_configurate(double * config, const char * name, const char * add_in)
  * @note  It is quite simple so there will be no more comments.
  * @param[in] m: The number of spatial points in the output data.
  * @param[in] N: The number of time steps in the output data.
- * @param[in] RHO,U,P,Ene,X[]: Array of the density/velocity/pressure/energy/position data.
+ * @param[in] RHO,U,P,Ene,X[]: Array of the density/velocity/pressure/energy/coordinate data.
  * @param[in] cpu_time: Array of the CPU time recording.
  * @param[in] config:   Array of the configuration data.
  * @param[in] name:     Name of the test example.
@@ -359,7 +367,7 @@ void _1D_file_write(const int m, const int N,
     exit(1);
   }
   int j = 0, n = 0;
-  for(n = 0; n <= N; ++n)
+  for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
       fprintf(fp_write, "%.18lf\t", RHO[n][j]);
@@ -376,7 +384,7 @@ void _1D_file_write(const int m, const int N,
     printf("Cannot open solution output file!\n");
     exit(1);
   }
-  for(n = 0; n <= N; ++n)
+  for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
       fprintf(fp_write, "%.18lf\t", U[n][j]);
@@ -393,7 +401,7 @@ void _1D_file_write(const int m, const int N,
     printf("Cannot open solution output file!\n");
     exit(1);
   }
-  for(n = 0; n <= N; ++n)
+  for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
       fprintf(fp_write, "%.18lf\t", P[n][j]);
@@ -410,7 +418,7 @@ void _1D_file_write(const int m, const int N,
     printf("Cannot open solution output file!\n");
     exit(1);
   }
-  for(n = 0; n <= N; ++n)
+  for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
       fprintf(fp_write, "%.18lf\t", Ene[n][j]);
@@ -427,7 +435,7 @@ void _1D_file_write(const int m, const int N,
     printf("Cannot open solution output file!\n");
     exit(1);
   }
-  for(n = 0; n <= N; ++n)
+  for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
       fprintf(fp_write, "%.18lf\t", 0.5 * (X[n][j] + X[n][j+1]));
@@ -457,18 +465,18 @@ void _1D_file_write(const int m, const int N,
   fprintf(fp_write, "t_all = %g\n", config[5]);
   fprintf(fp_write, "CFL   = %g\n", config[6]);
 
-  // fprintf(fp_write, "%d time steps computed.\n", N);
+  // fprintf(fp_write, "%d time steps computed.\n", N-1);
   /*
-  double* sum = calloc(N + 1, sizeof(double));
+  double* sum = calloc(N, sizeof(double));
   sum[0] = 0.0;
   fprintf(fp_write, "CPU time for each step:");
-  for(n = 1; n <= N; ++n)
+  for(n = 1; n < N; ++n)
   {
     fprintf(fp_write, "%.18lf  ", cpu_time[n]);
     sum[n] = sum[n-1] + cpu_time[n];
   }
   fprintf(fp_write, "\nTotal CPU time at each step:");
-  for(n = 1; n <= N; ++n)
+  for(n = 1; n < N; ++n)
     fprintf(fp_write, "%.18lf  ", sum[n]);
   free(sum);
   */

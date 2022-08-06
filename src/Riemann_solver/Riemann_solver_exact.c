@@ -1,4 +1,9 @@
-  #include <math.h>
+/**
+ * @file  Riemann_solver_exact.c
+ * @brief This is an exact Riemann solver in Ben-Artzi's book.
+ */
+
+#include <math.h>
 #include <stdio.h>
 
 
