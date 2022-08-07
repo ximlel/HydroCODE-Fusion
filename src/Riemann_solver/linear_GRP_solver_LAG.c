@@ -1,14 +1,34 @@
+/**
+ * @file  linear_GRP_solver_LAG.c
+ * @brief This is a Lagrangian GRP solver for compressible inviscid flow in Ben-Artzi's book.
+ */
+
 #include <math.h>
 #include <stdio.h>
 
 #include "../include/Riemann_solver.h"
 
 /**
+ * @brief A Lagrangian GRP solver for unsteady compressible inviscid flow in one space dimension.
+ * @param[out] dire: the temporal derivative of fluid variables. \n
+ *                   [rho_L, u, p, rho_R]_t
+ * @param[out] mid:  the Riemann solutions. \n
+ *                   [rho_star_L, u_star, p_star, rho_star_R]
+ * @param[in] rho_L, u_L, p_L: Left  States.
+ * @param[in] rho_R, u_R, p_R: Right States.
+ * @param[in] s_rho_L, s_u_L, s_p_L: Left  Lagrangian spatial derivatives.
+ * @param[in] s_rho_R, s_u_R, s_p_R: Right Lagrangian spatial derivatives.
+ * @param[in] gamma: the constant of the perfect gas.
+ * @param[in] eps: the largest value could be seen as zero.
  * @param[in] atc: Parameter that determines the solver type.
  *              - INFINITY: acoustic approximation
  *              - eps:      GRP solver(nonlinear + acoustic case)
  *              - -0.0:     GRP solver(only nonlinear case)
-*/
+ * @par  Reference
+ *       Theory is found in Reference [1]. \n
+ *       [1] M. Ben-Artzi & J. Falcovitz, A second-order Godunov-type scheme for compressible fluid dynamics,
+ *           Journal of Computational Physics, 55.1: 1-32, 1984
+ */
 
 void linear_GRP_solver_LAG
 (double * dire, double * mid,
@@ -19,20 +39,20 @@ void linear_GRP_solver_LAG
 {
   const double zeta = (gamma-1.0)/(gamma+1.0);
 
-  double dist;
-  int CRW[2];
+  double dist; // Euclidean distance
+  int CRW[2];  // Centred Rarefaction Wave (CRW) Indicator
 
-  double c_L, c_R, g_L, g_R;
+  double c_L, c_R, g_L, g_R; // g = rho * c
   c_L = sqrt(gamma * p_L / rho_L);
   c_R = sqrt(gamma * p_R / rho_R);
   g_L = rho_L*c_L;
   g_R = rho_R*c_R;
-  double speed_L, speed_R;
+  double W_L, W_R; // Wave speed
   double c_star_L, c_star_R, g_star_L, g_star_R;
   double u_star, p_star, rho_star_L, rho_star_R;
   double beta_star;
 
-  double a_L, b_L, d_L, a_R, b_R, d_R, L_rho, L_u, L_p, A, B, sigma;  
+  double a_L, b_L, d_L, a_R, b_R, d_R, L_rho, L_u, L_p, A, B;
 
   Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
 
@@ -40,25 +60,25 @@ void linear_GRP_solver_LAG
       {
 	  rho_star_L = rho_L*pow(p_star/p_L, 1.0/gamma);
 	  c_star_L = c_L*pow(p_star/p_L, 0.5*(gamma-1.0)/gamma);
-	  speed_L = u_L - c_L;
+	  W_L = u_L - c_L;
       }
   else
       {
 	  rho_star_L = rho_L*(p_star+zeta*p_L)/(p_L+zeta*p_star);
 	  c_star_L = sqrt(gamma * p_star / rho_star_L);
-	  speed_L = u_L - c_L*sqrt(0.5*((gamma+1.0)*(p_star/p_L) + (gamma-1.0))/gamma);
+	  W_L = u_L - c_L*sqrt(0.5*((gamma+1.0)*(p_star/p_L) + (gamma-1.0))/gamma);
       }
   if(CRW[1])
       {
 	  rho_star_R = rho_R*pow(p_star/p_R,1.0/gamma);
 	  c_star_R = c_R*pow(p_star/p_R, 0.5*(gamma-1.0)/gamma);
-	  speed_R = u_R + c_R;
+	  W_R = u_R + c_R;
       }
   else
       {
 	  rho_star_R = rho_R*(p_star+zeta*p_R)/(p_R+zeta*p_star);
 	  c_star_R = sqrt(gamma * p_star / rho_star_R);
-	  speed_R = u_R + c_R*sqrt(0.5*((gamma+1.0)*(p_star/p_R) + (gamma-1.0))/gamma);
+	  W_R = u_R + c_R*sqrt(0.5*((gamma+1.0)*(p_star/p_R) + (gamma-1.0))/gamma);
       }
   g_star_R = rho_star_R*c_star_R;
   g_star_L = rho_star_L*c_star_L;
@@ -87,7 +107,15 @@ void linear_GRP_solver_LAG
 	      }
 	  else //the 1-wave is a shock
 	      {
-		  
+		  W_L = (p_star-p_L) / (u_star-u_L);
+		  A   = - 0.5/(p_star + zeta * p_L);
+		  a_L = 2.0 + A * (p_star-p_L);
+		  b_L = - W_L/g_star_L/g_star_L - (a_R - 1.0)/W_L;
+		  L_rho = (p_star-p_L)/2.0/rho_L;
+		  B = 1.0/(p_star-p_L) - zeta * A;
+		  L_u = rho_L * (u_star-u_L) * (gamma*p_L*B + 0.5) + W_L;
+		  L_p = 1.0 + B * (p_star-p_L);
+		  d_L = L_u*s_u_L - L_p*s_p_L - L_rho*s_rho_L;		  
 	      }
 	  //determine a_R, b_R and d_R
 	  if(CRW[1]) //the 3-wave is a CRW
@@ -100,12 +128,14 @@ void linear_GRP_solver_LAG
 	      }
 	  else //the 3-wave is a shock
 	      {
-		  sigma = (p_star-p_R)/(u_star-u_R);
-		  a_R = 2.0 - 0.5*(p_star-p_R)/(p_star+zeta*p_R);
-		  b_R = -1.0*sigma/g_star_R/g_star_R - (a_R-1)/sigma;
-		  L_rho = -1.0*(p_star-p_R)/2.0/rho_R;
-		  L_u = sigma + rho_R*(u_star-u_R)/2.0 + g_R*g_R/sigma*(1.0+zeta*(p_star-p_R)/2.0/(p_star+zeta*p_R));
-		  L_p = -1.0*(2+zeta/2.0*(p_star-p_R)/(p_star+zeta*p_R));
+		  W_R = (p_star-p_R) / (u_star-u_R);
+		  A   = - 0.5/(p_star + zeta * p_R);
+		  a_R = - 2.0 - A * (p_star-p_R);
+		  b_R = W_R/g_star_R/g_star_R - (a_R + 1.0)/W_R;
+		  L_rho = (p_star-p_R)/2.0/rho_R;
+		  B = 1.0/(p_star-p_R) - zeta * A;
+		  L_u = rho_R * (u_R-u_star) * (gamma*p_R*B + 0.5) - W_R;
+		  L_p = 1.0 + B * (p_star-p_R);
 		  d_R = L_u*s_u_R + L_p*s_p_R + L_rho*s_rho_R;
 	      }
       }
