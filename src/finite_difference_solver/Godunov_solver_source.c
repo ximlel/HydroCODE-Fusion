@@ -82,7 +82,7 @@ void Godunov_solver_source
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = 1.0/0.0; // h/S_max = INF
+      h_S_max = INFINITY; // h/S_max = INF
       tic = clock();
 
       if (bound == -2) // reflective boundary conditions

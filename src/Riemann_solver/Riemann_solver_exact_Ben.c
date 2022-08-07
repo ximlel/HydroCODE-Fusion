@@ -1,5 +1,5 @@
 /**
- * @file  Riemann_solver_exact.c
+ * @file  Riemann_solver_exact_Ben.c
  * @brief This is an exact Riemann solver in Ben-Artzi's book.
  */
 
@@ -8,9 +8,9 @@
 
 
 /**
- * @brief EXACT RIEMANN SOLVER FOR A \gamma-Law Gas
+ * @brief EXACT RIEMANN SOLVER FOR A γ-Law Gas
  * @details The purpose of this function is to solve the Riemann problem exactly,
- *          for the time dependent one dimensional Euler equations for a \gamma-law gas.
+ *          for the time dependent one dimensional Euler equations for a γ-law gas.
  * @param[out] U_star, P_star: Velocity/Pressure in star region.
  * @param[in]  u_L, p_L, c_L: Initial Velocity/Pressure/sound_speed on left  state.
  * @param[in]  u_R, p_R, c_R: Initial Velocity/Pressure/sound_speed on right state.
@@ -27,7 +27,7 @@
  *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
  *           Cambridge University Press, 2003
  */
-double Riemann_solver_exact(double * U_star, double * P_star, const double gamma,
+double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double gamma,
 			    const double u_L, const double u_R, const double p_L, const double p_R,
 			    const double c_L, const double c_R, int * CRW,
 			    const double eps, const double tol, const int N)

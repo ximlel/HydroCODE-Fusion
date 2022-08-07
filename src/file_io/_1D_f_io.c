@@ -80,9 +80,9 @@ static int flu_var_count(FILE * fp, const char * add)
 void example_io(const char * name, char * add_mkdir, const int i_or_o)
 {	
     if (i_or_o == 0)
-	strcpy(add_mkdir, "../data_out/one-dim/");
+	strcpy(add_mkdir, "../../data_out/one-dim/");
     else
-	strcpy(add_mkdir, "../data_in/one-dim/");
+	strcpy(add_mkdir, "../../data_in/one-dim/");
     strcat(add_mkdir, name);
 
     if (ACCESS(add_mkdir) == -1) // Folder does not exist.

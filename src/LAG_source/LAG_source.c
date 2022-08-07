@@ -23,14 +23,16 @@
  * <tr><th> file_io/                   <td> Program reads and writes files
  * <tr><th> finite_difference_solver/  <td> Lagrangian finite volume scheme program
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
- * <tr><th> LAG_source.c               <td> Main program
- * <tr><th> make.sh                    <td> Bash script compiles and runs programs
+ * <tr><th> LAG_source/LAG_source.c    <td> Main program
+ * <tr><th> LAG_source/make.sh         <td> Bash script compiles and runs programs
  * </table>
  * 
  * @section Compile_environment Compile environment
  *          - Linux/Unix: gcc, glibc, MATLAB
- *            - Compile in src/: Run './make.sh' command on the terminal.
+ *            - Compile in 'src/LAG_source': Run './make.sh' command on the terminal.
  *          - Winodws: Visual Studio, MATLAB
+ *            - Create a C++ Project from Existing Code in 'src/'.
+ *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
  *
  * @section Usage_description Usage description
  *          - Input files are stored in folder '/data_in/one-dim/name_of_test_example'.
@@ -39,7 +41,14 @@
  *          - Run program:
  *            - Linux/Unix: Run 'LAG_source.out name_of_test_example order' command on the terminal. \n
  *                          e.g. 'LAG_source.out 6_1 2' (second-order GRP scheme)
- *            - Windows:
+ *            - Windows: Run 'LAG_source.exe name_of_test_example order' command on the terminal. \n
+ *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging
+ * 
+ *             <table>
+ *             <tr><th> Command Arguments <td> name_of_test_example order (e.g. '6_1 1')
+ *             <tr><th> Working Directory <td> \$(SolutionDir)\$(Platform)\\\$(Configuration)\
+ *            </table>
+ * 
  *          - Output files can be found in folder '/data_out/one-dim/'.
  *          - Output files may be visualized by MATLAB script 'value_plot.m'.
  */
@@ -48,9 +57,9 @@
 #include <math.h>
 #include <string.h>
 
-#include "include/file_io.h"
-#include "include/finite_difference_solver.h"
-#include "include/Riemann_solver.h"
+#include "../include/file_io.h"
+#include "../include/finite_difference_solver.h"
+#include "../include/Riemann_solver.h"
 
 double * U0;   //!< Initial velocity data array pointer.
 double * P0;   //!< Initial pressure data array pointer.
@@ -59,8 +68,10 @@ double * RHO0; //!< Initial density  data array pointer.
 /**
  * @brief This is the main function which constructs the
  *        main structure of the Lagrangian hydrocode.
- * @param[in] argv[1]: Name of test example.
- * @param[in] argv[2]: Order of numerical scheme (= 1 or 2).
+ * @param[in] argc: ARGument counter.
+ * @param[in] argv: ARGument values.
+ *            - argv[1]: Name of test example.
+ *            - argv[2]: Order of numerical scheme (= 1 or 2).
  * @return ARGuments state of the program.
  *     @retval 0: ARGuments counter is 3.
  *     @retval 1: ARGuments counter is not 3.

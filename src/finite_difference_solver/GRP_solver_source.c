@@ -84,9 +84,9 @@ void GRP_solver_source
   double c_L, c_R; // the speeds of sound
   double h_L, h_R; // length of spatial grids
 
-  double s_u_L, s_p_L, s_rho_L;
+  double s_u_L, s_p_L, s_rho_L; // spatial derivatives in coordinate x (slopes)
   double s_u_R, s_p_R, s_rho_R;
-  double t_u_L, t_p_L, t_rho_L;
+  double t_u_L, t_p_L, t_rho_L; // spatial derivatives in Lagrangian coordinate ξ
   double t_u_R, t_p_R, t_rho_R;
   /*
    * dire: the temporal derivative of fluid variables.
@@ -96,7 +96,7 @@ void GRP_solver_source
    */
   double dire[4], mid[4];
   // the paramater in slope limiters.
-  double alpha = 0.0; //1.9;
+  double alpha = 1.5;
 
   // the slopes of variable values
   double *s_rho, *s_u, *s_p;
@@ -148,7 +148,7 @@ void GRP_solver_source
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = 1.0/0.0; // h/S_max = INF
+      h_S_max = INFINITY; // h/S_max = INF
       tic = clock();
 
       if (bound == -2) // reflective boundary conditions
@@ -285,7 +285,7 @@ void GRP_solver_source
 	      h_S_max = fmin(h_S_max, h_L/c_L);
 	      h_S_max = fmin(h_S_max, h_R/c_R);
 
-	      if(j) //calculate the material derivative
+	      if(j) //calculate the material derivatives
 		  {
 		      t_u_L   =   s_u[j-1]/rho_L;
 		      t_p_L   =   s_p[j-1]/rho_L;
@@ -311,8 +311,8 @@ void GRP_solver_source
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_LAG(dire, mid, rho_L, rho_R, t_rho_L, t_rho_R, u_L, u_R, t_u_L, t_u_R, p_L, p_R, t_p_L, t_p_R, gamma, eps);
-
+	      linear_GRP_solver_LAG(dire, mid, rho_L, rho_R, t_rho_L, t_rho_R, u_L, u_R, t_u_L, t_u_R, p_L, p_R, t_p_L, t_p_R, gamma, eps, INFINITY);
+		  
 	      if(mid[2] < eps)
 		  {
 		      printf("<0.0 error on [%d, %d] (t_n, x) STAR\n", k, j);
@@ -323,6 +323,11 @@ void GRP_solver_source
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) STAR\n", k, j); 
 		      time_c = t_all;
 		  }
+	      
+	      RHO_next_L[j] = mid[0];
+	      RHO_next_R[j] = mid[3];
+	      U_next[j]     = mid[1];
+	      P_next[j]     = mid[2];
 	  }
 
 //====================Time step and grid movement======================
@@ -332,13 +337,13 @@ void GRP_solver_source
     
     for(j = 0; j <= m; ++j)
 	{
-	    U_F[j] = mid[1] + 0.5*tau*dire[1];
-	    P_F[j] = mid[2] + 0.5*tau*dire[2];         
+	    U_F[j] = U_next[j] + 0.5*tau*dire[1];
+	    P_F[j] = P_next[j] + 0.5*tau*dire[2];         
 
-	    RHO_next_L[j] = mid[0] + tau*dire[0];
-	    RHO_next_R[j] = mid[3] + tau*dire[3];
-	    U_next[j]     = mid[1] + tau*dire[1];
-	    P_next[j]     = mid[2] + tau*dire[2];
+	    RHO_next_L[j] += tau*dire[0];
+	    RHO_next_R[j] += tau*dire[3];
+	    U_next[j]     += tau*dire[1];
+	    P_next[j]     += tau*dire[2];
 
 	    X[n][j] = X[n-1][j] + tau * U_F[j]; // motion along the contact discontinuity
 	}
@@ -365,7 +370,7 @@ void GRP_solver_source
 		    time_c = t_all;
 		}
 	    
-//============================compute the slope============================
+//============================compute the slopes============================
 	    s_u[j]   = (    U_next[j+1] -     U_next[j])/(X[n][j+1]-X[n][j]);
 	    s_p[j]   = (    P_next[j+1] -     P_next[j])/(X[n][j+1]-X[n][j]);
 	    s_rho[j] = (RHO_next_L[j+1] - RHO_next_R[j])/(X[n][j+1]-X[n][j]);
