@@ -1,7 +1,7 @@
-# 1D Godunov/GRP scheme for Lagrangian hydrodynamics
+# 1D Godunov/GRP scheme for Lagrangian/Eulerian hydrodynamics
 What is it?
 -----------
-This is a implementation of fully explict forward Euler scheme for 1-D Euler equations of motion on Lagrange coordinate.
+This is a implementation of fully explict forward Euler scheme for 1-D Euler equations of motion on Lagrangian/Eulerian coordinate.
 
 How to use it?
 -----------

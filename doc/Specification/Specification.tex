@@ -24,7 +24,7 @@
 \hline
 \textbf{Riemann\_solver} & 精确Riemann解法器\\
 \hline
-\textbf{LAG\_source.c}   & 主程序\\
+\textbf{hydrocode.c}     & 主程序\\
 \hline
 \textbf{make.sh}         & 编译和运行程序的脚本\\
 \hline
@@ -39,7 +39,9 @@
 
 精确Riemann解法器根据【1】或者【2】(Appendix C)所写.
 
-向前Euler格式 (GRP/Gdounov\_solver\_source.c):
+\subsection{拉格朗日格式}
+
+向前Euler格式 [GRP/Gdounov\_solver\_LAG\_source()]:
 \begin{align*}
 & m_i(1/\rho_i^{n+1}-1/\rho_i^{n})-\Delta t(u_{i+1/2}^{n+1/2}-u_{i-1/2}^{n+1/2})=0,\\
 & m_i(u_i^{n+1}-u_i^{n})+\Delta t(p_{i+1/2}^{n+1/2}-p_{i-1/2}^{n+1/2})=0,\\
@@ -57,14 +59,14 @@ $$
 其中$u^{*},p^{*}$为Rienmann问题中$*$区域内的解.
 
 \begin{itemize}
-\item 拉式Gdounov格式 (Gdounov\_solver\_source.c)
+\item 拉式Gdounov格式 [Gdounov\_solver\_LAG\_source()]
 $$
 \left(\frac{D u}{D t}\right)_{i+1/2}^{n}=0, \quad \left(\frac{D p}{D t}\right)_{i+1/2}^{n}=0
 $$. 
 
-\item 拉式GRP格式 (GRP\_solver\_source.c)
+\item 拉式GRP格式 [GRP\_solver\_LAG\_source()]
 
-通过斜率限制器重构得到的斜率求出接触间断处的物质导数, 由GRP解法器 (linear\_GRP\_solver\_LAG.c) 计算出时间导数, 通过完全显式向前Euler格式更新, 再计算出斜率.
+通过斜率限制器重构得到的斜率求出接触间断处的物质导数, 由GRP解法器 [linear\_GRP\_solver\_LAG()] 计算出时间导数, 通过完全显式向前Euler格式更新, 再计算出斜率.
 \end{itemize}
 
 \section{数值算例}

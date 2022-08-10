@@ -22,4 +22,11 @@ void linear_GRP_solver_LAG
  const double   p_L, const double   p_R, const double   s_p_L, const double   s_p_R,
  const double gamma, const double eps, const double  atc);
 
+void linear_GRP_solver_Edir
+(double * direvative, double * mid,
+ const double rho_L, const double rho_R, const double s_rho_L, const double s_rho_R,
+ const double   u_L, const double   u_R, const double   s_u_L, const double   s_u_R,
+ const double   p_L, const double   p_R, const double   s_p_L, const double   s_p_R,
+ const double gamma, const double eps);
+
 #define Riemann_solver_exact Riemann_solver_exact_Ben

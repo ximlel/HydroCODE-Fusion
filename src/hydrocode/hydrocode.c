@@ -1,12 +1,12 @@
 /**
- * @file  LAG_source.c
+ * @file  hydrocode.c
  * @brief This is a C file of the main function.
  */
 
 /** 
- * @mainpage 1D Godunov/GRP scheme for Lagrangian hydrodynamics
+ * @mainpage 1D Godunov/GRP scheme for Lagrangian/Eulerian hydrodynamics
  * @brief This is an implementation of fully explict forward Euler scheme
- *        for 1-D Euler equations of motion on Lagrange coordinate.
+ *        for 1-D Euler equations of motion on Lagrangian/Eulerian coordinate.
  * @version 0.1
  *
  * @section File_directory File directory
@@ -21,15 +21,15 @@
  * <table>
  * <tr><th> include/                   <td> Header files
  * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> finite_difference_solver/  <td> Lagrangian finite volume scheme program
+ * <tr><th> finite_difference_solver/  <td> finite volume scheme program
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
- * <tr><th> LAG_source/LAG_source.c    <td> Main program
- * <tr><th> LAG_source/make.sh         <td> Bash script compiles and runs programs
+ * <tr><th> hydrocode/hydrocode.c      <td> Main program
+ * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
  * </table>
  * 
  * @section Compile_environment Compile environment
  *          - Linux/Unix: gcc, glibc, MATLAB
- *            - Compile in 'src/LAG_source': Run './make.sh' command on the terminal.
+ *            - Compile in 'src/hydrocode': Run './make.sh' command on the terminal.
  *          - Winodws: Visual Studio, MATLAB
  *            - Create a C++ Project from Existing Code in 'src/'.
  *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
@@ -39,15 +39,17 @@
  *          - Input files may be produced by MATLAB script 'value_start.m'.
  *          - Description of configuration file 'config.txt' refers to '_1D_configurate()'.
  *          - Run program:
- *            - Linux/Unix: Run 'LAG_source.out name_of_test_example order' command on the terminal. \n
- *                          e.g. 'LAG_source.out 6_1 2' (second-order GRP scheme)
- *            - Windows: Run 'LAG_source.exe name_of_test_example order' command on the terminal. \n
+ *            - Linux/Unix: Run 'hydrocode.out name_of_test_example order coordinate' command on the terminal. \n
+ *                          e.g. 'hydrocode.out 6_1 2 LAG' (second-order Lagrangian GRP scheme).
+ *                          - order: Order of Godunov/GRP numerical scheme (= 1 or 2).
+ *                          - coordinate: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
+ *            - Windows: Run 'hydrocode.exe name_of_test_example order coordinate' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging
  * 
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example order (e.g. '6_1 1')
+ *             <tr><th> Command Arguments <td> name_of_test_example order coordinate (e.g. '6_1 1 EUL')
  *             <tr><th> Working Directory <td> \$(SolutionDir)\$(Platform)\\\$(Configuration)\
- *            </table>
+ *             </table>
  * 
  *          - Output files can be found in folder '/data_out/one-dim/'.
  *          - Output files may be visualized by MATLAB script 'value_plot.m'.
@@ -67,19 +69,20 @@ double * RHO0; //!< Initial density  data array pointer.
 
 /**
  * @brief This is the main function which constructs the
- *        main structure of the Lagrangian hydrocode.
+ *        main structure of the Lagrangian/Eulerian hydrocode.
  * @param[in] argc: ARGument counter.
  * @param[in] argv: ARGument values.
  *            - argv[1]: Name of test example.
- *            - argv[2]: Order of numerical scheme (= 1 or 2).
+ *            - argv[2]: Order of Godunov/GRP numerical scheme (= 1 or 2).
+ *            - argv[3]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
  * @return ARGuments state of the program.
- *     @retval 0: ARGuments counter is 3.
- *     @retval 1: ARGuments counter is not 3.
+ *     @retval 0: ARGuments counter is 4.
+ *     @retval 1: ARGuments counter is not 4.
  */
 
 int main(int argc, char *argv[])
 {
-    if (argc!=3)
+    if (argc!=4)
 	{
 	    printf("ARGuments counter is %d not equal to 3!\n", argc);
 	    return 1;
@@ -118,7 +121,7 @@ int main(int argc, char *argv[])
   
   // Initialize arrays of fluid variables.
   double ** RHO, ** U, ** P, ** E, ** X;
-  double * MASS, * cpu_time;
+  double * cpu_time;
   RHO = (double **)malloc(N * sizeof(double *));
   RHO[0] = RHO0 + 1;
   for(k = 1; k < N; ++k)
@@ -172,15 +175,7 @@ int main(int argc, char *argv[])
       goto _END_;
     }
   }
-  MASS=malloc(m * sizeof(double));
-  if(MASS == NULL)
-      {
-	  printf("NOT enough memory! MASS\n");
-	  goto _END_;
-      }
-  // Initialize the values of mass, energy in computational cells and x-coordinate of the cell interfaces.
-  for(k = 0; k < m; ++k)
-		  MASS[k] = h * RHO[0][k];
+  // Initialize the values of energy in computational cells and x-coordinate of the cell interfaces.
   for(k = 0; k < m; ++k)
 		  E[0][k] = 0.5*U[0][k]*U[0][k] + P[0][k]/(gamma - 1.0)/RHO[0][k]; 
   for(k = 0; k <= m; ++k)
@@ -195,14 +190,33 @@ int main(int argc, char *argv[])
       
   int order; // 1-Godunov, 2-GRP
   order = atoi(argv[2]);
-  // Use GRP/Godunov scheme to solve it on Lagrange coordinate.
-  if (order == 1)
-      Godunov_solver_source(config, m, RHO, U, P, E, X, MASS, cpu_time);
-  else if (order == 2)
-      GRP_solver_source(config, m, RHO, U, P, E, X, MASS, cpu_time);
+  if (strcmp(argv[3],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
+      {
+	  if (order == 1)
+	      Godunov_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
+	  else if (order == 2)
+	      GRP_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
+	  else
+	      {
+		  printf("NOT appropriate order of the scheme! The order is %d\n", order);
+		  goto _END_;
+	      }
+      }
+  else if (strcmp(argv[3],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
+      {
+	  if (order == 1)
+	      Godunov_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
+	  else if (order == 2)
+	      GRP_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
+	  else
+	      {
+		  printf("NOT appropriate order of the scheme! The order is %d\n", order);
+		  goto _END_;
+	      }
+      }
   else
       {
-	  printf("NOT appropriate order of the scheme! The order is %d\n", order);
+	  printf("NOT appropriate coordinate framework! The framework is %s\n", argv[3]);
 	  goto _END_;
       }
   
@@ -242,8 +256,6 @@ int main(int argc, char *argv[])
   free(X[0]);
   E[0] = NULL;
   X[0] = NULL;
-  free(MASS);
-  MASS = NULL;
   free(cpu_time);
   cpu_time = NULL;
   

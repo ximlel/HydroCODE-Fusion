@@ -16,8 +16,8 @@
  *                   [rho_star_L, u_star, p_star, rho_star_R]
  * @param[in] rho_L, u_L, p_L: Left  States.
  * @param[in] rho_R, u_R, p_R: Right States.
- * @param[in] s_rho_L, s_u_L, s_p_L: Left  Lagrangian spatial derivatives.
- * @param[in] s_rho_R, s_u_R, s_p_R: Right Lagrangian spatial derivatives.
+ * @param[in] s_rho_L, s_u_L, s_p_L: Left  ξ-Lagrangian spatial derivatives.
+ * @param[in] s_rho_R, s_u_R, s_p_R: Right ξ-Lagrangian spatial derivatives.
  * @param[in] gamma: the constant of the perfect gas.
  * @param[in] eps: the largest value could be seen as zero.
  * @param[in] atc: Parameter that determines the solver type.
