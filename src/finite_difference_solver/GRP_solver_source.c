@@ -95,7 +95,7 @@ void GRP_solver_LAG_source
    */
   double dire[4], mid[4];
   // the paramater in slope limiters.
-  double alpha = 1.5;
+  double alpha = 1.9;
 
   // the slopes of variable values
   double *s_rho, *s_u, *s_p;
@@ -504,7 +504,7 @@ void GRP_solver_EUL_source
    */
   double dire[3], mid[3];
   // the paramater in slope limiters.
-  double alpha = 1.5;
+  double alpha = 1.9;
 
   // the slopes of variable values
   double *s_rho, *s_u, *s_p;
@@ -760,7 +760,7 @@ void GRP_solver_EUL_source
 	      P_t[j]   = dire[2];
 	  }
 
-//====================Time step and grid movement======================
+//====================Time step and grid fixed======================
     tau = CFL * h_S_max;
     if ((time_c + tau) > (t_all - eps))
         tau = t_all - time_c;
@@ -780,6 +780,8 @@ void GRP_solver_EUL_source
 	    RHO_next[j] += 0.5 * tau * RHO_t[j];;
 	    U_next[j]   += 0.5 * tau * U_t[j];
 	    P_next[j]   += 0.5 * tau * P_t[j];
+
+		X[n][j] = X[n - 1][j];
 	}
 
 //======================THE CORE ITERATION=========================(On Eulerian Coordinate)
@@ -828,8 +830,6 @@ void GRP_solver_EUL_source
 	}
 
 //===========================Fixed variable location=======================	
-    for(j = 0; j <= m; ++j)
-	X[n-1][j] = X[n][j];
     for(j = 0; j < m; ++j)
 	{
 	    RHO[n-1][j] = RHO[n][j];

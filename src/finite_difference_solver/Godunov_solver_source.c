@@ -412,11 +412,14 @@ void Godunov_solver_EUL_source
 	      F3[j] = F3[j]*mid[1];
 	  }
 
-//====================Time step======================
+//====================Time step and grid fixed======================
     tau = CFL * h_S_max;
     if ((time_c + tau) > (t_all - eps))
         tau = t_all - time_c;
     nu = tau / h;
+
+	for (j = 0; j <= m; ++j)
+		X[n][j] = X[n - 1][j];
 
 //======================THE CORE ITERATION=========================(On Eulerian Coordinate)
     for(j = 0; j < m; ++j) // forward Euler
@@ -459,8 +462,6 @@ void Godunov_solver_EUL_source
 	}
 
 //===========================Fixed variable location=======================	
-    for(j = 0; j <= m; ++j)
-	X[n-1][j] = X[n][j];
     for(j = 0; j < m; ++j)
 	{
 	    RHO[n-1][j] = RHO[n][j];

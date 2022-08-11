@@ -110,7 +110,7 @@ void linear_GRP_solver_LAG
 		  W_L = (p_star-p_L) / (u_star-u_L);
 		  A   = - 0.5/(p_star + zeta * p_L);
 		  a_L = 2.0 + A * (p_star-p_L);
-		  b_L = - W_L/g_star_L/g_star_L - (a_R - 1.0)/W_L;
+		  b_L = - W_L/g_star_L/g_star_L - (a_L - 1.0)/W_L;
 		  L_rho = (p_star-p_L)/2.0/rho_L;
 		  B = 1.0/(p_star-p_L) - zeta * A;
 		  L_u = rho_L * (u_star-u_L) * (gamma*p_L*B + 0.5) + W_L;

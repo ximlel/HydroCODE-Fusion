@@ -40,15 +40,18 @@
  *          - Description of configuration file 'config.txt' refers to '_1D_configurate()'.
  *          - Run program:
  *            - Linux/Unix: Run 'hydrocode.out name_of_test_example order coordinate' command on the terminal. \n
- *                          e.g. 'hydrocode.out 6_1 2 LAG' (second-order Lagrangian GRP scheme).
+ *                          e.g. 'hydrocode.out GRP_Book_6_1 2 LAG' (second-order Lagrangian GRP scheme).
  *                          - order: Order of Godunov/GRP numerical scheme (= 1 or 2).
  *                          - coordinate: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
  *            - Windows: Run 'hydrocode.exe name_of_test_example order coordinate' command on the terminal. \n
- *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging
- * 
+ *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example order coordinate (e.g. '6_1 1 EUL')
+ *             <tr><th> Command Arguments <td> name_of_test_example order coordinate (e.g. 'GRP_Book_6_1 1 EUL')
  *             <tr><th> Working Directory <td> \$(SolutionDir)\$(Platform)\\\$(Configuration)\
+ *             </table>
+ *                       [Run] Project -> Properties -> Configuration Properties -> Linker -> System \n
+ *             <table>
+ *             <tr><th> Subsystem <td> 控制台 (/SUBSYSTEM:CONSOLE)
  *             </table>
  * 
  *          - Output files can be found in folder '/data_out/one-dim/'.

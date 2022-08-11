@@ -19,7 +19,7 @@ cd ../Specification
 xelatex Specification.tex
 ```
 
-Open 'doc/html/index.html' in a browser to view	the specific instructions of the program.
+Open 'doc/html/index.html' in a browser to view the specific instructions of this program.
 
 Licensing
 ---------
