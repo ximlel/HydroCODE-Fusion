@@ -9,8 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "../include/Riemann_solver.h"
+#include "../include/tools.h"
 
 #ifdef _WIN32
 #define ISNAN(a) _isnan((a))
@@ -78,6 +80,8 @@ void GRP_solver_LAG_source
   double const CFL   = config[6];        // the CFL number
   int    const bound = (int)(config[7]); // the boundary condition
 
+  _Bool find_bound = false;
+  
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
   double c_L, c_R; // the speeds of sound
@@ -153,13 +157,6 @@ void GRP_solver_LAG_source
 
   double UL, PL, RHOL, HL, SUL, SPL, SRHOL; // Left  boundary condition
   double UR, PR, RHOR, HR, SUR, SPR, SRHOR; // Right boundary condition
-  if (bound == -1) // initial boudary conditions
-      {
-	  UL   =   U[0][0]; UR   =   U[0][m-1];
-	  PL   =   P[0][0]; PR   =   P[0][m-1];
-	  RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
-	  HL  = h; HR = h;
-      }
   SUL   = 0.0;   SUR = 0.0;
   SPL   = 0.0;   SPR = 0.0;
   SRHOL = 0.0; SRHOR = 0.0;
@@ -167,34 +164,67 @@ void GRP_solver_LAG_source
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = INFINITY; // h/S_max = INF
+      h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      if (bound == -2) // reflective boundary conditions
+      switch (bound)
 	  {
-	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
+	  case -1: // initial boudary conditions
+	      if(find_bound)
+		  break;
+	      else
+		  printf("Initial boudary conditions.\n");		  
+	      find_bound = true;
+	      UL   =   U[0][0]; UR   =   U[0][m-1];
+	      PL   =   P[0][0]; PR   =   P[0][m-1];
+	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
+	      HL  = h; HR = h;
+	      break;
+	  case -2: // reflective boundary conditions
+	      if(!find_bound)
+		  printf("Reflective boudary conditions.\n");
+	      find_bound = true;
+		  UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	}
-      if (bound == -4) // free boundary conditions
-	  {
-	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
+	      break;
+	  case -4: // free boundary conditions
+	      if(!find_bound)
+		  printf("Free boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
-      if (bound == -5) // periodic boundary conditions
-	  {
-	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
+	      break;
+	  case -5: // periodic boundary conditions
+	      if(!find_bound)
+		  printf("Periodic boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
 	      HL = X[n-1][m] - X[n-1][m-1];
 	      HR = X[n-1][1] - X[n-1][0];
+	      break;
+	  case -24: // reflective + free boundary conditions
+	      if(!find_bound)
+		  printf("Reflective + Free boudary conditions.\n");
+	      find_bound = true;
+	      break;
+		  UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
+	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
+	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
+	  default:
+	      printf("No suitable boundary coditions!\n");
+	      goto _END_;
 	  }
-      
+
 //=================Initialize slopes=====================
       for(j = 0; j < m; ++j) // Reconstruct slopes
 	  { /*
@@ -243,15 +273,19 @@ void GRP_solver_LAG_source
 		      s_rho[j] = minmod3(alpha*s_rho_L, alpha*s_rho_R, s_rho[j]);
 		  }
 	  }
-      if (bound == -2) // reflective boundary conditions
+      switch(bound)
 	  {
+	  case -2: // reflective boundary conditions
 	      SUL = - s_u[0]; SUR = - s_u[m-1];
-	  }
-      if (bound == -5) // periodic boundary conditions
-	  {
+	      break;
+	  case -5: // periodic boundary conditions
 	      SUL   =   s_u[m-1]; SUR   =   s_u[0];
 	      SPL   =   s_p[m-1]; SPR   =   s_p[0];
 	      SRHOL = s_rho[m-1]; SRHOR = s_rho[0];
+	      break;
+	  case -24: // reflective + free boundary conditions
+	      SUL = - s_u[0];
+	      break;
 	  }
       
       for(j = 0; j <= m; ++j)
@@ -408,9 +442,10 @@ void GRP_solver_LAG_source
     time_c += tau;
     if(time_c > (t_all - eps))
 	{
-	    printf("Time is up in time step %d.\n", k);
+	    printf("\nTime is up in time step %d.\n", k);
 	    break;
 	}
+    DispPro(time_c*100.0/t_all, k);
 
 //===========================Fixed variable location=======================	
     for(j = 0; j <= m; ++j)
@@ -424,7 +459,7 @@ void GRP_solver_LAG_source
 	}	
   }
 
-  printf("The cost of CPU time for 1D-GRP scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 1D-GRP Lagrangian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
 _END_:
@@ -488,6 +523,8 @@ void GRP_solver_EUL_source
   double const CFL   = config[6];        // the CFL number
   int    const bound = (int)(config[7]); // the boundary condition
 
+  _Bool find_bound = false;
+  
   double Mom, Ene;
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
@@ -562,13 +599,6 @@ void GRP_solver_EUL_source
 
   double UL, PL, RHOL, HL, SUL, SPL, SRHOL; // Left  boundary condition
   double UR, PR, RHOR, HR, SUR, SPR, SRHOR; // Right boundary condition
-  if (bound == -1) // initial boudary conditions
-      {
-	  UL   =   U[0][0]; UR   =   U[0][m-1];
-	  PL   =   P[0][0]; PR   =   P[0][m-1];
-	  RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
-	  HL  = h; HR = h;
-      }
   SUL   = 0.0;   SUR = 0.0;
   SPL   = 0.0;   SPR = 0.0;
   SRHOL = 0.0; SRHOR = 0.0;
@@ -576,32 +606,65 @@ void GRP_solver_EUL_source
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = INFINITY; // h/S_max = INF
+      h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      if (bound == -2) // reflective boundary conditions
+      switch (bound)
 	  {
-	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
+	  case -1: // initial boudary conditions
+	      if(find_bound)
+		  break;
+	      else
+		  printf("Initial boudary conditions.\n");		  
+	      find_bound = true;
+	      UL   =   U[0][0]; UR   =   U[0][m-1];
+	      PL   =   P[0][0]; PR   =   P[0][m-1];
+	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
+	      HL  = h; HR = h;
+	      break;
+	  case -2: // reflective boundary conditions
+	      if(!find_bound)
+		  printf("Reflective boudary conditions.\n");
+	      find_bound = true;
+		  UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	}
-      if (bound == -4) // free boundary conditions
-	  {
-	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
+	      break;
+	  case -4: // free boundary conditions
+	      if(!find_bound)
+		  printf("Free boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
-      if (bound == -5) // periodic boundary conditions
-	  {
-	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
+	      break;
+	  case -5: // periodic boundary conditions
+	      if(!find_bound)
+		  printf("Periodic boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
 	      HL = X[n-1][m] - X[n-1][m-1];
 	      HR = X[n-1][1] - X[n-1][0];
+	      break;
+	  case -24: // reflective + free boundary conditions
+	      if(!find_bound)
+		  printf("Reflective + Free boudary conditions.\n");
+	      find_bound = true;
+	      break;
+		  UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
+	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
+	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
+	  default:
+	      printf("No suitable boundary coditions!\n");
+	      goto _END_;
 	  }
       
 //=================Initialize slopes=====================
@@ -652,16 +715,22 @@ void GRP_solver_EUL_source
 		      s_rho[j] = minmod3(alpha*s_rho_L, alpha*s_rho_R, s_rho[j]);
 		  }
 	  }
-      if (bound == -2) // reflective boundary conditions
+      switch(bound)
 	  {
+	  case -2: // reflective boundary conditions
 	      SUL = - s_u[0]; SUR = - s_u[m-1];
-	  }
-      if (bound == -5) // periodic boundary conditions
-	  {
+	      break;
+	  case -5: // periodic boundary conditions
 	      SUL   =   s_u[m-1]; SUR   =   s_u[0];
 	      SPL   =   s_p[m-1]; SPR   =   s_p[0];
 	      SRHOL = s_rho[m-1]; SRHOR = s_rho[0];
+	      break;
+	  case -24: // reflective + free boundary conditions
+	      SUL = - s_u[0];
+	      break;
 	  }
+      if(find_bound == false)
+	  printf("No suitable boundary coditions!\n");
       
       for(j = 0; j <= m; ++j)
 	  { /*
@@ -825,9 +894,10 @@ void GRP_solver_EUL_source
     time_c += tau;
     if(time_c > (t_all - eps))
 	{
-	    printf("Time is up in time step %d.\n", k);
+	    printf("\nTime is up in time step %d.\n", k);
 	    break;
 	}
+    DispPro(time_c*100.0/t_all, k);
 
 //===========================Fixed variable location=======================	
     for(j = 0; j < m; ++j)
@@ -839,7 +909,7 @@ void GRP_solver_EUL_source
 	}	
   }
 
-  printf("The cost of CPU time for 1D-GRP scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 1D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
 _END_:

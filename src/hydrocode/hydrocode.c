@@ -21,22 +21,22 @@
  * <table>
  * <tr><th> include/                   <td> Header files
  * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> finite_difference_solver/  <td> finite volume scheme program
+ * <tr><th> finite_volume/             <td> finite volume scheme program
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> hydrocode/hydrocode.c      <td> Main program
  * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
  * </table>
  * 
  * @section Compile_environment Compile environment
- *          - Linux/Unix: gcc, glibc, MATLAB
+ *          - Linux/Unix: gcc, glibc, MATLAB/Octave
  *            - Compile in 'src/hydrocode': Run './make.sh' command on the terminal.
- *          - Winodws: Visual Studio, MATLAB
+ *          - Winodws: Visual Studio, MATLAB/Octave
  *            - Create a C++ Project from Existing Code in 'src/'.
  *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
  *
  * @section Usage_description Usage description
  *          - Input files are stored in folder '/data_in/one-dim/name_of_test_example'.
- *          - Input files may be produced by MATLAB script 'value_start.m'.
+ *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
  *          - Description of configuration file 'config.txt' refers to '_1D_configurate()'.
  *          - Run program:
  *            - Linux/Unix: Run 'hydrocode.out name_of_test_example order coordinate' command on the terminal. \n
@@ -55,7 +55,7 @@
  *             </table>
  * 
  *          - Output files can be found in folder '/data_out/one-dim/'.
- *          - Output files may be visualized by MATLAB script 'value_plot.m'.
+ *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +63,7 @@
 #include <string.h>
 
 #include "../include/file_io.h"
-#include "../include/finite_difference_solver.h"
+#include "../include/finite_volume.h"
 #include "../include/Riemann_solver.h"
 
 double * U0;   //!< Initial velocity data array pointer.
@@ -195,27 +195,31 @@ int main(int argc, char *argv[])
   order = atoi(argv[2]);
   if (strcmp(argv[3],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {
-	  if (order == 1)
-	      Godunov_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
-	  else if (order == 2)
-	      GRP_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
-	  else
+	  switch(order)
 	      {
+	      case 1:
+		  Godunov_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
+		  break;
+	      case 2:
+		  GRP_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
+		  break;
+	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d\n", order);
 		  goto _END_;
 	      }
       }
   else if (strcmp(argv[3],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
-	  if (order == 1)
-	      Godunov_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
-	  else if (order == 2)
-	      GRP_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
-	  else
+	  switch(order)
 	      {
+	      case 1:
+		  Godunov_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
+	      case 2:
+		  GRP_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
+	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d\n", order);
 		  goto _END_;
-	      }
+          }
       }
   else
       {

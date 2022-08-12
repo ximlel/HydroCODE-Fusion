@@ -92,8 +92,11 @@ dkms.conf
 # Data input
 *.mat
 
-# Data output
+# Data input/output
 *.dat
+
+# Octave Workspace
+octave-workspace
 
 # ======================   Doxygen   ==================
 

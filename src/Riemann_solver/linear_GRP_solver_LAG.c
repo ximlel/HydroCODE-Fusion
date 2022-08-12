@@ -40,7 +40,7 @@ void linear_GRP_solver_LAG
   const double zeta = (gamma-1.0)/(gamma+1.0);
 
   double dist; // Euclidean distance
-  int CRW[2];  // Centred Rarefaction Wave (CRW) Indicator
+  _Bool CRW[2];  // Centred Rarefaction Wave (CRW) Indicator
 
   double c_L, c_R, g_L, g_R; // g = rho * c
   c_L = sqrt(gamma * p_L / rho_L);

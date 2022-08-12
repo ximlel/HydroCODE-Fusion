@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 
 /**
@@ -16,8 +17,8 @@
  * @param[in]  u_R, p_R, c_R: Initial Velocity/Pressure/sound_speed on right state.
  * @param[in]  gamma: Ratio of specific heats.
  * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
- *                  - 1: CRW
- *                  - 0: Shock wave
+ *                  - true: CRW
+ *                  - false: Shock wave
  * @param[in]  eps: The largest value can be seen as zero.
  * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
  * @param[in]  N:   Maximum iteration step.
@@ -29,7 +30,7 @@
  */
 double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double gamma,
 			    const double u_L, const double u_R, const double p_L, const double p_R,
-			    const double c_L, const double c_R, int * CRW,
+			    const double c_L, const double c_R, _Bool * CRW,
 			    const double eps, const double tol, const int N)
 {
   double mu, nu, sigma;
@@ -75,13 +76,13 @@ double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double g
     u_RL = u_R + u_RL;
   }
   if(u_LR > u_R+eps)
-    CRW[1] = 0;
+    CRW[1] = false;
   else
-    CRW[1] = 1;
+    CRW[1] = true;
   if(u_RL > u_L-eps)
-    CRW[0] = 1;
+    CRW[0] = true;
   else
-    CRW[0] = 0;
+    CRW[0] = false;
 
   //======one step of the Newton ietration to get the intersection point of I1 and I3====
   k1 = -c_L / p_L / gamma;//the (p,u)-tangent slope on I1 at (u_L,p_L), i.e. [du/dp](p_L)

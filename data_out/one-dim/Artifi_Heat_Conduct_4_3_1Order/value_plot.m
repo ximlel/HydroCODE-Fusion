@@ -9,19 +9,15 @@ e_p  =E(N_STEP,:)-0.5*U(N_STEP,:).^2;
 x_p  =X(N_STEP,:);
 figure(1)
 hold on
-plot(x_p,rho_p,'b.');
-ylim([0,1]);
+plot(x_p,rho_p,'r.');
+xlim([0.2,0.8]);
+ylim([1,2.1]);
 xlabel('x');
 ylabel('\rho');
-figure(2)
-hold on
-plot(x_p,u_p,'b.');
-ylim([0,1]);
-xlabel('x');
-ylabel('u');
 figure(4)
 hold on
-plot(x_p,e_p,'b.');
-ylim([1.8,3.3]);
+plot(x_p,e_p,'r.');
+xlim([0.2,0.8]);
+ylim([2.5,3.9]);
 xlabel('x');
 ylabel('e');

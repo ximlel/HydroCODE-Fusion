@@ -35,7 +35,7 @@ void linear_GRP_solver_Edir
 {
   double dist;
   double c_L, c_R;
-  int CRW[2];
+  _Bool CRW[2];
   double u_star, p_star, rho_star_L, rho_star_R, c_star_L, c_star_R;
 
   double PI, H1, H2, H3;

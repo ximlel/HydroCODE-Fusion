@@ -4,9 +4,13 @@
  * @details This header file declares functions in files '_1D_f_io.c' and 'common.c'.
  */
 
+#ifndef FILEIO_H
+#define FILEIO_H
+
 extern double * U0;   //!< Initial velocity data array pointer.
 extern double * P0;   //!< Initial pressure data array pointer.
 extern double * RHO0; //!< Initial density  data array pointer.
+extern double * config;
 
 //! Define the number of configuration parameters.
 #ifndef N_CONF
@@ -24,3 +28,5 @@ void _1D_configurate(double * config, const char * name, const char * add);
 void _1D_file_write(const int m, const int N, 
                     double * RHO[], double * U[], double * P[], double * Ene[], double * X[], 
                     const double * cpu_time, const double * config, const char * name, const char * add_out);
+
+#endif

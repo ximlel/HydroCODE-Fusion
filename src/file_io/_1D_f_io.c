@@ -370,7 +370,7 @@ void _1D_file_write(const int m, const int N,
   for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
-      fprintf(fp_write, "%.18lf\t", RHO[n][j]);
+      fprintf(fp_write, "%.10lf\t", RHO[n][j]);
     fprintf(fp_write, "\n");
   }
   fclose(fp_write);
@@ -387,7 +387,7 @@ void _1D_file_write(const int m, const int N,
   for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
-      fprintf(fp_write, "%.18lf\t", U[n][j]);
+      fprintf(fp_write, "%.10lf\t", U[n][j]);
     fprintf(fp_write, "\n");
   }
   fclose(fp_write);
@@ -404,7 +404,7 @@ void _1D_file_write(const int m, const int N,
   for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
-      fprintf(fp_write, "%.18lf\t", P[n][j]);
+      fprintf(fp_write, "%.10lf\t", P[n][j]);
     fprintf(fp_write, "\n");
   }
   fclose(fp_write);
@@ -421,7 +421,7 @@ void _1D_file_write(const int m, const int N,
   for(n = 0; n < N; ++n)
   {
     for(j = 0; j < m; ++j)
-      fprintf(fp_write, "%.18lf\t", Ene[n][j]);
+      fprintf(fp_write, "%.10lf\t", Ene[n][j]);
     fprintf(fp_write, "\n");
   }
   fclose(fp_write);

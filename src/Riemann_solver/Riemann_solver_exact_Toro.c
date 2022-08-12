@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /**
  * @brief EXACT RIEMANN SOLVER FOR THE EULER EQUATIONS
@@ -15,8 +16,8 @@
  * @param[in]  U_r, P_r, c_r: Initial Velocity/Pressure/sound_speed on right state.
  * @param[in]  gamma: Ratio of specific heats.
  * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
- *                  - 1: CRW
- *                  - 0: Shock wave
+ *                  - true: CRW
+ *                  - false: Shock wave
  * @param[in]  eps: The largest value can be seen as zero.
  * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
  * @param[in]  N:   Maximum iteration step.
@@ -33,7 +34,7 @@
  */
 double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double gamma,
 				 const double U_l, const double U_r, const double P_l, const double P_r,
-				 const double c_l, const double c_r, int * CRW,
+				 const double c_l, const double c_r, _Bool * CRW,
 				 const double eps, const double tol, const int N)
 {
     int n = 0;		
@@ -100,13 +101,13 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 
     //==========Centred Rarefaction Wave or Not===================	
     if(P_int > P_l-eps)
-	CRW[0]=0;
+	CRW[0]=false;
     else
-	CRW[0]=1;
+	CRW[0]=true;
     if(P_int > P_r+eps)
-	CRW[1]=0;
+	CRW[1]=false;
     else
-	CRW[1]=1;
+	CRW[1]=true;
   
     U_int = 0.5*(U_l+U_r)+ 0.5 *(f_R-f_L);
 

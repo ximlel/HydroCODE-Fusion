@@ -9,8 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "../include/Riemann_solver.h"
+#include "../include/tools.h"
 
 #ifdef _WIN32
 #define ISNAN(a) _isnan((a))
@@ -50,11 +52,13 @@ void Godunov_solver_LAG_source
   double const CFL   = config[6];        // the CFL number
   int    const bound = (int)(config[7]); // the boundary condition
 
+  _Bool find_bound = false;
+  
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
   double c_L, c_R; // the speeds of sound
   double h_L, h_R; // length of spatial grids
-  int CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
+  _Bool CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
   double u_star, p_star; // the Riemann solutions
   double *u_mid = malloc((m + 1) * sizeof(double)); 
   double *p_mid = malloc((m + 1) * sizeof(double));
@@ -85,37 +89,71 @@ void Godunov_solver_LAG_source
 	  PL   =   P[0][0]; PR   =   P[0][m-1];
 	  RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
 	  HL  = h; HR = h;
-      }
+	  find_bound = true;
+	  printf("Initial boudary conditions.\n");
+      };
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = INFINITY; // h/S_max = INF
+      h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
-
-      if (bound == -2) // reflective boundary conditions
+      switch (bound)
 	  {
-	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
+	  case -1: // initial boudary conditions
+	      if(find_bound)
+		  break;
+	      else
+		  printf("Initial boudary conditions.\n");		  
+	      find_bound = true;
+	      UL   =   U[0][0]; UR   =   U[0][m-1];
+	      PL   =   P[0][0]; PR   =   P[0][m-1];
+	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
+	      HL  = h; HR = h;
+	      break;
+	  case -2: // reflective boundary conditions
+	      if(!find_bound)
+		  printf("Reflective boudary conditions.\n");
+	      find_bound = true;
+		  UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
-      if (bound == -4) // free boundary conditions
-	  {
-	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
+	      break;
+	  case -4: // free boundary conditions
+	      if(!find_bound)
+		  printf("Free boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
-      if (bound == -5) // periodic boundary conditions
-	  {
-	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
+	      break;
+	  case -5: // periodic boundary conditions
+	      if(!find_bound)
+		  printf("Periodic boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
 	      HL = X[n-1][m] - X[n-1][m-1];
 	      HR = X[n-1][1] - X[n-1][0];
+	      break;
+	  case -24: // reflective + free boundary conditions
+	      if(!find_bound)
+		  printf("Reflective + Free boudary conditions.\n");
+	      find_bound = true;
+	      break;
+		  UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
+	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
+	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
+	  default:
+	      printf("No suitable boundary coditions!\n");
+	      goto _END_;
 	  }
       
       for(j = 0; j <= m; ++j)
@@ -216,9 +254,10 @@ void Godunov_solver_LAG_source
     time_c += tau;
     if(time_c > (t_all - eps))
 	{
-	    printf("Time is up in time step %d.\n", k);
+	    printf("\nTime is up in time step %d.\n", k);
 	    break;
 	}
+    DispPro(time_c*100.0/t_all, k);
 
 //===========================Fixed variable location=======================	
     for(j = 0; j <= m; ++j)
@@ -232,7 +271,7 @@ void Godunov_solver_LAG_source
 	}	
   }
 
-  printf("The cost of CPU time for 1D-Godunov scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 1D-Godunov Lagrangian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
 _END_:
@@ -243,7 +282,6 @@ _END_:
   free(MASS);
   MASS = NULL;
 }
-
 
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
@@ -275,6 +313,8 @@ void Godunov_solver_EUL_source
   double const CFL   = config[6];        // the CFL number
   int    const bound = (int)(config[7]); // the boundary condition
 
+  _Bool find_bound = false;
+  
   double Mom, Ene;
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
@@ -285,7 +325,6 @@ void Godunov_solver_EUL_source
    *       [rho_star_L, u_star, p_star, rho_star_R]
    */
   double dire[3], mid[3];
-  int CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
   double nu;  // nu = tau/h
   double *F1, *F2, *F3; // the numerical flux at (x_{j-1/2}, t_{n}).
   double * MASS; // Array of the mass data in computational cells.
@@ -312,43 +351,69 @@ void Godunov_solver_EUL_source
 
   double UL, PL, RHOL, HL; // Left  boundary condition
   double UR, PR, RHOR, HR; // Right boundary condition
-  if (bound == -1) // initial boudary conditions
-      {
-	  UL   =   U[0][0]; UR   =   U[0][m-1];
-	  PL   =   P[0][0]; PR   =   P[0][m-1];
-	  RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
-	  HL  = h; HR = h;
-      }
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = INFINITY; // h/S_max = INF
+      h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      if (bound == -2) // reflective boundary conditions
+      switch (bound)
 	  {
-	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
+	  case -1: // initial boudary conditions
+	      if(find_bound)
+		  break;
+	      else
+		  printf("Initial boudary conditions.\n");		  
+	      find_bound = true;
+	      UL   =   U[0][0]; UR   =   U[0][m-1];
+	      PL   =   P[0][0]; PR   =   P[0][m-1];
+	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
+	      HL  = h; HR = h;
+	      break;
+	  case -2: // reflective boundary conditions
+	      if(!find_bound)
+		  printf("Reflective boudary conditions.\n");
+	      find_bound = true;
+		  UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
-      if (bound == -4) // free boundary conditions
-	  {
-	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
+	      break;
+	  case -4: // free boundary conditions
+	      if(!find_bound)
+		  printf("Free boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	  }
-      if (bound == -5) // periodic boundary conditions
-	  {
-	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
+	      break;
+	  case -5: // periodic boundary conditions
+	      if(!find_bound)
+		  printf("Periodic boudary conditions.\n");
+	      find_bound = true;
+		  UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
 	      HL = X[n-1][m] - X[n-1][m-1];
 	      HR = X[n-1][1] - X[n-1][0];
+	      break;
+	  case -24: // reflective + free boundary conditions
+	      if(!find_bound)
+		  printf("Reflective + Free boudary conditions.\n");
+	      find_bound = true;
+	      break;
+		  UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
+	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
+	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
+	  default:
+	      printf("No suitable boundary coditions!\n");
+	      goto _END_;
 	  }
       
       for(j = 0; j <= m; ++j)
@@ -435,7 +500,7 @@ void Godunov_solver_EUL_source
 	    U[n][j] = Mom / RHO[n][j];
 	    E[n][j] = Ene / RHO[n][j];
 	    P[n][j] = (Ene - 0.5*Mom*U[n][j])*(gamma-1.0);
-	  
+
 	    if(P[n][j] < eps || RHO[n][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x)\n", k, j);
@@ -457,9 +522,10 @@ void Godunov_solver_EUL_source
     time_c += tau;
     if(time_c > (t_all - eps))
 	{
-	    printf("Time is up in time step %d.\n", k);
+	    printf("\nTime is up in time step %d.\n", k);
 	    break;
 	}
+    DispPro(time_c*100.0/t_all, k);
 
 //===========================Fixed variable location=======================	
     for(j = 0; j < m; ++j)
@@ -471,7 +537,7 @@ void Godunov_solver_EUL_source
 	}	
   }
 
-  printf("The cost of CPU time for 1D-Godunov scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 1D-Godunov Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
 _END_:

@@ -5,6 +5,9 @@
  *          and 'GRP_solver_source.c'.
  */
 
+#ifndef FINITEVOLUME_H
+#define FINITEVOLUME_H
+
 void Godunov_solver_LAG_source
 (double * config, const int m, double * RHO[], double * U[], double * P[],
  double * E[], double * X[], double * cpu_time);
@@ -20,3 +23,5 @@ void Godunov_solver_EUL_source
 void GRP_solver_EUL_source
 (double * config, const int m, double * RHO[], double * U[], double * P[],
  double * E[], double * X[], double * cpu_time);
+
+#endif
