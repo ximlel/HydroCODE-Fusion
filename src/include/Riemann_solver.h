@@ -32,6 +32,8 @@ void linear_GRP_solver_Edir
  const double   p_L, const double   p_R, const double   s_p_L, const double   s_p_R,
  const double gamma, const double eps);
 
+#ifndef Riemann_solver_exact
 #define Riemann_solver_exact Riemann_solver_exact_Ben
+#endif
 
 #endif

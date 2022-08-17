@@ -26,6 +26,16 @@
  * <tr><th> hydrocode/hydrocode.c      <td> Main program
  * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
  * </table>
+ *
+ * @section Status_code Program exit status code
+ * <table>
+ * <tr><th> 0  <td> EXIT_SUCCESS
+ * <tr><th> 1  <td> File directory error
+ * <tr><th> 2  <td> Data reading error
+ * <tr><th> 3  <td> Calculation error
+ * <tr><th> 4  <td> Arguments error
+ * <tr><th> 5  <td> Memory error
+ * </table>
  * 
  * @section Compile_environment Compile environment
  *          - Linux/Unix: gcc, glibc, MATLAB/Octave
@@ -37,7 +47,7 @@
  * @section Usage_description Usage description
  *          - Input files are stored in folder '/data_in/one-dim/name_of_test_example'.
  *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
- *          - Description of configuration file 'config.txt' refers to '_1D_configurate()'.
+ *          - Description of configuration file 'config.txt' refers to 'doc/config.csv'.
  *          - Run program:
  *            - Linux/Unix: Run 'hydrocode.out name_of_test_example order coordinate' command on the terminal. \n
  *                          e.g. 'hydrocode.out GRP_Book_6_1 2 LAG' (second-order Lagrangian GRP scheme).
@@ -57,11 +67,13 @@
  *          - Output files can be found in folder '/data_out/one-dim/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
  */
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
+#include "../include/var_struc.h"
 #include "../include/file_io.h"
 #include "../include/finite_volume.h"
 #include "../include/Riemann_solver.h"
@@ -69,6 +81,22 @@
 double * U0;   //!< Initial velocity data array pointer.
 double * P0;   //!< Initial pressure data array pointer.
 double * RHO0; //!< Initial density  data array pointer.
+double config[N_CONF] = {INFINITY}; //!< Initial configuration data array.
+
+#define CV_INIT_MEM(v, N)						\
+    do {								\
+	CV.v = (double **)malloc(N * sizeof(double *));			\
+	CV.v[0] = v##0 + 1;						\
+	for(k = 1; k < N; ++k)						\
+	    {								\
+		CV.v[k] = (double *)malloc(m * sizeof(double));		\
+		if(CV.v[k] == NULL)					\
+		    {							\
+			printf("NOT enough memory! %s[%d]\n", #sfv, k);	\
+			goto return_NULL;				\
+		    }							\
+	    }								\
+    } while (0)								\
 
 /**
  * @brief This is the main function which constructs the
@@ -78,21 +106,22 @@ double * RHO0; //!< Initial density  data array pointer.
  *            - argv[1]: Name of test example.
  *            - argv[2]: Order of Godunov/GRP numerical scheme (= 1 or 2).
  *            - argv[3]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
- * @return ARGuments state of the program.
- *     @retval 0: ARGuments counter is 4.
- *     @retval 1: ARGuments counter is not 4.
+ * @return Program exit status code.
  */
-
 int main(int argc, char *argv[])
 {
-    if (argc!=4)
+    printf("ARGuments counter is equal to %d!\n", argc - 1);
+    
+    // Set dimension.
+    double dim;
+    dim = atoi(argv[3]);
+    if (dim != 1 && dim !=2 && dim !=3)
 	{
-	    printf("ARGuments counter is %d not equal to 3!\n", argc);
-	    return 1;
+	    printf("No appropriate dimension was entered!\n");
+	    return 4;
 	}
-    char add[FILENAME_MAX];
-    // Get the address of initial data files.
-    example_io(argv[1], add, 1);
+    config[0] = dim;
+
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
@@ -100,7 +129,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-    _1D_initialize(argv[1], add); 
+    _1D_initialize(argv[1]); 
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -108,64 +137,47 @@ int main(int argc, char *argv[])
      * notation in the math theory.
      */
     int m = (int)U0[0];
-    
-  double config[N_CONF];
-  /* 
-   * Read the configuration data.
-   * The detail could be seen in the definition of array config
-   * referring to file '_1D_f_io.c'.
-   */
-  _1D_configurate(config, argv[1], add); 
 
-  int k;
+    char * endptr;
+    int k, j;
+    double conf_tmp;
+    for (k = 6; k < argc; k++)
+	{
+	    errno = 0;
+	    j = strtol(argv[k], &endptr, 10);
+	    if (errno != ERANGE && *endptr == '=')
+		{							
+		    endptr++;
+		    errno = 0;
+		    conf_tmp = strtod(endptr, &endptr);
+		    if (errno != ERANGE && *endptr == '\0')
+			config[j] = conf_tmp;
+		    else
+			printf("Configuration error in ARGument variable! ERROR 2!\n");
+		}
+	    else
+		printf("Configuration error in ARGument variable! ERROR 1!\n");
+	}
+    double h = config[10], gamma = config[6];
+
   // The number of times steps of the fluid data stored for plotting.
-  int N = 2; // (int)(config[4]) + 1;
-  double h = config[2], gamma = config[0];
-  
-  // Initialize arrays of fluid variables.
-  double ** RHO, ** U, ** P, ** E, ** X;
+  int N = 2; // (int)(config[5]) + 1;
+
+  struct cell_var CV;
+  double ** X;
   double * cpu_time;
-  RHO = (double **)malloc(N * sizeof(double *));
-  RHO[0] = RHO0 + 1;
-  for(k = 1; k < N; ++k)
-  {
-    RHO[k] = (double *)malloc(m * sizeof(double));
-    if(RHO[k] == NULL)
-    {
-      printf("NOT enough memory! RHO[%d]\n", k);
-      goto _END_;
-    }
-  }
-  U = (double**)malloc(N * sizeof(double*));
-  U[0] = U0 + 1;
-  for(k = 1; k < N; ++k)
-  {
-    U[k] = (double *)malloc(m * sizeof(double));
-    if(U[k] == NULL)
-    {
-      printf("NOT enough memory! U[%d]\n", k);
-      goto _END_;
-    }
-  } 
-  P = (double**)malloc(N * sizeof(double*));
-  P[0] = P0 + 1;
-  for(k = 1; k < N; ++k)
-  {
-    P[k] = (double *)malloc(m * sizeof(double));
-    if(P[k] == NULL)
-    {
-      printf("NOT enough memory! P[%d]\n", k);
-      goto _END_;
-    }
-  }
-  E = (double**)malloc(N * sizeof(double*));
+  // Initialize arrays of fluid variables.
+  CV_INIT_MEM(RHO, N);
+  CV_INIT_MEM(U, N);
+  CV_INIT_MEM(P, N);
+  CV.E = (double**)malloc(N * sizeof(double*));
   for(k = 0; k < N; ++k)
   {
-    E[k] = (double *)malloc(m * sizeof(double));
-    if(E[k] == NULL)
+    CV.E[k] = (double *)malloc(m * sizeof(double));
+    if(CV.E[k] == NULL)
     {
       printf("NOT enough memory! E[%d]\n", k);
-      goto _END_;
+      goto return_NULL;
     }
   }
   X = (double**)malloc(N * sizeof(double*));
@@ -175,93 +187,100 @@ int main(int argc, char *argv[])
     if(X[k] == NULL)
     {
       printf("NOT enough memory! X[%d]\n", k);
-      goto _END_;
+      goto return_NULL;
     }
   }
   // Initialize the values of energy in computational cells and x-coordinate of the cell interfaces.
   for(k = 0; k < m; ++k)
-		  E[0][k] = 0.5*U[0][k]*U[0][k] + P[0][k]/(gamma - 1.0)/RHO[0][k]; 
+      E[0][k] = 0.5*CV.U[0][k]*CV.U[0][k] + CV.P[0][k]/(gamma - 1.0)/CV.RHO[0][k]; 
   for(k = 0; k <= m; ++k)
-		  X[0][k] = h * k;
+      X[0][k] = h * k;
 
   cpu_time = malloc(N * sizeof(double));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
-	  goto _END_;
+	  goto return_NULL;
       }
       
   int order; // 1-Godunov, 2-GRP
-  order = atoi(argv[2]);
-  if (strcmp(argv[3],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
+  char * scheme;
+  printf("Order_Scheme: %s\n",argv[4]);
+  errno = 0;
+  order = strtol(argv[4], &scheme, 10);	
+  if (*scheme == '_')
+      scheme++;
+  else if (*scheme != '\0' || errno == ERANGE)
+      {
+	  printf("No order!\n");
+	  goto return_NULL;
+      }
+
+  if (strcmp(argv[5],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
+		  Godunov_solver_LAG_source(m, CV, X, cpu_time);
 		  break;
 	      case 2:
-		  GRP_solver_LAG_source(config, m, RHO, U, P, E, X, cpu_time);
+		  GRP_solver_LAG_source(m, CV, X, cpu_time);
 		  break;
 	      default:
-		  printf("NOT appropriate order of the scheme! The order is %d\n", order);
-		  goto _END_;
+		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
+		  goto return_NULL;
 	      }
       }
-  else if (strcmp(argv[3],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
+  else if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
+		  Godunov_solver_EUL_source(m, CV, X, cpu_time);
+		  break;
 	      case 2:
-		  GRP_solver_EUL_source(config, m, RHO, U, P, E, X, cpu_time);
+		  GRP_solver_EUL_source(m, CV, X, cpu_time);
+		  break;
 	      default:
-		  printf("NOT appropriate order of the scheme! The order is %d\n", order);
-		  goto _END_;
-          }
+		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
+		  goto return_NULL;
+	      }
       }
   else
       {
-	  printf("NOT appropriate coordinate framework! The framework is %s\n", argv[3]);
-	  goto _END_;
+	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);
+	  goto return_NULL;
       }
-  
-  char name_out[200];
-  strcpy(name_out, argv[1]);  
-  strcat(name_out, "_");
-  strcat(name_out, argv[2]);
-  strcat(name_out, "Order");
-  example_io(name_out, add, 0);
-  // Write the final data down.
-  _1D_file_write(m, N, RHO, U, P, E, X, cpu_time, config, argv[1], add);
 
- _END_:
+  // Write the final data down.
+  _1D_file_write(m, N, CV, X, cpu_time, argv[2]);
+
+ return_NULL:
   for(k = 1; k < N; ++k)
   {
-    free(RHO[k]);
-    free(U[k]);
-    free(P[k]);
-    free(E[k]);
+    free(CV.RHO[k]);
+    free(CV.U[k]);
+    free(CV.P[k]);
+    free(CV.E[k]);
     free(X[k]);
-    RHO[k] = NULL;
-    U[k] = NULL;
-    P[k] = NULL;
-    E[k] = NULL;
+    CV.RHO[k] = NULL;
+    CV.U[k] = NULL;
+    CV.P[k] = NULL;
+    CV.E[k] = NULL;
     X[k] = NULL;
   }
-  free(RHO0);
-  free(U0);
-  free(P0);
-  RHO0 = NULL;
-  U0 = NULL;
-  P0 = NULL;
-  RHO[0] = NULL;
-  U[0] = NULL;
-  P[0] = NULL;
-  free(E[0]);
+  free(FV0.RHO);
+  free(FV0.U);
+  free(FV0.P);
+  FV0.RHO = NULL;
+  FV0.U = NULL;
+  FV0.P = NULL;
+  FV.RHO[0] = NULL;
+  FV.U[0] = NULL;
+  FV.P[0] = NULL;
+  free(FV.E[0]);
+  FV.E[0] = NULL;
   free(X[0]);
-  E[0] = NULL;
   X[0] = NULL;
   free(cpu_time);
   cpu_time = NULL;

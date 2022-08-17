@@ -10,14 +10,14 @@ x_p  =X(N_STEP,:);
 figure(1)
 hold on
 plot(x_p,rho_p,'kd-');
-xlim([0.2,0.8]);
-ylim([1,2.1]);
+xlim([0,0.4]);
+ylim([0.5,4.5]);
 xlabel('x');
 ylabel('\rho');
 figure(4)
 hold on
 plot(x_p,e_p,'kd-');
-xlim([0.2,0.8]);
-ylim([2.5,3.9]);
+xlim([0,0.4]);
+ylim([0,0.9]);
 xlabel('x');
 ylabel('e');

@@ -1,5 +1,5 @@
 /**
- * @file  common.c
+ * @file  io_common.c
  * @brief This is a set of common functions for string and number processing.
  */
 
@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-
+#include <errno.h>
 
 /**
  * @brief   This function examine whether a string represents a real number.
@@ -24,6 +24,8 @@
  *    @retval   1: Positive number.
  *    @retval  -1: Negative number.
  *    @retval   0: Not a number.
+ * @deprecated This function has been replaced by the variable 'errno'
+ *             in the standard Library <errno.h>.
  */
 static int format_string(char * str)
 {
@@ -178,44 +180,4 @@ static double str2num(char * number)
   }
   
   return result;
-}
-
-
-/**
- * @brief This function reads the initial data file to generate the initial data.
- * @param[in]  fp: The pointer to the input file.
- * @param[out]  U: The pointer to the data array.
- * @param[in] num: The number of the numbers in the input file. 
- * @return It returns 0 if successfully read the file,
- *         while returns the index of the wrong entry.
- */
-int file_read(FILE * fp, double * U, const int num)
-{
-  int idx = 0, j = 0; // j is a frequently used index for spatial variables.
-  char number[100]; // A string that stores a number.
-  char ch;
-  int sign = 1;
-
-  while((ch = getc(fp)) != EOF)
-  {
-    if(isspace(ch) && idx)
-    {
-      number[idx] = 0;
-      idx = 0;
-      
-      sign = format_string(number);
-      if(!sign)
-	return j+1;
-      if(j == num)
-	return j;
-
-      // U[j] = sign * str2num(number);
-      U[j] = sign * strtod(number,NULL);
-      ++j;
-    }
-    else if((ch == 46) || (ch == 45) || (ch == 69) || (ch == 101) || isdigit(ch))
-      number[idx++] = ch;
-  }
-
-  return 0;
 }

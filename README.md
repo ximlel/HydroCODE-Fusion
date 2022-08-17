@@ -28,3 +28,7 @@ Please see the file called LICENSE.
 Contacts
 --------
 If you want more available support for this program, please send an email to  [xinlei@cugb.edu.cn](mailto:xinlei@cugb.edu.cn).
+
+Copyright
+--------
+Copyright © 2022 ximlel

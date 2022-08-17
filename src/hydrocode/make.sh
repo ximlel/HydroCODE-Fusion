@@ -4,4 +4,4 @@ cd ../..
 make
 cd ./src/hydrocode
 
-./hydrocode.out GRP_Book_6_1_LAG 1 LAG
+./hydrocode.out Artifi_Heat_Conduct_4_22 1 LAG
