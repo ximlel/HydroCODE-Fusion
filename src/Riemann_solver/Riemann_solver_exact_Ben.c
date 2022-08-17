@@ -197,7 +197,6 @@ double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double g
     gap = fabs(v_L - v_R);
   }
 
-
   u_INT = k1*(v_R-v_L)/(k1-k3)+v_L;
 
   *P_star = p_INT;

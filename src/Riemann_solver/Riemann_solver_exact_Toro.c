@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
 /**
  * @brief EXACT RIEMANN SOLVER FOR THE EULER EQUATIONS
  * @details The purpose of this function is to solve the Riemann problem exactly,

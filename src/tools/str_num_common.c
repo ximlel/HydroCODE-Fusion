@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <errno.h>
+
 
 /**
  * @brief   This function examine whether a string represents a real number.

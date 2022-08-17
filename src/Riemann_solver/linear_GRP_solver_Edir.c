@@ -8,6 +8,7 @@
 
 #include "../include/Riemann_solver.h"
 
+
 /**
  * @brief A direct Eulerian GRP solver for unsteady compressible inviscid flow in one space dimension.
  * @param[out] direvative: the temporal derivative of fluid variables. \n
@@ -25,7 +26,6 @@
  *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
  *           Journal of Computational Physics, 218.1: 19-43, 2006.
  */
-
 void linear_GRP_solver_Edir
 (double * direvative, double * mid,
  const double rho_L, const double rho_R, const double s_rho_L, const double s_rho_R,

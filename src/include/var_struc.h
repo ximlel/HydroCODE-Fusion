@@ -18,9 +18,9 @@ struct flu_var {
 	double *RHO, *U, *P;
 };
 
-extern struct flu_var FV0; //!< Initial data array pointer.
+extern struct flu_var FV0; //!< Structural body of initial data array pointer.
 
-//! Pointer tructural body of variables on computational cells.
+//! Pointer structural body of variables on computational cells.
 struct cell_var {
 	double **RHO, **U, **V, **P, **E;
 };

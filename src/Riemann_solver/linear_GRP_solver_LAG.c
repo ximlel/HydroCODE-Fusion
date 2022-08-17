@@ -8,6 +8,7 @@
 
 #include "../include/Riemann_solver.h"
 
+
 /**
  * @brief A Lagrangian GRP solver for unsteady compressible inviscid flow in one space dimension.
  * @param[out] dire: the temporal derivative of fluid variables. \n
@@ -29,7 +30,6 @@
  *       [1] M. Ben-Artzi & J. Falcovitz, A second-order Godunov-type scheme for compressible fluid dynamics,
  *           Journal of Computational Physics, 55.1: 1-32, 1984
  */
-
 void linear_GRP_solver_LAG
 (double * dire, double * mid,
  const double rho_L, const double rho_R, const double s_rho_L, const double s_rho_R,

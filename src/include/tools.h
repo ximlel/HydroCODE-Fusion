@@ -1,20 +1,24 @@
 /**
  * @file tools.h
  * @brief This file is the header file of several independent tool functions.
- * @details This header file declares functions in files 'sys_pro.c' and 'math_algo.c',
+ * @details This header file declares functions in the folder 'tools',
  */
 
 #ifndef TOOLS_H
 #define TOOLS_H
 
-void DispPro(double pro, int step);
+// sys_pro.c
+void DispPro(const double pro, const int step);
+
 int CreateDir(const char* pPath);
 
-int rinv(double a[], int n);
-void Gauss_elimination(int n, double (*a)[n+1], double *x);
+
+// math_algo.c
+int rinv(double a[], const int n);
+
 
 /**
- * @brief Minmod limiter of two variables.
+ * @brief Minmod limiter function of two variables.
  */
 inline double minmod2(double s_L, double s_R)
 {
@@ -27,7 +31,7 @@ inline double minmod2(double s_L, double s_R)
 }
 
 /**
- * @brief Minmod limiter of three variables.
+ * @brief Minmod limiter function of three variables.
  */
 inline double minmod3(double s_L, double s_R, double s_m)
 {

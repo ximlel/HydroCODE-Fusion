@@ -23,12 +23,14 @@
 #define ISERR(a) !isfinite((a))
 #endif
 
+
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
  *        equations of motion on Lagrangian coordinate.
- * @param[in]  config:   The array of configuration data.
- * @param[in]  m:        The number of the grids.
- * @param[in,out] RHO,U,P,E,X[]: Array of the density/velocity/pressure/energy/coordinate data.
+ * @param[in]  config:   Array of configuration data.
+ * @param[in]  m:        Number of the grids.
+ * @param[in,out] CV:    structural body of grid variable data.
+ * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
 void Godunov_solver_LAG_source
@@ -262,7 +264,7 @@ void Godunov_solver_LAG_source
     if(time_c > (t_all - eps) || isinf(time_c))
 	{
 	    printf("\nTime is up in time step %d.\n", k);
-	    config[5] = k;
+	    config[5] = (double)k;
 	    break;
 	}
 

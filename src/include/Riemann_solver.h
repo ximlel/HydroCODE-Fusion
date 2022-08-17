@@ -1,8 +1,7 @@
 /**
  * @file Riemann_solver.h
  * @brief This file is the header file of several Riemann solvers and GRP solvers.
- * @details This header file declares functions in files 'Riemann_solver_exact_Ben.c',
- *          'Riemann_solver_exact_Toro.c',  'linear_GRP_solver_LAG.c' and 'linear_GRP_solver_Edir.c'.
+ * @details This header file declares functions in the folder 'Riemann_solver'.
  */
 
 #ifndef RIEMANNSOLVER_H

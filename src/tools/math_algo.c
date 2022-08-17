@@ -13,7 +13,7 @@
  * @param[in,out] a: The pointer of the input/output square matrix.
  * @param[in]     n: The order of the input/output square matrix.
  */
-int rinv(double a[], int n)
+int rinv(double a[], const int n)
 {
 	int *is,*js,i,j,k,l,u,v;
     double d,p;

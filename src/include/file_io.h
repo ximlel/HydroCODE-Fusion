@@ -7,22 +7,22 @@
 #ifndef FILEIO_H
 #define FILEIO_H
 
-
 // io_control.c
 void example_io(const char * name, char * add_mkdir, const int i_or_o);
 
-void config_check(void)
+int flu_var_count(FILE * fp, const char * add);
 
 
-
-// _1D_file_io.c
-int _1D_file_read(FILE * fp, double * U, const int num);
-
+// _1D_file_in.c
 void _1D_initialize(const char * name);
 
+
+// _1D_file_out.c
 void _1D_file_write(const int m, const int N, struct cell_var CV, double * X[], 
                     const double * cpu_time, const char * name);
 
 
+// config_in.c
+void _1D_configurate(const char * name);
 
 #endif

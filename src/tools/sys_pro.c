@@ -1,5 +1,5 @@
 /**
- * @file  math_algo.c
+ * @file  sys_pro.c
  * @brief There are some system processing programs.
  */
 
@@ -13,47 +13,52 @@
  * To realize cross-platform programming.
  * MKDIR:  Create a subdirectory.
  * ACCESS: Determine access permissions for files or folders.
+ *       - mode=0: Test for existence.
+ *       - mode=2: Test for write permission.
+ *       - mode=4: Test for read permission.
  */
 #ifdef _WIN32
-#include <windows.h>
-#include <direct.h>
 #include <io.h>
-/*
- * m=0: Test for existence.
- * m=2: Test for write permission.
- * m=4: Test for read permission.
- */
-#define ACCESS(a,m) _access((a),(m))
-#define MKDIR(a)    _mkdir((a))  // Create a subdirectory.
+#include <direct.h>
+#define ACCESS(path,mode) _access((path),(mode))
+#define MKDIR(path)       _mkdir((path))
 #elif __linux__
-#include <sys/stat.h>
 #include <unistd.h>
-#define ACCESS(a,m) access((a),(m))
-#define MKDIR(a)    mkdir((a),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
+#include <sys/stat.h>
+#define ACCESS(path,mode) access((path),(mode))
+#define MKDIR(path)       mkdir((path), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
 #endif
 
 
-void DispPro(double pro, int step)
+/**
+ * @brief This function print a progress bar on one line of standard output.
+ * @param[in]  pro: Numerator of percent that the process has completed.
+ * @param[in]  step: Number of time steps.
+ */
+void DispPro(const double pro, const int step)
 {
         int j;
         for (j = 0; j < 77; j++)
-                putchar('\b'); // 将当前行全部清空，用以显示最新的进度条状态
+                putchar('\b'); // Clears the current line to display the latest progress bar status.
         for (j = 0; j < lround(pro/2); j++)
-                putchar('+'); // 打印进度条上已经完成的部分，用‘+’表示  
+                putchar('+');  // Print the part of the progress bar that has been completed, denoted by '+'.
         for (j = 1; j <= 50-lround(pro/2); j++)
-                putchar('-'); // 打印进度条上还有多少没有完成的  
+                putchar('-');  // Print how much is left on the progress bar.  
         fprintf(stdout, "  %6.2f%%   STEP=%-8d", pro, step);  
         fflush(stdout);
 }
 
+/**
+ * @brief This is a function that recursively creates folders.
+ * @param[in] pPath: Pointer to the folder Path.
+ */
 int CreateDir(const char * pPath)
 {
-	if(-1 != ACCESS(pPath,2))
+	if(0 == ACCESS(pPath,2))
 		return -1;
 
 	const char* pCur = pPath;
-
-	char tmpPath[FILENAME_MAX];
+	char tmpPath[FILENAME_MAX+40];
 	memset(tmpPath,0,sizeof(tmpPath));
     
 	int pos = 0;
@@ -69,7 +74,7 @@ int CreateDir(const char * pPath)
 						}
 				}
 		}
-	if(!ACCESS(pPath,2))
+	if(0 == ACCESS(pPath,2))
 		return 0;
 	else
 		return 1;

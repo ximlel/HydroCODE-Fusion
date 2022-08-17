@@ -1,8 +1,7 @@
 /**
  * @file finite_difference_solver.h
  * @brief This file is the header file of Lagrangian/Eulerian hydrocode in finite volume framework.
- * @details This header file declares functions in files 'Godunov_solver_source.c',
- *          and 'GRP_solver_source.c'.
+ * @details This header file declares functions in the folder 'finite_volume'.
  */
 
 #ifndef FINITEVOLUME_H

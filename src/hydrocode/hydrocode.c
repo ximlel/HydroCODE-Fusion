@@ -23,6 +23,7 @@
  * <tr><th> file_io/                   <td> Program reads and writes files
  * <tr><th> finite_volume/             <td> finite volume scheme program
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
+ * <tr><th> tools/                     <td> Tool functions
  * <tr><th> hydrocode/hydrocode.c      <td> Main program
  * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
  * </table>
@@ -78,39 +79,47 @@
 #include "../include/finite_volume.h"
 #include "../include/Riemann_solver.h"
 
-double * U0;   //!< Initial velocity data array pointer.
-double * P0;   //!< Initial pressure data array pointer.
-double * RHO0; //!< Initial density  data array pointer.
-double config[N_CONF] = {INFINITY}; //!< Initial configuration data array.
 
-#define CV_INIT_MEM(v, N)						\
-    do {								\
-	CV.v = (double **)malloc(N * sizeof(double *));			\
-	CV.v[0] = v##0 + 1;						\
-	for(k = 1; k < N; ++k)						\
-	    {								\
-		CV.v[k] = (double *)malloc(m * sizeof(double));		\
-		if(CV.v[k] == NULL)					\
-		    {							\
-			printf("NOT enough memory! %s[%d]\n", #sfv, k);	\
-			goto return_NULL;				\
-		    }							\
-	    }								\
-    } while (0)								\
+double config[N_CONF]; //!< Initial configuration data array.
+struct flu_var FV0; //!< Structural body of initial data array pointer.
 
 /**
  * @brief This is the main function which constructs the
  *        main structure of the Lagrangian/Eulerian hydrocode.
  * @param[in] argc: ARGument counter.
  * @param[in] argv: ARGument values.
- *            - argv[1]: Name of test example.
- *            - argv[2]: Order of Godunov/GRP numerical scheme (= 1 or 2).
- *            - argv[3]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
+ *            - argv[1]: Folder name of test example (input path).
+ *            - argv[2]: Folder name of numerical results (output path).
+ *            - argv[3]: Dimensionality (= 1).
+ *            - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
+ *            - argv[5]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
+ *            - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
  * @return Program exit status code.
  */
+
+#define CV_INIT_MEM(v, N)						\
+    do {								\
+	CV.v = (double **)malloc(N * sizeof(double *));			\
+	CV.v[0] = FV0.v + 1;						\
+	for(k = 1; k < N; ++k)						\
+	    {								\
+		CV.v[k] = (double *)malloc(m * sizeof(double));		\
+		if(CV.v[k] == NULL)					\
+		    {							\
+			printf("NOT enough memory! %s[%d]\n", #v, k);	\
+			goto return_NULL;				\
+		    }							\
+	    }								\
+    } while (0)								\
+
 int main(int argc, char *argv[])
 {
-    printf("ARGuments counter is equal to %d!\n", argc - 1);
+    printf("\nTEST:\n  %s\n", argv[1]);
+    printf("Test Beginning: ARGuments Counter = %d.\n", argc);
+
+    int k;
+    for(k = 1; k < N_CONF; k++)
+        config[k] = INFINITY;
     
     // Set dimension.
     double dim;
@@ -120,7 +129,7 @@ int main(int argc, char *argv[])
 	    printf("No appropriate dimension was entered!\n");
 	    return 4;
 	}
-    config[0] = dim;
+    config[0] = (double)dim;
 
     /* 
      * We read the initial data files.
@@ -136,10 +145,10 @@ int main(int argc, char *argv[])
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-    int m = (int)U0[0];
+    int m = (int)FV0.RHO[0];
 
     char * endptr;
-    int k, j;
+    int j;
     double conf_tmp;
     for (k = 6; k < argc; k++)
 	{
@@ -151,7 +160,10 @@ int main(int argc, char *argv[])
 		    errno = 0;
 		    conf_tmp = strtod(endptr, &endptr);
 		    if (errno != ERANGE && *endptr == '\0')
+            {
 			config[j] = conf_tmp;
+						printf("%3d-th configuration: %g (supplement)\n", j, conf_tmp);
+        }
 		    else
 			printf("Configuration error in ARGument variable! ERROR 2!\n");
 		}
@@ -192,7 +204,7 @@ int main(int argc, char *argv[])
   }
   // Initialize the values of energy in computational cells and x-coordinate of the cell interfaces.
   for(k = 0; k < m; ++k)
-      E[0][k] = 0.5*CV.U[0][k]*CV.U[0][k] + CV.P[0][k]/(gamma - 1.0)/CV.RHO[0][k]; 
+      CV.E[0][k] = 0.5*CV.U[0][k]*CV.U[0][k] + CV.P[0][k]/(gamma - 1.0)/CV.RHO[0][k]; 
   for(k = 0; k <= m; ++k)
       X[0][k] = h * k;
 
@@ -212,12 +224,14 @@ int main(int argc, char *argv[])
       scheme++;
   else if (*scheme != '\0' || errno == ERANGE)
       {
-	  printf("No order!\n");
+	  printf("No order or Wrog scheme!\n");
 	  goto return_NULL;
       }
+  config[9] = (double)order;
 
   if (strcmp(argv[5],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {
+	  config[8] = (double)1;
 	  switch(order)
 	      {
 	      case 1:
@@ -233,6 +247,7 @@ int main(int argc, char *argv[])
       }
   else if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
+	  config[8] = (double)0;
 	  switch(order)
 	      {
 	      case 1:
@@ -275,11 +290,11 @@ int main(int argc, char *argv[])
   FV0.RHO = NULL;
   FV0.U = NULL;
   FV0.P = NULL;
-  FV.RHO[0] = NULL;
-  FV.U[0] = NULL;
-  FV.P[0] = NULL;
-  free(FV.E[0]);
-  FV.E[0] = NULL;
+  CV.RHO[0] = NULL;
+  CV.U[0] = NULL;
+  CV.P[0] = NULL;
+  free(CV.E[0]);
+  CV.E[0] = NULL;
   free(X[0]);
   X[0] = NULL;
   free(cpu_time);

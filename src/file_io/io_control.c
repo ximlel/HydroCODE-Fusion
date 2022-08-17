@@ -1,9 +1,15 @@
+/**
+ * @file  _1D_f_io.c
+ * @brief This is a set of functions which control the readout of one-dimensional data.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <dirent.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
@@ -12,19 +18,18 @@
 /*
  * To realize cross-platform programming.
  * ACCESS: Determine access permissions for files or folders.
+ *       - mode=0: Test for existence.
+ *       - mode=2: Test for write permission.
+ *       - mode=4: Test for read permission.
  */
 #ifdef _WIN32
 #include <io.h>
-/*
- * m=0: Test for existence.
- * m=2: Test for write permission.
- * m=4: Test for read permission.
- */
-#define ACCESS(a,m) _access((a),(m))
+#define ACCESS(path,mode) _access((path),(mode))
 #elif __linux__
 #include <unistd.h>
-#define ACCESS(a,m) access((a),(m))
+#define ACCESS(path,mode) access((path),(mode))
 #endif
+
 
 /** @brief This function produces folder path for data input or output.
  *  @param[in]  example:   Name of the test example.
@@ -35,8 +40,8 @@
  */
 void example_io(const char *example, char *add_mkdir, const int i_or_o)
 {
-	const int dim = (int)config[0];
-	const int el = (int)config[8];
+	const int dim   = (int)config[0];
+	const int el    = (int)config[8];
 	const int order = (int)config[9];
 
 	char *str_tmp, str_order[10];
@@ -81,7 +86,7 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 
 	if (i_or_o == 0)
 	    {
-		if(CreateDir(add_mkdir))
+		if(CreateDir(add_mkdir) == 1)
 		    {
 			fprintf(stderr, "Output directory '%s' construction failed.\n", add_mkdir);
 			exit(1);

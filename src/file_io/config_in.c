@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
@@ -31,18 +32,18 @@
 static void config_check()
 {
     const int dim = (int)config[0];
-    printf("dimension = %g\n", dim);
+    printf("  dimension\t= %d\n", dim);
 
     if(!isinf(config[1]))
-	printf("total time = %g\n", config[1]);
+	printf("  total time\t= %g\n", config[1]);
     else if (!isinf(config[5]) && !isinf(config[16]))
-	printf("tau        = %g\n", config[16]);
+	printf("  tau\t= %g\n", config[16]);
     else
 	{
 	    fprintf(stderr, "The total time or the maximum number of time steps must be setted!\n");
 	    exit(2);
 	}
-	printf("time step  = %d\n", (int)config[5]);
+	printf("  time step\t= %d\n", (int)config[5]);
 
     if(isinf(config[4]))
 	config[4] = EPS;
@@ -52,7 +53,7 @@ static void config_check()
 	    fprintf(stderr, "eps(%f) should in (0, 0.01)!\n", eps);
 	    exit(2);
 	}
-    printf("eps        = %g\n", eps);
+    printf("  eps\t\t= %g\n", eps);
 
     if(isinf(config[6]))
 	config[6] = 1.4;	
@@ -61,7 +62,7 @@ static void config_check()
 	    fprintf(stderr, "The constant of the perfect gas(%f) should be larger than 1.0!\n", config[6]);
 	    exit(2);
 	}
-    printf("gamma      = %g\n", config[6]);
+    printf("  gamma\t\t= %g\n", config[6]);
 
     if (isinf(config[7]))
 	{
@@ -78,7 +79,7 @@ static void config_check()
 	    fprintf(stderr, "The CFL number(%f) should be smaller than 1.0.\n", config[7]);
 	    exit(2);
 	}
-    printf("CFL number = %g\n", config[7]);
+    printf("  CFL number\t= %g\n", config[7]);
 
     if(isinf(config[41]))
 	config[41] = 1.9;
@@ -97,13 +98,13 @@ static void config_check()
 	}
 
     // Specie number
-    config[2] = isinf(config[2]) ? 1 : config[2];	
+    config[2] = isinf(config[2]) ? (double)1 : config[2];	
     // Coordinate framework (EUL/LAG/ALE)
-    config[8] = isinf(config[8]) ? 0 : config[8];
+    config[8] = isinf(config[8]) ? (double)0 : config[8];
     // Reconstruction (prim_var/cons_var)
-    config[31] = isinf(config[31]) ? 0 : config[31];
+    config[31] = isinf(config[31]) ? (double)0 : config[31];
     // v_fix
-    config[61] = isinf(config[61]) ? 0 : config[61];
+    config[61] = isinf(config[61]) ? (double)false : config[61];
     // offset_x
     config[210] = isinf(config[210]) ? 0.0 : config[210];
     // offset_y
@@ -120,6 +121,7 @@ static int config_read(FILE * fp)
 	double tmp;
 	int i, line_num = 1; // Index of config[*], line number.
 
+	printf("Configurating:\n");
 	while (fgets(one_line, sizeof(one_line), fp) != NULL)
 		{
 			// A line that doesn't begin with digits is a comment.
@@ -132,7 +134,7 @@ static int config_read(FILE * fp)
 					errno = 0;
 					tmp = strtod(endptr, NULL);
 					if(fabs(config[i] - tmp) > EPS)
-						CONF_INI(i,tmp);
+						printf("%3d-th configuration: %g\n", i, tmp);
 					config[i] = tmp;
 				}
 			else if (i != 0 || (*endptr != '#'&& *endptr != '\0') || errno == ERANGE)			   
@@ -155,10 +157,10 @@ static int config_read(FILE * fp)
  * @param[in]  name:   Name of the test example.
  * @param[in]  add_in: Adress of the initial data folder of the test example.
  */
-void _1D_configurate(const char * name)
+void _1D_configurate(const char * add_in)
 {
     FILE * fp_data;
-    char add[FILENAME_MAX];
+    char add[FILENAME_MAX+40];
     strcpy(add, add_in);
     strcat(add, "config.txt");
     
@@ -177,7 +179,7 @@ void _1D_configurate(const char * name)
       }
   fclose(fp_data);
 
-  printf("%s configurated:\n", name);
+  printf("Configurated:\n");
   // Check the configuration data.
   config_check();
 }

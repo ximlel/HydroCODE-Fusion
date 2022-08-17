@@ -1,24 +1,23 @@
 /**
- * @file  _1D_f_io.c
- * @brief This is a set of functions which control the reading and readout of
- *        one-dimensional data.
+ * @file  _1D_file_in.c
+ * @brief This is a set of functions which control the read-in of one-dimensional data.
  */
 
+#include <errno.h>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <time.h>
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
 
 /**
- * @brief This function reads the initial data file to generate the initial data.
+ * @brief This function reads the 1D initial data file to generate the initial data.
  * @param[in]  fp: The pointer to the input file.
- * @param[out]  U: The pointer to the data array.
+ * @param[out]  U: The pointer to the data array of fluid variables.
  * @param[in] num: The number of the numbers in the input file. 
  * @return It returns 0 if successfully read the file,
  *         while returns the index of the wrong entry.
@@ -27,9 +26,8 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 {
   int idx = 0, j = 0; // j is a frequently used index for spatial variables.
   char number[100]; // A string that stores a number.
-  char ch;
+  char ch, *endptr;
   // int sign = 1;
-  char *endptr;
     
   while((ch = getc(fp)) != EOF)
   {
@@ -37,8 +35,8 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
     {
       number[idx] = '\0';
       idx = 0;
-
-      /* // Before format_string() and str2num() are deprecated.
+      // format_string() and str2num() in 'str_num_common.c' are deprecated.
+      /*
       sign = format_string(number);
       if(!sign)
 	return j+1;
@@ -47,152 +45,92 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
       U[j] = sign * str2num(number);
       */
       errno = 0;
-      U[j] = strtod(number,&endptr);
+      U[j] = strtod(number, &endptr);
       if (errno == ERANGE || *endptr != '\0')
-	  return j+1;
+	  {
+	      printf("The %dth entry in the initial data file is not a double-precision floats.\n", j+1);
+	      return j+1;
+	  }
       else if(j == num)
-	  return j;
-      
+	  {
+	      printf("Error on the initial data file reading!\n");
+	      return j;
+	  }
       ++j;
     }
     else if((ch == 46) || (ch == 45) || (ch == 69) || (ch == 101) || isdigit(ch))
       number[idx++] = ch;
   }
-
   return 0;
 }
 
 
 /** 
-  * @brief      This function reads the initial data file of velocity/pressure/density.
-  * @details    The function initialize the extern pointer RHO0/U0/P0 pointing to the
+  * @brief      This function reads the 1D initial data file of velocity/pressure/density.
+  * @details    The function initialize the extern pointer FV0.RHO/U/P pointing to the
   *             position of a block of memory consisting (m+1) variables* of type double.
   *             The value of first of these variables is m.
   *             The following m variables are the initial value.
   * @param[in]  name: Name of the test example.
-  * @param[in]  add_in:  Adress of the initial data folder of the test example.
   */
+
+#define STR_FLU_INI(sfv)						\
+    do {								\
+	strcpy(add, add_in);						\
+	strcat(add, #sfv ".txt");					\
+	if((fp = fopen(add, "r")) == NULL)				\
+	    {								\
+		strcpy(add, add_in);					\
+		strcat(add, #sfv ".dat");				\
+	    }								\
+	if((fp = fopen(add, "r")) == NULL)				\
+	    {								\
+		printf("Cannot open initial data file: %s!\n", #sfv);	\
+		exit(1);						\
+	    }								\
+	num_cell = flu_var_count(fp, add);				\
+	if(isinf(config[3]))						\
+	    config[3] = (double)num_cell;				\
+	else if(num_cell != (int)config[3])				\
+	    {								\
+		printf("Input unequal! num_%s=%d,", #sfv, num_cell);	\
+		printf(" num_cell=%d.\n", num_cell, (int)config[3]);	\
+		exit(2);						\
+	    }								\
+	FV0.sfv = malloc((num_cell + 1) * sizeof(double));		\
+	FV0.sfv[0] = (double)num_cell;					\
+	if(_1D_flu_var_read(fp, FV0.sfv+1, num_cell))			\
+	    {								\
+		fclose(fp);						\
+		exit(2);						\
+	    }								\
+	fclose(fp);							\
+    } while(0)
+
 void _1D_initialize(const char * name)
 {
-  /* 
-   * Read the configuration data.
-   * The detail could be seen in the definition of array config
-   * referring to file '_1D_f_io.c'.
-   */
-  _1D_configurate(name);
-    printf("delta_x    = %g\n", config[10]);
-    printf("delta_t    = %g\n", config[16]);
-    printf("bondary    = %d\n", (int)config[17]);
-
-    char add_in[FILENAME_MAX];
-    // Get the address of initial data files.
+    char add_in[FILENAME_MAX+40]; 
+    // Get the address of the initial data folder of the test example.
     example_io(name, add_in, 1);
-  
-    char addRHO[FILENAME_MAX], addU[FILENAME_MAX], addP[FILENAME_MAX];
-    // The address of the velocity/pressure/density file to read in.
-    FILE * fp_U, * fp_P, * fp_rho; // The pointer to the above data files.
-    int num_U = 0, num_P = 0, num_rho = 0;  // The number of the numbers in the above data files.
-    char ch;
-    int file_read_state;
     
-    // Open the initial data files.
-    strcpy(addRHO, add_in);
-    strcat(addRHO, "RHO.txt");
-    if((fp_rho = fopen(addRHO, "r")) == NULL)
-	{
-	    strcpy(addRHO, add_in);
-	    strcat(addRHO, "RHO.dat");
-	}
-    if((fp_rho = fopen(addRHO, "r")) == NULL)
-	{
-	    printf("Cannot open initial data file RHO!\n");
-	    exit(1);
-	}
-    num_rho = flu_var_count(fp_rho, addRHO);
+    /* 
+     * Read the configuration data.
+     * The detail could be seen in the definition of array config
+     * referring to file 'doc/config.csv'.
+     */
+    _1D_configurate(add_in);
+    printf("  delta_x\t= %g\n", config[10]);
+    printf("  delta_t\t= %g\n", config[16]);
+    printf("  bondary\t= %d\n", (int)config[17]);
+  
+    char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
+    FILE * fp; // The pointer to the above data files.
+    int num_cell;  // The number of the numbers in the above data files.
+    
+    // Open the initial data files and initializes the reading of data.
+    STR_FLU_INI(RHO);
+    STR_FLU_INI(U);
+    STR_FLU_INI(P);
 
-    strcpy(addU, add_in);
-    strcat(addU, "U.txt");
-    if((fp_U = fopen(addU, "r")) == NULL)
-	{
-	    strcpy(addU, add_in);
-	    strcat(addU, "U.dat");
-	}
-    if((fp_U = fopen(addU, "r")) == NULL)
-	{
-	    printf("Cannot open initial data file U!\n");
-	    exit(1);
-	}
-    num_U = flu_var_count(fp_U, addU);
-    if(num_U != num_rho)
-	{
-	    printf("U:Unequal! num_U=%d  num_rho=%d\n", num_rho, num_U);
-	    exit(2);
-	}
-
-    strcpy(addP, add_in);
-    strcat(addP, "P.txt");
-    if((fp_P = fopen(addP, "r")) == NULL)
-	{
-	    strcpy(addP, add_in);
-	    strcat(addP, "P.dat");
-	}
-    if((fp_P = fopen(addP, "r")) == NULL)
-	{
-	    printf("Cannot open initial data file P!\n");
-	    exit(1);
-	}
-    num_P = flu_var_count(fp_P, addP);
-    if(num_P != num_rho)
-	{
-	    printf("P:Unequal! num_rho=%d  num_P=%d\n", num_rho, num_P);
-	    exit(2);
-	}
-
-    // Initializes the reading of data.
-  RHO0 = (double *)malloc((num_rho + 1) * sizeof(double));
-  RHO0[0] = (double)num_rho;
-  file_read_state = _1D_flu_var_read(fp_rho, RHO0+1, num_rho);
-  fclose(fp_rho);
-  if(file_read_state)
-  {
-    free(RHO0);
-    if(file_read_state == num_rho)
-      printf("Error on file reading!\n");
-    else
-      printf("\nThe %dth entry in the file RHO0 is not a number.\n", file_read_state);
-    exit(2);
-  }
-
-  U0 = (double *)malloc((num_U + 1) * sizeof(double));
-  U0[0] = (double)num_U;
-  file_read_state = _1D_flu_var_read(fp_U, U0+1, num_U);
-  fclose(fp_U);
-  if(file_read_state)
-  {
-    free(RHO0);
-    free(U0);
-    if(file_read_state == num_U)
-      printf("Error on file reading!\n");
-    else
-      printf("\nThe %dth entry in the file U0 is not a number.\n", file_read_state);
-    exit(2);
-  }
-
-  P0 = (double *)malloc((num_P + 1) * sizeof(double));
-  P0[0] = (double)num_P;
-  file_read_state = _1D_flu_var_read(fp_P, P0+1, num_P);
-  fclose(fp_P);
-  if(file_read_state)
-  {
-    free(RHO0);
-    free(U0);
-    free(P0);
-    if(file_read_state == num_P)
-      printf("Error on file reading!\n");
-    else
-      printf("\nThe %dth entry in the file P0 is not a number.\n", file_read_state);
-    exit(2);
-  }
-
-  printf("%s data initialized, m=%d\n", name, num_rho);
+    printf("%s data initialized, m=%d.\n", name, num_cell);
 }
