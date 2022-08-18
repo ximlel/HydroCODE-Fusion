@@ -2,14 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <dirent.h>
 #include <stdbool.h>
 #include <errno.h>
 #include <ctype.h>
 
 #include "../include/var_struc.h"
-#include "../include/tools.h"
-#include "../include/file_io.h"
 
 /*
  * To realize cross-platform programming.

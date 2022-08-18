@@ -68,20 +68,20 @@
  *          - Output files can be found in folder '/data_out/one-dim/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
  */
+
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
+#include <math.h>
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 #include "../include/finite_volume.h"
-#include "../include/Riemann_solver.h"
 
 
 double config[N_CONF]; //!< Initial configuration data array.
-struct flu_var FV0; //!< Structural body of initial data array pointer.
 
 /**
  * @brief This is the main function which constructs the
@@ -131,6 +131,7 @@ int main(int argc, char *argv[])
 	}
     config[0] = (double)dim;
 
+    struct flu_var FV0; // Structural body of initial data array pointer.
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-    _1D_initialize(argv[1]); 
+    _1D_initialize(argv[1], &FV0); 
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,

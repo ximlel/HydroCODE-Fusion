@@ -14,7 +14,7 @@ int flu_var_count(FILE * fp, const char * add);
 
 
 // _1D_file_in.c
-void _1D_initialize(const char * name);
+void _1D_initialize(const char * name, struct flu_var * FV0);
 
 
 // _1D_file_out.c

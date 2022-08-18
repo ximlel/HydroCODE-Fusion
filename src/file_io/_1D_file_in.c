@@ -67,7 +67,7 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 
 /** 
   * @brief      This function reads the 1D initial data file of velocity/pressure/density.
-  * @details    The function initialize the extern pointer FV0.RHO/U/P pointing to the
+  * @details    The function initialize the extern pointer FV0->RHO/U/P pointing to the
   *             position of a block of memory consisting (m+1) variables* of type double.
   *             The value of first of these variables is m.
   *             The following m variables are the initial value.
@@ -97,9 +97,9 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 		printf(" num_cell=%d.\n", num_cell, (int)config[3]);	\
 		exit(2);						\
 	    }								\
-	FV0.sfv = malloc((num_cell + 1) * sizeof(double));		\
-	FV0.sfv[0] = (double)num_cell;					\
-	if(_1D_flu_var_read(fp, FV0.sfv+1, num_cell))			\
+	FV0->sfv = malloc((num_cell + 1) * sizeof(double));		\
+	FV0->sfv[0] = (double)num_cell;					\
+	if(_1D_flu_var_read(fp, FV0->sfv+1, num_cell))			\
 	    {								\
 		fclose(fp);						\
 		exit(2);						\
@@ -107,7 +107,7 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 	fclose(fp);							\
     } while(0)
 
-void _1D_initialize(const char * name)
+void _1D_initialize(const char * name, struct flu_var * FV0)
 {
     char add_in[FILENAME_MAX+40]; 
     // Get the address of the initial data folder of the test example.

@@ -7,13 +7,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <dirent.h>
-#include <stdbool.h>
 #include <ctype.h>
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
-#include "../include/file_io.h"
 
 /*
  * To realize cross-platform programming.
@@ -92,11 +89,11 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 			exit(1);
 		    }
 		else
-		    printf("Output directory '%s' constructed.\n", add_mkdir);				
+		    printf("Output directory '%s' is constructed.\n", add_mkdir);				
 	    }
 	else if (ACCESS(add_mkdir,4) == -1)
 	    {
-		fprintf(stderr, "Input directory is unreadable!\n");
+		fprintf(stderr, "Input directory '%s' is unreadable!\n", add_mkdir);
 		exit(1);
 	    }
 
@@ -114,7 +111,7 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 int flu_var_count(FILE * fp, const char * add)
 {
     int num = 0;  // Data number.
-/* We read characters one by one from the data file.
+		  /* We read characters one by one from the data file.
 		  * "flg" helps us to count.
 		  * -# 1: when read a number-using character (0, 1, 2, ..., e, E, minus sign and dot).
 		  * -# 0: when read a non-number-using character. 
