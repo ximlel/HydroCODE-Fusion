@@ -21,21 +21,21 @@
  * <table>
  * <tr><th> include/                   <td> Header files
  * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> finite_volume/             <td> finite volume scheme program
+ * <tr><th> finite_volume/             <td> Finite volume scheme programs
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> hydrocode/hydrocode.c      <td> Main program
  * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
  * </table>
  *
- * @section Status_code Program exit status code
+ * @section Status_code Program exit() status code
  * <table>
- * <tr><th> 0  <td> EXIT_SUCCESS
- * <tr><th> 1  <td> File directory error
- * <tr><th> 2  <td> Data reading error
- * <tr><th> 3  <td> Calculation error
- * <tr><th> 4  <td> Arguments error
- * <tr><th> 5  <td> Memory error
+ * <tr><th> exit(0)  <td> EXIT_SUCCESS
+ * <tr><th> exit(1)  <td> File directory error
+ * <tr><th> exit(2)  <td> Data reading error
+ * <tr><th> exit(3)  <td> Calculation error
+ * <tr><th> exit(4)  <td> Arguments error
+ * <tr><th> exit(5)  <td> Memory error
  * </table>
  * 
  * @section Compile_environment Compile environment
@@ -50,9 +50,12 @@
  *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
  *          - Description of configuration file 'config.txt' refers to 'doc/config.csv'.
  *          - Run program:
- *            - Linux/Unix: Run 'hydrocode.out name_of_test_example order coordinate' command on the terminal. \n
- *                          e.g. 'hydrocode.out GRP_Book_6_1 2 LAG' (second-order Lagrangian GRP scheme).
- *                          - order: Order of Godunov/GRP numerical scheme (= 1 or 2).
+ *            - Linux/Unix: Run 'hydrocode.out name_of_test_example name_of_numeric_result dimension order[_scheme]
+ *                               coordinate config[n]=(double)C' command on the terminal. \n
+ *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 1 2[_GRP] LAG 5=100' (second-order Lagrangian GRP scheme).
+ *                          - dim: Dimension of test example (= 1 or 2).
+ *                          - order: Order of numerical scheme (= 1 or 2).
+ *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
  *                          - coordinate: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
  *            - Windows: Run 'hydrocode.exe name_of_test_example order coordinate' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
@@ -84,19 +87,8 @@
 double config[N_CONF]; //!< Initial configuration data array.
 
 /**
- * @brief This is the main function which constructs the
- *        main structure of the Lagrangian/Eulerian hydrocode.
- * @param[in] argc: ARGument counter.
- * @param[in] argv: ARGument values.
- *            - argv[1]: Folder name of test example (input path).
- *            - argv[2]: Folder name of numerical results (output path).
- *            - argv[3]: Dimensionality (= 1).
- *            - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
- *            - argv[5]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
- *            - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
- * @return Program exit status code.
+ * @brief N memory allocations to the initial fluid variable 'v' in the structural body cell_var.
  */
-
 #define CV_INIT_MEM(v, N)						\
     do {								\
 	CV.v = (double **)malloc(N * sizeof(double *));			\
@@ -110,13 +102,27 @@ double config[N_CONF]; //!< Initial configuration data array.
 			goto return_NULL;				\
 		    }							\
 	    }								\
-    } while (0)								\
+    } while (0)
 
+/**
+ * @brief This is the main function which constructs the
+ *        main structure of the Lagrangian/Eulerian hydrocode.
+ * @param[in] argc: ARGument counter.
+ * @param[in] argv: ARGument values.
+ *            - argv[1]: Folder name of test example (input path).
+ *            - argv[2]: Folder name of numerical results (output path).
+ *            - argv[3]: Dimensionality (= 1).
+ *            - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
+ *            - argv[5]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
+ *            - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
+ * @return Program exit status code.
+ */
 int main(int argc, char *argv[])
 {
     printf("\nTEST:\n  %s\n", argv[1]);
     printf("Test Beginning: ARGuments Counter = %d.\n", argc);
 
+    // Initialize configuration data array 
     int k;
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;
@@ -161,25 +167,25 @@ int main(int argc, char *argv[])
 		    errno = 0;
 		    conf_tmp = strtod(endptr, &endptr);
 		    if (errno != ERANGE && *endptr == '\0')
-            {
-			config[j] = conf_tmp;
-						printf("%3d-th configuration: %g (supplement)\n", j, conf_tmp);
-        }
+			{
+			    config[j] = conf_tmp;
+			    printf("%3d-th configuration (supplement): %g\n", j, conf_tmp);
+			}
 		    else
-			printf("Configuration error in ARGument variable! ERROR 2!\n");
+			printf("Configuration error in ARGument variable %d! ERROR 2!\n", k);
 		}
 	    else
-		printf("Configuration error in ARGument variable! ERROR 1!\n");
+		printf("Configuration error in ARGument variable %d! ERROR 1!\n", k);
 	}
     double h = config[10], gamma = config[6];
 
   // The number of times steps of the fluid data stored for plotting.
   int N = 2; // (int)(config[5]) + 1;
 
-  struct cell_var CV;
+  struct cell_var CV; // Structural body of fluid variables in computational cells array pointer.
   double ** X;
   double * cpu_time;
-  // Initialize arrays of fluid variables.
+  // Initialize arrays of fluid variables in cells.
   CV_INIT_MEM(RHO, N);
   CV_INIT_MEM(U, N);
   CV_INIT_MEM(P, N);
@@ -215,9 +221,10 @@ int main(int argc, char *argv[])
 	  printf("NOT enough memory! CPU_time\n");
 	  goto return_NULL;
       }
-      
-  int order; // 1-Godunov, 2-GRP
-  char * scheme;
+
+  // Set order and scheme.
+  int order; // 1, 2
+  char * scheme; // Riemann_exact(Godunov), GRP
   printf("Order_Scheme: %s\n",argv[4]);
   errno = 0;
   order = strtol(argv[4], &scheme, 10);	

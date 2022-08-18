@@ -1,5 +1,5 @@
 /**
- * @file  Godunov_solver_source.c
+ * @file  Godunov_solver_EUL_source.c
  * @brief This is an Eulerian Godunov scheme to solve 1-D Euler equations.
  */
 
@@ -13,21 +13,12 @@
 #include "../include/Riemann_solver.h"
 #include "../include/tools.h"
 
-#ifdef _WIN32
-#define ISNAN(a) _isnan((a))
-#define ISERR(a) !_finite((a))
-#elif __linux__
-#define ISNAN(a)    isnan((a))
-#define ISERR(a) !isfinite((a))
-#endif
-
 
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
  *        equations of motion on Eulerian coordinate.
- * @param[in]  config:   Array of configuration data.
  * @param[in]  m:        Number of the grids.
- * @param[in,out] CV:    structural body of grid variable data.
+ * @param[in,out] CV:    Structural body of cell variable data.
  * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
@@ -208,7 +199,7 @@ void Godunov_solver_EUL_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(ISERR(mid[1])||ISERR(mid[2]))
+	      if(!isfinite(mid[1])|| !isfinite(mid[2]))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
@@ -250,7 +241,7 @@ void Godunov_solver_EUL_source
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(ISERR(P[n][j])||ISERR(U[n][j])||ISERR(RHO[n][j]))
+	    if(!isfinite(P[n][j])|| !isfinite(U[n][j])|| !isfinite(RHO[n][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;

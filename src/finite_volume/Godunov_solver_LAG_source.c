@@ -1,5 +1,5 @@
 /**
- * @file  Godunov_solver_source.c
+ * @file  Godunov_solver_LAG_source.c
  * @brief This is a Lagrangian Godunov scheme to solve 1-D Euler equations.
  */
 
@@ -13,21 +13,12 @@
 #include "../include/Riemann_solver.h"
 #include "../include/tools.h"
 
-#ifdef _WIN32
-#define ISNAN(a) _isnan((a))
-#define ISERR(a) !_finite((a))
-#elif __linux__
-#define ISNAN(a)    isnan((a))
-#define ISERR(a) !isfinite((a))
-#endif
-
 
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
  *        equations of motion on Lagrangian coordinate.
- * @param[in]  config:   Array of configuration data.
  * @param[in]  m:        Number of the grids.
- * @param[in,out] CV:    structural body of grid variable data.
+ * @param[in,out] CV:    Structural body of cell variable data.
  * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
@@ -206,7 +197,7 @@ void Godunov_solver_LAG_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(ISERR(p_star)||ISERR(u_star))
+	      if(!_finite(p_star)|| !_finite(u_star))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
@@ -241,7 +232,7 @@ void Godunov_solver_LAG_source
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(ISERR(P[n][j])||ISERR(U[n][j])||ISERR(RHO[n][j]))
+	    if(!_finite(P[n][j])|| !_finite(U[n][j])|| !_finite(RHO[n][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;

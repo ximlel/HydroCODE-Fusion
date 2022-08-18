@@ -12,18 +12,11 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
-/**
- * @brief This function write the solution into output files.
- * @note  It is quite simple so there will be no more comments.
- * @param[in] m: The number of spatial points in the output data.
- * @param[in] N: The number of time steps in the output data.
- * @param[in,out] CV:   structural body of grid variable data.
- * @param[in,out] X[]:  Array of the coordinate data.
- * @param[in] cpu_time: Array of the CPU time recording.
- * @param[in] name:     Name of the test example.
- */
 
-#define PRINT_NP(v, v_print)						\
+/**
+ * @brief Print out fluid variable 'v' with array data element 'v_print'.
+ */
+#define PRINT_NC(v, v_print)						\
     do {								\
 	strcpy(file_data, add_out);					\
 	strcat(file_data, "/");						\
@@ -43,6 +36,16 @@
 	fclose(fp_write);						\
     } while (0)
 
+/**
+ * @brief This function write the solution into output files.
+ * @note  It is quite simple so there will be no more comments.
+ * @param[in] m: The number of spatial points in the output data.
+ * @param[in] N: The number of time steps in the output data.
+ * @param[in] CV:  Structural body of grid variable data.
+ * @param[in] X[]: Array of the coordinate data.
+ * @param[in] cpu_time: Array of the CPU time recording.
+ * @param[in] name:     Name of the numerical results.
+ */
 void _1D_file_write(const int m, const int N, struct cell_var CV, double * X[], 
                     const double * cpu_time, const char * name)
 {
@@ -66,11 +69,11 @@ void _1D_file_write(const int m, const int N, struct cell_var CV, double * X[],
 //===================Write Output Data File=========================
 
     int j, n;
-    PRINT_NP(RHO, CV.RHO[n][j]);
-    PRINT_NP(U, CV.U[n][j]);
-    PRINT_NP(P, CV.P[n][j]);
-    PRINT_NP(E, CV.E[n][j]);
-    PRINT_NP(X, 0.5 * (X[n][j] + X[n][j+1]));
+    PRINT_NC(RHO, CV.RHO[n][j]);
+    PRINT_NC(U, CV.U[n][j]);
+    PRINT_NC(P, CV.P[n][j]);
+    PRINT_NC(E, CV.E[n][j]);
+    PRINT_NC(X, 0.5 * (X[n][j] + X[n][j+1]));
 
 //======================Write Log File============================
   strcpy(file_data, add_out);

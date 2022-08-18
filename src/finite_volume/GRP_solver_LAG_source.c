@@ -1,5 +1,5 @@
 /**
- * @file  GRP_solver_source.c
+ * @file  GRP_solver_LAG_source.c
  * @brief This is a Lagrangian GRP scheme to solve 1-D Euler equations.
  */
 
@@ -13,21 +13,12 @@
 #include "../include/Riemann_solver.h"
 #include "../include/tools.h"
 
-#ifdef _WIN32
-#define ISNAN(a) _isnan((a))
-#define ISERR(a) !_finite((a))
-#elif __linux__
-#define ISNAN(a)    isnan((a))
-#define ISERR(a) !isfinite((a))
-#endif
-
 
 /**
  * @brief This function use GRP scheme to solve 1-D Euler
  *        equations of motion on Lagrangian coordinate.
- * @param[in]  config:   Array of configuration data.
  * @param[in]  m:        Number of the grids.
- * @param[in,out] CV:    structural body of grid variable data.
+ * @param[in,out] CV:    Structural body of cell variable data.
  * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
@@ -308,7 +299,7 @@ void GRP_solver_LAG_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
 		      goto return_NULL;
 		  }
-	      if(ISERR(p_L)||ISERR(p_R)||ISERR(u_L)||ISERR(u_R)||ISERR(rho_L)||ISERR(rho_R))
+	      if(!_finite(p_L)|| !_finite(p_R)|| !_finite(u_L)|| !_finite(u_R)|| !_finite(rho_L)|| !_finite(rho_R))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Reconstruction\n", k, j); 
 		      goto return_NULL;
@@ -352,7 +343,7 @@ void GRP_solver_LAG_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(ISERR(mid[1])||ISERR(mid[2]))
+	      if(!_finite(mid[1])|| !_finite(mid[2]))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
@@ -403,7 +394,7 @@ void GRP_solver_LAG_source
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(ISERR(P[n][j])||ISERR(U[n][j])||ISERR(RHO[n][j]))
+	    if(!_finite(P[n][j])|| !_finite(U[n][j])|| !_finite(RHO[n][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;

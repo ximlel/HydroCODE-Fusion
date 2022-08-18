@@ -1,14 +1,14 @@
 /**
  * @file file_io.h
  * @brief This file is the header file that controls data input and output.
- * @details This header file declares functions in files '_1D_f_io.c' and 'common.c'.
+ * @details This header file declares functions in the folder 'file_io'.
  */
 
 #ifndef FILEIO_H
 #define FILEIO_H
 
 // io_control.c
-void example_io(const char * name, char * add_mkdir, const int i_or_o);
+void example_io(const char * example, char * add_mkdir, const int i_or_o);
 
 int flu_var_count(FILE * fp, const char * add);
 
@@ -23,6 +23,6 @@ void _1D_file_write(const int m, const int N, struct cell_var CV, double * X[],
 
 
 // config_in.c
-void _1D_configurate(const char * name);
+void configurate(const char * name);
 
 #endif

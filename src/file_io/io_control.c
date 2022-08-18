@@ -1,6 +1,6 @@
 /**
- * @file  _1D_f_io.c
- * @brief This is a set of functions which control the readout of one-dimensional data.
+ * @file  io_control.c
+ * @brief This is a set of common functions which control the input/output data.
  */
 
 #include <stdio.h>
@@ -29,7 +29,7 @@
 
 
 /** @brief This function produces folder path for data input or output.
- *  @param[in]  example:   Name of the test example.
+ *  @param[in]  example:   Name of the test example/numerical results.
  *  @param[out] add_mkdir: Folder path for data input or output.
  *  @param[in]  i_or_o:    Conversion parameters for data input/output.
  *                         - 0:             data output.

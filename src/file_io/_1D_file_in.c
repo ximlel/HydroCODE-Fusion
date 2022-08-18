@@ -65,15 +65,9 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 }
 
 
-/** 
-  * @brief      This function reads the 1D initial data file of velocity/pressure/density.
-  * @details    The function initialize the extern pointer FV0->RHO/U/P pointing to the
-  *             position of a block of memory consisting (m+1) variables* of type double.
-  *             The value of first of these variables is m.
-  *             The following m variables are the initial value.
-  * @param[in]  name: Name of the test example.
-  */
-
+/**
+ * @brief Count out and read in data of the initial fluid variable 'sfv'.
+ */
 #define STR_FLU_INI(sfv)						\
     do {								\
 	strcpy(add, add_in);						\
@@ -107,6 +101,15 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 	fclose(fp);							\
     } while(0)
 
+/** 
+  * @brief      This function reads the 1D initial data file of velocity/pressure/density.
+  * @details    The function initialize the extern pointer FV0->RHO/U/P pointing to the
+  *             position of a block of memory consisting (m+1) variables* of type double.
+  *             The value of first of these variables is m.
+  *             The following m variables are the initial value.
+  * @param[in]  name: Name of the test example.
+  * @param[out] FV0:  Structural body pointer of initial data array pointer.
+  */
 void _1D_initialize(const char * name, struct flu_var * FV0)
 {
     char add_in[FILENAME_MAX+40]; 

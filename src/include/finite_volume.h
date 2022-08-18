@@ -1,5 +1,5 @@
 /**
- * @file finite_difference_solver.h
+ * @file finite_volume.h
  * @brief This file is the header file of Lagrangian/Eulerian hydrocode in finite volume framework.
  * @details This header file declares functions in the folder 'finite_volume'.
  */

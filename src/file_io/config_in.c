@@ -1,3 +1,8 @@
+/**
+ * @file  config_in.c
+ * @brief This is a set of functions which control the read-in of configuration data.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -26,7 +31,10 @@
 #endif
 
 
-static void config_check()
+/**
+ * @brief This function check whether the configuration data is reasonable and set the default.
+ */
+static void config_check(void)
 {
     const int dim = (int)config[0];
     printf("  dimension\t= %d\n", dim);
@@ -110,7 +118,11 @@ static void config_check()
     config[212] = isinf(config[212]) ? 0.0 : config[212];
 }
 
-
+/**
+ * @brief This function read the configuration data file, and
+ *        store the configuration data in the array "config".
+ * @param[in]  fp: The pointer to the configuration data file.
+ */
 static int config_read(FILE * fp)
 {	
 	char one_line[200]; // String to store one line.
@@ -148,13 +160,11 @@ static int config_read(FILE * fp)
 
 
 /**
- * @brief This function read the configuration data file, and
- *        store the configuration data in the array "config".
+ * @brief This function controls configuration data reading and validation.
  * @details The parameters in the configuration data file refer to 'doc/config.csv'.
- * @param[in]  name:   Name of the test example.
- * @param[in]  add_in: Adress of the initial data folder of the test example.
+ * @param[in] add_in: Adress of the initial data folder of the test example.
  */
-void _1D_configurate(const char * add_in)
+void configurate(const char * add_in)
 {
     FILE * fp_data;
     char add[FILENAME_MAX+40];
