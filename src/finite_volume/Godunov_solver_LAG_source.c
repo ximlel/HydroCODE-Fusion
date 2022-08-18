@@ -197,7 +197,7 @@ void Godunov_solver_LAG_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(!_finite(p_star)|| !_finite(u_star))
+	      if(!isfinite(p_star)|| !isfinite(u_star))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
@@ -208,7 +208,7 @@ void Godunov_solver_LAG_source
 	  }
 
 //====================Time step and grid movement======================
-    if (!isinf(t_all))
+    if (!isinf(t_all)) // If no total time, use fixed tau and time step N.
         tau = CFL * h_S_max;
     if ((time_c + tau) > (t_all - eps))
         tau = t_all - time_c;
@@ -232,7 +232,7 @@ void Godunov_solver_LAG_source
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(!_finite(P[n][j])|| !_finite(U[n][j])|| !_finite(RHO[n][j]))
+	    if(!isfinite(P[n][j])|| !isfinite(U[n][j])|| !isfinite(RHO[n][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;

@@ -84,26 +84,26 @@ void GRP_solver_LAG_source
 	  printf("NOT enough memory! Slope\n");
 	  goto return_NULL;
       }
-  U_next     = calloc(m+1, sizeof(double));
-  P_next     = calloc(m+1, sizeof(double));
-  RHO_next_L = calloc(m+1, sizeof(double));
-  RHO_next_R = calloc(m+1, sizeof(double));
+  U_next     = malloc((m+1) * sizeof(double));
+  P_next     = malloc((m+1) * sizeof(double));
+  RHO_next_L = malloc((m+1) * sizeof(double));
+  RHO_next_R = malloc((m+1) * sizeof(double));
   if(U_next == NULL || P_next == NULL || RHO_next_L == NULL || RHO_next_R == NULL)
       {
 	  printf("NOT enough memory! Variables_next\n");
 	  goto return_NULL;
       }
-  U_t     = calloc(m+1, sizeof(double));
-  P_t     = calloc(m+1, sizeof(double));
-  RHO_t_L = calloc(m+1, sizeof(double));
-  RHO_t_R = calloc(m+1, sizeof(double));
+  U_t     = malloc((m+1) * sizeof(double));
+  P_t     = malloc((m+1) * sizeof(double));
+  RHO_t_L = malloc((m+1) * sizeof(double));
+  RHO_t_R = malloc((m+1) * sizeof(double));
   if(U_t == NULL || P_t == NULL || RHO_t_L == NULL || RHO_t_R == NULL)
       {
 	  printf("NOT enough memory! Temproal derivative\n");
 	  goto return_NULL;
       }
-  U_F = calloc(m+1, sizeof(double));
-  P_F = calloc(m+1, sizeof(double));
+  U_F = malloc((m+1) * sizeof(double));
+  P_F = malloc((m+1) * sizeof(double));
   if(U_F == NULL || P_F == NULL)
       {
 	  printf("NOT enough memory! Variables_F\n");
@@ -299,7 +299,7 @@ void GRP_solver_LAG_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
 		      goto return_NULL;
 		  }
-	      if(!_finite(p_L)|| !_finite(p_R)|| !_finite(u_L)|| !_finite(u_R)|| !_finite(rho_L)|| !_finite(rho_R))
+	      if(!isfinite(p_L)|| !isfinite(p_R)|| !isfinite(u_L)|| !isfinite(u_R)|| !isfinite(rho_L)|| !isfinite(rho_R))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Reconstruction\n", k, j); 
 		      goto return_NULL;
@@ -343,7 +343,7 @@ void GRP_solver_LAG_source
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(!_finite(mid[1])|| !_finite(mid[2]))
+	      if(!isfinite(mid[1])|| !isfinite(mid[2]))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
@@ -360,7 +360,7 @@ void GRP_solver_LAG_source
 	  }
 
 //====================Time step and grid movement======================
-    if (!isinf(t_all))
+    if (!isinf(t_all)) // If no total time, use fixed tau and time step N.
         tau = CFL * h_S_max;
     if ((time_c + tau) > (t_all - eps))
         tau = t_all - time_c;
@@ -394,7 +394,7 @@ void GRP_solver_LAG_source
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(!_finite(P[n][j])|| !_finite(U[n][j])|| !_finite(RHO[n][j]))
+	    if(!isfinite(P[n][j])|| !isfinite(U[n][j])|| !isfinite(RHO[n][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;

@@ -12,6 +12,9 @@
  * @brief A function to caculate the inverse of the input square matrix.
  * @param[in,out] a: The pointer of the input/output square matrix.
  * @param[in]     n: The order of the input/output square matrix.
+ * @return Matrix is invertible or not.
+ *    @retval 0: No inverse matrix
+ *    @retval 1: Invertible matrix
  */
 int rinv(double a[], const int n)
 {
@@ -39,7 +42,7 @@ int rinv(double a[], const int n)
 					free(is);
 					free(js);
 					fprintf(stderr, "Error: no inverse matrix!\n");
-					return(0);
+					return 0;
 				}
 			if (is[k]!=k)
 				for (j=0; j<=n-1; j++)
@@ -104,5 +107,5 @@ int rinv(double a[], const int n)
 					}
 		}
     free(is); free(js);
-    return(1);
+    return 1;
 }

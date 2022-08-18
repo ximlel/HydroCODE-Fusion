@@ -121,7 +121,10 @@ static void config_check(void)
 /**
  * @brief This function read the configuration data file, and
  *        store the configuration data in the array "config".
- * @param[in]  fp: The pointer to the configuration data file.
+ * @param[in] fp: The pointer to the configuration data file.
+ * @return       File read status.
+ *    @retval 0: Success to read in configuration data file. 
+ *    @retval 1: Failure to read in configuration data file. 
  */
 static int config_read(FILE * fp)
 {	

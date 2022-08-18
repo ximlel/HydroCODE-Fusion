@@ -28,7 +28,7 @@
  * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
  * </table>
  *
- * @section Status_code Program exit() status code
+ * @section Exit_status Program exit status code
  * <table>
  * <tr><th> exit(0)  <td> EXIT_SUCCESS
  * <tr><th> exit(1)  <td> File directory error

@@ -51,6 +51,10 @@ void DispPro(const double pro, const int step)
 /**
  * @brief This is a function that recursively creates folders.
  * @param[in] pPath: Pointer to the folder Path.
+ * @return Folder Creation Status.
+ *    @retval -1: The path folder already exists and is readable.
+ *    @retval  0: Readable path folders are created recursively.
+ *    @retval  1: The path folder is not created properly.
  */
 int CreateDir(const char * pPath)
 {
