@@ -123,7 +123,6 @@ void _1D_initialize(const char * name, struct flu_var * FV0)
      */
     configurate(add_in);
     printf("  delta_x\t= %g\n", config[10]);
-    printf("  delta_t\t= %g\n", config[16]);
     printf("  bondary\t= %d\n", (int)config[17]);
   
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
@@ -135,5 +134,5 @@ void _1D_initialize(const char * name, struct flu_var * FV0)
     STR_FLU_INI(U);
     STR_FLU_INI(P);
 
-    printf("%s data initialized, m=%d.\n", name, num_cell);
+    printf("%s data initialized, grid cell number = %d.\n", name, num_cell);
 }

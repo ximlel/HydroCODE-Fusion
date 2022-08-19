@@ -22,6 +22,6 @@ ylabel('u');
 figure(4)
 hold on
 plot(x_p,e_p,'b.');
-ylim([1.8,3.3]);
+ylim([1.7,3.3]);
 xlabel('x');
 ylabel('e');

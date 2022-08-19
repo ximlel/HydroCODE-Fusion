@@ -38,6 +38,7 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 				 const double c_l, const double c_r, _Bool * CRW,
 				 const double eps, const double tol, const int N)
 {
+	printf("Toro\n");
     int n = 0;		
     double gap; // Relative pressure change after each iteration.
 	

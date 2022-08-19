@@ -38,7 +38,7 @@ void Godunov_solver_EUL_source
   clock_t tic, toc;
   double cpu_time_sum = 0.0;
 
-  double const t_all = config[1];        // the total time
+  double const t_all = config[1]<0.0 ? INFINITY : config[1]; // the total time
   double const eps   = config[4];        // the largest value could be seen as zero
   int    const N     = (int)(config[5]); // the maximum number of time steps
   double const gamma = config[6];        // the constant of the perfect gas
@@ -212,10 +212,13 @@ void Godunov_solver_EUL_source
 	  }
 
 //====================Time step and grid fixed======================
-    if (!isinf(t_all) || !isfinite(tau)) // If no total time, use fixed tau and time step N.
-        tau = CFL * h_S_max;
-    if ((time_c + tau) > (t_all - eps))
-        tau = t_all - time_c;
+    // If no total time, use fixed tau and time step N.
+    if (isfinite(t_all) || !isfinite(config[16]) || config[16] <= 0.0)
+	{
+	    tau = CFL * h_S_max;
+	    if ((time_c + tau) > (t_all - eps))
+		tau = t_all - time_c;
+	}
     nu = tau / h;
 
     for (j = 0; j <= m; ++j)
@@ -255,13 +258,12 @@ void Godunov_solver_EUL_source
     cpu_time_sum += cpu_time[n];
 
     time_c += tau;
-    if (isinf(t_all))
-        DispPro(k*100.0/N, k);
-    else
+    if (isfinite(t_all))
         DispPro(time_c*100.0/t_all, k);
+    else
+        DispPro(k*100.0/N, k);
     if(time_c > (t_all - eps) || isinf(time_c))
 	{
-	    printf("\nTime is up in time step %d.\n", k);
 	    config[5] = (double)k;
 	    break;
 	}
@@ -273,9 +275,10 @@ void Godunov_solver_EUL_source
 	    U[n-1][j]   =   U[n][j];
 	    E[n-1][j]   =   E[n][j];  
 	    P[n-1][j]   =   P[n][j];
-	}	
+	}
   }
 
+  printf("\nTime is up in time step %d.\n", k);
   printf("The cost of CPU time for 1D-Godunov Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 

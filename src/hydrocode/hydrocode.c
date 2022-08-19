@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     int k;
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;
-    
+
     // Set dimension.
     double dim;
     dim = atoi(argv[3]);
@@ -136,6 +136,31 @@ int main(int argc, char *argv[])
 	    return 4;
 	}
     config[0] = (double)dim;
+
+	printf("Configurating:\n");
+    char * endptr;
+    int j;
+    double conf_tmp;
+    for (k = 6; k < argc; k++)
+	{
+	    errno = 0;
+	    j = strtol(argv[k], &endptr, 10);
+	    if (errno != ERANGE && *endptr == '=')
+		{							
+		    endptr++;
+		    errno = 0;
+		    conf_tmp = strtod(endptr, &endptr);
+		    if (errno != ERANGE && *endptr == '\0')
+			{
+			    config[j] = conf_tmp;
+			    printf("%3d-th configuration: %g (ARGument)\n", j, conf_tmp);
+			}
+		    else
+			printf("Configuration error in ARGument variable %d! ERROR after '='!\n", k);
+		}
+	    else
+		printf("Configuration error in ARGument variable %d! ERROR before '='!\n", k);
+	}
 
     struct flu_var FV0; // Structural body of initial data array pointer.
     /* 
@@ -152,33 +177,8 @@ int main(int argc, char *argv[])
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-    int m = (int)FV0.RHO[0];
-
-    char * endptr;
-    int j;
-    double conf_tmp;
-    for (k = 6; k < argc; k++)
-	{
-	    errno = 0;
-	    j = strtol(argv[k], &endptr, 10);
-	    if (errno != ERANGE && *endptr == '=')
-		{							
-		    endptr++;
-		    errno = 0;
-		    conf_tmp = strtod(endptr, &endptr);
-		    if (errno != ERANGE && *endptr == '\0')
-			{
-			    config[j] = conf_tmp;
-			    printf("%3d-th configuration (supplement): %g\n", j, conf_tmp);
-			}
-		    else
-			printf("Configuration error in ARGument variable %d! ERROR 2!\n", k);
-		}
-	    else
-		printf("Configuration error in ARGument variable %d! ERROR 1!\n", k);
-	}
-    double h = config[10], gamma = config[6];
-
+  int m = (int)FV0.RHO[0];
+  double h = config[10], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
   int N = 2; // (int)(config[5]) + 1;
 
@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
   // Set order and scheme.
   int order; // 1, 2
   char * scheme; // Riemann_exact(Godunov), GRP
-  printf("Order_Scheme: %s\n",argv[4]);
+  printf("Order[_Scheme]: %s\n",argv[4]);
   errno = 0;
   order = strtol(argv[4], &scheme, 10);	
   if (*scheme == '_')

@@ -1,4 +1,4 @@
-% Sod¡¯s shock tube problem
+% Sod's shock tube problem
 line=1;
 column=100;
 interface=50;

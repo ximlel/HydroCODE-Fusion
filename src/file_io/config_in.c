@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include "../include/var_struc.h"
 
@@ -39,16 +40,23 @@ static void config_check(void)
     const int dim = (int)config[0];
     printf("  dimension\t= %d\n", dim);
 
-    if(!isinf(config[1]))
-	printf("  total time\t= %g\n", config[1]);
-    else if (!isinf(config[5]) && !isinf(config[16]))
-	printf("  tau\t= %g\n", config[16]);
-    else
+    // Maximum number of time steps
+    if(isfinite(config[1]) && config[1] >= 0.0)
 	{
-	    fprintf(stderr, "The total time or the maximum number of time steps must be setted!\n");
+	    config[5] = isfinite(config[5]) ? config[5] : (double)INT_MAX;
+	    printf("  total time\t= %g\n", config[1]);
+	}
+    else if(isfinite(config[5]) && isfinite(config[16]))
+	{
+	    printf("  total time\t= %g * %d = %g\n", config[16], (int)config[5], config[16] * (int)config[5]);
+	    printf("  delta_t\t= %g\n", config[16]);
+	}
+    else if(!isfinite(config[5]))
+	{
+	    fprintf(stderr, "The total time or the maximum number of time steps must be setted properly!\n");
 	    exit(2);
 	}
-	printf("  time step\t= %d\n", (int)config[5]);
+    printf("  time step\t= %d\n", (int)config[5]);
 
     if(isinf(config[4]))
 	config[4] = EPS;
@@ -103,28 +111,30 @@ static void config_check(void)
 	}
 
     // Specie number
-    config[2] = isinf(config[2]) ? (double)1 : config[2];	
+    config[2] = isfinite(config[2]) ? config[2] : (double)1;	
     // Coordinate framework (EUL/LAG/ALE)
-    config[8] = isinf(config[8]) ? (double)0 : config[8];
+    config[8] = isfinite(config[8]) ? config[8] : (double)0;
     // Reconstruction (prim_var/cons_var)
-    config[31] = isinf(config[31]) ? (double)0 : config[31];
+    config[31] = isfinite(config[31]) ? config[31] : (double)0;
+    // Parameter α in minmod limiter
+    config[41] = isfinite(config[41]) ? config[41] : (double)1.9;
     // v_fix
-    config[61] = isinf(config[61]) ? (double)false : config[61];
+    config[61] = isfinite(config[61]) ? config[61] : (double)false;
     // offset_x
-    config[210] = isinf(config[210]) ? 0.0 : config[210];
+    config[210] = isfinite(config[210]) ? config[210] : 0.0;
     // offset_y
-    config[211] = isinf(config[211]) ? 0.0 : config[211];
+    config[211] = isfinite(config[211]) ? config[211] : 0.0;
     // offset_z
-    config[212] = isinf(config[212]) ? 0.0 : config[212];
+    config[212] = isfinite(config[212]) ? config[212] : 0.0;
 }
 
 /**
  * @brief This function read the configuration data file, and
  *        store the configuration data in the array "config".
  * @param[in] fp: The pointer to the configuration data file.
- * @return       File read status.
- *    @retval 0: Success to read in configuration data file. 
- *    @retval 1: Failure to read in configuration data file. 
+ * @return       Configuration data file read status.
+ *    @retval 1: Success to read in configuration data file. 
+ *    @retval 0: Failure to read in configuration data file. 
  */
 static int config_read(FILE * fp)
 {	
@@ -133,24 +143,29 @@ static int config_read(FILE * fp)
 	double tmp;
 	int i, line_num = 1; // Index of config[*], line number.
 
-	printf("Configurating:\n");
 	while (fgets(one_line, sizeof(one_line), fp) != NULL)
 		{
 			// A line that doesn't begin with digits is a comment.
 			i =strtol(one_line, &endptr, 10);
-			for ( ;isspace(*endptr) ; endptr++) ;
+			for ( ; isspace(*endptr); endptr++) ;
 
 			// If the value of config[i] doesn't exit, it is 0 by default.
 			if (0 < i && i < N_CONF)
 				{
 					errno = 0;
 					tmp = strtod(endptr, NULL);
-					if(fabs(config[i] - tmp) > EPS)
-						printf("%3d-th configuration: %g\n", i, tmp);
-					config[i] = tmp;
+					if(errno == ERANGE)
+					    {
+						fprintf(stderr, "Value range error of %d-th configuration in line %d of configuration file!\n", i, line_num);
+						return 1;
+					    }
+					else if(isinf(config[i]))
+					    printf("%3d-th configuration: %g\n", i, config[i] = tmp);
+					else if(fabs(config[i] - tmp) > EPS)
+					    printf("%3d-th configuration is repeatedly assigned with %g and %g(abandon)!\n", i, config[i], tmp);
 				}
-			else if (i != 0 || (*endptr != '#'&& *endptr != '\0') || errno == ERANGE)			   
-				fprintf(stderr, "Warning: unknown row occurrs in configuration file in line %d!\n", line_num);
+			else if (i != 0 || (*endptr != '#' && *endptr != '\0'))
+				fprintf(stderr, "Warning: unknown row occurrs in line %d of configuration file!\n", line_num);
 			line_num++;
 		}
 	if (ferror(fp))

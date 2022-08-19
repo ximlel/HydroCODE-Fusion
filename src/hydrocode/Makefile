@@ -2,6 +2,8 @@ CC = gcc
 #C compiler
 CFLAGS = -std=c99 -O3 -pg
 #C compiler options
+CFLAGS += -D Riemann_solver_exact=Riemann_solver_exact_Ben
+#Macro definition
 SRC = ..
 #Directory of sources
 INCLUDE = -I $(SRC)/include

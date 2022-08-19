@@ -11,13 +11,13 @@ e_p  =E(N_STEP,:)-0.5*U(N_STEP,:).^2;
 x_p  =X(N_STEP,:);
 figure(1)
 hold on
-plot(x_p,rho_p,'b.');
+plot(x_p,rho_p,'go-');
 ylim([0,1]);
 xlabel('x');
 ylabel('\rho');
 figure(4)
 hold on
-plot(x_p,e_p,'b.');
+plot(x_p,e_p,'go-');
 ylim([0.3,1.5]);
 xlabel('x');
 ylabel('\rho e');

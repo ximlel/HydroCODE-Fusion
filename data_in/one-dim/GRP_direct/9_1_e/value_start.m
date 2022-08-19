@@ -1,4 +1,4 @@
-% Sod¡¯s shock tube problem
+% Low density and internal energy Riemann problem 
 line=1;
 column=100;
 interface=50;

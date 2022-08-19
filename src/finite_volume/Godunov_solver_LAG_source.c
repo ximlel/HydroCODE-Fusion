@@ -38,7 +38,7 @@ void Godunov_solver_LAG_source
   clock_t tic, toc;
   double cpu_time_sum = 0.0;
 
-  double const t_all = config[1];        // the total time
+  double const t_all = config[1]<0.0 ? INFINITY : config[1]; // the total time
   double const eps   = config[4];        // the largest value could be seen as zero
   int    const N     = (int)(config[5]); // the maximum number of time steps
   double const gamma = config[6];        // the constant of the perfect gas
@@ -74,6 +74,7 @@ void Godunov_solver_LAG_source
 
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
+  double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
   int n = 1; // the number of times storing plotting data
 
   double UL, PL, RHOL, CL, HL; // Left  boundary condition
@@ -208,10 +209,13 @@ void Godunov_solver_LAG_source
 	  }
 
 //====================Time step and grid movement======================
-    if (!isinf(t_all) || !isfinite(tau)) // If no total time, use fixed tau and time step N.
-        tau = CFL * h_S_max;
-    if ((time_c + tau) > (t_all - eps))
-        tau = t_all - time_c;
+    // If no total time, use fixed tau and time step N.
+    if (isfinite(t_all) || !isfinite(config[16]) || config[16] <= 0.0)
+	{
+	    tau = fmin(CFL * h_S_max, C_m * tau);
+	    if ((time_c + tau) > (t_all - eps))
+		tau = t_all - time_c;
+	}
     
     for(j = 0; j <= m; ++j)
 	X[n][j] = X[n-1][j] + tau * u_mid[j]; // motion along the contact discontinuity
@@ -223,7 +227,7 @@ void Godunov_solver_LAG_source
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[n][j] = 1 / (1/RHO[n-1][j] + tau/MASS[j]*(u_mid[j+1] - u_mid[j]));
+	    RHO[n][j] = 1.0 / (1.0/RHO[n-1][j] + tau/MASS[j]*(u_mid[j+1] - u_mid[j]));
 	    U[n][j]   = U[n-1][j] - tau/MASS[j]*(p_mid[j+1] - p_mid[j]);
 	    E[n][j]   = E[n-1][j] - tau/MASS[j]*(p_mid[j+1]*u_mid[j+1] - p_mid[j]*u_mid[j]);
 	    P[n][j]   = (E[n][j] - 0.5 * U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
@@ -246,13 +250,12 @@ void Godunov_solver_LAG_source
     cpu_time_sum += cpu_time[n];
 
     time_c += tau;
-    if (isinf(t_all))
-        DispPro(k*100.0/N, k);
-    else
+    if (isfinite(t_all))
         DispPro(time_c*100.0/t_all, k);
+    else
+        DispPro(k*100.0/N, k);
     if(time_c > (t_all - eps) || isinf(time_c))
 	{
-	    printf("\nTime is up in time step %d.\n", k);
 	    config[5] = (double)k;
 	    break;
 	}
@@ -266,9 +269,10 @@ void Godunov_solver_LAG_source
 	    U[n-1][j]   =   U[n][j];
 	    E[n-1][j]   =   E[n][j];  
 	    P[n-1][j]   =   P[n][j];
-	}	
+	}
   }
 
+  printf("\nTime is up in time step %d.\n", k);
   printf("The cost of CPU time for 1D-Godunov Lagrangian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
