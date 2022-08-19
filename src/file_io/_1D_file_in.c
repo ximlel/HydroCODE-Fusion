@@ -121,7 +121,7 @@ void _1D_initialize(const char * name, struct flu_var * FV0)
      * The detail could be seen in the definition of array config
      * referring to file 'doc/config.csv'.
      */
-    _1D_configurate(add_in);
+    configurate(add_in);
     printf("  delta_x\t= %g\n", config[10]);
     printf("  delta_t\t= %g\n", config[16]);
     printf("  bondary\t= %d\n", (int)config[17]);

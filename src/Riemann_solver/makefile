@@ -1,12 +1,18 @@
 CC = gcc
-CFLAGS += -std=c99 -c -O3 -pg
-INCLUDE = -I ../include
+#C compiler
+CFLAGS += -std=c99
+#C compiler options
+SRC = ..
+#Directory of sources
+INCLUDE = -I $(SRC)/include
+#Inclued folder
 
 AR = ar
 #Archive : creat static libs
-ARFLAGS = crv
+ARFLAGS = crsv
 #AR options
 RM = rm -vf
+#Delete command
 
 DIR_NAME = $(shell basename `pwd`)
 #Current folder
@@ -15,7 +21,7 @@ FILES_C = $(shell ls *.c)
 
 define compile_c_file #Compile all .c files
 @for file in $(FILES_C); do \
-( echo "$(CC) $(CFLAGS) $$file $(INCLUDE)" && $(CC) $(CFLAGS) $$file $(INCLUDE) ) \
+( echo "$(CC) $(CFLAGS) -c $$file $(INCLUDE)" && $(CC) $(CFLAGS) -c $$file $(INCLUDE) ) \
 done;
 endef
 
@@ -25,7 +31,7 @@ define rm_o_file #Delete all .o files
 done;
 endef
 
-all : compile archive
+all: compile archive
 .PHONYP:all
 
 compile:
@@ -38,7 +44,7 @@ FILES_O = $(shell find ./ -name "*.o" -print)
 
 archive:
 	@echo "************Producing static libs************"
-	@$(AR) $(ARFLAGS)  $(DIR_NAME).a $(FILES_O)
+	@$(AR) $(ARFLAGS) $(DIR_NAME).a $(FILES_O)
 ./PHONYP:archive
 
 clean:

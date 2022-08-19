@@ -352,7 +352,7 @@ void GRP_solver_EUL_source
 	  }
 
 //====================Time step and grid fixed======================
-    if (!isinf(t_all)) // If no total time, use fixed tau and time step N.
+    if (!isinf(t_all) || !isfinite(tau)) // If no total time, use fixed tau and time step N.
         tau = CFL * h_S_max;
     if ((time_c + tau) > (t_all - eps))
         tau = t_all - time_c;
