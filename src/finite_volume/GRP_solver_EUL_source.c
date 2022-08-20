@@ -38,7 +38,7 @@ void GRP_solver_EUL_source
   clock_t tic, toc;
   double cpu_time_sum = 0.0;
 
-  double const t_all = config[1]<0.0 ? INFINITY : config[1]; // the total time
+  double const t_all = config[1];        // the total time
   double const eps   = config[4];        // the largest value could be seen as zero
   int    const N     = (int)(config[5]); // the maximum number of time steps
   double const gamma = config[6];        // the constant of the perfect gas
@@ -438,7 +438,7 @@ void GRP_solver_EUL_source
 	}
   }
 
-  printf("\nTime is up in time step %d.\n", k);
+  printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 

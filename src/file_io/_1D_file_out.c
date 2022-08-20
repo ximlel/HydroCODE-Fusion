@@ -87,20 +87,17 @@ void _1D_file_write(const int m, const int N, struct cell_var CV, double * X[],
 
   fprintf(fp_write, "%s is initialized with %d grids.\n\n", name, m);
   fprintf(fp_write, "Configurated:\n");
-  if(!isinf(config[1]))
-      fprintf(fp_write, "t_all = %g\n", (int)config[1]);
-  else if(!isinf(config[5]))
-      {
-	  fprintf(fp_write, "N_t   = %d\n", (int)config[5]);
-	  fprintf(fp_write, "tau   = %g\n", config[16]);
-      }
-  fprintf(fp_write, "dim   = %g\n", config[3]);
-  fprintf(fp_write, "eps   = %g\n", config[4]);
-  fprintf(fp_write, "gamma = %g\n", config[6]);
-  fprintf(fp_write, "CFL   = %g\n", config[7]);
-  fprintf(fp_write, "h     = %g\n", config[10]);
-  fprintf(fp_write, "bond  = %d\n", (int)config[17]);
-  fprintf(fp_write, "\n%d time steps computed.\n", (int)config[5]);
+  fprintf(fp_write, "dim\t\t= %d\n", (int)config[0]);
+  if(isfinite(config[1]))
+      fprintf(fp_write, "t_all\t= %d\n", (int)config[1]);
+  else if(isfinite(config[16]))
+      fprintf(fp_write, "tau\t\t= %g\n", config[16]);
+  fprintf(fp_write, "eps\t\t= %g\n", config[4]);
+  fprintf(fp_write, "gamma\t= %g\n", config[6]);
+  fprintf(fp_write, "CFL\t\t= %g\n", config[7]);
+  fprintf(fp_write, "h\t\t= %g\n", config[10]);
+  fprintf(fp_write, "bond\t= %d\n", (int)config[17]);
+  fprintf(fp_write, "\nA total of %d time steps are computed.\n", (int)config[5]);
   /*
   double* sum = calloc(N, sizeof(double));
   sum[0] = 0.0;

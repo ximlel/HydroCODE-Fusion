@@ -26,8 +26,8 @@ SHARE
  ./hydrocode.out GRP_direct/9_1_e GRP_direct/9_1_e 1 2_GRP EUL
 !
 :<<SHARE
- ./hydrocode.out GRP_direct/9_1_e Artifi_Heat_Conduct/4_2 1 1 LAG
  ./hydrocode.out GRP_direct/9_1_b Artifi_Heat_Conduct/4_2 1 1 LAG 1=50 7=0.25
+ ./hydrocode.out GRP_direct/9_1_e Artifi_Heat_Conduct/4_4 1 1 LAG
 SHARE
 ## Artifi_Heat_Conduct
 :<<!

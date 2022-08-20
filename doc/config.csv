@@ -1,43 +1,43 @@
-config[*],Representation ,Common Variable Name,Variable Types,Value Range,Default Value (INFINITY),Enumeration Type
-0,Dimension,dim,unsigned int,"1, 2, 3",(ARGument Value),
-1,Total time,t_all,double,,config[5]*config[16],
-2,Number of species (muti-fluids),,unsigned int,,1,
-3,Total grid number,m / num_cell,unsigned int,,(Calculate from input data),
-4,Largest value can be seen as zero,eps,double,"(0, 0.01)",1.00E-09,
-5,Maximum number of time steps,N / N_t,unsigned int,,config[1]/config[16],
-6,Polytropic index (Specific heat ratio) γ,gamma,double,> 1.0,1.4 (air),
-7,CFL number,CFL,double,< 1.0,"0.9 (order = 1)
-0.45 (order = 2)",
+config[*],Representation ,Common Variable Name,Variable Types,Value Range,Default Value (INFINITY),Enumeration Type,Work condition,Precompiled macro
+0,Dimension,dim,unsigned int,"1, 2, 3",(ARGument Value),,,
+1,Total time,t_all,double,≥ 0.0,config[5]*config[16],,,
+2,Number of species (multi-fluids),multi,unsigned int,,1,,,
+3,Total grid number,m / num_cell,unsigned int,,(Calculate from input data),,,
+4,Largest value can be seen as zero,eps,double,"(0, 0.01)",1.00E-09,,,
+5,Maximum number of time steps,N / N_t,unsigned int,,INFINITY,,,
+6,Polytropic index (Specific heat ratio) γ,gamma,double,> 1.0,1.4 (air),,,
+7,CFL number,CFL,double,"(0, 1)","0.9 (order = 1)
+0.45 (order = 2)",,t_all ≥ 0.0,
 8,Coordinate framework,el,enum,,0: Eulerian,"1: Lagrangian
-2: ALE"
-9,Order of numerical scheme,order,unsigned int,,1,
-10,Spatial grid size in x direction,h / s_x,double,> 0.0,,
-11,Spatial grid size in y direction,s_y,double,> 0.0,,
-12,Spatial grid size in z direction,s_z,double,> 0.0,,
-13,Grid number in x direction   ,n_x,unsigned int,,,
-14,Grid number in y direction  ,n_y,unsigned int,,,
-15,Grid number in z direction ,n_z,unsigned int,,,
-16,Length of the time step,tau,double,> 0.0,,
-17,1D boudary conditions,bound,enum,< 0,—4: free,"—1: initial
+2: ALE",,
+9,Order of numerical scheme,order,unsigned int,,1,,,
+10,Spatial grid size in x direction,h / s_x,double,> 0.0,,,,
+11,Spatial grid size in y direction,s_y,double,> 0.0,,,dim > 1,
+12,Spatial grid size in z direction,s_z,double,> 0.0,,,dim > 2,
+13,Grid number in x direction   ,n_x,unsigned int,,(Calculate from input data),,,
+14,Grid number in y direction  ,n_y,unsigned int,,(Calculate from input data),,dim > 1,
+15,Grid number in z direction ,n_z,unsigned int,,(Calculate from input data),,dim > 2,
+16,Length of the time step,tau,double,> 0.0,,,t_all ≥ 0.0,
+17,Boudary conditions in x direction   ,bound,enum,< 0,—4: free,"—1: initial
 —2: reflective
 —3: prescribed
 —5: periodic
-—24: reflective + free"
-30,,,,,,
-31,Reconstitution,,enum,,0: primitive variables,1: conservative variables
-32,Output initial data,,_Bool,,true: Open,false: Close
-33,Dimensional splitting,,_Bool,,false: No,true: Yes
-40,Slope limiter ,,enum,,0: Venkatakrishnan,1: Barth-Jespersen
-41,Parameter α in minmod limiter,alpha,double,"[0,2)",1.9,
-60,,,,,,
-61,,,,,,
-70,,,,,,
-106,Polytropic index of fluid 2,,double,> 1.0,,
-110,Specific heat at constant volume,C_v,double,> 0.0,0.72 (air),
-111,Specific heat at constant volume of fluid 2,,double,> 0.0,,
-120,Energy released when a unit mass of gas is burnt,q_0,double,> 0.0,,
-121,Reaction rate,K,double,> 0.0,,
-122,Critical temperature,T_c,double,≥ 0.0,,
-210,Grid offset in x direction,offset_x,,,,
-211,Grid offset in y direction,offset_y,,,,
-212,Grid offset in z direction,offset_z,,,,
+—24: reflective + free",,
+30,,,,,,,,
+31,Reconstitution,,enum,,0: primitive variables,1: conservative variables,order > 1,
+32,Output initial data,,_Bool,,true: Open,false: Close,,
+33,Dimensional splitting,,_Bool,,false: No,true: Yes,dim > 1,
+40,Slope limiter ,,enum,,0: Venkatakrishnan,1: Barth-Jespersen,order > 1,
+41,Parameter α in minmod limiter,alpha,double,"[0,2)",1.9,,order > 1 & minmod limiter,
+60,,,,,,,,
+61,,,,,,,,
+70,,,,,,,,
+106,Polytropic index of fluid 2,gamma_b,double,> 1.0,,,multi > 1,
+110,Specific heat at constant volume,C_v,double,> 0.0,0.72 (air),,,
+111,Specific heat at constant volume of fluid 2,C_v_b,double,> 0.0,,,multi > 1,
+120,Energy released when a unit mass of gas is burnt,q_0,double,> 0.0,,,,
+121,Reaction rate,K,double,> 0.0,,,,
+122,Critical temperature,T_c,double,≥ 0.0,,,,
+210,Grid offset in x direction,offset_x,int,,0,,,
+211,Grid offset in y direction,offset_y,int,,0,,dim > 1,
+212,Grid offset in z direction,offset_z,int,,0,,dim > 2,

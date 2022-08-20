@@ -46,18 +46,22 @@ static void config_check(void)
 	    config[5] = isfinite(config[5]) ? config[5] : (double)INT_MAX;
 	    printf("  total time\t= %g\n", config[1]);
 	}
-    else if(isfinite(config[5]) && isfinite(config[16]))
-	{
-	    printf("  total time\t= %g * %d = %g\n", config[16], (int)config[5], config[16] * (int)config[5]);
-	    printf("  delta_t\t= %g\n", config[16]);
-	}
     else if(!isfinite(config[5]))
 	{
 	    fprintf(stderr, "The total time or the maximum number of time steps must be setted properly!\n");
 	    exit(2);
 	}
+    else
+	{
+	    config[1] = INFINITY;
+	    if(isfinite(config[16]))
+		{
+		    printf("  total time\t= %g * %d = %g\n", config[16], (int)config[5], config[16]*(int)config[5]);
+		    printf("  delta_t\t= %g\n", config[16]);
+		}
+	}
     printf("  time step\t= %d\n", (int)config[5]);
-
+	    
     if(isinf(config[4]))
 	config[4] = EPS;
     double eps = config[4];
