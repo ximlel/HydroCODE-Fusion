@@ -23,7 +23,7 @@
  * @param[out] cpu_time: Array of the CPU time recording.
  */
 void GRP_solver_LAG_source
-(const int m, struct cell_var CV, double * X[], double * cpu_time)
+(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;

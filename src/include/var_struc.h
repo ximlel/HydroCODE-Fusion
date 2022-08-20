@@ -14,13 +14,13 @@
 extern double config[]; //!< Initial configuration data array.
 
 //! Pointer structural body of fluid variables.
-struct flu_var {
-	double *RHO, *U, *P;
-};
+typedef struct flu_var {
+	double *RHO, *U, *V, *P;
+} S_FV;
 
-//! Pointer structural body of variables on computational cells.
-struct cell_var {
+//! Pointer structural body of variables on structural computational grid cells.
+typedef struct cell_var_stru {
 	double **RHO, **U, **V, **P, **E;
-};
+} S_CVS;
 
 #endif

@@ -21,7 +21,7 @@ SOURCE = hydrocode
 
 all: modules
 	@echo "**********Generate executable file***********"
-	$(CC) $(CFLAGS) -o $(SOURCE).out $(SRC)/$(SOURCE)/$(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
+	$(CC) $(CFLAGS) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
 .PHONYP:all
 
 modules:

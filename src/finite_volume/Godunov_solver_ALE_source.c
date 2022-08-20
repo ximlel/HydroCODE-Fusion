@@ -1,6 +1,6 @@
 /**
- * @file  Godunov_solver_LAG_source.c
- * @brief This is a Lagrangian Godunov scheme to solve 1-D Euler equations.
+ * @file  Godunov_solver_ALE_source.c
+ * @brief This is an ALE Godunov scheme to solve 1-D Euler equations.
  */
 
 #include <stdio.h>
@@ -16,13 +16,14 @@
 
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
- *        equations of motion on Lagrangian coordinate.
+ *        equations of motion on ALE coordinate.
  * @param[in]  m:        Number of the grids.
  * @param[in,out] CV:    Structural body of cell variable data.
  * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
+ * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-void Godunov_solver_LAG_source
+static void Godunov_solver_ALE_source_Undone
 (const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
@@ -49,18 +50,25 @@ void Godunov_solver_LAG_source
 
   _Bool find_bound = false;
   
+  double Mom, Ene;
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
   double c_L, c_R; // the speeds of sound
   double h_L, h_R; // length of spatial grids
-  _Bool CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
-  double u_star, p_star; // the Riemann solutions
-  double *u_mid = malloc((m + 1) * sizeof(double)); 
-  double *p_mid = malloc((m + 1) * sizeof(double));
+  /*
+   * mid:  the Riemann solutions.
+   *       [rho_star_L, u_star, p_star, rho_star_R]
+   */
+  double dire[3], mid[3];
+  double nu;  // nu = tau/h
+  double *F1, *F2, *F3; // the numerical flux at (x_{j-1/2}, t_{n}).
   double * MASS; // Array of the mass data in computational cells.
-  if(u_mid == NULL || p_mid == NULL)
+  F1 = malloc((m+1) * sizeof(double));
+  F2 = malloc((m+1) * sizeof(double));
+  F3 = malloc((m+1) * sizeof(double));
+  if(F1 == NULL || F2 == NULL || F3 == NULL)
       {
-	  printf("NOT enough memory! Mid Variables\n");
+	  printf("NOT enough memory! Flux\n");
 	  goto return_NULL;
       }
   MASS = malloc(m * sizeof(double));
@@ -74,11 +82,10 @@ void Godunov_solver_LAG_source
 
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
-  double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, CL, HL; // Left  boundary condition
-  double UR, PR, RHOR, CR, HR; // Right boundary condition
+  double UL, PL, RHOL, HL; // Left  boundary condition
+  double UR, PR, RHOR, HR; // Right boundary condition
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
@@ -108,9 +115,6 @@ void Godunov_solver_LAG_source
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	      CL = sqrt(gamma * PL / RHOL);
-	      CR = sqrt(gamma * PR / RHOR);
-	      h_S_max = fmin(HL/(fabs(UL)+CL), HR/(fabs(UR)+CR));
 	      break;
 	  case -4: // free boundary conditions
 	      if(!find_bound)
@@ -141,8 +145,6 @@ void Godunov_solver_LAG_source
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
 	      HL = X[n-1][1] - X[n-1][0];
 	      HR = X[n-1][m] - X[n-1][m-1];
-	      CL = sqrt(gamma * PL / RHOL);
-	      h_S_max = HL/(fabs(UL)+CL);
 	      break;
 	  default:
 	      printf("No suitable boundary coditions!\n");
@@ -186,51 +188,58 @@ void Godunov_solver_LAG_source
 
 	      c_L = sqrt(gamma * p_L / rho_L);
 	      c_R = sqrt(gamma * p_R / rho_R);
-	      h_S_max = fmin(h_S_max, h_L/c_L);
-	      h_S_max = fmin(h_S_max, h_R/c_R);
+	      h_S_max = fmin(h_S_max, h_L/(fabs(u_L)+fabs(c_L)));
+	      h_S_max = fmin(h_S_max, h_R/(fabs(u_R)+fabs(c_R)));
 
 //========================Solve Riemann Problem========================
 
-	      Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
+	      linear_GRP_solver_Edir(dire, mid, rho_L, rho_R, 0.0, 0.0, u_L, u_R, 0.0, 0.0, p_L, p_R, 0.0, 0.0, gamma, eps);
 
-	      if(p_star < eps)
+	      if(mid[2] < eps)
 		  {
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(!isfinite(p_star)|| !isfinite(u_star))
+	      if(!isfinite(mid[1])|| !isfinite(mid[2]))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
 		  }
 
-	      u_mid[j] = u_star;
-	      p_mid[j] = p_star;
+	      F1[j] = mid[0]*mid[1];
+	      F2[j] = F1[j]*mid[1] + mid[2];
+	      F3[j] = (gamma/(gamma-1.0))*mid[2] + 0.5*F1[j]*mid[1];
+	      F3[j] = F3[j]*mid[1];
 	  }
 
-//====================Time step and grid movement======================
+//====================Time step and grid fixed======================
     // If no total time, use fixed tau and time step N.
     if (isfinite(t_all) || !isfinite(config[16]) || config[16] <= 0.0)
 	{
-	    tau = fmin(CFL * h_S_max, C_m * tau);
+	    tau = CFL * h_S_max;
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
 	}
-    
-    for(j = 0; j <= m; ++j)
-	X[n][j] = X[n-1][j] + tau * u_mid[j]; // motion along the contact discontinuity
+    nu = tau / h;
 
-//======================THE CORE ITERATION=========================(On Lagrangian Coordinate)
+    for (j = 0; j <= m; ++j)
+	X[n][j] = X[n-1][j];
+
+//======================THE CORE ITERATION=========================(On Eulerian Coordinate)
     for(j = 0; j < m; ++j) // forward Euler
 	{ /*
 	   *  j-1          j          j+1
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[n][j] = 1.0 / (1.0/RHO[n-1][j] + tau/MASS[j]*(u_mid[j+1] - u_mid[j]));
-	    U[n][j]   = U[n-1][j] - tau/MASS[j]*(p_mid[j+1] - p_mid[j]);
-	    E[n][j]   = E[n-1][j] - tau/MASS[j]*(p_mid[j+1]*u_mid[j+1] - p_mid[j]*u_mid[j]);
-	    P[n][j]   = (E[n][j] - 0.5 * U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
+	    RHO[n][j] = RHO[n-1][j] - nu*(F1[j+1]-F1[j]);
+	    Mom = RHO[n-1][j]*U[n-1][j] - nu*(F2[j+1]-F2[j]);
+	    Ene = RHO[n-1][j]*E[n-1][j] - nu*(F3[j+1]-F3[j]);
+
+	    U[n][j] = Mom / RHO[n][j];
+	    E[n][j] = Ene / RHO[n][j];
+	    P[n][j] = (Ene - 0.5*Mom*U[n][j])*(gamma-1.0);
+
 	    if(P[n][j] < eps || RHO[n][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
@@ -261,8 +270,6 @@ void Godunov_solver_LAG_source
 	}
 
 //===========================Fixed variable location=======================	
-    for(j = 0; j <= m; ++j)
-	X[n-1][j] = X[n][j];
     for(j = 0; j < m; ++j)
 	{
 	    RHO[n-1][j] = RHO[n][j];
@@ -273,14 +280,16 @@ void Godunov_solver_LAG_source
   }
 
   printf("\nTime is up at time step %d.\n", k);
-  printf("The cost of CPU time for 1D-Godunov Lagrangian scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 1D-Godunov Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
 return_NULL:
-  free(u_mid);
-  free(p_mid);
-  u_mid = NULL;
-  p_mid = NULL;
+  free(F1);
+  free(F2);
+  free(F3);
+  F1 = NULL;
+  F2 = NULL;
+  F3 = NULL;
   free(MASS);
   MASS = NULL;
 }

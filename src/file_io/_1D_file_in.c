@@ -3,66 +3,13 @@
  * @brief This is a set of functions which control the read-in of one-dimensional data.
  */
 
-#include <errno.h>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
-
-
-/**
- * @brief This function reads the 1D initial data file to generate the initial data.
- * @param[in]  fp: The pointer to the input file.
- * @param[out]  U: The pointer to the data array of fluid variables.
- * @param[in] num: The number of the numbers in the input file. 
- * @return It returns 0 if successfully read the file,
- *         while returns the index of the wrong entry.
- */
-static int _1D_flu_var_read(FILE * fp, double * U, const int num)
-{
-  int idx = 0, j = 0; // j is a frequently used index for spatial variables.
-  char number[100]; // A string that stores a number.
-  char ch, *endptr;
-  // int sign = 1;
-    
-  while((ch = getc(fp)) != EOF)
-  {
-    if(isspace(ch) && idx)
-    {
-      number[idx] = '\0';
-      idx = 0;
-      // format_string() and str2num() in 'str_num_common.c' are deprecated.
-      /*
-      sign = format_string(number);
-      if(!sign)
-	return j+1;
-      else if(j == num)
-	return j;
-      U[j] = sign * str2num(number);
-      */
-      errno = 0;
-      U[j] = strtod(number, &endptr);
-      if (errno == ERANGE || *endptr != '\0')
-	  {
-	      printf("The %dth entry in the initial data file is not a double-precision floats.\n", j+1);
-	      return j+1;
-	  }
-      else if(j == num)
-	  {
-	      printf("Error on the initial data file reading!\n");
-	      return j;
-	  }
-      ++j;
-    }
-    else if((ch == 46) || (ch == 45) || (ch == 69) || (ch == 101) || isdigit(ch))
-      number[idx++] = ch;
-  }
-  return 0;
-}
 
 
 /**
@@ -83,17 +30,22 @@ static int _1D_flu_var_read(FILE * fp, double * U, const int num)
 		exit(1);						\
 	    }								\
 	num_cell = flu_var_count(fp, add);				\
+	if (num_cell < 1)						\
+	    {								\
+		printf("Error in counting fluid variables in initial data file: %s!\n", #sfv); \
+		fclose(fp);						\
+		exit(2);						\
+	    }								\
 	if(isinf(config[3]))						\
 	    config[3] = (double)num_cell;				\
 	else if(num_cell != (int)config[3])				\
 	    {								\
-		printf("Input unequal! num_%s=%d,", #sfv, num_cell);	\
-		printf(" num_cell=%d.\n", num_cell, (int)config[3]);	\
+		printf("Input unequal! num_%s=%d, num_cell=%d.\n", #sfv, num_cell, (int)config[3]); \
 		exit(2);						\
 	    }								\
 	FV0->sfv = malloc((num_cell + 1) * sizeof(double));		\
 	FV0->sfv[0] = (double)num_cell;					\
-	if(_1D_flu_var_read(fp, FV0->sfv+1, num_cell))			\
+	if(flu_var_read(fp, FV0->sfv + 1, num_cell))			\
 	    {								\
 		fclose(fp);						\
 		exit(2);						\

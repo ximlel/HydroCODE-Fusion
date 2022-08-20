@@ -1,6 +1,6 @@
 /**
- * @file  GRP_solver_EUL_source.c
- * @brief This is an Eulerian GRP scheme to solve 1-D Euler equations.
+ * @file  GRP_solver_ALE_source.c
+ * @brief This is an ALE GRP scheme to solve 1-D Euler equations.
  */
 
 #include <stdio.h>
@@ -16,13 +16,15 @@
 
 /**
  * @brief This function use GRP scheme to solve 1-D Euler
- *        equations of motion on Eulerian coordinate.
+ *        equations of motion on ALE coordinate.
  * @param[in]  m:        Number of the grids.
  * @param[in,out] CV:    Structural body of cell variable data.
+ * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
+ * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-void GRP_solver_EUL_source
-(const int m, struct cell_var_stru CV, double * cpu_time)
+static void GRP_solver_ALE_source_Undone
+(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;
@@ -54,6 +56,7 @@ void GRP_solver_EUL_source
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
   double c_L, c_R; // the speeds of sound
+  double h_L, h_R; // length of spatial grids
 
   double s_u_L, s_p_L, s_rho_L; // spatial derivatives in coordinate x (slopes)
   double s_u_R, s_p_R, s_rho_R;
@@ -119,8 +122,8 @@ void GRP_solver_EUL_source
   double time_c = 0.0; // the current time
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, SUL, SPL, SRHOL; // Left  boundary condition
-  double UR, PR, RHOR, SUR, SPR, SRHOR; // Right boundary condition
+  double UL, PL, RHOL, HL, SUL, SPL, SRHOL; // Left  boundary condition
+  double UR, PR, RHOR, HR, SUR, SPR, SRHOR; // Right boundary condition
   SUL   = 0.0;   SUR = 0.0;
   SPL   = 0.0;   SPR = 0.0;
   SRHOL = 0.0; SRHOR = 0.0;
@@ -142,6 +145,7 @@ void GRP_solver_EUL_source
 	      UL   =   U[0][0]; UR   =   U[0][m-1];
 	      PL   =   P[0][0]; PR   =   P[0][m-1];
 	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
+	      HL  = h; HR = h;
 	      break;
 	  case -2: // reflective boundary conditions
 	      if(!find_bound)
@@ -150,6 +154,8 @@ void GRP_solver_EUL_source
 	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
 	      break;
 	  case -4: // free boundary conditions
 	      if(!find_bound)
@@ -158,6 +164,8 @@ void GRP_solver_EUL_source
 	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
 	      break;
 	  case -5: // periodic boundary conditions
 	      if(!find_bound)
@@ -166,6 +174,8 @@ void GRP_solver_EUL_source
 	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
+	      HL = X[n-1][m] - X[n-1][m-1];
+	      HR = X[n-1][1] - X[n-1][0];
 	      break;
 	  case -24: // reflective + free boundary conditions
 	      if(!find_bound)
@@ -174,6 +184,8 @@ void GRP_solver_EUL_source
 	      UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
+	      HL = X[n-1][1] - X[n-1][0];
+	      HR = X[n-1][m] - X[n-1][m-1];
 	      break;
 	  default:
 	      printf("No suitable boundary coditions!\n");
@@ -189,27 +201,31 @@ void GRP_solver_EUL_source
 	     */
 	      if(j)
 		  {
-		      s_u_L   = (U[n-1][j]   -   U[n-1][j-1]) / h;
-		      s_p_L   = (P[n-1][j]   -   P[n-1][j-1]) / h;
-		      s_rho_L = (RHO[n-1][j] - RHO[n-1][j-1]) / h;
+		      h_L     = 0.5 * (X[n-1][j+1] - X[n-1][j-1]);
+		      s_u_L   = (U[n-1][j]   -   U[n-1][j-1]) / h_L;
+		      s_p_L   = (P[n-1][j]   -   P[n-1][j-1]) / h_L;
+		      s_rho_L = (RHO[n-1][j] - RHO[n-1][j-1]) / h_L;
 		  }
 	      else
 		  {
-		      s_u_L   = (U[n-1][j]   -   UL) / h;
-		      s_p_L   = (P[n-1][j]   -   PL) / h;
-		      s_rho_L = (RHO[n-1][j] - RHOL) / h;
+		      h_L     = 0.5 * (X[n-1][j+1] - X[n-1][j] + HL);
+		      s_u_L   = (U[n-1][j]   -   UL) / h_L;
+		      s_p_L   = (P[n-1][j]   -   PL) / h_L;
+		      s_rho_L = (RHO[n-1][j] - RHOL) / h_L;
 		  }
 	      if(j < m-1)
 		  {
-		      s_u_R   = (U[n-1][j+1]   -   U[n-1][j]) / h;
-		      s_p_R   = (P[n-1][j+1]   -   P[n-1][j]) / h;
-		      s_rho_R = (RHO[n-1][j+1] - RHO[n-1][j]) / h;
+		      h_R     = 0.5 * (X[n-1][j+2] - X[n-1][j]);
+		      s_u_R   = (U[n-1][j+1]   -   U[n-1][j]) / h_R;
+		      s_p_R   = (P[n-1][j+1]   -   P[n-1][j]) / h_R;
+		      s_rho_R = (RHO[n-1][j+1] - RHO[n-1][j]) / h_R;
 		  }
 	      else
 		  {
-		      s_u_R   = (UR   -   U[n-1][j]) / h;
-		      s_p_R   = (PR   -   P[n-1][j]) / h;
-		      s_rho_R = (RHOR - RHO[n-1][j]) / h;
+		      h_R     = 0.5 * (X[n-1][j+1] - X[n-1][j] + HR);
+		      s_u_R   = (UR   -   U[n-1][j]) / h_R;
+		      s_p_R   = (PR   -   P[n-1][j]) / h_R;
+		      s_rho_R = (RHOR - RHO[n-1][j]) / h_R;
 		  }
 	      if (k == 1)
 		  {
@@ -247,27 +263,31 @@ void GRP_solver_EUL_source
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      rho_L = RHO[n-1][j-1] + 0.5*h*s_rho[j-1];
-		      u_L   =   U[n-1][j-1] + 0.5*h*s_u[j-1];
-		      p_L   =   P[n-1][j-1] + 0.5*h*s_p[j-1];
+		      h_L   =   X[n-1][j] - X[n-1][j-1];
+		      rho_L = RHO[n-1][j-1] + 0.5*h_L*s_rho[j-1];
+		      u_L   =   U[n-1][j-1] + 0.5*h_L*s_u[j-1];
+		      p_L   =   P[n-1][j-1] + 0.5*h_L*s_p[j-1];
 		  }
 	      else
 		  {
-		      rho_L = RHOL + 0.5*h*SRHOL;
-		      u_L   =   UL + 0.5*h*SUL;
-		      p_L   =   PL + 0.5*h*SPL;
+		      h_L   =   HL;
+		      rho_L = RHOL + 0.5*h_L*SRHOL;
+		      u_L   =   UL + 0.5*h_L*SUL;
+		      p_L   =   PL + 0.5*h_L*SPL;
 		  }
 	      if(j < m)
 		  {
-		      rho_R = RHO[n-1][j] - 0.5*h*s_rho[j];
-		      u_R   =   U[n-1][j] - 0.5*h*s_u[j];
-		      p_R   =   P[n-1][j] - 0.5*h*s_p[j];
+		      h_R   =   X[n-1][j+1] - X[n-1][j];
+		      rho_R = RHO[n-1][j] - 0.5*h_R*s_rho[j];
+		      u_R   =   U[n-1][j] - 0.5*h_R*s_u[j];
+		      p_R   =   P[n-1][j] - 0.5*h_R*s_p[j];
 		  }
 	      else
 		  {
-		      rho_R = RHOR + 0.5*h*SRHOR;
-		      u_R   =   UR + 0.5*h*SUR;
-		      p_R   =   PR + 0.5*h*SPR;
+		      h_R   =   HR;
+		      rho_R = RHOR + 0.5*h_R*SRHOR;
+		      u_R   =   UR + 0.5*h_R*SUR;
+		      p_R   =   PR + 0.5*h_R*SPR;
 		  }
 	      if(p_L < eps || p_R < eps || rho_L < eps || rho_R < eps)
 		  {
@@ -282,8 +302,8 @@ void GRP_solver_EUL_source
 
 	      c_L = sqrt(gamma * p_L / rho_L);
 	      c_R = sqrt(gamma * p_R / rho_R);
-	      h_S_max = fmin(h_S_max, h/(fabs(u_L)+fabs(c_L)));
-	      h_S_max = fmin(h_S_max, h/(fabs(u_R)+fabs(c_R)));
+	      h_S_max = fmin(h_S_max, h_L/(fabs(u_L)+fabs(c_L)));
+	      h_S_max = fmin(h_S_max, h_R/(fabs(u_R)+fabs(c_R)));
 
 	      if(j) //calculate the material derivatives
 		  {
@@ -356,6 +376,8 @@ void GRP_solver_EUL_source
 	    RHO_next[j] += 0.5 * tau * RHO_t[j];;
 	    U_next[j]   += 0.5 * tau * U_t[j];
 	    P_next[j]   += 0.5 * tau * P_t[j];
+
+	    X[n][j] = X[n-1][j];
 	}
 
 //======================THE CORE ITERATION=========================(On Eulerian Coordinate)
@@ -385,9 +407,9 @@ void GRP_solver_EUL_source
 		}
 	    
 //============================compute the slopes============================
-	    s_u[j]   = (  U_next[j+1] -   U_next[j])/h;
-	    s_p[j]   = (  P_next[j+1] -   P_next[j])/h;
-	    s_rho[j] = (RHO_next[j+1] - RHO_next[j])/h;
+	    s_u[j]   = (  U_next[j+1] -   U_next[j])/(X[n][j+1]-X[n][j]);
+	    s_p[j]   = (  P_next[j+1] -   P_next[j])/(X[n][j+1]-X[n][j]);
+	    s_rho[j] = (RHO_next[j+1] - RHO_next[j])/(X[n][j+1]-X[n][j]);
 	}
 
 //============================Time update=======================

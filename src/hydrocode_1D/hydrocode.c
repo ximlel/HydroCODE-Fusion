@@ -24,8 +24,8 @@
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> tools/                     <td> Tool functions
- * <tr><th> hydrocode/hydrocode.c      <td> Main program
- * <tr><th> hydrocode/make.sh          <td> Bash script compiles and runs programs
+ * <tr><th> hydrocode_1D/hydrocode.c   <td> Main program
+ * <tr><th> hydrocode_1D/make.sh       <td> Bash script compiles and runs programs
  * </table>
  *
  * @section Exit_status Program exit status code
@@ -53,7 +53,7 @@
  *            - Linux/Unix: Run 'hydrocode.out name_of_test_example name_of_numeric_result dimension order[_scheme]
  *                               coordinate config[n]=(double)C' command on the terminal. \n
  *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 1 2[_GRP] LAG 5=100' (second-order Lagrangian GRP scheme).
- *                          - dim: Dimension of test example (= 1 or 2).
+ *                          - dim: Dimension of test example (= 1).
  *                          - order: Order of numerical scheme (= 1 or 2).
  *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
  *                          - coordinate: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
@@ -87,7 +87,7 @@
 double config[N_CONF]; //!< Initial configuration data array.
 
 /**
- * @brief N memory allocations to the initial fluid variable 'v' in the structural body cell_var.
+ * @brief N memory allocations to the initial fluid variable 'v' in the structural body cell_var_stru.
  */
 #define CV_INIT_MEM(v, N)						\
     do {								\
@@ -99,6 +99,7 @@ double config[N_CONF]; //!< Initial configuration data array.
 		if(CV.v[k] == NULL)					\
 		    {							\
 			printf("NOT enough memory! %s[%d]\n", #v, k);	\
+			retval = 5;					\
 			goto return_NULL;				\
 		    }							\
 	    }								\
@@ -121,25 +122,24 @@ int main(int argc, char *argv[])
 {
     printf("\nTEST:\n  %s\n", argv[1]);
     printf("Test Beginning: ARGuments Counter = %d.\n", argc);
-
-    // Initialize configuration data array 
-    int k;
+    
+    int k, j, retval = 0;
+    // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;
 
     // Set dimension.
     double dim;
     dim = atoi(argv[3]);
-    if (dim != 1 && dim !=2 && dim !=3)
+    if (dim != 1)
 	{
 	    printf("No appropriate dimension was entered!\n");
 	    return 4;
 	}
     config[0] = (double)dim;
 
-	printf("Configurating:\n");
+    printf("Configurating:\n");
     char * endptr;
-    int j;
     double conf_tmp;
     for (k = 6; k < argc; k++)
 	{
@@ -156,11 +156,32 @@ int main(int argc, char *argv[])
 			    printf("%3d-th configuration: %g (ARGument)\n", j, conf_tmp);
 			}
 		    else
-			printf("Configuration error in ARGument variable %d! ERROR after '='!\n", k);
+			{
+			    printf("Configuration error in ARGument variable %d! ERROR after '='!\n", k);
+			    return 4;
+			}
 		}
 	    else
-		printf("Configuration error in ARGument variable %d! ERROR before '='!\n", k);
+		{
+		    printf("Configuration error in ARGument variable %d! ERROR before '='!\n", k);
+		    return 4;
+		}
 	}
+	
+  // Set order and scheme.
+  int order; // 1, 2
+  char * scheme; // Riemann_exact(Godunov), GRP
+  printf("Order[_Scheme]: %s\n",argv[4]);
+  errno = 0;
+  order = strtol(argv[4], &scheme, 10);	
+  if (*scheme == '_')
+      scheme++;
+  else if (*scheme != '\0' || errno == ERANGE)
+      {
+	  printf("No order or Wrog scheme!\n");
+	  return 4;
+      }
+  config[9] = (double)order;
 
     struct flu_var FV0; // Structural body of initial data array pointer.
     /* 
@@ -182,7 +203,7 @@ int main(int argc, char *argv[])
   // The number of times steps of the fluid data stored for plotting.
   int N = 2; // (int)(config[5]) + 1;
 
-  struct cell_var CV; // Structural body of fluid variables in computational cells array pointer.
+  struct cell_var_stru CV; // Structural body of fluid variables in computational cells array pointer.
   double ** X;
   double * cpu_time;
   // Initialize arrays of fluid variables in cells.
@@ -196,6 +217,7 @@ int main(int argc, char *argv[])
     if(CV.E[k] == NULL)
     {
       printf("NOT enough memory! E[%d]\n", k);
+      retval = 5;
       goto return_NULL;
     }
   }
@@ -206,36 +228,23 @@ int main(int argc, char *argv[])
     if(X[k] == NULL)
     {
       printf("NOT enough memory! X[%d]\n", k);
+      retval = 5;
       goto return_NULL;
     }
   }
   // Initialize the values of energy in computational cells and x-coordinate of the cell interfaces.
-  for(k = 0; k < m; ++k)
-      CV.E[0][k] = 0.5*CV.U[0][k]*CV.U[0][k] + CV.P[0][k]/(gamma - 1.0)/CV.RHO[0][k]; 
-  for(k = 0; k <= m; ++k)
-      X[0][k] = h * k;
+  for(j = 0; j < m; ++j)
+      CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(gamma - 1.0)/CV.RHO[0][j]; 
+  for(j = 0; j <= m; ++j)
+      X[0][k] = j * h;
 
   cpu_time = malloc(N * sizeof(double));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
+	  retval = 5;
 	  goto return_NULL;
       }
-
-  // Set order and scheme.
-  int order; // 1, 2
-  char * scheme; // Riemann_exact(Godunov), GRP
-  printf("Order[_Scheme]: %s\n",argv[4]);
-  errno = 0;
-  order = strtol(argv[4], &scheme, 10);	
-  if (*scheme == '_')
-      scheme++;
-  else if (*scheme != '\0' || errno == ERANGE)
-      {
-	  printf("No order or Wrog scheme!\n");
-	  goto return_NULL;
-      }
-  config[9] = (double)order;
 
   if (strcmp(argv[5],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {
@@ -250,28 +259,34 @@ int main(int argc, char *argv[])
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
+		  retval = 4;
 		  goto return_NULL;
-	      }
+ 	      }
       }
   else if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
+	  for (k = 1; k < N; ++k)
+	      for (j = 0; j <= m; ++j)
+		  X[k][j] = X[0][j];
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_EUL_source(m, CV, X, cpu_time);
+		  Godunov_solver_EUL_source(m, CV, cpu_time);
 		  break;
 	      case 2:
-		  GRP_solver_EUL_source(m, CV, X, cpu_time);
+		  GRP_solver_EUL_source(m, CV, cpu_time);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
+		  retval = 4;
 		  goto return_NULL;
 	      }
       }
   else
       {
 	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);
+	  retval = 4;
 	  goto return_NULL;
       }
 
@@ -308,5 +323,5 @@ int main(int argc, char *argv[])
   free(cpu_time);
   cpu_time = NULL;
   
-  return 0;
+  return retval;
 }

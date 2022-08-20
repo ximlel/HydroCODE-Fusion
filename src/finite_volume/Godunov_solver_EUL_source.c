@@ -19,11 +19,10 @@
  *        equations of motion on Eulerian coordinate.
  * @param[in]  m:        Number of the grids.
  * @param[in,out] CV:    Structural body of cell variable data.
- * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
 void Godunov_solver_EUL_source
-(const int m, struct cell_var CV, double * X[], double * cpu_time)
+(const int m, struct cell_var_stru CV, double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;
@@ -53,7 +52,6 @@ void Godunov_solver_EUL_source
   double u_L, p_L, rho_L;
   double u_R, p_R, rho_R;
   double c_L, c_R; // the speeds of sound
-  double h_L, h_R; // length of spatial grids
   /*
    * mid:  the Riemann solutions.
    *       [rho_star_L, u_star, p_star, rho_star_R]
@@ -83,8 +81,8 @@ void Godunov_solver_EUL_source
   double time_c = 0.0; // the current time
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, HL; // Left  boundary condition
-  double UR, PR, RHOR, HR; // Right boundary condition
+  double UL, PL, RHOL; // Left  boundary condition
+  double UR, PR, RHOR; // Right boundary condition
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
@@ -103,7 +101,6 @@ void Godunov_solver_EUL_source
 	      UL   =   U[0][0]; UR   =   U[0][m-1];
 	      PL   =   P[0][0]; PR   =   P[0][m-1];
 	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
-	      HL  = h; HR = h;
 	      break;
 	  case -2: // reflective boundary conditions
 	      if(!find_bound)
@@ -112,8 +109,6 @@ void Godunov_solver_EUL_source
 	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
 	      break;
 	  case -4: // free boundary conditions
 	      if(!find_bound)
@@ -122,8 +117,6 @@ void Godunov_solver_EUL_source
 	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
 	      break;
 	  case -5: // periodic boundary conditions
 	      if(!find_bound)
@@ -132,8 +125,6 @@ void Godunov_solver_EUL_source
 	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
 	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
 	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
-	      HL = X[n-1][m] - X[n-1][m-1];
-	      HR = X[n-1][1] - X[n-1][0];
 	      break;
 	  case -24: // reflective + free boundary conditions
 	      if(!find_bound)
@@ -142,8 +133,6 @@ void Godunov_solver_EUL_source
 	      UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
 	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
 	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
 	      break;
 	  default:
 	      printf("No suitable boundary coditions!\n");
@@ -158,28 +147,24 @@ void Godunov_solver_EUL_source
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      h_L   =   X[n-1][j] - X[n-1][j-1];
 		      rho_L = RHO[n-1][j-1];
 		      u_L   =   U[n-1][j-1];
 		      p_L   =   P[n-1][j-1];
 		  }
 	      else
 		  {
-		      h_L   =   HL;
 		      rho_L = RHOL;
 		      u_L   =   UL;
 		      p_L   =   PL;
 		  }
 	      if(j < m)
 		  {
-		      h_R   =   X[n-1][j+1] - X[n-1][j];
 		      rho_R = RHO[n-1][j];
 		      u_R   =   U[n-1][j];
 		      p_R   =   P[n-1][j];
 		  }
 	      else
 		  {
-		      h_R   =   HR;
 		      rho_R = RHOR;
 		      u_R   =   UR;
 		      p_R   =   PR;
@@ -187,8 +172,8 @@ void Godunov_solver_EUL_source
 
 	      c_L = sqrt(gamma * p_L / rho_L);
 	      c_R = sqrt(gamma * p_R / rho_R);
-	      h_S_max = fmin(h_S_max, h_L/(fabs(u_L)+fabs(c_L)));
-	      h_S_max = fmin(h_S_max, h_R/(fabs(u_R)+fabs(c_R)));
+	      h_S_max = fmin(h_S_max, h/(fabs(u_L)+fabs(c_L)));
+	      h_S_max = fmin(h_S_max, h/(fabs(u_R)+fabs(c_R)));
 
 //========================Solve Riemann Problem========================
 
@@ -220,9 +205,6 @@ void Godunov_solver_EUL_source
 		tau = t_all - time_c;
 	}
     nu = tau / h;
-
-    for (j = 0; j <= m; ++j)
-	X[n][j] = X[n-1][j];
 
 //======================THE CORE ITERATION=========================(On Eulerian Coordinate)
     for(j = 0; j < m; ++j) // forward Euler

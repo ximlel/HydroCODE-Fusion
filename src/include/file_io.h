@@ -11,14 +11,16 @@
 void example_io(const char * example, char * add_mkdir, const int i_or_o);
 
 int flu_var_count(FILE * fp, const char * add);
+int flu_var_count_line(FILE * fp, const char * add, int * n_x);
 
+int flu_var_read(FILE * fp, double * U, const int num);
 
 // _1D_file_in.c
 void _1D_initialize(const char * name, struct flu_var * FV0);
 
 
 // _1D_file_out.c
-void _1D_file_write(const int m, const int N, struct cell_var CV, double * X[], 
+void _1D_file_write(const int m, const int N, struct cell_var_stru CV, double * X[], 
                     const double * cpu_time, const char * name);
 
 

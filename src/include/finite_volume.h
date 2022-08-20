@@ -10,15 +10,13 @@
 #include "../include/var_struc.h"
 
 void Godunov_solver_LAG_source
-(const int m, struct cell_var CV, double * X[], double * cpu_time);
-
+(const int m, struct cell_var_stru CV, double * X[], double * cpu_time);
 void GRP_solver_LAG_source
-(const int m, struct cell_var CV, double * X[], double * cpu_time);
+(const int m, struct cell_var_stru CV, double * X[], double * cpu_time);
 
 void Godunov_solver_EUL_source
-(const int m, struct cell_var CV, double * X[], double * cpu_time);
-
+(const int m, struct cell_var_stru CV, double * cpu_time);
 void GRP_solver_EUL_source
-(const int m, struct cell_var CV, double * X[], double * cpu_time);
+(const int m, struct cell_var_stru CV, double * cpu_time);
 
 #endif
