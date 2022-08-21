@@ -50,10 +50,15 @@
 	    printf(" line=%d, n_y=%d.\n", line, (int)config[14]);	\
 	    exit(2);							\
 	}								\
-    FV0->sfv = malloc((num_cell + 2) * sizeof(double));			\
-    FV0->sfv[0] = (double)line;						\
-    FV0->sfv[1] = (double)column;					\
-    if(flu_var_read(fp, FV0->sfv + 2, num_cell))			\
+    FV0.sfv = malloc((num_cell + 2) * sizeof(double));			\
+    if(FV0.sfv == NULL)							\
+	{								\
+	    printf("NOT enough memory! %s\n", #sfv);			\
+	    exit(5);							\
+	}								\
+    FV0.sfv[0] = (double)line;						\
+    FV0.sfv[1] = (double)column;					\
+    if(flu_var_read(fp, FV0.sfv + 2, num_cell))				\
 	{								\
 	    fclose(fp);							\
 	    exit(2);							\
@@ -63,15 +68,17 @@
 
 /** 
   * @brief      This function reads the initial data file of velocity/pressure/density.
-  * @details    The function initialize the extern pointer FV0->RHO/U/P pointing to the
+  * @details    The function initialize the extern pointer FV0.RHO/U/P pointing to the
   *             position of a block of memory consisting (m+1) variables* of type double.
   *             The value of first of these variables is m.
   *             The following m variables are the initial value.
   * @param[in]  name: Name of the test example.
   * @param[out] FV0:  Structural body pointer of initial data array pointer.
   */
-void initialize(char * name, struct flu_var * FV0)
+struct flu_var _2D_initialize(const char * name)
 {
+    struct flu_var FV0;
+
     char add_in[FILENAME_MAX+40]; 
     // Get the address of the initial data folder of the test example.
     example_io(name, add_in, 1);
@@ -97,6 +104,7 @@ void initialize(char * name, struct flu_var * FV0)
     STR_FLU_INI(P);
 
     printf("%s data initialized, line = %d, column = %d.\n", name, line, column);
+    return FV0;
 }
 
 

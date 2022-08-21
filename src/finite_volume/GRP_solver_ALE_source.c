@@ -23,8 +23,7 @@
  * @param[out] cpu_time: Array of the CPU time recording.
  * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-static void GRP_solver_ALE_source_Undone
-(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
+static void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;
@@ -48,7 +47,6 @@ static void GRP_solver_ALE_source_Undone
   double       tau   = config[16];       // the length of the time step
   int    const bound = (int)(config[17]);// the boundary condition
   double const alpha = config[41];       // the paramater in slope limiters.
-  printf("alpha = %g\n",alpha);
 
   _Bool find_bound = false;
   
@@ -108,7 +106,7 @@ static void GRP_solver_ALE_source_Undone
   double nu;  // nu = tau/h
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
-  int n = 1; // the number of times storing plotting data
+  int nt = 1; // the number of times storing plotting data
 
   double UL, PL, RHOL, HL = h, SUL = 0.0, SPL = 0.0, SRHOL = 0.0; // Left  boundary condition
   double UR, PR, RHOR, HR = h, SUR = 0.0, SPR = 0.0, SRHOR = 0.0; // Right boundary condition
@@ -136,41 +134,41 @@ static void GRP_solver_ALE_source_Undone
 	      if(!find_bound)
 		  printf("Reflective boudary conditions.\n");
 	      find_bound = true;
-	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
-	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
-	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
+	      UL   = - U[nt-1][0]; UR   = - U[nt-1][m-1];
+	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
+	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
+	      HL = X[nt-1][1] - X[nt-1][0];
+	      HR = X[nt-1][m] - X[nt-1][m-1];
 	      break;
 	  case -4: // free boundary conditions
 	      if(!find_bound)
 		  printf("Free boudary conditions.\n");
 	      find_bound = true;
-	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
-	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
-	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
+	      UL   =   U[nt-1][0]; UR   =   U[nt-1][m-1];
+	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
+	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
+	      HL = X[nt-1][1] - X[nt-1][0];
+	      HR = X[nt-1][m] - X[nt-1][m-1];
 	      break;
 	  case -5: // periodic boundary conditions
 	      if(!find_bound)
 		  printf("Periodic boudary conditions.\n");
 	      find_bound = true;
-	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
-	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
-	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
-	      HL = X[n-1][m] - X[n-1][m-1];
-	      HR = X[n-1][1] - X[n-1][0];
+	      UL   =   U[nt-1][m-1]; UR   =   U[nt-1][0];
+	      PL   =   P[nt-1][m-1]; PR   =   P[nt-1][0];
+	      RHOL = RHO[nt-1][m-1]; RHOR = RHO[nt-1][0];
+	      HL = X[nt-1][m] - X[nt-1][m-1];
+	      HR = X[nt-1][1] - X[nt-1][0];
 	      break;
 	  case -24: // reflective + free boundary conditions
 	      if(!find_bound)
 		  printf("Reflective + Free boudary conditions.\n");
 	      find_bound = true;
-	      UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
-	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
-	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
+	      UL   = - U[nt-1][0]; UR   =   U[nt-1][m-1];
+	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
+	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
+	      HL = X[nt-1][1] - X[nt-1][0];
+	      HR = X[nt-1][m] - X[nt-1][m-1];
 	      break;
 	  default:
 	      printf("No suitable boundary coditions!\n");
@@ -186,31 +184,31 @@ static void GRP_solver_ALE_source_Undone
 	     */
 	      if(j)
 		  {
-		      h_L     = 0.5 * (X[n-1][j+1] - X[n-1][j-1]);
-		      s_u_L   = (U[n-1][j]   -   U[n-1][j-1]) / h_L;
-		      s_p_L   = (P[n-1][j]   -   P[n-1][j-1]) / h_L;
-		      s_rho_L = (RHO[n-1][j] - RHO[n-1][j-1]) / h_L;
+		      h_L     = 0.5 * (X[nt-1][j+1] - X[nt-1][j-1]);
+		      s_u_L   = (U[nt-1][j]   -   U[nt-1][j-1]) / h_L;
+		      s_p_L   = (P[nt-1][j]   -   P[nt-1][j-1]) / h_L;
+		      s_rho_L = (RHO[nt-1][j] - RHO[nt-1][j-1]) / h_L;
 		  }
 	      else
 		  {
-		      h_L     = 0.5 * (X[n-1][j+1] - X[n-1][j] + HL);
-		      s_u_L   = (U[n-1][j]   -   UL) / h_L;
-		      s_p_L   = (P[n-1][j]   -   PL) / h_L;
-		      s_rho_L = (RHO[n-1][j] - RHOL) / h_L;
+		      h_L     = 0.5 * (X[nt-1][j+1] - X[nt-1][j] + HL);
+		      s_u_L   = (U[nt-1][j]   -   UL) / h_L;
+		      s_p_L   = (P[nt-1][j]   -   PL) / h_L;
+		      s_rho_L = (RHO[nt-1][j] - RHOL) / h_L;
 		  }
 	      if(j < m-1)
 		  {
-		      h_R     = 0.5 * (X[n-1][j+2] - X[n-1][j]);
-		      s_u_R   = (U[n-1][j+1]   -   U[n-1][j]) / h_R;
-		      s_p_R   = (P[n-1][j+1]   -   P[n-1][j]) / h_R;
-		      s_rho_R = (RHO[n-1][j+1] - RHO[n-1][j]) / h_R;
+		      h_R     = 0.5 * (X[nt-1][j+2] - X[nt-1][j]);
+		      s_u_R   = (U[nt-1][j+1]   -   U[nt-1][j]) / h_R;
+		      s_p_R   = (P[nt-1][j+1]   -   P[nt-1][j]) / h_R;
+		      s_rho_R = (RHO[nt-1][j+1] - RHO[nt-1][j]) / h_R;
 		  }
 	      else
 		  {
-		      h_R     = 0.5 * (X[n-1][j+1] - X[n-1][j] + HR);
-		      s_u_R   = (UR   -   U[n-1][j]) / h_R;
-		      s_p_R   = (PR   -   P[n-1][j]) / h_R;
-		      s_rho_R = (RHOR - RHO[n-1][j]) / h_R;
+		      h_R     = 0.5 * (X[nt-1][j+1] - X[nt-1][j] + HR);
+		      s_u_R   = (UR   -   U[nt-1][j]) / h_R;
+		      s_p_R   = (PR   -   P[nt-1][j]) / h_R;
+		      s_rho_R = (RHOR - RHO[nt-1][j]) / h_R;
 		  }
 	      if (k == 1)
 		  {
@@ -248,10 +246,10 @@ static void GRP_solver_ALE_source_Undone
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      h_L   =   X[n-1][j] - X[n-1][j-1];
-		      rho_L = RHO[n-1][j-1] + 0.5*h_L*s_rho[j-1];
-		      u_L   =   U[n-1][j-1] + 0.5*h_L*s_u[j-1];
-		      p_L   =   P[n-1][j-1] + 0.5*h_L*s_p[j-1];
+		      h_L   =   X[nt-1][j] - X[nt-1][j-1];
+		      rho_L = RHO[nt-1][j-1] + 0.5*h_L*s_rho[j-1];
+		      u_L   =   U[nt-1][j-1] + 0.5*h_L*s_u[j-1];
+		      p_L   =   P[nt-1][j-1] + 0.5*h_L*s_p[j-1];
 		  }
 	      else
 		  {
@@ -262,10 +260,10 @@ static void GRP_solver_ALE_source_Undone
 		  }
 	      if(j < m)
 		  {
-		      h_R   =   X[n-1][j+1] - X[n-1][j];
-		      rho_R = RHO[n-1][j] - 0.5*h_R*s_rho[j];
-		      u_R   =   U[n-1][j] - 0.5*h_R*s_u[j];
-		      p_R   =   P[n-1][j] - 0.5*h_R*s_p[j];
+		      h_R   =   X[nt-1][j+1] - X[nt-1][j];
+		      rho_R = RHO[nt-1][j] - 0.5*h_R*s_rho[j];
+		      u_R   =   U[nt-1][j] - 0.5*h_R*s_u[j];
+		      p_R   =   P[nt-1][j] - 0.5*h_R*s_p[j];
 		  }
 	      else
 		  {
@@ -362,7 +360,7 @@ static void GRP_solver_ALE_source_Undone
 	    U_next[j]   += 0.5 * tau * U_t[j];
 	    P_next[j]   += 0.5 * tau * P_t[j];
 
-	    X[n][j] = X[n-1][j];
+	    X[nt][j] = X[nt-1][j];
 	}
 
 //======================THE CORE ITERATION=========================(On Eulerian Coordinate)
@@ -372,36 +370,36 @@ static void GRP_solver_ALE_source_Undone
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[n][j] = RHO[n-1][j] - nu*(F1[j+1]-F1[j]);
-	    Mom = RHO[n-1][j]*U[n-1][j] - nu*(F2[j+1]-F2[j]);
-	    Ene = RHO[n-1][j]*E[n-1][j] - nu*(F3[j+1]-F3[j]);
+	    RHO[nt][j] = RHO[nt-1][j]     - nu*(F1[j+1]-F1[j]);
+	    Mom = RHO[nt-1][j]*U[nt-1][j] - nu*(F2[j+1]-F2[j]);
+	    Ene = RHO[nt-1][j]*E[nt-1][j] - nu*(F3[j+1]-F3[j]);
 
-	    U[n][j] = Mom / RHO[n][j];
-	    E[n][j] = Ene / RHO[n][j];
-	    P[n][j] = (Ene - 0.5*Mom*U[n][j])*(gamma-1.0);
+	    U[nt][j] = Mom / RHO[nt][j];
+	    E[nt][j] = Ene / RHO[nt][j];
+	    P[nt][j] = (Ene - 0.5*Mom*U[nt][j])*(gamma-1.0);
 
-	    if(P[n][j] < eps || RHO[n][j] < eps)
+	    if(P[nt][j] < eps || RHO[nt][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(!isfinite(P[n][j])|| !isfinite(U[n][j])|| !isfinite(RHO[n][j]))
+	    if(!isfinite(P[nt][j])|| !isfinite(U[nt][j])|| !isfinite(RHO[nt][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;
 		}
 	    
 //============================compute the slopes============================
-	    s_u[j]   = (  U_next[j+1] -   U_next[j])/(X[n][j+1]-X[n][j]);
-	    s_p[j]   = (  P_next[j+1] -   P_next[j])/(X[n][j+1]-X[n][j]);
-	    s_rho[j] = (RHO_next[j+1] - RHO_next[j])/(X[n][j+1]-X[n][j]);
+	    s_u[j]   = (  U_next[j+1] -   U_next[j])/(X[nt][j+1]-X[nt][j]);
+	    s_p[j]   = (  P_next[j+1] -   P_next[j])/(X[nt][j+1]-X[nt][j]);
+	    s_rho[j] = (RHO_next[j+1] - RHO_next[j])/(X[nt][j+1]-X[nt][j]);
 	}
 
 //============================Time update=======================
 
     toc = clock();
-    cpu_time[n] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    cpu_time_sum += cpu_time[n];
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time_sum += cpu_time[nt];
 
     time_c += tau;
     if (isfinite(t_all))
@@ -417,10 +415,10 @@ static void GRP_solver_ALE_source_Undone
 //===========================Fixed variable location=======================	
     for(j = 0; j < m; ++j)
 	{
-	    RHO[n-1][j] = RHO[n][j];
-	    U[n-1][j]   =   U[n][j];
-	    E[n-1][j]   =   E[n][j];  
-	    P[n-1][j]   =   P[n][j];
+	    RHO[nt-1][j] = RHO[nt][j];
+	    U[nt-1][j]   =   U[nt][j];
+	    E[nt-1][j]   =   E[nt][j];  
+	    P[nt-1][j]   =   P[nt][j];
 	}
   }
 

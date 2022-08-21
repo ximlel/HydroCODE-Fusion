@@ -94,19 +94,28 @@ double config[N_CONF]; //!< Initial configuration data array.
 /**
  * @brief N memory allocations to the initial fluid variable 'v' in the structural body cell_var_stru.
  */
-#define CV_INIT_MEM(v, n_x)						\
+#define CV_INIT_MEM(v, N)						\
     do {								\
-	CV->v = (double **)malloc(n_x * sizeof(double *));		\
-	for(j = 0; j < n_x; ++j)					\
-	    {								\
-		CV->v[k] = (double *)malloc(n_x * sizeof(double));	\
-		if(CV->v[k] == NULL)					\
-		    {							\
-			printf("NOT enough memory! %s[%d]\n", #v, k);	\
-			retval = 5;					\
-			goto return_NULL;				\
-		    }							\
-	    }								\
+    for(k = 0; k < N; ++k)						\
+	{								\
+	    CV[k].v = (double **)malloc(n_x * sizeof(double *));	\
+	    if(CV[k].v == NULL)						\
+		{							\
+		    printf("NOT enough memory! CV[%d].%s\n", k, #v);	\
+		    retval = 5;						\
+		    goto return_NULL;					\
+		}							\
+	    for(j = 0; j < n_x; ++j)					\
+		{							\
+		    CV[k].v[j] = (double *)malloc(n_y * sizeof(double)); \
+		    if(CV[k].v[j] == NULL)				\
+			{						\
+			    printf("NOT enough memory! CV[%d].%s[%d]\n", k, #v, j); \
+			    retval = 5;					\
+			    goto return_NULL;				\
+			}						\
+		}							\
+	}								\
     } while (0)
 
 /**
@@ -127,13 +136,13 @@ int main(int argc, char *argv[])
     printf("\nTEST:\n  %s\n", argv[1]);
     printf("Test Beginning: ARGuments Counter = %d.\n", argc);
     
-    int k, j, retval = 0;
+    int k, i, j, retval = 0;
     // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;
 
     // Set dimension.
-    double dim;
+    int dim;
     dim = atoi(argv[3]);
     if (dim != 2)
 	{
@@ -173,7 +182,7 @@ int main(int argc, char *argv[])
 	}
 	
   // Set order and scheme.
-  unsigned int order; // 1, 2
+  int order; // 1, 2
   char * scheme; // Riemann_exact(Godunov), GRP
   printf("Order[_Scheme]: %s\n",argv[4]);
   errno = 0;
@@ -187,7 +196,6 @@ int main(int argc, char *argv[])
       }
   config[9] = (double)order;
 
-    struct flu_var FV0; // Structural body of initial data array pointer.
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
@@ -195,82 +203,95 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-    _2D_initialize(argv[1], &FV0); 
+    struct flu_var FV0 = _2D_initialize(argv[1]); // Structural body of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-  unsigned int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
-  double h = config[10], gamma = config[6];
+  int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
+  double h_x = config[10], h_y = config[11], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
-  unsigned int N = 2; // (int)(config[5]) + 1;
-
-  S_CVR * CV; // Structural body of fluid variables in computational cells array pointer.
-  CV = (S_CVR *)malloc(N * sizeof(S_CVR));
+  int N = 2; // (int)(config[5]) + 1;
+  
+  // Structural body of fluid variables in computational cells array pointer.
+  struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));
   if(CV == NULL)
       {
-	  printf("NOT enough memory! CV\n");
+	  printf("NOT enough memory! Cell Variables\n");
 	  retval = 5;
 	  goto return_NULL;
       }
-    
-  double ** X;
-  double * cpu_time;
-  // Initialize arrays of fluid variables in cells.
-  CV_INIT_MEM(RHO, N);
-  CV_INIT_MEM(U, N);
-  CV_INIT_MEM(P, N);
-  CV->E = (double**)malloc(N * sizeof(double*));
-  for(k = 0; k < N; ++k)
-  {
-    CV->E[k] = (double *)malloc(m * sizeof(double));
-    if(CV->E[k] == NULL)
-    {
-      printf("NOT enough memory! E[%d]\n", k);
-      retval = 5;
-      goto return_NULL;
-    }
-  }
-  X = (double**)malloc(N * sizeof(double*));
-  for(k = 0; k < N; ++k)
-  {
-    X[k] = (double *)malloc((m+1) * sizeof(double));
-    if(X[k] == NULL)
-    {
-      printf("NOT enough memory! X[%d]\n", k);
-      retval = 5;
-      goto return_NULL;
-    }
-  }
-  // Initialize the values of energy in computational cells and x-coordinate of the cell interfaces.
-  for(j = 0; j < m; ++j)
-      CV->E[0][j] = 0.5*CV->U[0][j]*CV->U[0][j] + CV->P[0][j]/(gamma - 1.0)/CV->RHO[0][j]; 
-  for(j = 0; j <= m; ++j)
-      X[0][j] = h * j;
-
-  cpu_time = (double *)malloc(N * sizeof(double));
+  double ** X = NULL, ** Y = NULL;
+  double * cpu_time = malloc(N * sizeof(double));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
 	  retval = 5;
 	  goto return_NULL;
       }
+  // Initialize arrays of fluid variables in cells.
+  CV_INIT_MEM(RHO, N);
+  CV_INIT_MEM(U, N);
+  CV_INIT_MEM(V, N);
+  CV_INIT_MEM(P, N);
+  CV_INIT_MEM(E, N);
+  X = (double **)malloc((n_x+1) * sizeof(double *));
+  Y = (double **)malloc((n_x+1) * sizeof(double *));
+  if(X == NULL || Y == NULL)
+      {
+	  printf("NOT enough memory! X or Y\n");
+	  retval = 5;
+	  goto return_NULL;
+      }
+  for(j = 0; j <= n_x; ++j)
+  {
+    X[j] = (double *)malloc((n_y+1) * sizeof(double));
+    Y[j] = (double *)malloc((n_y+1) * sizeof(double));
+    if(X[j] == NULL || Y[j] == NULL)
+    {
+      printf("NOT enough memory! X[%d] or Y[%d]\n", j, j);
+      retval = 5;
+      goto return_NULL;
+    }
+  }
+  // Initialize the values of energy in computational cells and (x,y)-coordinate of the cell interfaces.
+  for(j = 0; j <= n_x; ++j)
+      for(i = 0; i <= n_y; ++i)	
+	  {
+	      X[j][i] = i * h_y;
+	      Y[j][i] = j * h_x;
+	  }
+  for(j = 0; j < n_x; ++j)
+      for(i = 0; i < n_y; ++i)	
+	  {
+	      CV[0].RHO[j][i] = FV0.RHO[i*n_x + j + 2];
+	      CV[0].U[j][i]   = FV0.U[i*n_x + j + 2];
+	      CV[0].V[j][i]   = FV0.V[i*n_x + j + 2];
+	      CV[0].P[j][i]   = FV0.P[i*n_x + j + 2];
+	      CV[0].E[j][i]   = 0.5*CV[0].U[j][i]*CV[0].U[j][i] + CV[0].P[j][i]/(gamma - 1.0)/CV[0].RHO[j][i];
+	      CV[0].E[j][i]  += 0.5*CV[0].V[j][i]*CV[0].V[j][i];
+	  }
+  free(FV0.RHO);
+  free(FV0.U);
+  free(FV0.V);
+  free(FV0.P);
+  FV0.RHO = NULL;
+  FV0.U = NULL;
+  FV0.V = NULL;
+  FV0.P = NULL;
 
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
-	  for (k = 1; k < N; ++k)
-	      for (j = 0; j <= m; ++j)
-		  X[k][j] = X[0][j];
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_EUL_source(m, CV, cpu_time);
+		  Godunov_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  break;
 	      case 2:
-		  GRP_solver_EUL_source(m, CV, cpu_time);
+		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -286,35 +307,48 @@ int main(int argc, char *argv[])
       }
 
   // Write the final data down.
-  _1D_file_write(m, N, CV, X, cpu_time, argv[2]);
+  _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2]);
 
  return_NULL:
-  for(k = 1; k < N; ++k)
+  for(k = 0; k < N; ++k)
   {
-    free(CV->RHO[k]);
-    free(CV->U[k]);
-    free(CV->P[k]);
-    free(CV->E[k]);
-    free(X[k]);
-    CV->RHO[k] = NULL;
-    CV->U[k] = NULL;
-    CV->P[k] = NULL;
-    CV->E[k] = NULL;
-    X[k] = NULL;
+    for(j = 0; j < n_x; ++j)
+	{
+            free(CV[k].RHO[j]);
+            free(CV[k].U[j]);
+            free(CV[k].V[j]);
+            free(CV[k].P[j]);
+            free(CV[k].E[j]);
+            CV[k].RHO[j] = NULL;
+            CV[k].U[j]   = NULL;
+            CV[k].V[j]   = NULL;
+            CV[k].P[j]   = NULL;
+            CV[k].E[j]   = NULL;
+	}
+    free(CV[k].RHO);
+    free(CV[k].U);
+    free(CV[k].V);
+    free(CV[k].P);
+    free(CV[k].E);
+    CV[k].RHO = NULL;
+    CV[k].U   = NULL;
+    CV[k].V   = NULL;
+    CV[k].P   = NULL;
+    CV[k].E   = NULL;
   }
-  free(FV0.RHO);
-  free(FV0.U);
-  free(FV0.P);
-  FV0.RHO = NULL;
-  FV0.U = NULL;
-  FV0.P = NULL;
-  CV->RHO[0] = NULL;
-  CV->U[0] = NULL;
-  CV->P[0] = NULL;
-  free(CV->E[0]);
-  CV->E[0] = NULL;
-  free(X[0]);
-  X[0] = NULL;
+  free(CV);
+  CV = NULL;
+  for(j = 0; j <= n_x; ++j)
+  {
+      free(X[j]);
+      free(Y[j]);
+      X[j] = NULL;
+      Y[j] = NULL;
+  }
+  free(X);
+  free(Y);
+  X = NULL;
+  Y = NULL; 
   free(cpu_time);
   cpu_time = NULL;
   

@@ -16,13 +16,14 @@ int flu_var_count_line(FILE * fp, const char * add, int * n_x);
 int flu_var_read(FILE * fp, double * U, const int num);
 
 // _1D_file_in.c
-void _1D_initialize(const char * name, struct flu_var * FV0);
-
+struct flu_var _1D_initialize(const char * name);
+struct flu_var _2D_initialize(const char * name);
 
 // _1D_file_out.c
-void _1D_file_write(const int m, const int N, struct cell_var_stru CV, double * X[], 
-                    const double * cpu_time, const char * name);
-
+void _1D_file_write(const int m, const int N, const struct cell_var_stru CV, 
+                    double * X[], const double * cpu_time, const char * name);
+void _2D_file_write(const int n_x, const int n_y, const int N, struct cell_var_stru * CV,
+		    double * X[], double * Y[], double * cpu_time, const char * name);
 
 // config_in.c
 void configurate(const char * name);

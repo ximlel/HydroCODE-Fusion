@@ -22,8 +22,7 @@
  * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
-void Godunov_solver_LAG_source
-(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
+void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;
@@ -69,7 +68,7 @@ void Godunov_solver_LAG_source
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
   double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
-  int n = 1; // the number of times storing plotting data
+  int nt = 1; // the number of times storing plotting data
 
   double UL, PL, RHOL, CL, HL = h; // Left  boundary condition
   double UR, PR, RHOR, CR, HR = h; // Right boundary condition
@@ -97,11 +96,11 @@ void Godunov_solver_LAG_source
 	      if(!find_bound)
 		  printf("Reflective boudary conditions.\n");
 	      find_bound = true;
-	      UL   = - U[n-1][0]; UR   = - U[n-1][m-1];
-	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
-	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
+	      UL   = - U[nt-1][0]; UR   = - U[nt-1][m-1];
+	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
+	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
+	      HL = X[nt-1][1] - X[nt-1][0];
+	      HR = X[nt-1][m] - X[nt-1][m-1];
 	      CL = sqrt(gamma * PL / RHOL);
 	      CR = sqrt(gamma * PR / RHOR);
 	      h_S_max = fmin(HL/(fabs(UL)+CL), HR/(fabs(UR)+CR));
@@ -110,31 +109,31 @@ void Godunov_solver_LAG_source
 	      if(!find_bound)
 		  printf("Free boudary conditions.\n");
 	      find_bound = true;
-	      UL   =   U[n-1][0]; UR   =   U[n-1][m-1];
-	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
-	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
+	      UL   =   U[nt-1][0]; UR   =   U[nt-1][m-1];
+	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
+	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
+	      HL = X[nt-1][1] - X[nt-1][0];
+	      HR = X[nt-1][m] - X[nt-1][m-1];
 	      break;
 	  case -5: // periodic boundary conditions
 	      if(!find_bound)
 		  printf("Periodic boudary conditions.\n");
 	      find_bound = true;
-	      UL   =   U[n-1][m-1]; UR   =   U[n-1][0];
-	      PL   =   P[n-1][m-1]; PR   =   P[n-1][0];
-	      RHOL = RHO[n-1][m-1]; RHOR = RHO[n-1][0];
-	      HL = X[n-1][m] - X[n-1][m-1];
-	      HR = X[n-1][1] - X[n-1][0];
+	      UL   =   U[nt-1][m-1]; UR   =   U[nt-1][0];
+	      PL   =   P[nt-1][m-1]; PR   =   P[nt-1][0];
+	      RHOL = RHO[nt-1][m-1]; RHOR = RHO[nt-1][0];
+	      HL = X[nt-1][m] - X[nt-1][m-1];
+	      HR = X[nt-1][1] - X[nt-1][0];
 	      break;
 	  case -24: // reflective + free boundary conditions
 	      if(!find_bound)
 		  printf("Reflective + Free boudary conditions.\n");
 	      find_bound = true;
-	      UL   = - U[n-1][0]; UR   =   U[n-1][m-1];
-	      PL   =   P[n-1][0]; PR   =   P[n-1][m-1];
-	      RHOL = RHO[n-1][0]; RHOR = RHO[n-1][m-1];
-	      HL = X[n-1][1] - X[n-1][0];
-	      HR = X[n-1][m] - X[n-1][m-1];
+	      UL   = - U[nt-1][0]; UR   =   U[nt-1][m-1];
+	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
+	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
+	      HL = X[nt-1][1] - X[nt-1][0];
+	      HR = X[nt-1][m] - X[nt-1][m-1];
 	      CL = sqrt(gamma * PL / RHOL);
 	      h_S_max = HL/(fabs(UL)+CL);
 	      break;
@@ -151,10 +150,10 @@ void Godunov_solver_LAG_source
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      h_L   =   X[n-1][j] - X[n-1][j-1];
-		      rho_L = RHO[n-1][j-1];
-		      u_L   =   U[n-1][j-1];
-		      p_L   =   P[n-1][j-1];
+		      h_L   =   X[nt-1][j] - X[nt-1][j-1];
+		      rho_L = RHO[nt-1][j-1];
+		      u_L   =   U[nt-1][j-1];
+		      p_L   =   P[nt-1][j-1];
 		  }
 	      else
 		  {
@@ -165,10 +164,10 @@ void Godunov_solver_LAG_source
 		  }
 	      if(j < m)
 		  {
-		      h_R   =   X[n-1][j+1] - X[n-1][j];
-		      rho_R = RHO[n-1][j];
-		      u_R   =   U[n-1][j];
-		      p_R   =   P[n-1][j];
+		      h_R   =   X[nt-1][j+1] - X[nt-1][j];
+		      rho_R = RHO[nt-1][j];
+		      u_R   =   U[nt-1][j];
+		      p_R   =   P[nt-1][j];
 		  }
 	      else
 		  {
@@ -212,7 +211,7 @@ void Godunov_solver_LAG_source
 	}
     
     for(j = 0; j <= m; ++j)
-	X[n][j] = X[n-1][j] + tau * u_mid[j]; // motion along the contact discontinuity
+	X[nt][j] = X[nt-1][j] + tau * u_mid[j]; // motion along the contact discontinuity
 
 //======================THE CORE ITERATION=========================(On Lagrangian Coordinate)
     for(j = 0; j < m; ++j) // forward Euler
@@ -221,16 +220,16 @@ void Godunov_solver_LAG_source
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[n][j] = 1.0 / (1.0/RHO[n-1][j] + tau/MASS[j]*(u_mid[j+1] - u_mid[j]));
-	    U[n][j]   = U[n-1][j] - tau/MASS[j]*(p_mid[j+1] - p_mid[j]);
-	    E[n][j]   = E[n-1][j] - tau/MASS[j]*(p_mid[j+1]*u_mid[j+1] - p_mid[j]*u_mid[j]);
-	    P[n][j]   = (E[n][j] - 0.5 * U[n][j]*U[n][j]) * (gamma - 1.0) * RHO[n][j];
-	    if(P[n][j] < eps || RHO[n][j] < eps)
+	    RHO[nt][j] = 1.0 / (1.0/RHO[nt-1][j] + tau/MASS[j]*(u_mid[j+1] - u_mid[j]));
+	    U[nt][j]   = U[nt-1][j] - tau/MASS[j]*(p_mid[j+1] - p_mid[j]);
+	    E[nt][j]   = E[nt-1][j] - tau/MASS[j]*(p_mid[j+1]*u_mid[j+1] - p_mid[j]*u_mid[j]);
+	    P[nt][j]   = (E[nt][j] - 0.5 * U[nt][j]*U[nt][j]) * (gamma - 1.0) * RHO[nt][j];
+	    if(P[nt][j] < eps || RHO[nt][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
 		    time_c = t_all;
 		}
-	    if(!isfinite(P[n][j])|| !isfinite(U[n][j])|| !isfinite(RHO[n][j]))
+	    if(!isfinite(P[nt][j])|| !isfinite(U[nt][j])|| !isfinite(RHO[nt][j]))
 		{
 		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;
@@ -240,8 +239,8 @@ void Godunov_solver_LAG_source
 //============================Time update=======================
 
     toc = clock();
-    cpu_time[n] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    cpu_time_sum += cpu_time[n];
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time_sum += cpu_time[nt];
 
     time_c += tau;
     if (isfinite(t_all))
@@ -256,13 +255,13 @@ void Godunov_solver_LAG_source
 
 //===========================Fixed variable location=======================	
     for(j = 0; j <= m; ++j)
-	X[n-1][j] = X[n][j];
+	X[nt-1][j] = X[nt][j];
     for(j = 0; j < m; ++j)
 	{
-	    RHO[n-1][j] = RHO[n][j];
-	    U[n-1][j]   =   U[n][j];
-	    E[n-1][j]   =   E[n][j];  
-	    P[n-1][j]   =   P[n][j];
+	    RHO[nt-1][j] = RHO[nt][j];
+	    U[nt-1][j]   =   U[nt][j];
+	    E[nt-1][j]   =   E[nt][j];  
+	    P[nt-1][j]   =   P[nt][j];
 	}
   }
 

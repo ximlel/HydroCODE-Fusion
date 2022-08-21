@@ -46,8 +46,8 @@
  * @param[in] cpu_time: Array of the CPU time recording.
  * @param[in] name:     Name of the numerical results.
  */
-void _1D_file_write(const int m, const int N, struct cell_var_stru CV, double * X[], 
-                    const double * cpu_time, const char * name)
+void _1D_file_write(const int m, const int N, const struct cell_var_stru CV, 
+                    double * X[], const double * cpu_time, const char * name)
 {
   // Records the time when the program is running.
   /*

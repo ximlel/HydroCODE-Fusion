@@ -69,6 +69,12 @@
     <ClCompile Include="..\tools\sys_pro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\file_io\_2D_file_in.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\_2D_file_out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\file_io.h">

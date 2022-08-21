@@ -107,6 +107,8 @@
     <ClCompile Include="..\file_io\io_control.c" />
     <ClCompile Include="..\file_io\_1D_file_in.c" />
     <ClCompile Include="..\file_io\_1D_file_out.c" />
+    <ClCompile Include="..\file_io\_2D_file_in.c" />
+    <ClCompile Include="..\file_io\_2D_file_out.c" />
     <ClCompile Include="..\finite_volume\Godunov_solver_ALE_source.c" />
     <ClCompile Include="..\finite_volume\Godunov_solver_EUL_source.c" />
     <ClCompile Include="..\finite_volume\Godunov_solver_LAG_source.c" />
