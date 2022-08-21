@@ -40,22 +40,22 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 {
 	printf("Toro\n");
     int n = 0;		
-    double gap; // Relative pressure change after each iteration.
+    double gap = INFINITY; // Relative pressure change after each iteration.
 	
     double P_int,U_int; // =>P_star,U_star
     double P_int_save;
-    double f_R,f_L,df_R,df_L;
+    double f_R = 0.0,f_L = 0.0,df_R,df_L;
 
     double RHO_r=gamma * P_r/c_r/c_r;
     double RHO_l=gamma * P_l/c_l/c_l;
 	
-    double g1=(gamma -1.0);
+  //  double g1=(gamma -1.0);
     double g2=(gamma+1.0);
     double g3=2.0*gamma/(gamma-1.0);
-    double g4=2.0/(gamma-1.0);
-    double g5=2.0/(gamma+1.0);
+  //  double g4=2.0/(gamma-1.0);
+  //  double g5=2.0/(gamma+1.0);
     double g6=(gamma-1.0)/(gamma+1.0);
-    double g7=(gamma-1.0)/2.0;
+  //  double g7=(gamma-1.0)/2.0;
     double g8=gamma-1.0;
 
     double A_L=2.0/g2/RHO_l;
@@ -92,12 +92,11 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 		    df_R=c_r/gamma/P_r*pow(P_int/P_r,1.0/g3-1.0);
 		}
 
-	    if(gap < tol)
-		break;
-	
 	    P_int=P_int - (f_L - f_R + U_r - U_l)/(df_L-df_R);
 
-	    gap = 0.5*fabs(P_int - P_int_save) / (P_int + P_int_save) ;
+	    gap = 0.5*fabs(P_int - P_int_save) / (P_int + P_int_save);
+		if (gap < tol)
+			break;
 	    ++n;
 	}
 

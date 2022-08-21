@@ -55,18 +55,12 @@ void Godunov_solver_LAG_source
   double h_L, h_R; // length of spatial grids
   _Bool CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
   double u_star, p_star; // the Riemann solutions
-  double *u_mid = malloc((m + 1) * sizeof(double)); 
-  double *p_mid = malloc((m + 1) * sizeof(double));
-  double * MASS; // Array of the mass data in computational cells.
-  if(u_mid == NULL || p_mid == NULL)
+  double * u_mid = malloc((m + 1) * sizeof(double)); 
+  double * p_mid = malloc((m + 1) * sizeof(double));
+  double * MASS  = malloc(m * sizeof(double)); // Array of the mass data in computational cells.
+  if(u_mid == NULL || p_mid == NULL || MASS == NULL)
       {
-	  printf("NOT enough memory! Mid Variables\n");
-	  goto return_NULL;
-      }
-  MASS = malloc(m * sizeof(double));
-  if(MASS == NULL)
-      {
-	  printf("NOT enough memory! MASS\n");
+	  printf("NOT enough memory! Mid Variables or MASS\n");
 	  goto return_NULL;
       }
   for(k = 0; k < m; ++k) // Initialize the values of mass in computational cells
@@ -77,8 +71,8 @@ void Godunov_solver_LAG_source
   double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, CL, HL; // Left  boundary condition
-  double UR, PR, RHOR, CR, HR; // Right boundary condition
+  double UL, PL, RHOL, CL, HL = h; // Left  boundary condition
+  double UR, PR, RHOR, CR, HR = h; // Right boundary condition
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)

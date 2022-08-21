@@ -68,50 +68,41 @@ void GRP_solver_LAG_source
   double dire[4], mid[4];
 
   // the slopes of variable values
-  double *s_rho, *s_u, *s_p;
+  double * s_rho = calloc(m, sizeof(double));
+  double * s_u   = calloc(m, sizeof(double));
+  double * s_p   = calloc(m, sizeof(double));
   // the variable values at (x_{j-1/2}, t_{n+1}).
-  double *U_next, *P_next, *RHO_next_L, *RHO_next_R;
+  double * U_next     = malloc((m+1) * sizeof(double));
+  double * P_next     = malloc((m+1) * sizeof(double));
+  double * RHO_next_L = malloc((m+1) * sizeof(double));
+  double * RHO_next_R = malloc((m+1) * sizeof(double));
   // the temporal derivatives at (x_{j-1/2}, t_{n}).
-  double *U_t, *P_t, *RHO_t_L, *RHO_t_R;
-  double *U_F, *P_F; // the numerical flux at (x_{j-1/2}, t_{n+1/2}).
-  double * MASS; // Array of the mass data in computational cells.
-  s_rho = calloc(m, sizeof(double));
-  s_u   = calloc(m, sizeof(double));
-  s_p   = calloc(m, sizeof(double));
+  double * U_t     = malloc((m+1) * sizeof(double));
+  double * P_t     = malloc((m+1) * sizeof(double));
+  double * RHO_t_L = malloc((m+1) * sizeof(double));
+  double * RHO_t_R = malloc((m+1) * sizeof(double));
+  // the numerical flux at (x_{j-1/2}, t_{n+1/2}).
+  double * U_F  = malloc((m+1) * sizeof(double));
+  double * P_F  = malloc((m+1) * sizeof(double));
+  double * MASS = malloc(m * sizeof(double));; // Array of the mass data in computational cells.
   if(s_rho == NULL || s_u == NULL || s_p == NULL)
       {
 	  printf("NOT enough memory! Slope\n");
 	  goto return_NULL;
       }
-  U_next     = malloc((m+1) * sizeof(double));
-  P_next     = malloc((m+1) * sizeof(double));
-  RHO_next_L = malloc((m+1) * sizeof(double));
-  RHO_next_R = malloc((m+1) * sizeof(double));
   if(U_next == NULL || P_next == NULL || RHO_next_L == NULL || RHO_next_R == NULL)
       {
 	  printf("NOT enough memory! Variables_next\n");
 	  goto return_NULL;
       }
-  U_t     = malloc((m+1) * sizeof(double));
-  P_t     = malloc((m+1) * sizeof(double));
-  RHO_t_L = malloc((m+1) * sizeof(double));
-  RHO_t_R = malloc((m+1) * sizeof(double));
   if(U_t == NULL || P_t == NULL || RHO_t_L == NULL || RHO_t_R == NULL)
       {
 	  printf("NOT enough memory! Temproal derivative\n");
 	  goto return_NULL;
       }
-  U_F = malloc((m+1) * sizeof(double));
-  P_F = malloc((m+1) * sizeof(double));
-  if(U_F == NULL || P_F == NULL)
+  if(U_F == NULL || P_F == NULL || MASS == NULL)
       {
-	  printf("NOT enough memory! Variables_F\n");
-	  goto return_NULL;
-      }
-  MASS = malloc(m * sizeof(double));
-  if(MASS == NULL)
-      {
-	  printf("NOT enough memory! MASS\n");
+	  printf("NOT enough memory! Variables_F or MASS\n");
 	  goto return_NULL;
       }
   for(k = 0; k < m; ++k) // Initialize the values of mass in computational cells
@@ -122,11 +113,8 @@ void GRP_solver_LAG_source
   double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, CL, HL, SUL, SPL, SRHOL; // Left  boundary condition
-  double UR, PR, RHOR, CR, HR, SUR, SPR, SRHOR; // Right boundary condition
-  SUL   = 0.0;   SUR = 0.0;
-  SPL   = 0.0;   SPR = 0.0;
-  SRHOL = 0.0; SRHOR = 0.0;
+  double UL = U[0][0],   PL = P[0][0],   RHOL = RHO[0][0],   CL, HL = h, SUL = 0.0, SPL = 0.0, SRHOL = 0.0; // Left  boundary condition
+  double UR = U[0][m-1], PR = P[0][m-1], RHOR = RHO[0][m-1], CR, HR = h, SUR = 0.0, SPR = 0.0, SRHOR = 0.0; // Right boundary condition
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)

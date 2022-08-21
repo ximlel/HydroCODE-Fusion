@@ -23,6 +23,8 @@ config[*],Representation ,Common Variable Name,Variable Types,Value Range,Defaul
 —3: prescribed
 —5: periodic
 —24: reflective + free",,
+18,Boudary conditions in y direction   ,bound_y,enum,< 0,(Ditto),(Ditto),,
+19,Boudary conditions in z direction   ,bound_z,enum,< 0,(Ditto),(Ditto),,
 30,,,,,,,,
 31,Reconstitution,,enum,,0: primitive variables,1: conservative variables,order > 1,
 32,Output initial data,,_Bool,,true: Open,false: Close,,

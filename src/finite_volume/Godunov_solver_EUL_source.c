@@ -57,26 +57,17 @@ void Godunov_solver_EUL_source
    *       [rho_star_L, u_star, p_star, rho_star_R]
    */
   double dire[3], mid[3];
-  double nu;  // nu = tau/h
-  double *F1, *F2, *F3; // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * MASS; // Array of the mass data in computational cells.
-  F1 = malloc((m+1) * sizeof(double));
-  F2 = malloc((m+1) * sizeof(double));
-  F3 = malloc((m+1) * sizeof(double));
+  // the numerical flux at (x_{j-1/2}, t_{n}).
+  double * F1 = malloc((m+1) * sizeof(double));
+  double * F2 = malloc((m+1) * sizeof(double));
+  double * F3 = malloc((m+1) * sizeof(double));
   if(F1 == NULL || F2 == NULL || F3 == NULL)
       {
 	  printf("NOT enough memory! Flux\n");
 	  goto return_NULL;
       }
-  MASS = malloc(m * sizeof(double));
-  if(MASS == NULL)
-      {
-	  printf("NOT enough memory! MASS\n");
-	  goto return_NULL;
-      }
-  for(k = 0; k < m; ++k) // Initialize the values of mass in computational cells
-      MASS[k] = h * RHO[0][k];
 
+  double nu;  // nu = tau/h
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
   int n = 1; // the number of times storing plotting data
@@ -271,6 +262,4 @@ return_NULL:
   F1 = NULL;
   F2 = NULL;
   F3 = NULL;
-  free(MASS);
-  MASS = NULL;
 }

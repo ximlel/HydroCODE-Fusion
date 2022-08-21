@@ -128,7 +128,7 @@ static double str2num(char * number)
 {
   double result = 0.0, super_script = 0.0;
   int idx = 0, dot = -2;
-  int i = 0, j = 0, power, k = 0;
+  int i = 0, j = 0;
   int length = 0;
   int pos_e = 0;
   char * after_e = number;
@@ -173,7 +173,6 @@ static double str2num(char * number)
       result += (double)(number[i] - 48)*pow(10, dot - i);
 
     dot += 1;
-    double addon = 0.0;
     for (i = 1; i < length - dot; ++i)
       result += (double)(number[dot+i] - 48)*pow(0.1, i);
   }

@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -O3 -pg
+CFLAGS = -std=c99 -O3 -pg -Wall
 #C compiler options
 CFLAGS += -D Riemann_solver_exact=Riemann_solver_exact_Ben
 #Macro definition

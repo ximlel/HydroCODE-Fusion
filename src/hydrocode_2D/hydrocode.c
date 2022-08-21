@@ -25,7 +25,7 @@
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> hydrocode_2D/hydrocode.c   <td> Main program
- * <tr><th> hydrocode_2D/make.sh       <td> Bash script compiles and runs programs
+ * <tr><th> hydrocode_2D/hydrocode.sh  <td> Bash script compiles and runs programs
  * </table>
  *
  * @section Exit_status Program exit status code
@@ -42,7 +42,7 @@
  *          - Linux/Unix: gcc, glibc, MATLAB/Octave
  *            - Compile in 'src/hydrocode': Run './make.sh' command on the terminal.
  *          - Winodws: Visual Studio, MATLAB/Octave
- *            - Create a C++ Project from Existing Code in 'src/'.
+ *            - Create a C++ Project from Existing Code in 'src/hydrocode_2D/' with ProjectName 'hydrocode'.
  *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
  *
  * @section Usage_description Usage description
@@ -50,22 +50,27 @@
  *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
  *          - Description of configuration file 'config.txt' refers to 'doc/config.csv'.
  *          - Run program:
- *            - Linux/Unix: Run 'hydrocode.out name_of_test_example name_of_numeric_result dimension order[_scheme]
+ *            - Linux/Unix: Run 'hydrocode.sh' command on the terminal. \n
+ *                          The details are as follows: \n
+ *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result dimension order[_scheme]
  *                               coordinate config[n]=(double)C' command on the terminal. \n
  *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 1 2[_GRP] EUL 5=100' (second-order Eulerian GRP scheme).
  *                          - dim: Dimension of test example (= 2).
  *                          - order: Order of numerical scheme (= 1 or 2).
  *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
  *                          - coordinate: Eulerian coordinate framework (= EUL).
- *            - Windows: Run 'hydrocode.exe name_of_test_example order coordinate' command on the terminal. \n
+ *            - Windows: Run 'hydrocode.bat' command on the terminal. \n
+ *                       The details are as follows: \n
+ *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result 2 order[_scheme] 
+ *                            coordinate n=C' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example order coordinate (e.g. 'GRP_Book_6_1 1 EUL')
- *             <tr><th> Working Directory <td> \$(SolutionDir)\$(Platform)\\\$(Configuration)\
+ *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result 2 order[_scheme] coordinate n=C
+ *             <tr><th> Working Directory <td> hydrocode_2D
  *             </table>
  *                       [Run] Project -> Properties -> Configuration Properties -> Linker -> System \n
  *             <table>
- *             <tr><th> Subsystem <td> 控制台 (/SUBSYSTEM:CONSOLE)
+ *             <tr><th> Subsystem <td> (/SUBSYSTEM:CONSOLE)
  *             </table>
  * 
  *          - Output files can be found in folder '/data_out/two-dim/'.
@@ -143,7 +148,7 @@ int main(int argc, char *argv[])
     for (k = 6; k < argc; k++)
 	{
 	    errno = 0;
-	    j = strtol(argv[k], &endptr, 10);
+	    j = strtoul(argv[k], &endptr, 10);
 	    if (errno != ERANGE && *endptr == '=')
 		{							
 		    endptr++;
@@ -168,11 +173,11 @@ int main(int argc, char *argv[])
 	}
 	
   // Set order and scheme.
-  int order; // 1, 2
+  unsigned int order; // 1, 2
   char * scheme; // Riemann_exact(Godunov), GRP
   printf("Order[_Scheme]: %s\n",argv[4]);
   errno = 0;
-  order = strtol(argv[4], &scheme, 10);	
+  order = strtoul(argv[4], &scheme, 10);
   if (*scheme == '_')
       scheme++;
   else if (*scheme != '\0' || errno == ERANGE)
@@ -197,10 +202,10 @@ int main(int argc, char *argv[])
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-  int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
+  unsigned int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
   double h = config[10], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
-  int N = 2; // (int)(config[5]) + 1;
+  unsigned int N = 2; // (int)(config[5]) + 1;
 
   S_CVR * CV; // Structural body of fluid variables in computational cells array pointer.
   CV = (S_CVR *)malloc(N * sizeof(S_CVR));
@@ -240,12 +245,12 @@ int main(int argc, char *argv[])
     }
   }
   // Initialize the values of energy in computational cells and x-coordinate of the cell interfaces.
-  for(k = 0; k < m; ++k)
-      CV->E[0][k] = 0.5*CV->U[0][k]*CV->U[0][k] + CV->P[0][k]/(gamma - 1.0)/CV->RHO[0][k]; 
-  for(k = 0; k <= m; ++k)
-      X[0][k] = h * k;
+  for(j = 0; j < m; ++j)
+      CV->E[0][j] = 0.5*CV->U[0][j]*CV->U[0][j] + CV->P[0][j]/(gamma - 1.0)/CV->RHO[0][j]; 
+  for(j = 0; j <= m; ++j)
+      X[0][j] = h * j;
 
-  cpu_time = malloc(N * sizeof(double));
+  cpu_time = (double *)malloc(N * sizeof(double));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
@@ -256,13 +261,16 @@ int main(int argc, char *argv[])
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
+	  for (k = 1; k < N; ++k)
+	      for (j = 0; j <= m; ++j)
+		  X[k][j] = X[0][j];
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_EUL_source(m, CV, X, cpu_time);
+		  Godunov_solver_EUL_source(m, CV, cpu_time);
 		  break;
 	      case 2:
-		  GRP_solver_EUL_source(m, CV, X, cpu_time);
+		  GRP_solver_EUL_source(m, CV, cpu_time);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);

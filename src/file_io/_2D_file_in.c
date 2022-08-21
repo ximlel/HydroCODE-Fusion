@@ -96,7 +96,7 @@ void initialize(char * name, struct flu_var * FV0)
     STR_FLU_INI(V);
     STR_FLU_INI(P);
 
-    printf("%s data initialized, line = %d, column = %d.\n", line, column);
+    printf("%s data initialized, line = %d, column = %d.\n", name, line, column);
 }
 
 

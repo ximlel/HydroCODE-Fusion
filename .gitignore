@@ -419,10 +419,7 @@ TSWLatexianTemp*
 *.user
 *.userosscache
 *.sln.docstates
-*.sln
 *.vcxproj.user
-*.vcxproj.filters
-*.vcxproj
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

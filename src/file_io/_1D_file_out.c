@@ -27,7 +27,7 @@
 		printf("Cannot open solution output file: %s!\n", #v);	\
 		exit(1);						\
 	    }								\
-	for(n = 0; n < N; ++n)						\
+	for(k = 0; k < N; ++k)						\
 	    {								\
 		for(j = 0; j < m; ++j)					\
 		    fprintf(fp_write, "%.10g\t", (v_print));		\
@@ -68,12 +68,12 @@ void _1D_file_write(const int m, const int N, struct cell_var_stru CV, double * 
 
 //===================Write Output Data File=========================
 
-    int j, n;
-    PRINT_NC(RHO, CV.RHO[n][j]);
-    PRINT_NC(U, CV.U[n][j]);
-    PRINT_NC(P, CV.P[n][j]);
-    PRINT_NC(E, CV.E[n][j]);
-    PRINT_NC(X, 0.5 * (X[n][j] + X[n][j+1]));
+    int k, j;
+    PRINT_NC(RHO, CV.RHO[k][j]);
+    PRINT_NC(U, CV.U[k][j]);
+    PRINT_NC(P, CV.P[k][j]);
+    PRINT_NC(E, CV.E[k][j]);
+    PRINT_NC(X, 0.5 * (X[k][j] + X[k][j+1]));
 
 //======================Write Log File============================
   strcpy(file_data, add_out);
@@ -99,18 +99,19 @@ void _1D_file_write(const int m, const int N, struct cell_var_stru CV, double * 
   fprintf(fp_write, "bond\t= %d\n", (int)config[17]);
   fprintf(fp_write, "\nA total of %d time steps are computed.\n", (int)config[5]);
   /*
-  double* sum = calloc(N, sizeof(double));
+  double * sum = calloc(N, sizeof(double));
   sum[0] = 0.0;
   fprintf(fp_write, "CPU time for each step:");
-  for(n = 1; n < N; ++n)
+  for(k = 1; k < N; ++k)
   {
-    fprintf(fp_write, "%.18f  ", cpu_time[n]);
-    sum[n] = sum[n-1] + cpu_time[n];
+    fprintf(fp_write, "%.18f  ", cpu_time[k]);
+    sum[k] = sum[k-1] + cpu_time[k];
   }
   fprintf(fp_write, "\nTotal CPU time at each step:");
-  for(n = 1; n < N; ++n)
-    fprintf(fp_write, "%.18f  ", sum[n]);
+  for(k = 1; k < N; ++k)
+    fprintf(fp_write, "%.18f  ", sum[k]);
   free(sum);
+  sum = NULL;
   */
   fclose(fp_write);
 }

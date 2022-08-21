@@ -33,18 +33,15 @@ double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double g
 			    const double c_L, const double c_R, _Bool * CRW,
 			    const double eps, const double tol, const int N)
 {
-  double mu, nu, sigma;
+  double mu, nu;
   double delta_p, u_LR, u_RL;
   double k1, k3, p_INT, p_INT0, u_INT;
-  double rho_star_l, rho_star_r;
   double v_L, v_R, gap;
   double temp1, temp2, temp3;
-  double dbg = 2;
   int n = 0;
 
   mu = (gamma-1.0) / (2.0*gamma);
   nu = (gamma+1.0) / (2.0*gamma);
-  sigma = (gamma - 1.0) / (gamma + 1.0);
 
   //=====find out the kinds of the 1-wave and the 3-wave, page 132 in the GRP book
   //find out where (u_LR,p_R) lies on the curve of LEFT state
@@ -116,7 +113,6 @@ double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double g
   }
   else
   {
-    //dbg = pow(p_INT/p_R, mu);
     v_R = pow(p_INT/p_R, mu) - 1.0;
     v_R = 2.0 * c_R * v_R / (gamma-1.0);
     v_R = u_R + v_R;

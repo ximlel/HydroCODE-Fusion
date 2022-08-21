@@ -69,64 +69,49 @@ static void GRP_solver_ALE_source_Undone
   double dire[3], mid[3];
 
   // the slopes of variable values
-  double *s_rho, *s_u, *s_p;
+  double * s_rho = calloc(m, sizeof(double));
+  double * s_u   = calloc(m, sizeof(double));
+  double * s_p   = calloc(m, sizeof(double));
   // the variable values at (x_{j-1/2}, t_{n+1}).
-  double *U_next, *P_next, *RHO_next;
+  double * U_next   = malloc((m+1) * sizeof(double));
+  double * P_next   = malloc((m+1) * sizeof(double));
+  double * RHO_next = malloc((m+1) * sizeof(double));
   // the temporal derivatives at (x_{j-1/2}, t_{n}).
-  double *U_t, *P_t, *RHO_t;
-  double nu;  // nu = tau/h
-  double *F1, *F2, *F3; // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * MASS; // Array of the mass data in computational cells.
-  s_rho = calloc(m, sizeof(double));
-  s_u   = calloc(m, sizeof(double));
-  s_p   = calloc(m, sizeof(double));
+  double * U_t   = malloc((m+1) * sizeof(double));
+  double * P_t   = malloc((m+1) * sizeof(double));
+  double * RHO_t = malloc((m+1) * sizeof(double));
+  // the numerical flux at (x_{j-1/2}, t_{n}).
+  double * F1 = malloc((m+1) * sizeof(double));
+  double * F2 = malloc((m+1) * sizeof(double));
+  double * F3 = malloc((m+1) * sizeof(double));
   if(s_rho == NULL || s_u == NULL || s_p == NULL)
       {
 	  printf("NOT enough memory! Slope\n");
 	  goto return_NULL;
       }
-  U_next   = malloc((m+1) * sizeof(double));
-  P_next   = malloc((m+1) * sizeof(double));
-  RHO_next = malloc((m+1) * sizeof(double));
   if(U_next == NULL || P_next == NULL || RHO_next == NULL)
       {
 	  printf("NOT enough memory! Variables_next\n");
 	  goto return_NULL;
       }
-  U_t   = malloc((m+1) * sizeof(double));
-  P_t   = malloc((m+1) * sizeof(double));
-  RHO_t = malloc((m+1) * sizeof(double));
   if(U_t == NULL || P_t == NULL || RHO_t == NULL)
       {
 	  printf("NOT enough memory! Temproal derivative\n");
 	  goto return_NULL;
       }
-  F1 = malloc((m+1) * sizeof(double));
-  F2 = malloc((m+1) * sizeof(double));
-  F3 = malloc((m+1) * sizeof(double));
   if(F1 == NULL || F2 == NULL || F3 == NULL)
       {
 	  printf("NOT enough memory! Flux\n");
 	  goto return_NULL;
       }
-  MASS = malloc(m * sizeof(double));
-  if(MASS == NULL)
-      {
-	  printf("NOT enough memory! MASS\n");
-	  goto return_NULL;
-      }
-  for(k = 0; k < m; ++k) // Initialize the values of mass in computational cells
-      MASS[k] = h * RHO[0][k];
 
+  double nu;  // nu = tau/h
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
   int n = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, HL, SUL, SPL, SRHOL; // Left  boundary condition
-  double UR, PR, RHOR, HR, SUR, SPR, SRHOR; // Right boundary condition
-  SUL   = 0.0;   SUR = 0.0;
-  SPL   = 0.0;   SPR = 0.0;
-  SRHOL = 0.0; SRHOR = 0.0;
+  double UL, PL, RHOL, HL = h, SUL = 0.0, SPL = 0.0, SRHOL = 0.0; // Left  boundary condition
+  double UR, PR, RHOR, HR = h, SUR = 0.0, SPR = 0.0, SRHOR = 0.0; // Right boundary condition
 
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
@@ -468,6 +453,4 @@ return_NULL:
   F1 = NULL;
   F2 = NULL;
   F3 = NULL;
-  free(MASS);
-  MASS = NULL;
 }
