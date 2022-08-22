@@ -60,10 +60,10 @@ static void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru C
    */
   double dire[3], mid[3];
   // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F1 = malloc((m+1) * sizeof(double));
-  double * F2 = malloc((m+1) * sizeof(double));
-  double * F3 = malloc((m+1) * sizeof(double));
-  if(F1 == NULL || F2 == NULL || F3 == NULL)
+  double * F_rho = malloc((m+1) * sizeof(double));
+  double * F_u   = malloc((m+1) * sizeof(double));
+  double * F_e   = malloc((m+1) * sizeof(double));
+  if(F_rho == NULL || F_u == NULL || F_e == NULL)
       {
 	  printf("NOT enough memory! Flux\n");
 	  goto return_NULL;
@@ -196,10 +196,10 @@ static void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru C
 		      time_c = t_all;
 		  }
 
-	      F1[j] = mid[0]*mid[1];
-	      F2[j] = F1[j]*mid[1] + mid[2];
-	      F3[j] = (gamma/(gamma-1.0))*mid[2] + 0.5*F1[j]*mid[1];
-	      F3[j] = F3[j]*mid[1];
+	      F_rho[j] = mid[0]*mid[1];
+	      F_u[j] = F_rho[j]*mid[1] + mid[2];
+	      F_e[j] = (gamma/(gamma-1.0))*mid[2] + 0.5*F_rho[j]*mid[1];
+	      F_e[j] = F_e[j]*mid[1];
 	  }
 
 //====================Time step and grid fixed======================
@@ -222,9 +222,9 @@ static void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru C
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[nt][j] = RHO[nt-1][j]     - nu*(F1[j+1]-F1[j]);
-	    Mom = RHO[nt-1][j]*U[nt-1][j] - nu*(F2[j+1]-F2[j]);
-	    Ene = RHO[nt-1][j]*E[nt-1][j] - nu*(F3[j+1]-F3[j]);
+	    RHO[nt][j] = RHO[nt-1][j]     - nu*(F_rho[j+1]-F_rho[j]);
+	    Mom = RHO[nt-1][j]*U[nt-1][j] - nu*(F_u[j+1]  -F_u[j]);
+	    Ene = RHO[nt-1][j]*E[nt-1][j] - nu*(F_e[j+1]  -F_e[j]);
 
 	    U[nt][j] = Mom / RHO[nt][j];
 	    E[nt][j] = Ene / RHO[nt][j];
@@ -274,10 +274,10 @@ static void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru C
 //---------------------END OF THE MAIN LOOP----------------------
 
 return_NULL:
-  free(F1);
-  free(F2);
-  free(F3);
-  F1 = NULL;
-  F2 = NULL;
-  F3 = NULL;
+  free(F_rho);
+  free(F_u);
+  free(F_e);
+  F_rho = NULL;
+  F_u   = NULL;
+  F_e   = NULL;
 }

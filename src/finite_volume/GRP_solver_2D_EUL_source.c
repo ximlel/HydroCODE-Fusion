@@ -78,20 +78,9 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 
   double mom_x, mom_y, ene;
   double c; // the speeds of sound
-  struct i_f_var ifv_L, ifv_R;
-  /*
-   * dire: the temporal derivative of fluid variables.
-   *       \frac{\partial [rho, u, v, p]}{\partial t}
-   * mid:  the Riemann solutions.
-   *       [rho_star, u_star, v_star, p_star]
-   */
-  double dire[4], mid[4];
-
-  // the numerical flux at (x_{j-1/2}, t_{n}).
-  double ** F1, ** F2, ** F3, ** F4;
-  // the numerical flux at (y_{j-1/2}, t_{n}).
-  double ** G1, ** G2, ** G3, ** G4;
-  struct b_f_var * bfv_L, * bfv_R, * bfv_U, * bfv_D; // Left/Right/Upper/Downside boundary condition
+  
+  // Left/Right/Upper/Downside boundary condition
+  struct b_f_var * bfv_L = NULL, * bfv_R = NULL, * bfv_U = NULL, * bfv_D = NULL; 
   // the slopes of variable values.
   _2D_INIT_MEM(CV->s_rho, m, n); _2D_INIT_MEM(CV->t_rho, m, n);
   _2D_INIT_MEM(CV->s_u,   m, n); _2D_INIT_MEM(CV->t_u,   m, n);
@@ -102,18 +91,22 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   _2D_INIT_MEM(CV->uIx,   m+1, n);
   _2D_INIT_MEM(CV->vIx,   m+1, n);
   _2D_INIT_MEM(CV->pIx,   m+1, n);
-  _2D_INIT_MEM(F1, m+1, n); _2D_INIT_MEM(F2, m+1, n);
-  _2D_INIT_MEM(F3, m+1, n); _2D_INIT_MEM(F4, m+1, n); 
+  _2D_INIT_MEM(CV->F_rho, m+1, n);
+  _2D_INIT_MEM(CV->F_u,   m+1, n);
+  _2D_INIT_MEM(CV->F_v,   m+1, n);
+  _2D_INIT_MEM(CV->F_e,   m+1, n); 
   // the variable values at (y_{j-1/2}, t_{n+1}).
   _2D_INIT_MEM(CV->rhoIy, m, n+1);
   _2D_INIT_MEM(CV->uIy,   m, n+1);
   _2D_INIT_MEM(CV->vIy,   m, n+1);
   _2D_INIT_MEM(CV->pIy,   m, n+1);
-  _2D_INIT_MEM(G1, m, n+1); _2D_INIT_MEM(G2, m, n+1);
-  _2D_INIT_MEM(G3, m, n+1); _2D_INIT_MEM(G4, m, n+1);
+  _2D_INIT_MEM(CV->G_rho, m, n+1);
+  _2D_INIT_MEM(CV->G_u,   m, n+1);
+  _2D_INIT_MEM(CV->G_v,   m, n+1);
+  _2D_INIT_MEM(CV->G_e,   m, n+1);
   // boundary condition
   _1D_BC_INIT_MEM(bfv_L, n); _1D_BC_INIT_MEM(bfv_R, n);
-  _1D_BC_INIT_MEM(bfv_U, m); _1D_BC_INIT_MEM(bfv_D, m);
+  _1D_BC_INIT_MEM(bfv_D, m); _1D_BC_INIT_MEM(bfv_U, m);
   
   double half_tau, half_nu, mu, nu;  // nu = tau/h_x, mu = tau/h_y.
 
@@ -177,12 +170,14 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	}
     half_tau = tau * 0.5;
     half_nu = half_tau / h_x;
+    nu = tau / h_x;
     mu = tau / h_y;
 
-    if(find_bound_x = bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x))
+    find_bound_x = bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x);
+    if(find_bound_x)
         goto return_NULL;
 
-    flux_generator_x(m, n, half_tau, CV, F1, F2, F3, F4);
+    flux_generator_x(m, n, half_tau, CV);
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -192,10 +187,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->U[j][i] - half_nu*(F2[j+1][i]-F2[j][i]);
-	  mom_y = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->V[j][i] - half_nu*(F3[j+1][i]-F3[j][i]);
-	  ene   = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->E[j][i] - half_nu*(F4[j+1][i]-F4[j][i]);
-	  (CV+nt)->RHO[j][i] = (CV+nt-1)->RHO[j][i]       - half_nu*(F1[j+1][i]-F1[j][i]);
+	  mom_x = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->U[j][i] - half_nu*(CV->F_u[j+1][i]-CV->F_u[j][i]);
+	  mom_y = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->V[j][i] - half_nu*(CV->F_v[j+1][i]-CV->F_v[j][i]);
+	  ene   = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->E[j][i] - half_nu*(CV->F_e[j+1][i]-CV->F_e[j][i]);
+	  (CV+nt)->RHO[j][i] = (CV+nt-1)->RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 	  
 	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
 	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
@@ -210,9 +205,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 
 //==================================================
 
-    if(find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_U, bfv_D, find_bound_y))
+    find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_D, bfv_U, find_bound_y);
+    if(find_bound_y)
         goto return_NULL;
-    flux_generator_y(m, n, tau, CV, G1, G2, G3, G4);
+    flux_generator_y(m, n, tau, CV);
 
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
@@ -222,10 +218,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - mu*(G2[j][i+1]-G2[j][i]);
-	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - mu*(G3[j][i+1]-G3[j][i]);
-	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - mu*(G4[j][i+1]-G4[j][i]);
-	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - mu*(G1[j][i+1]-G1[j][i]);
+	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - mu*(CV->G_u[j][i+1]-CV->G_u[j][i]);
+	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - mu*(CV->G_v[j][i+1]-CV->G_v[j][i]);
+	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - mu*(CV->G_e[j][i+1]-CV->G_e[j][i]);
+	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  
 	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
 	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
@@ -240,7 +236,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 //==================================================
 
     bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x);
-    flux_generator_x(m, n, half_tau, CV, F1, F2, F3, F4);
+    flux_generator_x(m, n, half_tau, CV);
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -250,10 +246,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - half_nu*(F2[j+1][i]-F2[j][i]);
-	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - half_nu*(F3[j+1][i]-F3[j][i]);
-	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - half_nu*(F4[j+1][i]-F4[j][i]);
-	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - half_nu*(F1[j+1][i]-F1[j][i]);
+	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - half_nu*(CV->F_u[j+1][i]-CV->F_u[j][i]);
+	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - half_nu*(CV->F_v[j+1][i]-CV->F_v[j][i]);
+	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - half_nu*(CV->F_e[j+1][i]-CV->F_e[j][i]);
+	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 	  
 	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
 	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
@@ -301,20 +297,38 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 return_NULL:
   for(j = 0; j < m+1; ++j)
   {
-    free(F1[j]); free(F2[j]); free(F3[j]); free(F4[j]);
+    free(CV->F_rho[j]); free(CV->F_u[j]); free(CV->F_v[j]); free(CV->F_e[j]);
     free(CV->rhoIx[j]); free(CV->uIx[j]); free(CV->vIx[j]); free(CV->pIx[j]);
+    CV->F_rho[j]= NULL; CV->F_u[j]= NULL; CV->F_v[j]= NULL; CV->F_e[j]= NULL;
+    CV->rhoIx[j]= NULL; CV->uIx[j]= NULL; CV->vIx[j]= NULL; CV->pIx[j]= NULL;
   }
   for(j = 0; j < m; ++j)
   {
-    free(G1[j]); free(G2[j]); free(G3[j]); free(G4[j]);
+    free(CV->G_rho[j]); free(CV->G_u[j]); free(CV->G_v[j]); free(CV->G_e[j]);
     free(CV->rhoIy[j]); free(CV->uIy[j]); free(CV->vIy[j]); free(CV->pIy[j]);
     free(CV->s_rho[j]); free(CV->s_u[j]); free(CV->s_v[j]); free(CV->s_p[j]);
     free(CV->t_rho[j]); free(CV->t_u[j]); free(CV->t_v[j]); free(CV->t_p[j]);
+
+    CV->G_rho[j]= NULL; CV->G_u[j]= NULL; CV->G_v[j]= NULL; CV->G_e[j]= NULL; 
+    CV->rhoIy[j]= NULL; CV->uIy[j]= NULL; CV->vIy[j]= NULL; CV->pIy[j]= NULL; 
+    CV->s_rho[j]= NULL; CV->s_u[j]= NULL; CV->s_v[j]= NULL; CV->s_p[j]= NULL; 
+    CV->t_rho[j]= NULL; CV->t_u[j]= NULL; CV->t_v[j]= NULL; CV->t_p[j]= NULL; 
   }
-    free(F1);   free(F2); free(F3); free(F4);
-    free(G1);   free(G2); free(G3); free(G4);
+    free(CV->F_rho); free(CV->F_u); free(CV->F_v); free(CV->F_e);
     free(CV->rhoIx); free(CV->uIx); free(CV->vIx); free(CV->pIx);
+    free(CV->G_rho); free(CV->G_u); free(CV->G_v); free(CV->G_e);
     free(CV->rhoIy); free(CV->uIy); free(CV->vIy); free(CV->pIy); 
     free(CV->s_rho); free(CV->s_u); free(CV->s_v); free(CV->s_p);
     free(CV->t_rho); free(CV->t_u); free(CV->t_v); free(CV->t_p);
+    free(bfv_L); free(bfv_R);
+    free(bfv_D); free(bfv_U);
+    
+    CV->F_rho= NULL; CV->F_u= NULL; CV->F_v= NULL; CV->F_e= NULL;
+    CV->rhoIx= NULL; CV->uIx= NULL; CV->vIx= NULL; CV->pIx= NULL;
+    CV->G_rho= NULL; CV->G_u= NULL; CV->G_v= NULL; CV->G_e= NULL;
+    CV->rhoIy= NULL; CV->uIy= NULL; CV->vIy= NULL; CV->pIy= NULL; 
+    CV->s_rho= NULL; CV->s_u= NULL; CV->s_v= NULL; CV->s_p= NULL;
+    CV->t_rho= NULL; CV->t_u= NULL; CV->t_v= NULL; CV->t_p= NULL;
+    bfv_L= NULL; bfv_R= NULL;
+    bfv_D= NULL; bfv_U= NULL;
 }

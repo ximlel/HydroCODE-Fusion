@@ -6,7 +6,8 @@
 #include "../include/var_struc.h"
 #include "../include/inter_process.h"
 
-_Bool bound_cond_slope_limiter_y(const int m, const int n, const int nt, S_CVS * CV, S_BFV * bfv_U, S_BFV * bfv_D, _Bool find_bound_y)
+
+_Bool bound_cond_slope_limiter_y(const int m, const int n, const int nt, S_CVS * CV, S_BFV * bfv_D, S_BFV * bfv_U, _Bool find_bound_y)
 {
     int const bound_y = (int)(config[18]);// the boundary condition in y-direction
     double const h_y  = config[11];       // the length of the initial y-spatial grids

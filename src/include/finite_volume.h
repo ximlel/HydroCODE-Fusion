@@ -15,6 +15,6 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time);
 void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time);
 //void Godunov_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time);
-void GRP_solver_EUL_2D_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time);
+void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time);
 
 #endif

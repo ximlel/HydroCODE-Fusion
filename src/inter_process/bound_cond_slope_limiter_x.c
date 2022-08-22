@@ -6,6 +6,7 @@
 #include "../include/var_struc.h"
 #include "../include/inter_process.h"
 
+
 _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, S_CVS * CV, S_BFV * bfv_L, S_BFV * bfv_R, _Bool find_bound_x)
 {
     int const bound_x = (int)(config[17]);// the boundary condition in x-direction
@@ -63,10 +64,10 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, S_CVS *
 
     for(i = 0; i < n; ++i)
 	{
-    minmod_limiter(false, m, find_bound_x, CV->s_u[*][i],   (CV+nt-1)->U[*][i],   bfv_L[i].U,   bfv_R[i].U,   h_x);
-    minmod_limiter(false, m, find_bound_x, CV->s_v[*][i],   (CV+nt-1)->V[*][i],   bfv_L[i].V,   bfv_R[i].V,   h_x);
-    minmod_limiter(false, m, find_bound_x, CV->s_p[*][i],   (CV+nt-1)->P[*][i],   bfv_L[i].P,   bfv_R[i].P,   h_x);
-    minmod_limiter(false, m, find_bound_x, CV->s_rho[*][i], (CV+nt-1)->RHO[*][i], bfv_L[i].RHO, bfv_R[i].RHO, h_x);
+    minmod_limiter_2D_x(false, m, find_bound_x, i, CV->s_u,   (CV+nt-1)->U,   bfv_L[i].U,   bfv_R[i].U,   h_x);
+    minmod_limiter_2D_x(false, m, find_bound_x, i, CV->s_v,   (CV+nt-1)->V,   bfv_L[i].V,   bfv_R[i].V,   h_x);
+    minmod_limiter_2D_x(false, m, find_bound_x, i, CV->s_p,   (CV+nt-1)->P,   bfv_L[i].P,   bfv_R[i].P,   h_x);
+    minmod_limiter_2D_x(false, m, find_bound_x, i, CV->s_rho, (CV+nt-1)->RHO, bfv_L[i].RHO, bfv_R[i].RHO, h_x);
 	}
 
     for(i = 1; i < n; ++i)

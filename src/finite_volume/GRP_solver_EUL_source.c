@@ -76,9 +76,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
   double * P_t   = malloc((m+1) * sizeof(double));
   double * RHO_t = malloc((m+1) * sizeof(double));
   // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F1 = malloc((m+1) * sizeof(double));
-  double * F2 = malloc((m+1) * sizeof(double));
-  double * F3 = malloc((m+1) * sizeof(double));
+  double * F_rho = malloc((m+1) * sizeof(double));
+  double * F_u   = malloc((m+1) * sizeof(double));
+  double * F_e   = malloc((m+1) * sizeof(double));
   if(s_rho == NULL || s_u == NULL || s_p == NULL)
       {
 	  printf("NOT enough memory! Slope\n");
@@ -94,7 +94,7 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	  printf("NOT enough memory! Temproal derivative\n");
 	  goto return_NULL;
       }
-  if(F1 == NULL || F2 == NULL || F3 == NULL)
+  if(F_rho == NULL || F_u == NULL || F_e == NULL)
       {
 	  printf("NOT enough memory! Flux\n");
 	  goto return_NULL;
@@ -165,9 +165,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 
 //=================Initialize slopes=====================
       // Reconstruct slopes
-      minmod_limiter_x(false, m, k-1, s_u,   U[nt-1],   UL,   UR,   h);
-      minmod_limiter_x(false, m, k-1, s_p,   P[nt-1],   PL,   PR,   h);
-      minmod_limiter_x(false, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, h);
+      minmod_limiter(false, m, k-1, s_u,   U[nt-1],   UL,   UR,   h);
+      minmod_limiter(false, m, k-1, s_p,   P[nt-1],   PL,   PR,   h);
+      minmod_limiter(false, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, h);
 
       switch(bound)
 	  {
@@ -293,10 +293,10 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	    U_next[j]   += 0.5 * tau * U_t[j];
 	    P_next[j]   += 0.5 * tau * P_t[j];
 
-	    F1[j] = RHO_next[j]*U_next[j];
-	    F2[j] = F1[j]*U_next[j] + P_next[j];
-	    F3[j] = (gamma/(gamma-1.0))*P_next[j] + 0.5*F1[j]*U_next[j];
-	    F3[j] = F3[j]*U_next[j];
+	    F_rho[j] = RHO_next[j]*U_next[j];
+	    F_u[j] = F_rho[j]*U_next[j] + P_next[j];
+	    F_e[j] = (gamma/(gamma-1.0))*P_next[j] + 0.5*F_rho[j]*U_next[j];
+	    F_e[j] = F_e[j]*U_next[j];
 
 	    RHO_next[j] += 0.5 * tau * RHO_t[j];;
 	    U_next[j]   += 0.5 * tau * U_t[j];
@@ -310,9 +310,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[nt][j] = RHO[nt-1][j]     - nu*(F1[j+1]-F1[j]);
-	    Mom = RHO[nt-1][j]*U[nt-1][j] - nu*(F2[j+1]-F2[j]);
-	    Ene = RHO[nt-1][j]*E[nt-1][j] - nu*(F3[j+1]-F3[j]);
+	    RHO[nt][j] = RHO[nt-1][j]     - nu*(F_rho[j+1]-F_rho[j]);
+	    Mom = RHO[nt-1][j]*U[nt-1][j] - nu*(F_u[j+1]  -F_u[j]);
+	    Ene = RHO[nt-1][j]*E[nt-1][j] - nu*(F_e[j+1]  -F_e[j]);
 
 	    U[nt][j] = Mom / RHO[nt][j];
 	    E[nt][j] = Ene / RHO[nt][j];
@@ -385,10 +385,10 @@ return_NULL:
   U_t   = NULL;
   P_t   = NULL;
   RHO_t = NULL;
-  free(F1);
-  free(F2);
-  free(F3);
-  F1 = NULL;
-  F2 = NULL;
-  F3 = NULL;
+  free(F_rho);
+  free(F_u);
+  free(F_e);
+  F_rho = NULL;
+  F_u   = NULL;
+  F_e   = NULL;
 }

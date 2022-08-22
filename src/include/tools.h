@@ -24,9 +24,11 @@ inline double minmod2(double s_L, double s_R)
 {
     if(s_L * s_R < 0.0)
 	return 0.0;
-    else if(fabs(s_R) < fabs(s_L))
+    else if(s_R > 0.0 && s_R < s_L)
 	return s_R;
-    else
+    else if(s_R < 0.0 && s_R > s_L)
+	return s_R;
+    else // fabs(s_R) > fabs(s_L)
 	return s_L;
 }
 
@@ -37,9 +39,13 @@ inline double minmod3(double s_L, double s_R, double s_m)
 {
     if(s_L * s_m < 0.0 || s_R * s_m < 0.0)
 	return 0.0;
-    else if(fabs(s_m) < fabs(s_L) && fabs(s_m) < fabs(s_R))
+    else if(s_m > 0.0 && s_m < s_L && s_m < s_R)
 	return s_m;
-    else if(fabs(s_R) < fabs(s_L))
+    else if(s_m < 0.0 && s_m > s_L && s_m > s_R)
+	return s_m;
+    else if(s_R > 0.0 && s_R < s_L)
+	return s_R;
+    else if(s_R < 0.0 && s_R > s_L)
 	return s_R;
     else
 	return s_L;

@@ -288,7 +288,9 @@ int main(int argc, char *argv[])
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
+		  // Godunov_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
+		  config[41] = 0.0; // alpha = 0.0
+		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  break;
 	      case 2:
 		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);

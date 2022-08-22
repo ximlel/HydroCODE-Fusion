@@ -184,9 +184,9 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 
 //=================Initialize slopes=====================
       // Reconstruct slopes
-      minmod_limiter_x(true, m, k-1, s_u,   U[nt-1],   UL,   UR,   HL, HR, X[nt-1]);
-      minmod_limiter_x(true, m, k-1, s_p,   P[nt-1],   PL,   PR,   HL, HR, X[nt-1]);
-      minmod_limiter_x(true, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, HL, HR, X[nt-1]);
+      minmod_limiter(true, m, k-1, s_u,   U[nt-1],   UL,   UR,   HL, HR, X[nt-1]);
+      minmod_limiter(true, m, k-1, s_p,   P[nt-1],   PL,   PR,   HL, HR, X[nt-1]);
+      minmod_limiter(true, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, HL, HR, X[nt-1]);
 
       switch(bound)
 	  {
