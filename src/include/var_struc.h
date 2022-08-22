@@ -21,6 +21,25 @@ typedef struct flu_var {
 //! Pointer structural body of variables on structural computational grid cells.
 typedef struct cell_var_stru {
 	double **RHO, **U, **V, **P, **E;
+	double ** s_rho, ** s_u, ** s_v, ** s_p; // spatial derivatives in coordinate x (slopes)
+	double ** t_rho, ** t_u, ** t_v, ** t_p; // spatial derivatives in coordinate y (slopes)
+	double ** rhoIx, ** uIx, ** vIx, ** pIx; // interfacial variable values in coordinate x.
+	double ** rhoIy, ** uIy, ** vIy, ** pIy; // interfacial variable values in coordinate y.
 } S_CVS;
+
+
+//! Interfacial fluid variables.
+typedef struct i_f_var {
+	double RHO, P, U, V;
+	double d_rho, d_p, d_u, d_v; // normal spatial derivatives
+	double t_rho, t_p, t_u, t_v; // tangential spatial derivatives
+} S_IFV;
+
+//! Fluid variables at boundary.
+typedef struct b_f_var {
+	double RHO, P, U, V;
+	double SRHO, SP, SU, SV;
+	double TRHO, TP, TU, TV;
+} S_BFV;
 
 #endif

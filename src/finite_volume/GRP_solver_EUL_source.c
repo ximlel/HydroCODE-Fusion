@@ -11,6 +11,7 @@
 
 #include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
+#include "../include/inter_process.h"
 #include "../include/tools.h"
 
 
@@ -44,7 +45,6 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
   double const h     = config[10];       // the length of the initial spatial grids
   double       tau   = config[16];       // the length of the time step
   int    const bound = (int)(config[17]);// the boundary condition
-  double const alpha = config[41];       // the paramater in slope limiters.
 
   _Bool find_bound = false;
   
@@ -63,7 +63,7 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
    */
   double dire[3], mid[3];
 
-  // the slopes of variable values
+  // the slopes of variable values.
   double * s_rho = calloc(m, sizeof(double));
   double * s_u   = calloc(m, sizeof(double));
   double * s_p   = calloc(m, sizeof(double));
@@ -164,49 +164,11 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	  }
 
 //=================Initialize slopes=====================
-      for(j = 0; j < m; ++j) // Reconstruct slopes
-	  { /*
-	     *  j-1          j          j+1
-	     * j-1/2  j-1  j+1/2   j   j+3/2  j+1
-	     *   o-----X-----o-----X-----o-----X--...
-	     */
-	      if(j)
-		  {
-		      s_u_L   = (U[nt-1][j]   -   U[nt-1][j-1]) / h;
-		      s_p_L   = (P[nt-1][j]   -   P[nt-1][j-1]) / h;
-		      s_rho_L = (RHO[nt-1][j] - RHO[nt-1][j-1]) / h;
-		  }
-	      else
-		  {
-		      s_u_L   = (U[nt-1][j]   -   UL) / h;
-		      s_p_L   = (P[nt-1][j]   -   PL) / h;
-		      s_rho_L = (RHO[nt-1][j] - RHOL) / h;
-		  }
-	      if(j < m-1)
-		  {
-		      s_u_R   = (U[nt-1][j+1]   -   U[nt-1][j]) / h;
-		      s_p_R   = (P[nt-1][j+1]   -   P[nt-1][j]) / h;
-		      s_rho_R = (RHO[nt-1][j+1] - RHO[nt-1][j]) / h;
-		  }
-	      else
-		  {
-		      s_u_R   = (UR   -   U[nt-1][j]) / h;
-		      s_p_R   = (PR   -   P[nt-1][j]) / h;
-		      s_rho_R = (RHOR - RHO[nt-1][j]) / h;
-		  }
-	      if (k == 1)
-		  {
-		      s_u[j]   = minmod2(s_u_L,   s_u_R);
-		      s_p[j]   = minmod2(s_p_L,   s_p_R);
-		      s_rho[j] = minmod2(s_rho_L, s_rho_R);
-		  }
-	      else
-		  {
-		      s_u[j]   = minmod3(alpha*s_u_L,   alpha*s_u_R,   s_u[j]);
-		      s_p[j]   = minmod3(alpha*s_p_L,   alpha*s_p_R,   s_p[j]);
-		      s_rho[j] = minmod3(alpha*s_rho_L, alpha*s_rho_R, s_rho[j]);
-		  }
-	  }
+      // Reconstruct slopes
+      minmod_limiter_x(false, m, k-1, s_u,   U[nt-1],   UL,   UR,   h);
+      minmod_limiter_x(false, m, k-1, s_p,   P[nt-1],   PL,   PR,   h);
+      minmod_limiter_x(false, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, h);
+
       switch(bound)
 	  {
 	  case -2: // reflective boundary conditions
