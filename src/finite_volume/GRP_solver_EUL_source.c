@@ -165,9 +165,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 
 //=================Initialize slopes=====================
       // Reconstruct slopes
-      minmod_limiter(false, m, k-1, s_u,   U[nt-1],   UL,   UR,   h);
-      minmod_limiter(false, m, k-1, s_p,   P[nt-1],   PL,   PR,   h);
-      minmod_limiter(false, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, h);
+      minmod_limiter(false, m, (_Bool)(k-1), s_u,   U[nt-1],   UL,   UR,   h);
+      minmod_limiter(false, m, (_Bool)(k-1), s_p,   P[nt-1],   PL,   PR,   h);
+      minmod_limiter(false, m, (_Bool)(k-1), s_rho, RHO[nt-1], RHOL, RHOR, h);
 
       switch(bound)
 	  {

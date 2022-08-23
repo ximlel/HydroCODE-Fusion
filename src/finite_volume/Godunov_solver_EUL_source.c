@@ -57,9 +57,9 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
    */
   double dire[3], mid[3];
   // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F_rho = malloc((m+1) * sizeof(double));
-  double * F_u   = malloc((m+1) * sizeof(double));
-  double * F_e   = malloc((m+1) * sizeof(double));
+  double * F_rho = malloc(((long long)m+1) * sizeof(double));
+  double * F_u   = malloc(((long long)m+1) * sizeof(double));
+  double * F_e   = malloc(((long long)m+1) * sizeof(double));
   if(F_rho == NULL || F_u == NULL || F_e == NULL)
       {
 	  printf("NOT enough memory! Flux\n");

@@ -184,7 +184,7 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 
 //========================Solve Riemann Problem========================
 
-	      Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
+	      Riemann_solver_exact_single(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
 
 	      if(p_star < eps)
 		  {

@@ -23,7 +23,7 @@
  * @param[out] cpu_time: Array of the CPU time recording.
  * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-static void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
+void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;
@@ -60,9 +60,9 @@ static void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru C
    */
   double dire[3], mid[3];
   // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F_rho = malloc((m+1) * sizeof(double));
-  double * F_u   = malloc((m+1) * sizeof(double));
-  double * F_e   = malloc((m+1) * sizeof(double));
+  double * F_rho = malloc(((long long)m+1) * sizeof(double));
+  double * F_u   = malloc(((long long)m+1) * sizeof(double));
+  double * F_e   = malloc(((long long)m+1) * sizeof(double));
   if(F_rho == NULL || F_u == NULL || F_e == NULL)
       {
 	  printf("NOT enough memory! Flux\n");

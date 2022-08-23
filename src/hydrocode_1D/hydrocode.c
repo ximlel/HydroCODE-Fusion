@@ -131,10 +131,14 @@ double config[N_CONF]; //!< Initial configuration data array.
  */
 int main(int argc, char *argv[])
 {
-    printf("\nTEST:\n  %s\n", argv[1]);
+    printf("\n");
+    int k, j, retval = 0;
+    for (k = 0; k < argc; k++)
+	printf("%s ", argv[k]);
+    printf("\n");
+    printf("TEST:\n  %s\n", argv[1]);
     printf("Test Beginning: ARGuments Counter = %d.\n", argc);
     
-    int k, j, retval = 0;
     // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;
@@ -213,7 +217,7 @@ int main(int argc, char *argv[])
   // The number of times steps of the fluid data stored for plotting.
   int N = 2; // (int)(config[5]) + 1;
 
-  struct cell_var_stru CV; // Structural body of fluid variables in computational cells array pointer.
+  struct cell_var_stru CV = {NULL}; // Structural body of fluid variables in computational cells array pointer.
   double ** X = NULL;
   double * cpu_time = malloc(N * sizeof(double));
   if(cpu_time == NULL)
@@ -252,7 +256,7 @@ int main(int argc, char *argv[])
       }
   for(k = 0; k < N; ++k)
   {
-    X[k] = (double *)malloc((m+1) * sizeof(double));
+    X[k] = (double *)malloc(((long long)m+1) * sizeof(double));
     if(X[k] == NULL)
     {
       printf("NOT enough memory! X[%d]\n", k);

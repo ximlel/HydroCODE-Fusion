@@ -15,34 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\file_io\config_load.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\file_io\io_control.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\file_io\_1D_file_in.c">
+    <ClCompile Include="..\file_io\_2D_file_in.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\file_io\_1D_file_out.c">
+    <ClCompile Include="..\file_io\_2D_file_out.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\finite_volume\Godunov_solver_EUL_source.c">
+    <ClCompile Include="..\finite_volume\GRP_solver_2D_EUL_source.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\finite_volume\Godunov_solver_LAG_source.c">
+    <ClCompile Include="..\inter_process\bound_cond_slope_limiter_x.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\finite_volume\GRP_solver_EUL_source.c">
+    <ClCompile Include="..\inter_process\bound_cond_slope_limiter_y.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\finite_volume\GRP_solver_LAG_source.c">
+    <ClCompile Include="..\inter_process\flux_generator_x.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hydrocode.c">
+    <ClCompile Include="..\inter_process\flux_generator_y.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process\slope_limiter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process\slope_limiter_2D_x.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_LAG.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Ben.c">
@@ -57,10 +63,7 @@
     <ClCompile Include="..\tools\sys_pro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\file_io\config_load.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\inter_process\slope_limiter.c">
+    <ClCompile Include="hydrocode.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,6 +74,9 @@
     <ClInclude Include="..\include\finite_volume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\inter_process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\Riemann_solver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -78,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\var_struc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\inter_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

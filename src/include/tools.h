@@ -16,6 +16,7 @@ int CreateDir(const char* pPath);
 // math_algo.c
 int rinv(double a[], const int n);
 
+inline double minmod3(double s_L, double s_R, double s_m);
 
 /**
  * @brief Minmod limiter function of two variables.

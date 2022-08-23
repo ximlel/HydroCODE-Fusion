@@ -11,6 +11,7 @@
 
 #include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
+#include "../include/flux_calc.h"
 #include "../include/inter_process.h"
 #include "../include/tools.h"
 
@@ -64,15 +65,15 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   clock_t tic, toc;
   double cpu_time_sum = 0.0;
 
-  double const t_all   = config[1];        // the total time
-  double const eps     = config[4];        // the largest value could be seen as zero
-  int    const N       = (int)(config[5]); // the maximum number of time steps
-  double const gamma   = config[6];        // the constant of the perfect gas
-  double const CFL     = config[7];        // the CFL number
-  double const h_x     = config[10];       // the length of the initial x-spatial grids
-  double const h_y     = config[11];       // the length of the initial y-spatial grids
-  double       tau     = config[16];       // the length of the time step
-  double const alpha   = config[41];       // the paramater in slope limiters.
+  double const t_all     = config[1];        // the total time
+  double const eps       = config[4];        // the largest value could be seen as zero
+  int    const N         = (int)(config[5]); // the maximum number of time steps
+  double const gamma     = config[6];        // the constant of the perfect gas
+  double const CFL       = config[7];        // the CFL number
+  double const h_x       = config[10];       // the length of the initial x-spatial grids
+  double const h_y       = config[11];       // the length of the initial y-spatial grids
+  double       tau       = config[16];       // the length of the time step
+  _Bool  const dim_split = (_Bool)config[33];// Dimensional splitting?
 
   _Bool find_bound_x = false, find_bound_y = false;
 
@@ -114,36 +115,6 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
 
-  for(i = 0; i < n; ++i)
-  {
-    for(j = 1; j < m; ++j)
-    {
-	CV->s_rho[j][i] = alpha*(CV->RHO[j][i] - CV->RHO[j-1][i])/h_x;
-        CV->s_u[j][i] = alpha*(  CV->U[j][i] -   CV->U[j-1][i])/h_x;
-        CV->s_v[j][i] = alpha*(  CV->V[j][i] -   CV->V[j-1][i])/h_x;
-        CV->s_p[j][i] = alpha*(  CV->P[j][i] -   CV->P[j-1][i])/h_x;
-    }
-    CV->s_rho[0][i] = alpha*(CV->RHO[1][i] - CV->RHO[0][i])/h_x;
-    CV->s_u[0][i] = alpha*(  CV->U[1][i] -   CV->U[0][i])/h_x;
-    CV->s_v[0][i] = alpha*(  CV->V[1][i] -   CV->V[0][i])/h_x;
-    CV->s_p[0][i] = alpha*(  CV->P[1][i] -   CV->P[0][i])/h_x;
-  }
-  for(j = 0; j < m; ++j)
-  {
-    for(i = 1; i < n; ++i)
-    {
-	CV->t_rho[j][i] = alpha*(CV->RHO[j][i] - CV->RHO[j][i-1])/h_y;
-        CV->t_u[j][i] = alpha*(  CV->U[j][i] -   CV->U[j][i-1])/h_y;
-        CV->t_v[j][i] = alpha*(  CV->V[j][i] -   CV->V[j][i-1])/h_y;
-        CV->t_p[j][i] = alpha*(  CV->P[j][i] -   CV->P[j][i-1])/h_y;
-    }
-    CV->t_rho[j][0] = alpha*(CV->RHO[j][1] - CV->RHO[j][0])/h_y;
-    CV->t_u[j][0] = alpha*(  CV->U[j][1] -   CV->U[j][0])/h_y;
-    CV->t_v[j][0] = alpha*(  CV->V[j][1] -   CV->V[j][0])/h_y;
-    CV->t_p[j][0] = alpha*(  CV->P[j][1] -   CV->P[j][0])/h_y;
-  }
-
-
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; ++k)
   {
@@ -168,16 +139,24 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
 	}
-    half_tau = tau * 0.5;
-    half_nu = half_tau / h_x;
-    nu = tau / h_x;
     mu = tau / h_y;
+    nu = tau / h_x;
+    if(dim_split)
+	{
+	    half_tau = tau * 0.5;
+	    half_nu = half_tau / h_x;
+	}
+    else // NO dimensional splitting!
+	{
+	    half_tau = tau;
+	    half_nu  = nu;
+	}
 
-    find_bound_x = bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x);
+    find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x);
     if(find_bound_x)
         goto return_NULL;
 
-    flux_generator_x(m, n, half_tau, CV);
+    flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R);
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -187,10 +166,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->U[j][i] - half_nu*(CV->F_u[j+1][i]-CV->F_u[j][i]);
-	  mom_y = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->V[j][i] - half_nu*(CV->F_v[j+1][i]-CV->F_v[j][i]);
-	  ene   = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->E[j][i] - half_nu*(CV->F_e[j+1][i]-CV->F_e[j][i]);
 	  (CV+nt)->RHO[j][i] = (CV+nt-1)->RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
+	  mom_x = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
+	  mom_y = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
+	  ene   = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
 	  
 	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
 	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
@@ -208,7 +187,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
     find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_D, bfv_U, find_bound_y);
     if(find_bound_y)
         goto return_NULL;
-    flux_generator_y(m, n, tau, CV);
+    flux_generator_y(m, n, nt, tau, CV, bfv_D, bfv_U);
 
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
@@ -218,9 +197,9 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - mu*(CV->G_u[j][i+1]-CV->G_u[j][i]);
-	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - mu*(CV->G_v[j][i+1]-CV->G_v[j][i]);
-	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - mu*(CV->G_e[j][i+1]-CV->G_e[j][i]);
+	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
+	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
+	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
 	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  
 	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
@@ -228,15 +207,17 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	  (CV+nt)->E[j][i] = ene   / (CV+nt)->RHO[j][i];
 	  (CV+nt)->P[j][i] = (ene - 0.5*mom_y*(CV+nt)->V[j][i])*(gamma-1.0);
 	  
-	  CV->s_rho[j][i] = (CV->rhoIy[j][i+1] - CV->rhoIy[j][i])/h_y;
-	  CV->s_u[j][i]   = (  CV->uIy[j][i+1] -   CV->uIy[j][i])/h_y;
-	  CV->s_v[j][i]   = (  CV->vIy[j][i+1] -   CV->vIy[j][i])/h_y;
-	  CV->s_p[j][i]   = (  CV->pIy[j][i+1] -   CV->pIy[j][i])/h_y;
+	  CV->t_rho[j][i] = (CV->rhoIy[j][i+1] - CV->rhoIy[j][i])/h_y;
+	  CV->t_u[j][i]   = (  CV->uIy[j][i+1] -   CV->uIy[j][i])/h_y;
+	  CV->t_v[j][i]   = (  CV->vIy[j][i+1] -   CV->vIy[j][i])/h_y;
+	  CV->t_p[j][i]   = (  CV->pIy[j][i+1] -   CV->pIy[j][i])/h_y;
       }
 //==================================================
 
-    bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x);
-    flux_generator_x(m, n, half_tau, CV);
+    if(dim_split)
+    {
+    bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x);
+    flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R);
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -246,9 +227,9 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - half_nu*(CV->F_u[j+1][i]-CV->F_u[j][i]);
-	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - half_nu*(CV->F_v[j+1][i]-CV->F_v[j][i]);
-	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - half_nu*(CV->F_e[j+1][i]-CV->F_e[j][i]);
+	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
+	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
+	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
 	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 	  
 	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
@@ -261,6 +242,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	  CV->s_v[j][i]   = (  CV->vIx[j+1][i] -   CV->vIx[j][i])/h_x;
 	  CV->s_p[j][i]   = (  CV->pIx[j+1][i] -   CV->pIx[j][i])/h_x;
       }
+    }
 //==================================================
 
     toc = clock();

@@ -7,23 +7,21 @@
 #include "../include/tools.h"
 
 
-void minmod_limiter(_Bool NO_h, int m, _Bool find_bound_x, double * s, double * U, double UL, double UR, ...)
+void minmod_limiter(_Bool NO_h, int m, _Bool find_bound_x, double * s, double * U, double UL, double UR, double HL, ...)
 {
     va_list ap;
+    va_start(ap, HL);
     int j;
     double const alpha = config[41]; // the paramater in slope limiters.
     double s_L, s_R; // spatial derivatives in coordinate x (slopes) 
-    va_start(ap, UR);
-    double h, HL, HR, * X;
+    double h = HL, HR, * X;
     if (NO_h)
 	{
-	    HL = va_arg(ap, double);
 	    HR = va_arg(ap, double);
 	    X  = va_arg(ap, double *);
+		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	}
-    else 
-	h = va_arg(ap, double);
-	
+
     for(j = 0; j < m; ++j) // Reconstruct slopes
 	{ /*
 	   *  j-1          j          j+1

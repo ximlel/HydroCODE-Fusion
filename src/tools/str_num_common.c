@@ -26,7 +26,7 @@
  * @deprecated This function has been replaced by the variable 'errno'
  *             in the standard Library <errno.h>.
  */
-static int format_string(char * str)
+int format_string(char * str)
 {
   int i = 0, length = 0, j = 0;
   int sign = 1;
@@ -124,7 +124,7 @@ static int format_string(char * str)
  * @deprecated This function has been replaced by the 'strtod()'
  *             function in the standard Library <stdio.h>.
  */
-static double str2num(char * number)
+double str2num(char * number)
 {
   double result = 0.0, super_script = 0.0;
   int idx = 0, dot = -2;

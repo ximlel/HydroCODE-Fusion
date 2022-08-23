@@ -54,7 +54,7 @@ void linear_GRP_solver_LAG
 
   double a_L, b_L, d_L, a_R, b_R, d_R, L_rho, L_u, L_p, A, B;
 
-  Riemann_solver_exact(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
+  Riemann_solver_exact_single(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
 
   if(CRW[0])
       {

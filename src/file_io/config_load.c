@@ -120,6 +120,8 @@ static void config_check(void)
     config[8] = isfinite(config[8]) ? config[8] : (double)0;
     // Reconstruction (prim_var/cons_var)
     config[31] = isfinite(config[31]) ? config[31] : (double)0;
+    // Dimensional splitting
+    config[33] = isfinite(config[33]) ? config[31] : (double)false;
     // Parameter α in minmod limiter
     config[41] = isfinite(config[41]) ? config[41] : (double)1.9;
     // v_fix

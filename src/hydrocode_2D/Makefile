@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS = -std=c99 -O3 -pg -Wall
 #C compiler options
-CFLAGS += -D Riemann_solver_exact=Riemann_solver_exact_Ben
+CFLAGS += -D Riemann_solver_exact_single=Riemann_solver_exact_Ben
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -14,7 +14,7 @@ LIBS = -lm
 RM = rm -vf
 #Delete command
 
-HEAD = inter_process finite_volume file_io Riemann_solver tools
+HEAD = finite_volume flux_calc inter_process Riemann_solver file_io tools
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 

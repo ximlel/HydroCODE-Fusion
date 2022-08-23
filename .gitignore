@@ -110,6 +110,7 @@ doc/html/
 *.*~
 *.#*
 *#
+*.kate-swp
 
 # Windows:
 Thumbs.db

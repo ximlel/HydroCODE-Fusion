@@ -24,7 +24,7 @@
  * @param[out] cpu_time: Array of the CPU time recording.
  * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-static void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
+void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
     double ** RHO = CV.RHO;
     double ** U   = CV.U;
@@ -177,9 +177,9 @@ static void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, d
 
 //=================Initialize slopes=====================
       // Reconstruct slopes
-      minmod_limiter(true, m, k-1, s_u,   U[nt-1],   UL,   UR,   HL, HR, X[nt-1]);
-      minmod_limiter(true, m, k-1, s_p,   P[nt-1],   PL,   PR,   HL, HR, X[nt-1]);
-      minmod_limiter(true, m, k-1, s_rho, RHO[nt-1], RHOL, RHOR, HL, HR, X[nt-1]);
+      minmod_limiter(true, m, (_Bool)(k-1), s_u,   U[nt-1],   UL,   UR,   HL, HR, X[nt-1]);
+      minmod_limiter(true, m, (_Bool)(k-1), s_p,   P[nt-1],   PL,   PR,   HL, HR, X[nt-1]);
+      minmod_limiter(true, m, (_Bool)(k-1), s_rho, RHO[nt-1], RHOL, RHOR, HL, HR, X[nt-1]);
 
       switch(bound)
 	  {

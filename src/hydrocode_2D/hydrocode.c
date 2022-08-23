@@ -133,7 +133,12 @@ double config[N_CONF]; //!< Initial configuration data array.
  */
 int main(int argc, char *argv[])
 {
-    printf("\nTEST:\n  %s\n", argv[1]);
+    printf("\n");
+    int k, j, retval = 0;
+    for (k = 0; k < argc; k++)
+	printf("%s ", argv[k]);
+    printf("\n");
+    printf("TEST:\n  %s\n", argv[1]);
     printf("Test Beginning: ARGuments Counter = %d.\n", argc);
     
     int k, i, j, retval = 0;

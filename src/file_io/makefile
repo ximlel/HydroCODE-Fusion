@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS += -std=c99
+CFLAGS += -std=c99 -Wall
 #C compiler options
 SRC = ..
 #Directory of sources

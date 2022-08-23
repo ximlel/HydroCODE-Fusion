@@ -14,12 +14,12 @@
 extern double config[]; //!< Initial configuration data array.
 
 //! Pointer structural body of fluid variables.
-typedef struct flu_var {
+struct flu_var {
 	double *RHO, *U, *V, *P;
-} S_FV;
+};
 
 //! Pointer structural body of variables on structural computational grid cells.
-typedef struct cell_var_stru {
+struct cell_var_stru {
 	double **RHO, **U, **V, **P, **E;
 	double ** s_rho, ** s_u, ** s_v, ** s_p; // spatial derivatives in coordinate x (slopes).
 	double ** t_rho, ** t_u, ** t_v, ** t_p; // spatial derivatives in coordinate y (slopes).
@@ -27,21 +27,24 @@ typedef struct cell_var_stru {
 	double ** rhoIy, ** uIy, ** vIy, ** pIy; // interfacial variable values in coordinate y.
 	double ** F_rho, ** F_e, ** F_u, ** F_v; // numerical fluxes at (x_{j-1/2}, t_{n}).
 	double ** G_rho, ** G_e, ** G_u, ** G_v; // numerical fluxes at (y_{j-1/2}, t_{n}).
-} S_CVS;
+};
 
 
 //! Interfacial fluid variables.
-typedef struct i_f_var {
+struct i_f_var {
+	double n_x, n_y;
+	double F_rho, F_e, F_u, F_v;
 	double RHO, P, U, V;
 	double d_rho, d_p, d_u, d_v; // normal spatial derivatives
 	double t_rho, t_p, t_u, t_v; // tangential spatial derivatives
-} S_IFV;
+	double RHO_int,  P_int,  U_int,  V_int;
+};
 
 //! Fluid variables at boundary.
-typedef struct b_f_var {
+struct b_f_var {
 	double RHO, P, U, V;
 	double SRHO, SP, SU, SV;
 	double TRHO, TP, TU, TV;
-} S_BFV;
+};
 
 #endif
