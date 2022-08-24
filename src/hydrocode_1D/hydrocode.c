@@ -220,12 +220,29 @@ int main(int argc, char *argv[])
   struct cell_var_stru CV = {NULL}; // Structural body of fluid variables in computational cells array pointer.
   double ** X = NULL;
   double * cpu_time = malloc(N * sizeof(double));
+  X = (double **)malloc(N * sizeof(double *));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
 	  retval = 5;
 	  goto return_NULL;
       }
+  if(X == NULL)
+      {
+	  printf("NOT enough memory! X\n");
+	  retval = 5;
+	  goto return_NULL;
+      }
+  for(k = 0; k < N; ++k)
+  {
+    X[k] = (double *)malloc(((long long)m+1) * sizeof(double));
+    if(X[k] == NULL)
+    {
+      printf("NOT enough memory! X[%d]\n", k);
+      retval = 5;
+      goto return_NULL;
+    }
+  }
   // Initialize arrays of fluid variables in cells.
   CV_INIT_MEM(RHO, N);
   CV_INIT_MEM(U, N);
@@ -243,23 +260,6 @@ int main(int argc, char *argv[])
     if(CV.E[k] == NULL)
     {
       printf("NOT enough memory! E[%d]\n", k);
-      retval = 5;
-      goto return_NULL;
-    }
-  }
-  X = (double **)malloc(N * sizeof(double *));
-  if(X == NULL)
-      {
-	  printf("NOT enough memory! X\n");
-	  retval = 5;
-	  goto return_NULL;
-      }
-  for(k = 0; k < N; ++k)
-  {
-    X[k] = (double *)malloc(((long long)m+1) * sizeof(double));
-    if(X[k] == NULL)
-    {
-      printf("NOT enough memory! X[%d]\n", k);
       retval = 5;
       goto return_NULL;
     }
@@ -318,6 +318,12 @@ int main(int argc, char *argv[])
   _1D_file_write(m, N, CV, X, cpu_time, argv[2]);
 
  return_NULL:
+  free(FV0.RHO);
+  free(FV0.U);
+  free(FV0.P);
+  FV0.RHO = NULL;
+  FV0.U   = NULL;
+  FV0.P   = NULL;
   for(k = 1; k < N; ++k)
   {
     free(CV.E[k]);
@@ -331,19 +337,21 @@ int main(int argc, char *argv[])
     CV.P[k]   = NULL;
     X[k] = NULL;
   }
-  free(FV0.RHO);
-  free(FV0.U);
-  free(FV0.P);
-  FV0.RHO = NULL;
-  FV0.U   = NULL;
-  FV0.P   = NULL;
   free(CV.E[0]);
   CV.E[0]   = NULL;
   CV.RHO[0] = NULL;
   CV.U[0]   = NULL;
   CV.P[0]   = NULL;
-  free(X[0]);
-  X[0] = NULL;
+  free(CV.E);
+  free(CV.RHO);
+  free(CV.U);
+  free(CV.P);
+  CV.E   = NULL;
+  CV.RHO = NULL;
+  CV.U   = NULL;
+  CV.P   = NULL;
+  free(X);
+  X = NULL;
   free(cpu_time);
   cpu_time = NULL;
   

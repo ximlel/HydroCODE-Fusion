@@ -134,14 +134,13 @@ double config[N_CONF]; //!< Initial configuration data array.
 int main(int argc, char *argv[])
 {
     printf("\n");
-    int k, j, retval = 0;
+    int k, i, j, retval = 0;
     for (k = 0; k < argc; k++)
 	printf("%s ", argv[k]);
     printf("\n");
     printf("TEST:\n  %s\n", argv[1]);
     printf("Test Beginning: ARGuments Counter = %d.\n", argc);
     
-    int k, i, j, retval = 0;
     // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;
@@ -219,20 +218,40 @@ int main(int argc, char *argv[])
   double h_x = config[10], h_y = config[11], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
   int N = 2; // (int)(config[5]) + 1;
-  
+
   // Structural body of fluid variables in computational cells array pointer.
   struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));
-  if(CV == NULL)
-      {
-	  printf("NOT enough memory! Cell Variables\n");
-	  retval = 5;
-	  goto return_NULL;
-      }
-  double ** X = NULL, ** Y = NULL;
+  double ** X, ** Y;
   double * cpu_time = malloc(N * sizeof(double));
+  X = (double **)malloc(((long long)n_x+1) * sizeof(double *));
+  Y = (double **)malloc(((long long)n_x+1) * sizeof(double *));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
+	  retval = 5;
+	  goto return_NULL;
+      }
+
+  if(X == NULL || Y == NULL)
+      {
+	  printf("NOT enough memory! X or Y\n");
+	  retval = 5;
+	  goto return_NULL;
+      }
+  for(j = 0; j <= n_x; ++j)
+  {
+    X[j] = (double *)malloc(((long long)n_y+1) * sizeof(double));
+    Y[j] = (double *)malloc(((long long)n_y+1) * sizeof(double));
+    if(X[j] == NULL || Y[j] == NULL)
+    {
+      printf("NOT enough memory! X[%d] or Y[%d]\n", j, j);
+      retval = 5;
+      goto return_NULL;
+    }
+  }
+  if(CV == NULL)
+      {
+	  printf("NOT enough memory! Cell Variables\n");
 	  retval = 5;
 	  goto return_NULL;
       }
@@ -242,25 +261,6 @@ int main(int argc, char *argv[])
   CV_INIT_MEM(V, N);
   CV_INIT_MEM(P, N);
   CV_INIT_MEM(E, N);
-  X = (double **)malloc((n_x+1) * sizeof(double *));
-  Y = (double **)malloc((n_x+1) * sizeof(double *));
-  if(X == NULL || Y == NULL)
-      {
-	  printf("NOT enough memory! X or Y\n");
-	  retval = 5;
-	  goto return_NULL;
-      }
-  for(j = 0; j <= n_x; ++j)
-  {
-    X[j] = (double *)malloc((n_y+1) * sizeof(double));
-    Y[j] = (double *)malloc((n_y+1) * sizeof(double));
-    if(X[j] == NULL || Y[j] == NULL)
-    {
-      printf("NOT enough memory! X[%d] or Y[%d]\n", j, j);
-      retval = 5;
-      goto return_NULL;
-    }
-  }
   // Initialize the values of energy in computational cells and (x,y)-coordinate of the cell interfaces.
   for(j = 0; j <= n_x; ++j)
       for(i = 0; i <= n_y; ++i)	
@@ -278,14 +278,6 @@ int main(int argc, char *argv[])
 	      CV[0].E[j][i]   = 0.5*CV[0].U[j][i]*CV[0].U[j][i] + CV[0].P[j][i]/(gamma - 1.0)/CV[0].RHO[j][i];
 	      CV[0].E[j][i]  += 0.5*CV[0].V[j][i]*CV[0].V[j][i];
 	  }
-  free(FV0.RHO);
-  free(FV0.U);
-  free(FV0.V);
-  free(FV0.P);
-  FV0.RHO = NULL;
-  FV0.U = NULL;
-  FV0.V = NULL;
-  FV0.P = NULL;
 
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
@@ -317,6 +309,14 @@ int main(int argc, char *argv[])
   _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2]);
 
  return_NULL:
+  free(FV0.RHO);
+  free(FV0.U);
+  free(FV0.V);
+  free(FV0.P);
+  FV0.RHO = NULL;
+  FV0.U   = NULL;
+  FV0.V   = NULL;
+  FV0.P   = NULL;
   for(k = 0; k < N; ++k)
   {
     for(j = 0; j < n_x; ++j)

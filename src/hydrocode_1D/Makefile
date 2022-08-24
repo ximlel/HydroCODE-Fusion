@@ -1,8 +1,8 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -O3 -pg -Wall
+CFLAGS = -std=c99 -Wall -O3 -pg
 #C compiler options
-CFLAGS += -D Riemann_solver_exact_single=Riemann_solver_exact_Ben
+CFLAGS += 
 #Macro definition
 SRC = ..
 #Directory of sources

@@ -51,9 +51,6 @@
     <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Toro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\math_algo.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\tools\sys_pro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,6 +58,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\inter_process\slope_limiter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\finite_volume\Godunov_solver_ALE_source.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\finite_volume\GRP_solver_ALE_source.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

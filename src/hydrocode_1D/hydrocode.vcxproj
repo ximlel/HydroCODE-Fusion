@@ -107,8 +107,10 @@
     <ClCompile Include="..\file_io\io_control.c" />
     <ClCompile Include="..\file_io\_1D_file_in.c" />
     <ClCompile Include="..\file_io\_1D_file_out.c" />
+    <ClCompile Include="..\finite_volume\Godunov_solver_ALE_source.c" />
     <ClCompile Include="..\finite_volume\Godunov_solver_EUL_source.c" />
     <ClCompile Include="..\finite_volume\Godunov_solver_LAG_source.c" />
+    <ClCompile Include="..\finite_volume\GRP_solver_ALE_source.c" />
     <ClCompile Include="..\finite_volume\GRP_solver_EUL_source.c" />
     <ClCompile Include="..\finite_volume\GRP_solver_LAG_source.c" />
     <ClCompile Include="..\inter_process\slope_limiter.c" />
@@ -116,7 +118,6 @@
     <ClCompile Include="..\riemann_solver\linear_GRP_solver_LAG.c" />
     <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Ben.c" />
     <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Toro.c" />
-    <ClCompile Include="..\tools\math_algo.c" />
     <ClCompile Include="..\tools\sys_pro.c" />
     <ClCompile Include="hydrocode.c" />
   </ItemGroup>
