@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS = -std=c99 -Wall -O3 -pg
 #C compiler options
-CFLAGS += 
+CFLAGD = 
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -21,14 +21,14 @@ SOURCE = hydrocode
 
 all: modules
 	@echo "**********Generate executable file***********"
-	$(CC) $(CFLAGS) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
+	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
 .PHONYP:all
 
 modules:
 #Enter each subdirectory
 #Call the Makefile in the subdirectory
 	@for n in $(HEAD); do \
-	( $(MAKE) CFLAGS='$(CFLAGS)' --directory=$(SRC)/$$n )  \
+	( $(MAKE) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
 	done;
 .PHONYP:modules
 

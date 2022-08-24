@@ -7,7 +7,8 @@
 #include "../include/tools.h"
 
 
-void minmod_limiter(_Bool NO_h, int m, _Bool find_bound_x, double * s, double * U, double UL, double UR, double HL, ...)
+void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound_x, double * s,
+		    const double * U, const double UL, const double UR, const double HL, ...)
 {
     va_list ap;
     va_start(ap, HL);
@@ -19,7 +20,6 @@ void minmod_limiter(_Bool NO_h, int m, _Bool find_bound_x, double * s, double * 
 	{
 	    HR = va_arg(ap, double);
 	    X  = va_arg(ap, double *);
-		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	}
 
     for(j = 0; j < m; ++j) // Reconstruct slopes
@@ -53,9 +53,9 @@ void minmod_limiter(_Bool NO_h, int m, _Bool find_bound_x, double * s, double * 
 		    s_R = (UR - U[j]) / h;
 		}
 	    if (find_bound_x)
-		s[j]   = minmod3(alpha*s_L, alpha*s_R, s[j]);
+		s[j] = minmod3(alpha*s_L, alpha*s_R, s[j]);
 	    else
-		s[j]   = minmod2(s_L, s_R);
+		s[j] = minmod2(s_L, s_R);
 	}
     va_end(ap);
 }

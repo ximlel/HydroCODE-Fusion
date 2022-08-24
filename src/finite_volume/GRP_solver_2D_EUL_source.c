@@ -166,15 +166,15 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  (CV+nt)->RHO[j][i] = (CV+nt-1)->RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
-	  mom_x = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
-	  mom_y = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
-	  ene   = (CV+nt-1)->RHO[j][i]*(CV+nt-1)->E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
+	  mom_x = CV[nt-1].RHO[j][i]*CV[nt-1].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
+	  mom_y = CV[nt-1].RHO[j][i]*CV[nt-1].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
+	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
 	  
-	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
-	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
-	  (CV+nt)->E[j][i] = ene   / (CV+nt)->RHO[j][i];
-	  (CV+nt)->P[j][i] = (ene - 0.5*mom_x*(CV+nt)->U[j][i])*(gamma-1.0);
+	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
+	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
+	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
+	  CV[nt].P[j][i] = (ene - 0.5*mom_x*CV[nt].U[j][i])*(gamma-1.0);
 	  
 	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
 	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
@@ -197,15 +197,15 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
-	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
-	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
-	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
+	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
+	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
+	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt].RHO[j][i]     - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  
-	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
-	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
-	  (CV+nt)->E[j][i] = ene   / (CV+nt)->RHO[j][i];
-	  (CV+nt)->P[j][i] = (ene - 0.5*mom_y*(CV+nt)->V[j][i])*(gamma-1.0);
+	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
+	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
+	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
+	  CV[nt].P[j][i] = (ene - 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
 	  
 	  CV->t_rho[j][i] = (CV->rhoIy[j][i+1] - CV->rhoIy[j][i])/h_y;
 	  CV->t_u[j][i]   = (  CV->uIy[j][i+1] -   CV->uIy[j][i])/h_y;
@@ -216,8 +216,8 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 
     if(dim_split)
     {
-    bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x);
-    flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R);
+    bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x);
+    flux_generator_x(m, n, nt, half_tau, CV, bfv_L, bfv_R);
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -227,15 +227,15 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  mom_x = (CV+nt)->RHO[j][i]*(CV+nt)->U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
-	  mom_y = (CV+nt)->RHO[j][i]*(CV+nt)->V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
-	  ene   = (CV+nt)->RHO[j][i]*(CV+nt)->E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
-	  (CV+nt)->RHO[j][i] = (CV+nt)->RHO[j][i]     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
+	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
+	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
+	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt].RHO[j][i]     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 	  
-	  (CV+nt)->U[j][i] = mom_x / (CV+nt)->RHO[j][i];
-	  (CV+nt)->V[j][i] = mom_y / (CV+nt)->RHO[j][i];
-	  (CV+nt)->E[j][i] = ene   / (CV+nt)->RHO[j][i];
-	  (CV+nt)->P[j][i] = (ene - 0.5*mom_x*(CV+nt)->U[j][i])*(gamma-1.0);
+	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
+	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
+	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
+	  CV[nt].P[j][i] = (ene - 0.5*mom_x*CV[nt].U[j][i])*(gamma-1.0);
 	  
 	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
 	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
@@ -264,11 +264,11 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
 	    {
-		(CV+nt-1)->RHO[j][i] = (CV+nt)->RHO[j][i];
-		(CV+nt-1)->U[j][i]   =   (CV+nt)->U[j][i];
-		(CV+nt-1)->V[j][i]   =   (CV+nt)->V[j][i];
-		(CV+nt-1)->E[j][i]   =   (CV+nt)->E[j][i];  
-		(CV+nt-1)->P[j][i]   =   (CV+nt)->P[j][i];
+		CV[nt-1].RHO[j][i] = CV[nt].RHO[j][i];
+		CV[nt-1].U[j][i]   =   CV[nt].U[j][i];
+		CV[nt-1].V[j][i]   =   CV[nt].V[j][i];
+		CV[nt-1].E[j][i]   =   CV[nt].E[j][i];  
+		CV[nt-1].P[j][i]   =   CV[nt].P[j][i];
 	    }
   }
   

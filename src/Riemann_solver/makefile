@@ -1,8 +1,9 @@
 CC = gcc
 #C compiler
-CFLAGS += -std=c99 -Wall
+CFLAGS = -std=c99 -Wall
 #C compiler options
-CFLAGD = -D Riemann_solver_exact_single=Riemann_solver_exact_Ben
+CFLAGD = -DRiemann_solver_exact_single=Riemann_solver_exact_Ben
+# CFLAGD += -DEXACT_TANGENT_DERIVATIVE
 #Macro definition
 SRC = ..
 #Directory of sources

@@ -7,7 +7,8 @@
 #include "../include/tools.h"
 
 
-void minmod_limiter_2D_x(_Bool NO_h, int m, int i, _Bool find_bound_x, double ** s, double ** U, double UL, double UR, double HL, ...)
+void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool find_bound_x, double ** s,
+			 double ** U, const double UL, const double UR, const double HL, ...)
 {
     va_list ap;
     va_start(ap, HL);

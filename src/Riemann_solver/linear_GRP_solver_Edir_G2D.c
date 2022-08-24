@@ -4,7 +4,9 @@
 #include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
 
-// #define EXACT_TANGENT_DERIVATIVE
+#ifndef EXACT_TANGENT_DERIVATIVE
+#undef  EXACT_TANGENT_DERIVATIVE
+#endif
 
 /*
   atc=1.0/0.0(inf) acoustic approximation

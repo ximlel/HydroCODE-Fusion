@@ -16,18 +16,17 @@ int CreateDir(const char* pPath);
 // math_algo.c
 int rinv(double a[], const int n);
 
-inline double minmod3(double s_L, double s_R, double s_m);
 
 /**
  * @brief Minmod limiter function of two variables.
  */
-inline double minmod2(double s_L, double s_R)
+inline double minmod2(const double s_L, const double s_R)
 {
-    if(s_L * s_R < 0.0)
+    if(s_L * s_R <= 0.0)
 	return 0.0;
-    else if(s_R > 0.0 && s_R < s_L)
+    else if(s_R >  0.0 && s_R < s_L)
 	return s_R;
-    else if(s_R < 0.0 && s_R > s_L)
+    else if(s_R <= 0.0 && s_R > s_L)
 	return s_R;
     else // fabs(s_R) > fabs(s_L)
 	return s_L;
@@ -36,17 +35,17 @@ inline double minmod2(double s_L, double s_R)
 /**
  * @brief Minmod limiter function of three variables.
  */
-inline double minmod3(double s_L, double s_R, double s_m)
+inline double minmod3(const double s_L, const double s_R, const double s_m)
 {
-    if(s_L * s_m < 0.0 || s_R * s_m < 0.0)
+    if(s_L * s_m <= 0.0 || s_R * s_m <= 0.0)
 	return 0.0;
-    else if(s_m > 0.0 && s_m < s_L && s_m < s_R)
+    else if(s_m >  0.0 && s_m < s_L && s_m < s_R)
 	return s_m;
-    else if(s_m < 0.0 && s_m > s_L && s_m > s_R)
+    else if(s_m <= 0.0 && s_m > s_L && s_m > s_R)
 	return s_m;
-    else if(s_R > 0.0 && s_R < s_L)
+    else if(s_R >  0.0 && s_R < s_L)
 	return s_R;
-    else if(s_R < 0.0 && s_R > s_L)
+    else if(s_R <= 0.0 && s_R > s_L)
 	return s_R;
     else
 	return s_L;
