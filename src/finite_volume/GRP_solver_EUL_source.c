@@ -24,10 +24,6 @@
  */
 void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time)
 {
-    double ** RHO = CV.RHO;
-    double ** U   = CV.U;
-    double ** P   = CV.P;
-    double ** E   = CV.E;
     /* 
      * j is a frequently used index for spatial variables.
      * k is a frequently used index for the time step.
@@ -44,7 +40,6 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
   double const CFL   = config[7];        // the CFL number
   double const h     = config[10];       // the length of the initial spatial grids
   double       tau   = config[16];       // the length of the time step
-  int    const bound = (int)(config[17]);// the boundary condition
 
   _Bool find_bound = false;
   
@@ -63,10 +58,17 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
    */
   double dire[3], mid[3];
 
-  // the slopes of variable values.
+  double ** RHO  = CV.RHO;
+  double ** U    = CV.U;
+  double ** P    = CV.P;
+  double ** E    = CV.E;
+  // the slopes of variable values
   double * s_rho = calloc(m, sizeof(double));
   double * s_u   = calloc(m, sizeof(double));
   double * s_p   = calloc(m, sizeof(double));
+  CV.d_rho = s_rho;
+  CV.d_u   = s_u;
+  CV.d_p   = s_p;
   // the variable values at (x_{j-1/2}, t_{n+1}).
   double * U_next   = malloc((m+1) * sizeof(double));
   double * P_next   = malloc((m+1) * sizeof(double));
@@ -105,85 +107,19 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, SUL = 0.0, SPL = 0.0, SRHOL = 0.0; // Left  boundary condition
-  double UR, PR, RHOR, SUR = 0.0, SPR = 0.0, SRHOR = 0.0; // Right boundary condition
-
+  struct b_f_var bfv_L = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
+  struct b_f_var bfv_R = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
+  
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
       h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      switch (bound)
-	  {
-	  case -1: // initial boudary conditions
-	      if(find_bound)
-		  break;
-	      else
-		  printf("Initial boudary conditions.\n");		  
-	      find_bound = true;
-	      UL   =   U[0][0]; UR   =   U[0][m-1];
-	      PL   =   P[0][0]; PR   =   P[0][m-1];
-	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
-	      break;
-	  case -2: // reflective boundary conditions
-	      if(!find_bound)
-		  printf("Reflective boudary conditions.\n");
-	      find_bound = true;
-	      UL   = - U[nt-1][0]; UR   = - U[nt-1][m-1];
-	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
-	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
-	      break;
-	  case -4: // free boundary conditions
-	      if(!find_bound)
-		  printf("Free boudary conditions.\n");
-	      find_bound = true;
-	      UL   =   U[nt-1][0]; UR   =   U[nt-1][m-1];
-	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
-	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
-	      break;
-	  case -5: // periodic boundary conditions
-	      if(!find_bound)
-		  printf("Periodic boudary conditions.\n");
-	      find_bound = true;
-	      UL   =   U[nt-1][m-1]; UR   =   U[nt-1][0];
-	      PL   =   P[nt-1][m-1]; PR   =   P[nt-1][0];
-	      RHOL = RHO[nt-1][m-1]; RHOR = RHO[nt-1][0];
-	      break;
-	  case -24: // reflective + free boundary conditions
-	      if(!find_bound)
-		  printf("Reflective + Free boudary conditions.\n");
-	      find_bound = true;
-	      UL   = - U[nt-1][0]; UR   =   U[nt-1][m-1];
-	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
-	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
-	      break;
-	  default:
-	      printf("No suitable boundary coditions!\n");
-	      goto return_NULL;
-	  }
+      find_bound = bound_cond_slope_limiter(false, m, nt-1, CV, &bfv_L, &bfv_R, find_bound, true, time_c);
+      if(!find_bound)
+	  goto return_NULL;
 
-//=================Initialize slopes=====================
-      // Reconstruct slopes
-      minmod_limiter(false, m, (_Bool)(k-1), s_u,   U[nt-1],   UL,   UR,   h);
-      minmod_limiter(false, m, (_Bool)(k-1), s_p,   P[nt-1],   PL,   PR,   h);
-      minmod_limiter(false, m, (_Bool)(k-1), s_rho, RHO[nt-1], RHOL, RHOR, h);
-
-      switch(bound)
-	  {
-	  case -2: // reflective boundary conditions
-	      SUL = - s_u[0]; SUR = - s_u[m-1];
-	      break;
-	  case -5: // periodic boundary conditions
-	      SUL   =   s_u[m-1]; SUR   =   s_u[0];
-	      SPL   =   s_p[m-1]; SPR   =   s_p[0];
-	      SRHOL = s_rho[m-1]; SRHOR = s_rho[0];
-	      break;
-	  case -24: // reflective + free boundary conditions
-	      SUL = - s_u[0];
-	      break;
-	  }
-      
       for(j = 0; j <= m; ++j)
 	  { /*
 	     *  j-1          j          j+1
@@ -198,9 +134,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		  }
 	      else
 		  {
-		      rho_L = RHOL + 0.5*h*SRHOL;
-		      u_L   =   UL + 0.5*h*SUL;
-		      p_L   =   PL + 0.5*h*SPL;
+		      rho_L = bfv_L.RHO + 0.5*h*bfv_L.SRHO;
+		      u_L   = bfv_L.U   + 0.5*h*bfv_L.SU;
+		      p_L   = bfv_L.P   + 0.5*h*bfv_L.SP;
 		  }
 	      if(j < m)
 		  {
@@ -210,9 +146,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		  }
 	      else
 		  {
-		      rho_R = RHOR + 0.5*h*SRHOR;
-		      u_R   =   UR + 0.5*h*SUR;
-		      p_R   =   PR + 0.5*h*SPR;
+		      rho_R = bfv_R.RHO + 0.5*h*bfv_R.SRHO;
+		      u_R   = bfv_R.U   + 0.5*h*bfv_R.SU;
+		      p_R   = bfv_R.P   + 0.5*h*bfv_R.SP;
 		  }
 	      if(p_L < eps || p_R < eps || rho_L < eps || rho_R < eps)
 		  {
@@ -238,9 +174,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		  }
 	      else
 		  {
-		      s_rho_L = SRHOL;
-		      s_u_L   =   SUL;
-		      s_p_L   =   SPL;
+		      s_rho_L = bfv_L.SRHO;
+		      s_u_L   = bfv_L.SU;
+		      s_p_L   = bfv_L.SP;
 		  }
 	      if(j < m)
 		  {
@@ -250,9 +186,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		  }
 	      else
 		  {
-		      s_rho_R = SRHOR;
-		      s_u_R   =   SUR;
-		      s_p_R   =   SPR;
+		      s_rho_R = bfv_R.SRHO;
+		      s_u_R   = bfv_R.SU;
+		      s_p_R   = bfv_R.SP;
 		  }
 
 //========================Solve GRP========================

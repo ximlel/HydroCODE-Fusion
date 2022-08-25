@@ -214,10 +214,10 @@ int main(int argc, char *argv[])
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-  int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
-  double h_x = config[10], h_y = config[11], gamma = config[6];
+  const int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
+  const double h_x = config[10], h_y = config[11], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
-  int N = 2; // (int)(config[5]) + 1;
+  const int N = 2; // (int)(config[5]) + 1;
 
   // Structural body of fluid variables in computational cells array pointer.
   struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));
@@ -279,6 +279,7 @@ int main(int argc, char *argv[])
 	      CV[0].E[j][i]  += 0.5*CV[0].V[j][i]*CV[0].V[j][i];
 	  }
 
+  _Bool const dim_split = (_Bool)config[33]; // Dimensional splitting?
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
@@ -290,7 +291,10 @@ int main(int argc, char *argv[])
 		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  break;
 	      case 2:
-		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
+		  if (dim_split)
+		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, cpu_time);
+		  else
+		      GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);

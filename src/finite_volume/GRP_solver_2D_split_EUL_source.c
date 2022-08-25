@@ -53,7 +53,7 @@
  * @param[in,out] CV:    Structural body of cell variable data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
-void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time)
+void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time)
 {
     /* 
      * i is a frequently used index for y-spatial variables.
@@ -108,7 +108,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   _1D_BC_INIT_MEM(bfv_L, n); _1D_BC_INIT_MEM(bfv_R, n);
   _1D_BC_INIT_MEM(bfv_D, m); _1D_BC_INIT_MEM(bfv_U, m);
   
-  double mu, nu;  // nu = tau/h_x, mu = tau/h_y.
+  double half_tau, half_nu, mu;  // nu = tau/h_x, mu = tau/h_y.
 
   double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
   double time_c = 0.0; // the current time
@@ -138,19 +138,15 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
 	}
-    nu = tau / h_x;
+    half_tau = tau * 0.5;
+    half_nu = half_tau / h_x;
     mu = tau / h_y;
 
 
     find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
     if(!find_bound_x)
         goto return_NULL;
-    find_bound_y = bound_cond_slope_limiter_y(m, n, nt-1, CV, bfv_D, bfv_U, find_bound_y, true, time_c);
-    if(!find_bound_y)
-        goto return_NULL;
-
-    flux_generator_x(m, n, nt-1, tau, CV, bfv_L, bfv_R, true);
-    flux_generator_y(m, n, nt-1, tau, CV, bfv_D, bfv_U, true);
+    flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R, false);
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -160,26 +156,80 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]) - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
-	  mom_x = CV[nt-1].RHO[j][i]*CV[nt-1].U[j][i] - nu*(CV->F_u[j+1][i]  -CV->F_u[j][i])   - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
-	  mom_y = CV[nt-1].RHO[j][i]*CV[nt-1].V[j][i] - nu*(CV->F_v[j+1][i]  -CV->F_v[j][i])   - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
-	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - nu*(CV->F_e[j+1][i]  -CV->F_e[j][i])   - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
+	  mom_x = CV[nt-1].RHO[j][i]*CV[nt-1].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
+	  mom_y = CV[nt-1].RHO[j][i]*CV[nt-1].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
+	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
+	  
+	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
+	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
+	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
+	  CV[nt].P[j][i] = (ene - 0.5*mom_x*CV[nt].U[j][i]- 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
+	  
+	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
+	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
+	  CV->s_v[j][i]   = (  CV->vIx[j+1][i] -   CV->vIx[j][i])/h_x;
+	  CV->s_p[j][i]   = (  CV->pIx[j+1][i] -   CV->pIx[j][i])/h_x;
+      }
+
+//==================================================
+
+    find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_D, bfv_U, find_bound_y, true, time_c);
+    if(!find_bound_y)
+        goto return_NULL;
+    flux_generator_y(m, n, nt, tau, CV, bfv_D, bfv_U, false);
+
+//===============THE CORE ITERATION=================
+    for(j = 0; j < m; ++j)
+      for(i = 0; i < n; ++i)
+      { /*
+	 *  j-1          j          j+1
+	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
+	 *   o-----X-----o-----X-----o-----X--...
+	 */
+	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
+	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
+	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt].RHO[j][i]     - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
 	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
 	  CV[nt].P[j][i] = (ene - 0.5*mom_x*CV[nt].U[j][i] - 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
 	  
-	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
-	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
-	  CV->s_v[j][i]   = (  CV->vIx[j+1][i] -   CV->vIx[j][i])/h_x;
-	  CV->s_p[j][i]   = (  CV->pIx[j+1][i] -   CV->pIx[j][i])/h_x;
 	  CV->t_rho[j][i] = (CV->rhoIy[j][i+1] - CV->rhoIy[j][i])/h_y;
 	  CV->t_u[j][i]   = (  CV->uIy[j][i+1] -   CV->uIy[j][i])/h_y;
 	  CV->t_v[j][i]   = (  CV->vIy[j][i+1] -   CV->vIy[j][i])/h_y;
 	  CV->t_p[j][i]   = (  CV->pIy[j][i+1] -   CV->pIy[j][i])/h_y;
       }
+//==================================================
 
+    bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
+    flux_generator_x(m, n, nt, half_tau, CV, bfv_L, bfv_R, false);
+
+//===============THE CORE ITERATION=================
+    for(i = 0; i < n; ++i)
+      for(j = 0; j < m; ++j)
+      { /*
+	 *  j-1          j          j+1
+	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
+	 *   o-----X-----o-----X-----o-----X--...
+	 */
+	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
+	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
+	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt].RHO[j][i]     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
+	  
+	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
+	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
+	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
+	  CV[nt].P[j][i] = (ene  - 0.5*mom_x*CV[nt].U[j][i] - 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
+	  
+	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
+	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
+	  CV->s_v[j][i]   = (  CV->vIx[j+1][i] -   CV->vIx[j][i])/h_x;
+	  CV->s_p[j][i]   = (  CV->pIx[j+1][i] -   CV->pIx[j][i])/h_x;
+      }
 //==================================================
 
     toc = clock();

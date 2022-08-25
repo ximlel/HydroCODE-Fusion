@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -Wall -O3 -pg
+CFLAGS = -std=c99 -Wall -pedantic -O3 -pg
 #C compiler options
 CFLAGD = 
 #Macro definition

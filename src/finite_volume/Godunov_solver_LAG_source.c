@@ -11,6 +11,7 @@
 
 #include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
+#include "../include/inter_process.h"
 #include "../include/tools.h"
 
 
@@ -24,10 +25,6 @@
  */
 void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
 {
-    double ** RHO = CV.RHO;
-    double ** U   = CV.U;
-    double ** P   = CV.P;
-    double ** E   = CV.E;
     /* 
      * j is a frequently used index for spatial variables.
      * k is a frequently used index for the time step.
@@ -44,7 +41,7 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
   double const CFL   = config[7];        // the CFL number
   double const h     = config[10];       // the length of the initial spatial grids
   double       tau   = config[16];       // the length of the time step
-  int    const bound = (int)(config[17]);// the boundary condition
+  int    const bound = (int)(config[17]);// the boundary condition in x-direction
 
   _Bool find_bound = false;
   
@@ -54,6 +51,11 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
   double h_L, h_R; // length of spatial grids
   _Bool CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
   double u_star, p_star; // the Riemann solutions
+
+  double ** RHO  = CV.RHO;
+  double ** U    = CV.U;
+  double ** P    = CV.P;
+  double ** E    = CV.E;
   double * u_mid = malloc((m + 1) * sizeof(double)); 
   double * p_mid = malloc((m + 1) * sizeof(double));
   double * MASS  = malloc(m * sizeof(double)); // Array of the mass data in computational cells.
@@ -70,78 +72,19 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
   double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
   int nt = 1; // the number of times storing plotting data
 
-  double UL, PL, RHOL, CL, HL = h; // Left  boundary condition
-  double UR, PR, RHOR, CR, HR = h; // Right boundary condition
-
+  struct b_f_var bfv_L = {.H = h}; // Left  boundary condition
+  struct b_f_var bfv_R = {.H = h}; // Right boundary condition
+  
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
       h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      switch (bound)
-	  {
-	  case -1: // initial boudary conditions
-	      if(find_bound)
-		  break;
-	      else
-		  printf("Initial boudary conditions.\n");		  
-	      find_bound = true;
-	      UL   =   U[0][0]; UR   =   U[0][m-1];
-	      PL   =   P[0][0]; PR   =   P[0][m-1];
-	      RHOL = RHO[0][0]; RHOR = RHO[0][m-1];
-	      HL  = h; HR = h;
-	      break;
-	  case -2: // reflective boundary conditions
-	      if(!find_bound)
-		  printf("Reflective boudary conditions.\n");
-	      find_bound = true;
-	      UL   = - U[nt-1][0]; UR   = - U[nt-1][m-1];
-	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
-	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
-	      HL = X[nt-1][1] - X[nt-1][0];
-	      HR = X[nt-1][m] - X[nt-1][m-1];
-	      CL = sqrt(gamma * PL / RHOL);
-	      CR = sqrt(gamma * PR / RHOR);
-	      h_S_max = fmin(HL/(fabs(UL)+CL), HR/(fabs(UR)+CR));
-	      break;
-	  case -4: // free boundary conditions
-	      if(!find_bound)
-		  printf("Free boudary conditions.\n");
-	      find_bound = true;
-	      UL   =   U[nt-1][0]; UR   =   U[nt-1][m-1];
-	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
-	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
-	      HL = X[nt-1][1] - X[nt-1][0];
-	      HR = X[nt-1][m] - X[nt-1][m-1];
-	      break;
-	  case -5: // periodic boundary conditions
-	      if(!find_bound)
-		  printf("Periodic boudary conditions.\n");
-	      find_bound = true;
-	      UL   =   U[nt-1][m-1]; UR   =   U[nt-1][0];
-	      PL   =   P[nt-1][m-1]; PR   =   P[nt-1][0];
-	      RHOL = RHO[nt-1][m-1]; RHOR = RHO[nt-1][0];
-	      HL = X[nt-1][m] - X[nt-1][m-1];
-	      HR = X[nt-1][1] - X[nt-1][0];
-	      break;
-	  case -24: // reflective + free boundary conditions
-	      if(!find_bound)
-		  printf("Reflective + Free boudary conditions.\n");
-	      find_bound = true;
-	      UL   = - U[nt-1][0]; UR   =   U[nt-1][m-1];
-	      PL   =   P[nt-1][0]; PR   =   P[nt-1][m-1];
-	      RHOL = RHO[nt-1][0]; RHOR = RHO[nt-1][m-1];
-	      HL = X[nt-1][1] - X[nt-1][0];
-	      HR = X[nt-1][m] - X[nt-1][m-1];
-	      CL = sqrt(gamma * PL / RHOL);
-	      h_S_max = HL/(fabs(UL)+CL);
-	      break;
-	  default:
-	      printf("No suitable boundary coditions!\n");
-	      goto return_NULL;
-	  }
-      
+      find_bound = bound_cond_slope_limiter(true, m, nt-1, CV, &bfv_L, &bfv_R, find_bound, false, time_c, X[nt-1]);
+      if(!find_bound)
+	  goto return_NULL;
+
       for(j = 0; j <= m; ++j)
 	  { /*
 	     *  j-1          j          j+1
@@ -157,10 +100,10 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 		  }
 	      else
 		  {
-		      h_L   =   HL;
-		      rho_L = RHOL;
-		      u_L   =   UL;
-		      p_L   =   PL;
+		      h_L   = bfv_L.H;
+		      rho_L = bfv_L.RHO;
+		      u_L   = bfv_L.U;
+		      p_L   = bfv_L.P;
 		  }
 	      if(j < m)
 		  {
@@ -171,16 +114,20 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 		  }
 	      else
 		  {
-		      h_R   =   HR;
-		      rho_R = RHOR;
-		      u_R   =   UR;
-		      p_R   =   PR;
+		      h_R   = bfv_R.H;
+		      rho_R = bfv_R.RHO;
+		      u_R   = bfv_R.U;
+		      p_R   = bfv_R.P;
 		  }
 
 	      c_L = sqrt(gamma * p_L / rho_L);
 	      c_R = sqrt(gamma * p_R / rho_R);
 	      h_S_max = fmin(h_S_max, h_L/c_L);
 	      h_S_max = fmin(h_S_max, h_R/c_R);
+	      if ((bound == -2 || bound == -24) && j == 0) // reflective boundary conditions
+		  h_S_max = fmin(h_S_max, h_L/(fabs(u_L)+c_L));
+	      if (bound == -2 && j == m)
+		  h_S_max = fmin(h_S_max, h_R/(fabs(u_R)+c_R));
 
 //========================Solve Riemann Problem========================
 

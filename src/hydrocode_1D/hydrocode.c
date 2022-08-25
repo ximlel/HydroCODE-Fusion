@@ -212,10 +212,10 @@ int main(int argc, char *argv[])
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-  int m = (int)FV0.RHO[0];
-  double h = config[10], gamma = config[6];
+  const int m = (int)FV0.RHO[0];
+  const double h = config[10], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
-  int N = 2; // (int)(config[5]) + 1;
+  const int N = 2; // (int)(config[5]) + 1;
 
   struct cell_var_stru CV = {NULL}; // Structural body of fluid variables in computational cells array pointer.
   double ** X = NULL;

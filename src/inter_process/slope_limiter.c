@@ -7,7 +7,7 @@
 #include "../include/tools.h"
 
 
-void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound_x, double * s,
+void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, double * s,
 		    const double * U, const double UL, const double UR, const double HL, ...)
 {
     va_list ap;
@@ -52,7 +52,7 @@ void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound_x, dou
 			h = 0.5 * (X[j+1] - X[j] + HR);
 		    s_R = (UR - U[j]) / h;
 		}
-	    if (find_bound_x)
+	    if (find_bound)
 		s[j] = minmod3(alpha*s_L, alpha*s_R, s[j]);
 	    else
 		s[j] = minmod2(s_L, s_R);

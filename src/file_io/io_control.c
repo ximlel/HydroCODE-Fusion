@@ -165,15 +165,18 @@ int flu_var_count_line(FILE * fp, const char * add, int * n_x)
 	      if(flag)
 		  ++column;
 	      flag = 0;
-	      if(!line)
-		  *n_x = column;
-	      else if(column != *n_x)
+	      if(column)
 		  {
-		      printf("Error in input data file '%s', line=%d, column=%d, n_x=%d\n", add, line, column, *n_x);
-		      return 0;
+		      if(!line)
+			  *n_x = column;
+		      else if(column != *n_x)
+			  {
+			      printf("Error in input data file '%s', line=%d, column=%d, n_x=%d\n", add, line, column, *n_x);
+			      return 0;
+			  }
+		      ++line;
+		      column = 0;
 		  }
-	      ++line;
-	      column = 0;
 	  }      
       else if(ch == 45 || ch == 46 || ch == 69 || ch == 101 || isdigit(ch))
 	  flag = 1;
