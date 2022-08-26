@@ -1,5 +1,9 @@
+function value_start(column)
+if nargin < 1
+column = input('Please input the column number: (Default 20 40 80 160 320 640 1280) ')
+end
+
 line=3;
-column=320
 d_x=2.0/column;
 
 u0=1
@@ -48,3 +52,25 @@ fprintf(fid,'%12.10g\t',p);
 fprintf(fid,'\n');
 end
 fclose(fid);
+
+
+eps=1e-9;
+t_all=10;
+step=500000;
+gamma=1.4;
+CFL=0.45;
+
+fid = fopen('config.dat','wt');
+fprintf(fid,'1\t%g\n',t_all);
+fprintf(fid,'4\t%g\n',eps);
+fprintf(fid,'5\t%i\n',step);
+fprintf(fid,'6\t%g\n',gamma);
+fprintf(fid,'7\t%g\n',CFL);
+fprintf(fid,'10\t%g\n',d_x);
+fprintf(fid,'11\t%g\n',d_x);
+fprintf(fid,'13\t%i\n',column);
+fprintf(fid,'14\t%i\n',line);
+fprintf(fid,'17\t-5\n');
+fprintf(fid,'18\t-5\n');
+fclose(fid);
+end

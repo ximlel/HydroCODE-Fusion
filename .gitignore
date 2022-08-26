@@ -80,8 +80,11 @@ dkms.conf
 *.out
 *.app
 
+# gprof
 
-# ======================MATLAB/Octave project==================
+gp
+
+# =====================MATLAB/Octave project=================
 
 # mexFunction
 *.mex
@@ -93,21 +96,23 @@ dkms.conf
 *.mat
 *.dat
 
+# Octave Workspace
+octave-workspace
+
+# =======================Data visualization===================
+
 # Tecplot data (data_out)
 *.plt
 *.tec
 # VTK data (data_out)
 *.vtk
 
-# Octave Workspace
-octave-workspace
-
-# ======================   Doxygen   ==================
+# ============================Doxygen=========================
 
 doc/latex/
 doc/html/
 
-# ==========================TeX========================
+# ==============================TeX===========================
 
 # Text Backup
 .~*

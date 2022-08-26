@@ -39,3 +39,6 @@ SHARE
  $EXEcute Artifi_Heat_Conduct/4_5 Artifi_Heat_Conduct/4_5 1 1     LAG 7=0.25
  $EXEcute Artifi_Heat_Conduct/4_5 Artifi_Heat_Conduct/4_5 1 2_GRP LAG 7=0.25
 !
+
+### gprof
+gprof -b -A -p -q hydrocode.out gmon.out > pg

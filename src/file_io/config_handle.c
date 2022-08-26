@@ -197,10 +197,15 @@ void configurate(const char * add_in)
     
   // Open the configuration data file.
   if((fp_data = fopen(add, "r")) == NULL)
-  {
-    printf("Cannot open configuration data file!\n");
-    exit(1);
-  }
+      {
+	  strcpy(add, add_in);
+	  strcat(add, "config.dat");
+      }
+  if((fp_data = fopen(add, "r")) == NULL)
+      {
+	  printf("Cannot open configuration data file!\n");
+	  exit(1);
+      }
 
   // Read the configuration data file.
   if(config_read(fp_data) == 0)

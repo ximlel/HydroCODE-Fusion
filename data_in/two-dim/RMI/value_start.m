@@ -1,5 +1,9 @@
-column=160;
-line=321;
+function value_start(column)
+if nargin < 1
+column = input('Please input the column number: (Default 40 80 160 320) ')
+end
+
+line=2*column+1;
 A=round((line-1)/16);  %amplitude (number of grid)
 K=1;  %wavenumber
 
@@ -97,7 +101,7 @@ eps=1e-9;
 t_all=4.7;
 step=25000;
 
-fid = fopen('config.txt','wt');
+fid = fopen('config.dat','wt');
 fprintf(fid,'1\t%g\n',t_all);
 fprintf(fid,'4\t%g\n',eps);
 fprintf(fid,'5\t%i\n',step);
@@ -107,3 +111,4 @@ fprintf(fid,'11\t%g\n',L_y);
 fprintf(fid,'17\t-5\n');
 fprintf(fid,'18\t-4\n');
 fclose(fid);
+end
