@@ -81,7 +81,7 @@ dkms.conf
 *.app
 
 
-# ======================MATLAB project==================
+# ======================MATLAB/Octave project==================
 
 # mexFunction
 *.mex
@@ -89,11 +89,15 @@ dkms.conf
 *.mexw64
 *.mexaw64
 
-# Data input
+# matrix data (data_in)
 *.mat
-
-# Data input/output
 *.dat
+
+# Tecplot data (data_out)
+*.plt
+*.tec
+# VTK data (data_out)
+*.vtk
 
 # Octave Workspace
 octave-workspace

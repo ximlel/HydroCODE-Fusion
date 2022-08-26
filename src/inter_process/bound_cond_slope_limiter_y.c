@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdbool.h>
 
 #include "../include/var_struc.h"
@@ -7,12 +6,12 @@
 
 
 _Bool bound_cond_slope_limiter_y(const int m, const int n, const int nt, struct cell_var_stru * CV,
-				 struct b_f_var * bfv_D, struct b_f_var * bfv_U, _Bool find_bound_y, _Bool Slope, double t_c)
+				 struct b_f_var * bfv_D, struct b_f_var * bfv_U, _Bool find_bound_y, const _Bool Slope, const double t_c)
 {
     int const bound_y = (int)(config[18]);// the boundary condition in y-direction
     double const h_y  = config[11];       // the length of the initial y-spatial grids
     int j;
-    for(j = 1; j < m; ++j)
+    for(j = 0; j < m; ++j)
 	switch (bound_y)
 	    {
 	    case -1: // initial boudary conditions

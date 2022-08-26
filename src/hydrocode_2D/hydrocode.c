@@ -218,6 +218,7 @@ int main(int argc, char *argv[])
   const double h_x = config[10], h_y = config[11], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
   const int N = 2; // (int)(config[5]) + 1;
+  double time_plot[2];
 
   // Structural body of fluid variables in computational cells array pointer.
   struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));
@@ -288,13 +289,13 @@ int main(int argc, char *argv[])
 	      case 1:
 		  // Godunov_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  config[41] = 0.0; // alpha = 0.0
-		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
+		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time, time_plot);
 		  break;
 	      case 2:
 		  if (dim_split)
-		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, cpu_time);
+		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, cpu_time, time_plot);
 		  else
-		      GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
+		      GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -310,7 +311,8 @@ int main(int argc, char *argv[])
       }
 
   // Write the final data down.
-  _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2]);
+  // _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2]);
+  _2D_TEC_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
 
  return_NULL:
   free(FV0.RHO);

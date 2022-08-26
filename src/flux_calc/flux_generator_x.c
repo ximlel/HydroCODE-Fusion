@@ -5,7 +5,7 @@
 
 
 void flux_generator_x(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
-		      struct b_f_var * bfv_L, struct b_f_var * bfv_R, _Bool Transversal)
+		      struct b_f_var * bfv_L, struct b_f_var * bfv_R, const _Bool Transversal)
 {
   double const h_x = config[10]; // the length of the initial x spatial grids
   struct i_f_var ifv_L = {.n_x = 1.0, .n_y = 0.0}, ifv_R = {.n_x = 1.0, .n_y = 0.0};
@@ -62,38 +62,36 @@ void flux_generator_x(const int m, const int n, const int nt, const double tau, 
 //===========================
 
       if (Transversal)
-	  for(i = 0; i < n; ++i)
-	      for(j = 0; j <= m; ++j)
+	  {
+	      if(j)
 		  {
-		      if(j)
-			  {
-			      ifv_L.t_rho = CV->t_rho[j-1][i];
-			      ifv_L.t_u   =   CV->t_u[j-1][i];
-			      ifv_L.t_v   =   CV->t_v[j-1][i];
-			      ifv_L.t_p   =   CV->t_p[j-1][i];
-			  }
-		      else
-			  {
-			      ifv_L.t_rho = bfv_L[i].TRHO;
-			      ifv_L.t_u   = bfv_L[i].TU;
-			      ifv_L.t_v   = bfv_L[i].TV;
-			      ifv_L.t_p   = bfv_L[i].TP;
-			  }
-		      if(j < m)
-			  {
-			      ifv_R.t_rho = CV->t_rho[j][i];
-			      ifv_R.t_u   =   CV->t_u[j][i];
-			      ifv_R.t_v   =   CV->t_v[j][i];
-			      ifv_R.t_p   =   CV->t_p[j][i];
-			  }
-		      else
-			  {
-			      ifv_R.t_rho = bfv_R[i].TRHO;
-			      ifv_R.t_u   = bfv_R[i].TU;
-			      ifv_R.t_v   = bfv_R[i].TV;
-			      ifv_R.t_p   = bfv_R[i].TP;
-			  }
+		      ifv_L.t_rho = CV->t_rho[j-1][i];
+		      ifv_L.t_u   =   CV->t_u[j-1][i];
+		      ifv_L.t_v   =   CV->t_v[j-1][i];
+		      ifv_L.t_p   =   CV->t_p[j-1][i];
 		  }
+	      else
+		  {
+		      ifv_L.t_rho = bfv_L[i].TRHO;
+		      ifv_L.t_u   = bfv_L[i].TU;
+		      ifv_L.t_v   = bfv_L[i].TV;
+		      ifv_L.t_p   = bfv_L[i].TP;
+		  }
+	      if(j < m)
+		  {
+		      ifv_R.t_rho = CV->t_rho[j][i];
+		      ifv_R.t_u   =   CV->t_u[j][i];
+		      ifv_R.t_v   =   CV->t_v[j][i];
+		      ifv_R.t_p   =   CV->t_p[j][i];
+		  }
+	      else
+		  {
+		      ifv_R.t_rho = bfv_R[i].TRHO;
+		      ifv_R.t_u   = bfv_R[i].TU;
+		      ifv_R.t_v   = bfv_R[i].TV;
+		      ifv_R.t_p   = bfv_R[i].TP;
+		  }
+	  }
       else
 	  {
 	      ifv_L.t_rho = 0.0;

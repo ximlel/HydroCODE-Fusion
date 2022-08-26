@@ -1,14 +1,12 @@
 #include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
 #include <stdarg.h>
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
 
 
-void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, double * s,
-		    const double * U, const double UL, const double UR, const double HL, ...)
+void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, double s[],
+		    const double U[], const double UL, const double UR, const double HL, ...)
 {
     va_list ap;
     va_start(ap, HL);

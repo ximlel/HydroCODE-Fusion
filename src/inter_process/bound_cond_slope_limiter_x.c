@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdbool.h>
 
 #include "../include/var_struc.h"
@@ -7,12 +6,12 @@
 
 
 _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct cell_var_stru * CV,
-				 struct b_f_var * bfv_L, struct b_f_var * bfv_R, _Bool find_bound_x, _Bool Slope, double t_c)
+				 struct b_f_var * bfv_L, struct b_f_var * bfv_R, _Bool find_bound_x, const _Bool Slope, const double t_c)
 {
     int const bound_x = (int)(config[17]);// the boundary condition in x-direction
     double const h_x  = config[10];       // the length of the initial x-spatial grids
     int i;
-    for(i = 1; i < n; ++i)
+    for(i = 0; i < n; ++i)
 	switch (bound_x)
 	    {
 	    case -1: // initial boudary conditions
@@ -71,7 +70,7 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 		    minmod_limiter_2D_x(false, m, find_bound_x, i, CV->s_rho, CV[nt].RHO, bfv_L[i].RHO, bfv_R[i].RHO, h_x);
 		}
 
-	    for(i = 1; i < n; ++i)
+	    for(i = 0; i < n; ++i)
 		switch(bound_x)
 		    {
 		    case -2: // reflective boundary conditions
@@ -92,7 +91,7 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 			break;
 		    }
 		    
-	    for(i = 1; i < n; ++i)
+	    for(i = 0; i < n; ++i)
 		switch(bound_x)
 		    {
 		    case -2: case -4: case -24:

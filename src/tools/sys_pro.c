@@ -4,10 +4,8 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <limits.h>
 
 /*
  * To realize cross-platform programming.

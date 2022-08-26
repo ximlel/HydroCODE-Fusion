@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\file_io\config_load.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\file_io\io_control.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,6 +64,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tools\sys_pro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\config_handle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\finite_volume\GRP_solver_2D_split_EUL_source.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

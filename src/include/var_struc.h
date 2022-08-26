@@ -21,7 +21,7 @@ typedef struct flu_var {
 //! Pointer structural body of variables on structural computational grid cells.
 typedef struct cell_var_stru {
 	double ** RHO, ** U, ** V, ** P, ** E;
-	double  * d_rho,  * d_u,          * d_p; // spatial derivatives in one dimension
+	double  * d_rho,  * d_u,          * d_p; // spatial derivatives in one dimension.
 	double ** s_rho, ** s_u, ** s_v, ** s_p; // spatial derivatives in coordinate x (slopes).
 	double ** t_rho, ** t_u, ** t_v, ** t_p; // spatial derivatives in coordinate y (slopes).
 	double ** rhoIx, ** uIx, ** vIx, ** pIx; // interfacial variable values in coordinate x.

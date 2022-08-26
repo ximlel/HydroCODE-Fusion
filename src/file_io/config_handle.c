@@ -214,3 +214,56 @@ void configurate(const char * add_in)
   // Check the configuration data.
   config_check();
 }
+
+
+void config_write(const char * add_out, const double * cpu_time, const char * name)
+{
+    char file_data[FILENAME_MAX+40];
+	const int dim = (int)config[0];
+    FILE * fp_write;
+
+//======================Write Log File============================
+  strcpy(file_data, add_out);
+  strcat(file_data, "/log");
+  strcat(file_data, ".dat");
+  if((fp_write = fopen(file_data, "w")) == NULL)
+  {
+    printf("Cannot open log output file!\n");
+    exit(1);
+  }
+
+  fprintf(fp_write, "%s is initialized with %d grids.\n\n", name, (int)config[3]);
+  fprintf(fp_write, "Configurated:\n");
+  fprintf(fp_write, "dim\t\t= %d\n", dim);
+  if(isfinite(config[1]))
+      fprintf(fp_write, "t_all\t= %d\n", (int)config[1]);
+  else if(isfinite(config[16]))
+      fprintf(fp_write, "tau\t\t= %g\n", config[16]);
+  fprintf(fp_write, "eps\t\t= %g\n", config[4]);
+  fprintf(fp_write, "gamma\t= %g\n", config[6]);
+  fprintf(fp_write, "CFL\t\t= %g\n", config[7]);
+  fprintf(fp_write, "h\t\t= %g\n", config[10]);
+  fprintf(fp_write, "bond\t= %d\n", (int)config[17]);
+if(dim == 2)
+{
+  fprintf(fp_write, "n_y\t= %g\n", config[11]);
+  fprintf(fp_write, "bond_y\t= %d\n", (int)config[18]);
+}
+  fprintf(fp_write, "\nA total of %d time steps are computed.\n", (int)config[5]);
+  /*
+  double * sum = calloc(N, sizeof(double));
+  sum[0] = 0.0;
+  fprintf(fp_write, "CPU time for each step:");
+  for(k = 1; k < N; ++k)
+  {
+    fprintf(fp_write, "%.18f  ", cpu_time[k]);
+    sum[k] = sum[k-1] + cpu_time[k];
+  }
+  fprintf(fp_write, "\nTotal CPU time at each step:");
+  for(k = 1; k < N; ++k)
+    fprintf(fp_write, "%.18f  ", sum[k]);
+  free(sum);
+  sum = NULL;
+  */
+  fclose(fp_write);
+}

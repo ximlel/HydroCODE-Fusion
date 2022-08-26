@@ -42,7 +42,7 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 	const int el    = (int)config[8];
 	const int order = (int)config[9];
 
-	char *str_tmp, str_order[10];
+	char *str_tmp, str_order[11];
 	switch (dim)
 	    {
 	    case 1 :

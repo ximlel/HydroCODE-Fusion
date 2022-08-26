@@ -54,9 +54,6 @@
     <ClCompile Include="..\tools\sys_pro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\file_io\config_load.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\inter_process\slope_limiter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -64,6 +61,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\finite_volume\GRP_solver_ALE_source.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\config_handle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process\bound_cond_slope_limiter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -27,22 +27,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -103,7 +103,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\file_io\config_load.c" />
+    <ClCompile Include="..\file_io\config_handle.c" />
     <ClCompile Include="..\file_io\io_control.c" />
     <ClCompile Include="..\file_io\_1D_file_in.c" />
     <ClCompile Include="..\file_io\_1D_file_out.c" />
@@ -113,6 +113,7 @@
     <ClCompile Include="..\finite_volume\GRP_solver_ALE_source.c" />
     <ClCompile Include="..\finite_volume\GRP_solver_EUL_source.c" />
     <ClCompile Include="..\finite_volume\GRP_solver_LAG_source.c" />
+    <ClCompile Include="..\inter_process\bound_cond_slope_limiter.c" />
     <ClCompile Include="..\inter_process\slope_limiter.c" />
     <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir.c" />
     <ClCompile Include="..\riemann_solver\linear_GRP_solver_LAG.c" />

@@ -53,7 +53,7 @@
  * @param[in,out] CV:    Structural body of cell variable data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
-void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time)
+void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, double * time_plot)
 {
     /* 
      * i is a frequently used index for y-spatial variables.
@@ -113,6 +113,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
+  time_plot[0] = 0.0;
 
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; ++k)
@@ -258,9 +259,10 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 		CV[nt-1].P[j][i]   =   CV[nt].P[j][i];
 	    }
   }
-  
+
+  time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
-  printf("The cost of CPU time for 1D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 2D-GRP dimension splitting Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
   //------------END OF THE MAIN LOOP-------------
   
 return_NULL:

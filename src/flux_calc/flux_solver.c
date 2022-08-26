@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "../include/Riemann_solver.h"
@@ -52,7 +50,7 @@ void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double ta
 	ifv->F_v   = ifv->F_rho*v_mid + p_mid*n_y;
 	ifv->F_e   = (gamma_mid/(gamma_mid-1.0))*p_mid/rho_mid + 0.5*(u_mid*u_mid + v_mid*v_mid);
 	ifv->F_e   = ifv->F_rho*ifv->F_e;
-	
+
 	ifv->U_int   = (mid[1] + tau*dire[1])*n_x - (mid[2] + tau*dire[2])*n_y;
 	ifv->V_int   = (mid[1] + tau*dire[1])*n_y + (mid[2] + tau*dire[2])*n_x;
 	ifv->RHO_int =  mid[0] + tau*dire[0];
