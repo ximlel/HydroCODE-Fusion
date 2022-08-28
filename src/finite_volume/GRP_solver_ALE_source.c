@@ -195,7 +195,7 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps);
+	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, eps);
 
 	      if(mid[2] < eps)
 		  {

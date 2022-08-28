@@ -188,7 +188,7 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps);
+	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, eps);
 
 	      if(mid[2] < eps)
 		  {

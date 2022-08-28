@@ -1,6 +1,6 @@
 /**
  * @file  Riemann_solver_exact_Ben.c
- * @brief This is an exact Riemann solver in Ben-Artzi's book.
+ * @brief There are exact Riemann solvers in Ben-Artzi's book.
  */
 
 #include <math.h>
@@ -8,6 +8,26 @@
 #include <stdbool.h>
 
 
+/**
+ * @brief EXACT RIEMANN SOLVER FOR Two-Component γ-Law Gas
+ * @details The purpose of this function is to solve the Riemann problem exactly,
+ *          for the time dependent one dimensional Euler equations for two-component γ-law gas.
+ * @param[out] U_star, P_star: Velocity/Pressure in star region.
+ * @param[in]  u_L, p_L, c_L: Initial Velocity/Pressure/sound_speed on left  state.
+ * @param[in]  u_R, p_R, c_R: Initial Velocity/Pressure/sound_speed on right state.
+ * @param[in]  gammaL, gamma_R: Ratio of specific heats.
+ * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
+ *                  - true: CRW
+ *                  - false: Shock wave
+ * @param[in]  eps: The largest value can be seen as zero.
+ * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
+ * @param[in]  N:   Maximum iteration step.
+ * @return \b gap: Relative pressure change after the last iteration.
+ * @par  Reference
+ *       Theory is found in Appendix C of Reference [1]. \n
+ *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
+ *           Cambridge University Press, 2003
+ */
 double Riemann_solver_exact(double * U_star, double * P_star, const double gammaL, const double gammaR,
 			    const double u_L, const double u_R, const double p_L, const double p_R, 
 			    const double c_L, const double c_R, _Bool * CRW,
@@ -190,6 +210,7 @@ double Riemann_solver_exact(double * U_star, double * P_star, const double gamma
 
   return gap;
 }
+
 
 /**
  * @brief EXACT RIEMANN SOLVER FOR A γ-Law Gas

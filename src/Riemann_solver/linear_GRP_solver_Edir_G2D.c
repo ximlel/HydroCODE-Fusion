@@ -9,10 +9,10 @@
 #endif
 
 /*
-  atc=1.0/0.0(inf) acoustic approximation
+  atc=INFINITY     acoustic approximation
   atc=eps          G2D GRP solver(nonlinear + acoustic case)
   atc=-0.0         G2D GRP solver(only nonlinear case)
-  atc,d_,t_=-0.0   exact Riemann solver
+  atc=INFINITY,d_,t_=-0.0   exact Riemann solver
   atc=eps,t_=-0.0  P1D GRP solver
 */
 
@@ -84,7 +84,7 @@ void linear_GRP_solver_Edir_G2D
 	if(dist < atc)
 		{
 			if (atc > 2*eps)  //=========acoustic approximation==========
-				{				
+				{
 					Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
 					if(CRW[0])
 						{
@@ -305,7 +305,7 @@ void linear_GRP_solver_Edir_G2D
 	else//----non-trivial case----
 		{
 			// calculate T_rho, T_u, T_v, T_p, T_z, T_phi
-#if !defined(EXACT_TANGENT_DERIVATIVE)
+#ifndef EXACT_TANGENT_DERIVATIVE
 			if(u_star < lambda_u)
 				{		   
 					T_p = 0.5*((t_u_L-t_u_R)*rho_star_R*c_star_R+t_p_L+t_p_R);
@@ -505,7 +505,7 @@ void linear_GRP_solver_Edir_G2D
 
 							H1 =  0.5*VAR * (p_star+(1+2.0*zetaR)*p_R)/(p_star+zetaR*p_R);
 							H2 = -0.5*VAR * ((2.0+zetaR)*p_star+zetaR*p_R)/(p_star+zetaR*p_R);
-							H3 = -0.5*VAR *(p_star-p_R) /rho_R;
+							H3 = -0.5*VAR * (p_star-p_R) /rho_R;
 
 							L_p = -1.0/rho_R + SmUR*H2;
 							L_u = SmUR - rho_R*(c_R*c_R*H2 + H3);

@@ -5,11 +5,11 @@
 #include "../include/Riemann_solver.h"
 
 /*
-atc=1.0/0.0(inf) acoustic approximation
-atc=eps          Q1D GRP solver(nonlinear + acoustic case)
-atc=-0.0         Q1D GRP solver(only nonlinear case)
-atc,d_,t_=-0.0   exact Riemann solver
-atc=eps,t_=-0.0  P1D GRP solver
+  atc=INFINITY     acoustic approximation
+  atc=eps          Q1D GRP solver(nonlinear + acoustic case)
+  atc=-0.0         Q1D GRP solver(only nonlinear case)
+  atc=INFINITY,d_,t_=-0.0   exact Riemann solver
+  atc=eps,t_=-0.0  P1D GRP solver
 */
 
 void linear_GRP_solver_Edir_Q1D
@@ -64,7 +64,6 @@ void linear_GRP_solver_Edir_Q1D
 	const double zetaR = (gammaR-1.0)/(gammaR+1.0);
  
 	double rho_x, f;
-
 	double speed_L, speed_R;
 
 	c_L = sqrt(gammaL * p_L / rho_L);
@@ -75,7 +74,7 @@ void linear_GRP_solver_Edir_Q1D
 	if(dist < atc)
 		{
 			if (atc > 2*eps)  //=========acoustic approximation==========
-				{				
+				{
 					Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
 					if(CRW[0])
 						{
@@ -189,10 +188,10 @@ void linear_GRP_solver_Edir_Q1D
 							C    =   c_star_R;
 						}			
 
-					D_p = 0.5*((d_u_L*(U[0]*C) + d_p_L) - (d_u_R*(U[0]*C) - d_p_R));			
+					D_p = 0.5*((d_u_L*(U[0]*C) + d_p_L) - (d_u_R*(U[0]*C) - d_p_R));
 					T_p = 0.5*((t_u_L*(U[0]*C) + t_p_L) - (t_u_R*(U[0]*C) - t_p_R));
-					D_u = 0.5*(d_u_L + d_p_L/(U[0]*C) + d_u_R - d_p_R/(U[0]*C));			
-					T_u = 0.5*(t_u_L + t_p_L/(U[0]*C) + t_u_R - t_p_R/(U[0]*C));			
+					D_u = 0.5*(d_u_L + d_p_L/(U[0]*C) + d_u_R - d_p_R/(U[0]*C));
+					T_u = 0.5*(t_u_L + t_p_L/(U[0]*C) + t_u_R - t_p_R/(U[0]*C));
 					if(u_star > lambda_u)
 						{
 							D_v = d_v_L;
@@ -202,7 +201,7 @@ void linear_GRP_solver_Edir_Q1D
 							D_phi = d_phi_L;
 							T_phi = t_phi_L;
 							D_rho = d_rho_L - d_p_L/(C*C) + D_p/(C*C);
-							T_rho = t_rho_L - t_p_L/(C*C) + T_p/(C*C);				
+							T_rho = t_rho_L - t_p_L/(C*C) + T_p/(C*C);
 						}
 					else
 						{
@@ -220,7 +219,7 @@ void linear_GRP_solver_Edir_Q1D
 					D[2] = -(U[1]-lambda_u)*D_v   - (U[2]-lambda_v)*T_v   - T_p/U[0];
 					D[3] = -(U[1]-lambda_u)*D_p   - (U[2]-lambda_v)*T_p   - U[0]*C*C*(D_u+T_v);
 					D[4] = -(U[1]-lambda_u)*D_z   - (U[2]-lambda_v)*T_z;
-					D[5] = -(U[1]-lambda_u)*D_phi - (U[2]-lambda_v)*T_phi;	
+					D[5] = -(U[1]-lambda_u)*D_phi - (U[2]-lambda_v)*T_phi;
 				}				
 			U_star[0] = rho_star_L;
 			U_star[1] = u_star;
@@ -308,10 +307,9 @@ void linear_GRP_solver_Edir_Q1D
 					c_frac = C/c_L;
 					TdS = (d_p_L - d_rho_L*c_L*c_L)/(gammaL-1.0)/rho_L;
 					d_Psi = d_u_L + (gammaL*d_p_L/c_L - c_L*d_rho_L)/(gammaL-1.0)/rho_L;
-
 					D[1] = ((1.0+zetaL)*pow(c_frac, 0.5/zetaL) + zetaL*pow(c_frac, (1.0+zetaL)/zetaL));
 					D[1] = D[1]/(1.0+2.0*zetaL) * TdS;
-					D[1] = D[1] - c_L*pow(c_frac, 0.5/zetaL)*d_Psi;
+					D[1] = D[1] - c_L*pow(c_frac, 0.5/zetaL) * d_Psi;
 					D[3] = U[0]*(U[1] - lambda_u)*D[1];
 
 					D[0] = U[0]*(U[1] - lambda_u)*pow(c_frac, (1.0+zetaL)/zetaL)*TdS*(gammaL-1.0);
@@ -330,11 +328,10 @@ void linear_GRP_solver_Edir_Q1D
 					U[2] = v_R;
 					U[4] = z_R;
 					U[5] = phi_R;
-					
+
 					c_frac = C/c_R;
 					TdS = (d_p_R - d_rho_R*c_R*c_R)/(gammaR-1.0)/rho_R;
 					d_Phi = d_u_R - (gammaR*d_p_R/c_R - c_R*d_rho_R)/(gammaR-1.0)/rho_R;
-
 					D[1] = ((1.0+zetaR)*pow(c_frac, 0.5/zetaR) + zetaR*pow(c_frac, (1.0+zetaR)/zetaR));
 					D[1] = D[1]/(1.0+2.0*zetaR) * TdS;
 					D[1] = D[1] + c_R*pow(c_frac, 0.5/zetaR)*d_Phi;
@@ -411,7 +408,7 @@ void linear_GRP_solver_Edir_Q1D
 							d_Phi = d_u_R - (gammaR*d_p_R/c_R - c_R*d_rho_R)/(gammaR-1.0)/rho_R;
 							d_R = ((1.0+zetaR)*pow(c_frac, 0.5/zetaR) + zetaR*pow(c_frac, (1.0+zetaR)/zetaR));
 							d_R = d_R/(1.0+2.0*zetaR) * TdS;
-							d_R = d_R + c_R*pow(c_frac, 0.5/zetaR)*d_Phi;
+							d_R = d_R + c_R*pow(c_frac, 0.5/zetaR) * d_Phi;
 						}
 					else //the 3-wave is a shock
 						{
@@ -420,9 +417,9 @@ void linear_GRP_solver_Edir_Q1D
 
 							VAR  = sqrt((1.0-zetaR)/(rho_R*(p_star+zetaR*p_R)));
 
-							H1 = 0.5* VAR * (p_star+(1+2.0*zetaR)*p_R)/(p_star+zetaR*p_R);
+							H1 =  0.5*VAR * (p_star+(1+2.0*zetaR)*p_R)/(p_star+zetaR*p_R);
 							H2 = -0.5*VAR * ((2.0+zetaR)*p_star+zetaR*p_R)/(p_star+zetaR*p_R);
-							H3 = -0.5*(p_star-p_R)* VAR /rho_R;
+							H3 = -0.5*VAR * (p_star-p_R) /rho_R;
 
 							L_p = -1.0/rho_R + SmUR*H2;
 							L_u = SmUR - rho_R*(c_R*c_R*H2 + H3);
@@ -506,7 +503,6 @@ void linear_GRP_solver_Edir_Q1D
 									SmUL = -sqrt(0.5*((gammaL+1.0)*p_star+(gammaL-1.0)*p_L   )/rho_L);
 
 									VAR = p_L + zetaL*p_star;
-
 									H1 = rho_L * p_L    * (1.0 - zetaL*zetaL) / VAR/VAR;
 									H2 = rho_L * p_star * (zetaL*zetaL - 1.0) / VAR/VAR;
 									H3 = (p_star + zetaL*p_L)/VAR;

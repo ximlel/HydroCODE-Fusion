@@ -38,7 +38,6 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 				 const double c_l, const double c_r, _Bool * CRW,
 				 const double eps, const double tol, const int N)
 {
-	printf("Toro\n");
     int n = 0;		
     double gap = INFINITY; // Relative pressure change after each iteration.
 	
@@ -49,13 +48,13 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
     double RHO_r=gamma * P_r/c_r/c_r;
     double RHO_l=gamma * P_l/c_l/c_l;
 	
-  //  double g1=(gamma -1.0);
+  // double g1=(gamma -1.0);
     double g2=(gamma+1.0);
     double g3=2.0*gamma/(gamma-1.0);
-  //  double g4=2.0/(gamma-1.0);
-  //  double g5=2.0/(gamma+1.0);
+  // double g4=2.0/(gamma-1.0);
+  // double g5=2.0/(gamma+1.0);
     double g6=(gamma-1.0)/(gamma+1.0);
-  //  double g7=(gamma-1.0)/2.0;
+  // double g7=(gamma-1.0)/2.0;
     double g8=gamma-1.0;
 
     double A_L=2.0/g2/RHO_l;
@@ -95,8 +94,8 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 	    P_int=P_int - (f_L - f_R + U_r - U_l)/(df_L-df_R);
 
 	    gap = 0.5*fabs(P_int - P_int_save) / (P_int + P_int_save);
-		if (gap < tol)
-			break;
+	    if (gap < tol)
+		break;
 	    ++n;
 	}
 

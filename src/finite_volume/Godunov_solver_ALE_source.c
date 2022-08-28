@@ -128,7 +128,7 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
 	      h_S_max = fmin(h_S_max, h_R/(fabs(ifv_R.U)+fabs(c_R)));
 
 //========================Solve Riemann Problem========================
-	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps);
+	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, INFINITY);
 
 	      if(mid[2] < eps)
 		  {

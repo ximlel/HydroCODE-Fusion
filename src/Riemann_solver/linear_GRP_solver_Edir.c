@@ -16,18 +16,21 @@
  *                         [rho, u, p]_t
  * @param[out] U:  the Riemann solutions. \n
  *                   [rho_star, u_star, p_star]
- * @param[in] rho_L, u_L, p_L: Left  States.
- * @param[in] rho_R, u_R, p_R: Right States.
- * @param[in] s_rho_L, s_u_L, s_p_L: Left  x-spatial derivatives.
- * @param[in] s_rho_R, s_u_R, s_p_R: Right x-spatial derivatives.
- * @param[in] gamma: the constant of the perfect gas.
+ * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, s_rho_L, s_u_L, s_p_L, gammaL).
+ * @param[in] ifv_R: Right States (rho_R, u_R, p_R, s_rho_R, s_u_R, s_p_R, gammaR).
+ *                   - s_rho, s_u, s_p: x-spatial derivatives.
+ *                   - gamma: the constant of the perfect gas.
  * @param[in] eps: the largest value could be seen as zero.
+ * @param[in] atc: Parameter that determines the solver type.
+ *              - INFINITY: acoustic approximation
+ *              - eps:      GRP solver(nonlinear + acoustic case)
+ *              - -0.0:     GRP solver(only nonlinear case)
  * @par  Reference
  *       Theory is found in Reference [1]. \n
  *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
  *           Journal of Computational Physics, 218.1: 19-43, 2006.
  */
-void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double eps)
+void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double eps, const double  atc)
 {
   const double   rho_L = ifv_L.RHO,     rho_R = ifv_R.RHO;
   const double s_rho_L = ifv_L.d_rho, s_rho_R = ifv_R.d_rho;
@@ -55,7 +58,7 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, 
 
   dist = sqrt((u_L-u_R)*(u_L-u_R) + (p_L-p_R)*(p_L-p_R));
 //=========acoustic case==========
-  if(dist < eps)
+  if(dist < atc)
   {
     //------trivial case------
     if(u_L-c_L > 0.0) //the t-axe is on the left side of all the three waves
@@ -85,12 +88,30 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, 
     //------non-trivial case------
     else
     {
-      rho_star_L = rho_L;
-      rho_star_R = rho_R;
-      c_star_L =   c_L;
-      c_star_R =   c_R;
-      u_star = 0.5*(u_R+u_L);
-      p_star = 0.5*(p_R+p_L);
+      if (atc > 2*eps)
+      {
+	  Riemann_solver_exact_single(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 50);
+
+	  if(p_star > p_L)
+	      rho_star_L = rho_L*(p_star+zeta*p_L)/(p_L+zeta*p_star);
+	  else
+	      rho_star_L = rho_L*pow(p_star/p_L,1.0/gamma);
+	  if(p_star > p_R)
+	      rho_star_R = rho_R*(p_star+zeta*p_R)/(p_R+zeta*p_star);
+	  else
+	      rho_star_R = rho_R*pow(p_star/p_R,1.0/gamma);
+	  c_star_L = sqrt(gamma * p_star / rho_star_L);
+	  c_star_R = sqrt(gamma * p_star / rho_star_R);
+      }
+      else
+      {
+	  rho_star_L = rho_L;
+	  rho_star_R = rho_R;
+	  c_star_L =   c_L;
+	  c_star_R =   c_R;
+	  u_star = 0.5*(u_R+u_L);
+	  p_star = 0.5*(p_R+p_L);
+      }
 
       if(u_star > 0.0)
       {

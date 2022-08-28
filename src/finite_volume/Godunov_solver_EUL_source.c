@@ -121,7 +121,7 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
 	      h_S_max = fmin(h_S_max, h/(fabs(ifv_R.U)+fabs(c_R)));
 
 //========================Solve Riemann Problem========================
-	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps);
+	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, INFINITY);
 
 	      if(mid[2] < eps)
 		  {

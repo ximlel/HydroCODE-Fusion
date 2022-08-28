@@ -82,6 +82,7 @@ dkms.conf
 
 # gprof
 pg
+pg.png
 
 # =====================MATLAB/Octave project=================
 
