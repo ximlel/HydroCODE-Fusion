@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
 
 #ifndef EXACT_TANGENT_DERIVATIVE
@@ -16,15 +17,38 @@
 */
 
 void linear_GRP_solver_Edir_G2D
-(double *wave_speed, double *D, double *U, double *U_star, const double lambda_u, const double lambda_v,
- const double rho_L, const double rho_R, const double d_rho_L, const double d_rho_R, const double t_rho_L, const double t_rho_R,
- const double   u_L, const double   u_R, const double   d_u_L, const double   d_u_R, const double   t_u_L, const double   t_u_R,
- const double   v_L, const double   v_R, const double   d_v_L, const double   d_v_R, const double   t_v_L, const double   t_v_R,
- const double   p_L, const double   p_R, const double   d_p_L, const double   d_p_R, const double   t_p_L, const double   t_p_R,
- const double   z_L, const double   z_R, const double   d_z_L, const double   d_z_R, const double   t_z_L, const double   t_z_R,
- const double phi_L, const double phi_R, const double d_phi_L, const double d_phi_R, const double t_phi_L, const double t_phi_R,
- const double gammaL, const double gammaR, const double  eps, const double  atc)
+(double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double  eps, const double  atc)
 {
+	const double lambda_u = ifv_L.lambda_u, lambda_v = ifv_R.lambda_v;
+	const double  gammaL = ifv_L.gamma,  gammaR = ifv_R.gamma;
+	const double   rho_L = ifv_L.RHO,     rho_R = ifv_R.RHO;
+	const double d_rho_L = ifv_L.d_rho, d_rho_R = ifv_R.d_rho;
+	const double t_rho_L = ifv_L.t_rho, t_rho_R = ifv_R.t_rho;
+	const double     u_L = ifv_L.U,         u_R = ifv_R.U;
+	const double   d_u_L = ifv_L.d_u,     d_u_R = ifv_R.d_u;
+	const double   t_u_L = ifv_L.t_u,     t_u_R = ifv_R.t_u;
+	const double     v_L = ifv_L.V,         v_R = ifv_R.V;
+	const double   d_v_L = ifv_L.d_v,     d_v_R = ifv_R.d_v;
+	const double   t_v_L = ifv_L.t_v,     t_v_R = ifv_R.t_v;
+	const double     p_L = ifv_L.P,         p_R = ifv_R.P;
+	const double   d_p_L = ifv_L.d_p,     d_p_R = ifv_R.d_p;
+	const double   t_p_L = ifv_L.t_p,     t_p_R = ifv_R.t_p;
+#ifdef MULTIFLUID_BASICS
+	const double     z_L = ifv_L.Z_a,       z_R = ifv_R.Z_a;
+	const double   d_z_L = ifv_L.d_z_a,   d_z_R = ifv_R.d_z_a;
+	const double   t_z_L = ifv_L.t_z_a,   t_z_R = ifv_R.t_z_a;
+	const double   phi_L = ifv_L.PHI,     phi_R = ifv_R.PHI;
+	const double d_phi_L = ifv_L.d_phi, d_phi_R = ifv_R.d_phi;
+	const double t_phi_L = ifv_L.t_phi, t_phi_R = ifv_R.t_phi;
+#else
+	const double     z_L =  0.0,     z_R =  0.0;
+	const double   d_z_L = -0.0,   d_z_R = -0.0;
+	const double   t_z_L = -0.0,   t_z_R = -0.0;
+	const double   phi_L =  0.0,   phi_R =  0.0;
+	const double d_phi_L = -0.0, d_phi_R = -0.0;
+	const double t_phi_L = -0.0, t_phi_R = -0.0;
+#endif
+
 	_Bool CRW[2];
 	double dist;
 	double c_L, c_R, C, c_frac = 1.0;

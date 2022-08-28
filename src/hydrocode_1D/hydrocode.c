@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
       }
   for(k = 0; k < N; ++k)
   {
-    X[k] = (double *)malloc(((long long)m+1) * sizeof(double));
+    X[k] = (double *)malloc((m+1) * sizeof(double));
     if(X[k] == NULL)
     {
       printf("NOT enough memory! X[%d]\n", k);

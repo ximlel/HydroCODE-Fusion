@@ -24,7 +24,7 @@
  * @param[out] cpu_time: Array of the CPU time recording.
  * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
+void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double * time_plot)
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -44,15 +44,13 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
   double       tau   = config[16];       // the length of the time step
 
   _Bool find_bound = false;
-  
+
   double Mom, Ene;
-  double u_L, p_L, rho_L;
-  double u_R, p_R, rho_R;
   double c_L, c_R; // the speeds of sound
   double h_L, h_R; // length of spatial grids
   /*
    * mid:  the Riemann solutions.
-   *       [rho_star_L, u_star, p_star, rho_star_R]
+   *       [rho_star, u_star, p_star]
    */
   double dire[3], mid[3];
 
@@ -61,9 +59,9 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
   double ** P    = CV.P;
   double ** E    = CV.E;
   // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F_rho = malloc(((long long)m+1) * sizeof(double));
-  double * F_u   = malloc(((long long)m+1) * sizeof(double));
-  double * F_e   = malloc(((long long)m+1) * sizeof(double));
+  double * F_rho = malloc((m+1) * sizeof(double));
+  double * F_u   = malloc((m+1) * sizeof(double));
+  double * F_e   = malloc((m+1) * sizeof(double));
   if(F_rho == NULL || F_u == NULL || F_e == NULL)
       {
 	  printf("NOT enough memory! Flux\n");
@@ -75,8 +73,9 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
 
-  struct b_f_var bfv_L = {.H = h}; // Left  boundary condition
-  struct b_f_var bfv_R = {.H = h}; // Right boundary condition
+  struct b_f_var bfv_L = {.H = h, .SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
+  struct b_f_var bfv_R = {.H = h, .SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
   
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
@@ -96,41 +95,40 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      h_L   =   X[nt-1][j] - X[nt-1][j-1];
-		      rho_L = RHO[nt-1][j-1];
-		      u_L   =   U[nt-1][j-1];
-		      p_L   =   P[nt-1][j-1];
+		      h_L       =   X[nt-1][j] - X[nt-1][j-1];
+		      ifv_L.RHO = RHO[nt-1][j-1];
+		      ifv_L.U   =   U[nt-1][j-1];
+		      ifv_L.P   =   P[nt-1][j-1];
 		  }
 	      else
 		  {
-		      h_L   = bfv_L.H;
-		      rho_L = bfv_L.RHO;
-		      u_L   = bfv_L.U;
-		      p_L   = bfv_L.P;
+		      h_L       = bfv_L.H;
+		      ifv_L.RHO = bfv_L.RHO;
+		      ifv_L.U   = bfv_L.U;
+		      ifv_L.P   = bfv_L.P;
 		  }
 	      if(j < m)
 		  {
-		      h_R   =   X[nt-1][j+1] - X[nt-1][j];
-		      rho_R = RHO[nt-1][j];
-		      u_R   =   U[nt-1][j];
-		      p_R   =   P[nt-1][j];
+		      h_R       =   X[nt-1][j+1] - X[nt-1][j];
+		      ifv_R.RHO = RHO[nt-1][j];
+		      ifv_R.U   =   U[nt-1][j];
+		      ifv_R.P   =   P[nt-1][j];
 		  }
 	      else
 		  {
-		      h_R   = bfv_R.H;
-		      rho_R = bfv_R.RHO;
-		      u_R   = bfv_R.U;
-		      p_R   = bfv_R.P;
+		      h_R       = bfv_R.H;
+		      ifv_R.RHO = bfv_R.RHO;
+		      ifv_R.U   = bfv_R.U;
+		      ifv_R.P   = bfv_R.P;
 		  }
 
-	      c_L = sqrt(gamma * p_L / rho_L);
-	      c_R = sqrt(gamma * p_R / rho_R);
-	      h_S_max = fmin(h_S_max, h_L/(fabs(u_L)+fabs(c_L)));
-	      h_S_max = fmin(h_S_max, h_R/(fabs(u_R)+fabs(c_R)));
+	      c_L = sqrt(gamma * ifv_L.P / ifv_L.RHO);
+	      c_R = sqrt(gamma * ifv_R.P / ifv_R.RHO);
+	      h_S_max = fmin(h_S_max, h_L/(fabs(ifv_L.U)+fabs(c_L)));
+	      h_S_max = fmin(h_S_max, h_R/(fabs(ifv_R.U)+fabs(c_R)));
 
 //========================Solve Riemann Problem========================
-
-	      linear_GRP_solver_Edir(dire, mid, rho_L, rho_R, 0.0, 0.0, u_L, u_R, 0.0, 0.0, p_L, p_R, 0.0, 0.0, gamma, eps);
+	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps);
 
 	      if(mid[2] < eps)
 		  {
@@ -216,6 +214,8 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
 	}
   }
 
+  time_plot[0] = time_c - tau;
+  time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-Godunov Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------

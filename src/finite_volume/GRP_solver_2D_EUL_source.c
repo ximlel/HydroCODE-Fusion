@@ -113,7 +113,6 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
-  time_plot[0] = 0.0;
 
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; ++k)
@@ -210,6 +209,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	    }
   }
 
+  time_plot[0] = time_c - tau;
   time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for genuinely 2D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);

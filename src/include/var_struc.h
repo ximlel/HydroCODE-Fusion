@@ -37,7 +37,12 @@ typedef struct i_f_var {
 	double RHO_int, P_int, U_int, V_int;
 	double F_rho, F_e, F_u, F_v; // interfacial flux
 	double d_rho, d_p, d_u, d_v; // normal spatial derivatives
-	double t_rho, t_p, t_u, t_v; // tangential spatial derivatives
+	double t_rho, t_p, t_u, t_v; // tangential spatial derivatives or spatial derivatives in Lagrangian coordinate ξ
+	double lambda_u, lambda_v, gamma;
+#ifdef MULTIFLUID_BASICS
+	double PHI, d_phi, t_phi;
+	double Z_a, d_z_a, t_z_a;
+#endif
 } Interface_Fluid_Variable;
 
 //! Fluid variables at boundary.

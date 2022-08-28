@@ -22,7 +22,7 @@
  * @param[in,out] CV:    Structural body of cell variable data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
-void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time)
+void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, double * time_plot)
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -42,14 +42,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
   double       tau   = config[16];       // the length of the time step
 
   _Bool find_bound = false;
-  
-  double Mom, Ene;
-  double u_L, p_L, rho_L;
-  double u_R, p_R, rho_R;
-  double c_L, c_R; // the speeds of sound
 
-  double s_u_L, s_p_L, s_rho_L; // spatial derivatives in coordinate x (slopes)
-  double s_u_R, s_p_R, s_rho_R;
+  double Mom, Ene;
+  double c_L, c_R; // the speeds of sound
   /*
    * dire: the temporal derivative of fluid variables.
    *       \frac{\partial [rho, u, p]}{\partial t}
@@ -109,6 +104,7 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 
   struct b_f_var bfv_L = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
   struct b_f_var bfv_R = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
   
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
@@ -128,71 +124,71 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      rho_L = RHO[nt-1][j-1] + 0.5*h*s_rho[j-1];
-		      u_L   =   U[nt-1][j-1] + 0.5*h*s_u[j-1];
-		      p_L   =   P[nt-1][j-1] + 0.5*h*s_p[j-1];
+		      ifv_L.RHO = RHO[nt-1][j-1] + 0.5*h*s_rho[j-1];
+		      ifv_L.U   =   U[nt-1][j-1] + 0.5*h*s_u[j-1];
+		      ifv_L.P   =   P[nt-1][j-1] + 0.5*h*s_p[j-1];
 		  }
 	      else
 		  {
-		      rho_L = bfv_L.RHO + 0.5*h*bfv_L.SRHO;
-		      u_L   = bfv_L.U   + 0.5*h*bfv_L.SU;
-		      p_L   = bfv_L.P   + 0.5*h*bfv_L.SP;
+		      ifv_L.RHO = bfv_L.RHO + 0.5*h*bfv_L.SRHO;
+		      ifv_L.U   = bfv_L.U   + 0.5*h*bfv_L.SU;
+		      ifv_L.P   = bfv_L.P   + 0.5*h*bfv_L.SP;
 		  }
 	      if(j < m)
 		  {
-		      rho_R = RHO[nt-1][j] - 0.5*h*s_rho[j];
-		      u_R   =   U[nt-1][j] - 0.5*h*s_u[j];
-		      p_R   =   P[nt-1][j] - 0.5*h*s_p[j];
+		      ifv_R.RHO = RHO[nt-1][j] - 0.5*h*s_rho[j];
+		      ifv_R.U   =   U[nt-1][j] - 0.5*h*s_u[j];
+		      ifv_R.P   =   P[nt-1][j] - 0.5*h*s_p[j];
 		  }
 	      else
 		  {
-		      rho_R = bfv_R.RHO + 0.5*h*bfv_R.SRHO;
-		      u_R   = bfv_R.U   + 0.5*h*bfv_R.SU;
-		      p_R   = bfv_R.P   + 0.5*h*bfv_R.SP;
+		      ifv_R.RHO = bfv_R.RHO + 0.5*h*bfv_R.SRHO;
+		      ifv_R.U   = bfv_R.U   + 0.5*h*bfv_R.SU;
+		      ifv_R.P   = bfv_R.P   + 0.5*h*bfv_R.SP;
 		  }
-	      if(p_L < eps || p_R < eps || rho_L < eps || rho_R < eps)
+	      if(ifv_L.P < eps || ifv_R.P < eps || ifv_L.RHO < eps || ifv_R.RHO < eps)
 		  {
 		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
 		      goto return_NULL;
 		  }
-	      if(!isfinite(p_L)|| !isfinite(p_R)|| !isfinite(u_L)|| !isfinite(u_R)|| !isfinite(rho_L)|| !isfinite(rho_R))
+	      if(!isfinite(ifv_L.P)|| !isfinite(ifv_R.P)|| !isfinite(ifv_L.U)|| !isfinite(ifv_R.U)|| !isfinite(ifv_L.RHO)|| !isfinite(ifv_R.RHO))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Reconstruction\n", k, j); 
 		      goto return_NULL;
 		  }
 
-	      c_L = sqrt(gamma * p_L / rho_L);
-	      c_R = sqrt(gamma * p_R / rho_R);
-	      h_S_max = fmin(h_S_max, h/(fabs(u_L)+fabs(c_L)));
-	      h_S_max = fmin(h_S_max, h/(fabs(u_R)+fabs(c_R)));
+	      c_L = sqrt(gamma * ifv_L.P / ifv_L.RHO);
+	      c_R = sqrt(gamma * ifv_R.P / ifv_R.RHO);
+	      h_S_max = fmin(h_S_max, h/(fabs(ifv_L.U)+fabs(c_L)));
+	      h_S_max = fmin(h_S_max, h/(fabs(ifv_R.U)+fabs(c_R)));
 
 	      if(j) //calculate the material derivatives
 		  {
-		      s_u_L   =   s_u[j-1];
-		      s_p_L   =   s_p[j-1];
-		      s_rho_L = s_rho[j-1];
+		      ifv_L.d_u   =   s_u[j-1];
+		      ifv_L.d_p   =   s_p[j-1];
+		      ifv_L.d_rho = s_rho[j-1];
 		  }
 	      else
 		  {
-		      s_rho_L = bfv_L.SRHO;
-		      s_u_L   = bfv_L.SU;
-		      s_p_L   = bfv_L.SP;
+		      ifv_L.d_rho = bfv_L.SRHO;
+		      ifv_L.d_u   = bfv_L.SU;
+		      ifv_L.d_p   = bfv_L.SP;
 		  }
 	      if(j < m)
 		  {
-		      s_u_R   =   s_u[j];
-		      s_p_R   =   s_p[j];
-		      s_rho_R = s_rho[j];
+		      ifv_R.d_u   =   s_u[j];
+		      ifv_R.d_p   =   s_p[j];
+		      ifv_R.d_rho = s_rho[j];
 		  }
 	      else
 		  {
-		      s_rho_R = bfv_R.SRHO;
-		      s_u_R   = bfv_R.SU;
-		      s_p_R   = bfv_R.SP;
+		      ifv_R.d_rho = bfv_R.SRHO;
+		      ifv_R.d_u   = bfv_R.SU;
+		      ifv_R.d_p   = bfv_R.SP;
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_Edir(dire, mid, rho_L, rho_R, s_rho_L, s_rho_R, u_L, u_R, s_u_L, s_u_R, p_L, p_R, s_p_L, s_p_R, gamma, eps);
+	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps);
 
 	      if(mid[2] < eps)
 		  {
@@ -298,6 +294,8 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	}
   }
 
+  time_plot[0] = time_c - tau;
+  time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------

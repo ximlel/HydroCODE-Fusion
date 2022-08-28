@@ -6,14 +6,15 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
 
 
 /**
  * @brief A Lagrangian GRP solver for unsteady compressible inviscid flow in one space dimension.
- * @param[out] dire: the temporal derivative of fluid variables. \n
+ * @param[out] D: the temporal derivative of fluid variables. \n
  *                   [rho_L, u, p, rho_R]_t
- * @param[out] mid:  the Riemann solutions. \n
+ * @param[out] U:  the Riemann solutions. \n
  *                   [rho_star_L, u_star, p_star, rho_star_R]
  * @param[in] rho_L, u_L, p_L: Left  States.
  * @param[in] rho_R, u_R, p_R: Right States.
@@ -30,13 +31,16 @@
  *       [1] M. Ben-Artzi & J. Falcovitz, A second-order Godunov-type scheme for compressible fluid dynamics,
  *           Journal of Computational Physics, 55.1: 1-32, 1984
  */
-void linear_GRP_solver_LAG
-(double * dire, double * mid,
- const double rho_L, const double rho_R, const double s_rho_L, const double s_rho_R,
- const double   u_L, const double   u_R, const double   s_u_L, const double   s_u_R,
- const double   p_L, const double   p_R, const double   s_p_L, const double   s_p_R,
- const double gamma, const double eps, const double  atc)
+void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double eps, const double  atc)
 {
+  const double   rho_L = ifv_L.RHO,     rho_R = ifv_R.RHO;
+  const double s_rho_L = ifv_L.t_rho, s_rho_R = ifv_R.t_rho;
+  const double     u_L = ifv_L.U,         u_R = ifv_R.U;
+  const double   s_u_L = ifv_L.t_u,     s_u_R = ifv_R.t_u;
+  const double     p_L = ifv_L.P,         p_R = ifv_R.P;
+  const double   s_p_L = ifv_L.t_p,     s_p_R = ifv_R.t_p;
+  const double   gamma = ifv_L.gamma;
+
   const double zeta = (gamma-1.0)/(gamma+1.0);
 
   double dist; // Euclidean distance
@@ -140,12 +144,12 @@ void linear_GRP_solver_LAG
 	      }
       }
   
-  mid[1] =   u_star;
-  mid[2] =   p_star;
-  mid[0] = rho_star_L;
-  mid[3] = rho_star_R;
-  dire[1] = (d_L*b_R-d_R*b_L)/(a_L*b_R-a_R*b_L);
-  dire[2] = (d_L*a_R-d_R*a_L)/(b_L*a_R-b_R*a_L);
-  dire[0] = 1.0/c_star_L/c_star_L*dire[2];
-  dire[3] = 1.0/c_star_R/c_star_R*dire[2];
+  U[1] =   u_star;
+  U[2] =   p_star;
+  U[0] = rho_star_L;
+  U[3] = rho_star_R;
+  D[1] = (d_L*b_R-d_R*b_L)/(a_L*b_R-a_R*b_L);
+  D[2] = (d_L*a_R-d_R*a_L)/(b_L*a_R-b_R*a_L);
+  D[0] = 1.0/c_star_L/c_star_L*D[2];
+  D[3] = 1.0/c_star_R/c_star_R*D[2];
 }

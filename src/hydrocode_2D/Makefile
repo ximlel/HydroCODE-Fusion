@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS = -std=c99 -Wall -pedantic -O -g -pg
 #C compiler options
-CFLAGD = 
+CFLAGD = -DNODATPLOT
 #Macro definition
 SRC = ..
 #Directory of sources

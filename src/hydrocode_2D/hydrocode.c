@@ -217,15 +217,15 @@ int main(int argc, char *argv[])
   const int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
   const double h_x = config[10], h_y = config[11], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
-  const int N = 2; // (int)(config[5]) + 1;
+  int N = 2; // (int)(config[5]) + 1;
   double time_plot[2];
 
   // Structural body of fluid variables in computational cells array pointer.
   struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));
   double ** X, ** Y;
   double * cpu_time = malloc(N * sizeof(double));
-  X = (double **)malloc(((long long)n_x+1) * sizeof(double *));
-  Y = (double **)malloc(((long long)n_x+1) * sizeof(double *));
+  X = (double **)malloc((n_x+1) * sizeof(double *));
+  Y = (double **)malloc((n_x+1) * sizeof(double *));
   if(cpu_time == NULL)
       {
 	  printf("NOT enough memory! CPU_time\n");
@@ -241,8 +241,8 @@ int main(int argc, char *argv[])
       }
   for(j = 0; j <= n_x; ++j)
   {
-    X[j] = (double *)malloc(((long long)n_y+1) * sizeof(double));
-    Y[j] = (double *)malloc(((long long)n_y+1) * sizeof(double));
+    X[j] = (double *)malloc((n_y+1) * sizeof(double));
+    Y[j] = (double *)malloc((n_y+1) * sizeof(double));
     if(X[j] == NULL || Y[j] == NULL)
     {
       printf("NOT enough memory! X[%d] or Y[%d]\n", j, j);
@@ -311,8 +311,12 @@ int main(int argc, char *argv[])
       }
 
   // Write the final data down.
-  // _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2]);
+#ifndef NODATPLOT
+  _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+#endif
+#ifndef NOTECPLOT
   _2D_TEC_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+#endif
 
  return_NULL:
   free(FV0.RHO);

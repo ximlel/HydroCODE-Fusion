@@ -23,7 +23,7 @@
  * @param[in,out] X[]:   Array of the coordinate data.
  * @param[out] cpu_time: Array of the CPU time recording.
  */
-void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time)
+void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double * time_plot)
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -44,17 +44,13 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
   int    const bound = (int)(config[17]);// the boundary condition in x-direction
 
   _Bool find_bound = false;
-  
-  double u_L, p_L, rho_L;
-  double u_R, p_R, rho_R;
+
   double c_L, c_R; // the speeds of sound
   double h_L, h_R; // length of spatial grids
 
-  double t_u_L, t_p_L, t_rho_L; // spatial derivatives in Lagrangian coordinate ξ
-  double t_u_R, t_p_R, t_rho_R;
   /*
    * dire: the temporal derivative of fluid variables.
-   *       \frac{\partial [rho_L, u, p, rho_R]}{\partial t}
+   *       \frac{\partial [ifv_L.RHO, u, p, ifv_R.RHO]}{\partial t}
    * mid:  the Riemann solutions.
    *       [rho_star_L, u_star, p_star, rho_star_R]
    */
@@ -84,7 +80,7 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
   // the numerical flux at (x_{j-1/2}, t_{n+1/2}).
   double * U_F  = malloc((m+1) * sizeof(double));
   double * P_F  = malloc((m+1) * sizeof(double));
-  double * MASS = malloc(m * sizeof(double));; // Array of the mass data in computational cells.
+  double * MASS = malloc(m * sizeof(double)); // Array of the mass data in computational cells.
   if(s_rho == NULL || s_u == NULL || s_p == NULL)
       {
 	  printf("NOT enough memory! Slope\n");
@@ -115,6 +111,7 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 
   struct b_f_var bfv_L = {.H = h, .SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
   struct b_f_var bfv_R = {.H = h, .SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
   
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
@@ -134,79 +131,79 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      h_L   =   X[nt-1][j] - X[nt-1][j-1];
-		      rho_L = RHO[nt-1][j-1] + 0.5*h_L*s_rho[j-1];
-		      u_L   =   U[nt-1][j-1] + 0.5*h_L*s_u[j-1];
-		      p_L   =   P[nt-1][j-1] + 0.5*h_L*s_p[j-1];
+		      h_L       =   X[nt-1][j] - X[nt-1][j-1];
+		      ifv_L.RHO = RHO[nt-1][j-1] + 0.5*h_L*s_rho[j-1];
+		      ifv_L.U   =   U[nt-1][j-1] + 0.5*h_L*s_u[j-1];
+		      ifv_L.P   =   P[nt-1][j-1] + 0.5*h_L*s_p[j-1];
 		  }
 	      else
 		  {
-		      h_L   = bfv_L.H;
-		      rho_L = bfv_L.RHO + 0.5*h_L*bfv_L.SRHO;
-		      u_L   = bfv_L.U   + 0.5*h_L*bfv_L.SU;
-		      p_L   = bfv_L.P   + 0.5*h_L*bfv_L.SP;
+		      h_L       = bfv_L.H;
+		      ifv_L.RHO = bfv_L.RHO + 0.5*h_L*bfv_L.SRHO;
+		      ifv_L.U   = bfv_L.U   + 0.5*h_L*bfv_L.SU;
+		      ifv_L.P   = bfv_L.P   + 0.5*h_L*bfv_L.SP;
 		  }
 	      if(j < m)
 		  {
-		      h_R   =   X[nt-1][j+1] - X[nt-1][j];
-		      rho_R = RHO[nt-1][j] - 0.5*h_R*s_rho[j];
-		      u_R   =   U[nt-1][j] - 0.5*h_R*s_u[j];
-		      p_R   =   P[nt-1][j] - 0.5*h_R*s_p[j];
+		      h_R       =   X[nt-1][j+1] - X[nt-1][j];
+		      ifv_R.RHO = RHO[nt-1][j] - 0.5*h_R*s_rho[j];
+		      ifv_R.U   =   U[nt-1][j] - 0.5*h_R*s_u[j];
+		      ifv_R.P   =   P[nt-1][j] - 0.5*h_R*s_p[j];
 		  }
 	      else
 		  {
-		      h_R   = bfv_R.H;
-		      rho_R = bfv_R.RHO + 0.5*h_R*bfv_R.SRHO;
-		      u_R   = bfv_R.U   + 0.5*h_R*bfv_R.SU;
-		      p_R   = bfv_R.P   + 0.5*h_R*bfv_R.SP;
+		      h_R       = bfv_R.H;
+		      ifv_R.RHO = bfv_R.RHO + 0.5*h_R*bfv_R.SRHO;
+		      ifv_R.U   = bfv_R.U   + 0.5*h_R*bfv_R.SU;
+		      ifv_R.P   = bfv_R.P   + 0.5*h_R*bfv_R.SP;
 		  }
-	      if(p_L < eps || p_R < eps || rho_L < eps || rho_R < eps)
+	      if(ifv_L.P < eps || ifv_R.P < eps || ifv_L.RHO < eps || ifv_R.RHO < eps)
 		  {
 		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
 		      goto return_NULL;
 		  }
-	      if(!isfinite(p_L)|| !isfinite(p_R)|| !isfinite(u_L)|| !isfinite(u_R)|| !isfinite(rho_L)|| !isfinite(rho_R))
+	      if(!isfinite(ifv_L.P)|| !isfinite(ifv_R.P)|| !isfinite(ifv_L.U)|| !isfinite(ifv_R.U)|| !isfinite(ifv_L.RHO)|| !isfinite(ifv_R.RHO))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Reconstruction\n", k, j); 
 		      goto return_NULL;
 		  }
 
-	      c_L = sqrt(gamma * p_L / rho_L);
-	      c_R = sqrt(gamma * p_R / rho_R);
+	      c_L = sqrt(gamma * ifv_L.P / ifv_L.RHO);
+	      c_R = sqrt(gamma * ifv_R.P / ifv_R.RHO);
 	      h_S_max = fmin(h_S_max, h_L/c_L);
 	      h_S_max = fmin(h_S_max, h_R/c_R);
 	      if ((bound == -2 || bound == -24) && j == 0) // reflective boundary conditions
-		  h_S_max = fmin(h_S_max, h_L/(fabs(u_L)+c_L));
+		  h_S_max = fmin(h_S_max, h_L/(fabs(ifv_L.U)+c_L));
 	      if (bound == -2 && j == m)
-		  h_S_max = fmin(h_S_max, h_R/(fabs(u_R)+c_R));
+		  h_S_max = fmin(h_S_max, h_R/(fabs(ifv_R.U)+c_R));
 
 	      if(j) //calculate the material derivatives
 		  {
-		      t_u_L   =   s_u[j-1]/rho_L;
-		      t_p_L   =   s_p[j-1]/rho_L;
-		      t_rho_L = s_rho[j-1]/rho_L;
+		      ifv_L.t_u   =   s_u[j-1]/ifv_L.RHO;
+		      ifv_L.t_p   =   s_p[j-1]/ifv_L.RHO;
+		      ifv_L.t_rho = s_rho[j-1]/ifv_L.RHO;
 		  }
 	      else
 		  {
-		      t_rho_L = bfv_L.SRHO/rho_L;
-		      t_u_L   = bfv_L.SU  /rho_L;
-		      t_p_L   = bfv_L.SP  /rho_L;
+		      ifv_L.t_rho = bfv_L.SRHO/ifv_L.RHO;
+		      ifv_L.t_u   = bfv_L.SU  /ifv_L.RHO;
+		      ifv_L.t_p   = bfv_L.SP  /ifv_L.RHO;
 		  }
 	      if(j < m)
 		  {
-		      t_u_R   =   s_u[j]/rho_R;
-		      t_p_R   =   s_p[j]/rho_R;
-		      t_rho_R = s_rho[j]/rho_R;
+		      ifv_R.t_u   =   s_u[j]/ifv_R.RHO;
+		      ifv_R.t_p   =   s_p[j]/ifv_R.RHO;
+		      ifv_R.t_rho = s_rho[j]/ifv_R.RHO;
 		  }
 	      else
 		  {
-		      t_rho_R = bfv_R.SRHO/rho_R;
-		      t_u_R   = bfv_R.SU  /rho_R;
-		      t_p_R   = bfv_R.SP  /rho_R;
+		      ifv_R.t_rho = bfv_R.SRHO/ifv_R.RHO;
+		      ifv_R.t_u   = bfv_R.SU  /ifv_R.RHO;
+		      ifv_R.t_p   = bfv_R.SP  /ifv_R.RHO;
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_LAG(dire, mid, rho_L, rho_R, t_rho_L, t_rho_R, u_L, u_R, t_u_L, t_u_R, p_L, p_R, t_p_L, t_p_R, gamma, eps, eps);
+	      linear_GRP_solver_LAG(dire, mid, ifv_L, ifv_R, eps, eps);
 
 	      if(mid[2] < eps)
 		  {
@@ -308,6 +305,8 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	}
   }
 
+  time_plot[0] = time_c - tau;
+  time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-GRP Lagrangian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------

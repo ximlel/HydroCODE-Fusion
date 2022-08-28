@@ -92,8 +92,8 @@ void _2D_TEC_file_write(const int n_x, const int n_y, const int N, const struct 
 
     for(k = 0; k < N; ++k)
 	{
-	    if (k == N-1)
-		continue;
+	    // if (k == N-1)
+		// continue;
 	    fprintf(fp, "ZONE I=%d, J=%d, SOLUTIONTIME=%.10g, DATAPACKING=POINT\n", n_x, n_y, time_plot[k]);
 	    for(i = 0; i < n_y; ++i)
 		for(j = 0; j < n_x; ++j)
