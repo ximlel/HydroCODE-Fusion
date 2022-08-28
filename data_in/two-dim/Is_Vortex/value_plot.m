@@ -1,7 +1,8 @@
-load RHO.dat;
-load U.dat;
-load V.dat;
-load P.dat;
+Path="u_0/"
+load(fullfile(Path,"RHO.dat"));
+load(fullfile(Path,"U.dat"));
+load(fullfile(Path,"V.dat"));
+load(fullfile(Path,"P.dat"));
 %U=U(end:-1:1,:);
 %V=V(end:-1:1,:);
 line = 50;

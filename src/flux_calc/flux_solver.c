@@ -10,20 +10,27 @@ void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double ta
 	const double eps = config[4];
 	double gamma_mid = config[6];
 	const double n_x = ifv->n_x, n_y = ifv->n_y;
+	ifv->lambda_u = 0.0; ifv->lambda_v = 0.0;
 
-	double u, u_R, d_u, d_u_R, t_u, t_u_R, v, v_R, d_v, d_v_R, t_v, t_v_R;
-	u     =  ifv->U    *n_x + ifv->V    *n_y;
-	u_R   =  ifv_R->U  *n_x + ifv_R->V  *n_y;
-	d_u   =  ifv->d_u  *n_x + ifv->d_v  *n_y;
-	d_u_R =  ifv_R->d_u*n_x + ifv_R->d_v*n_y;
-	t_u   =  ifv->t_u  *n_x + ifv->t_v  *n_y;
-	t_u_R =  ifv_R->t_u*n_x + ifv_R->t_v*n_y;
-	v     = -ifv->U    *n_y + ifv->V    *n_x;
-	v_R   = -ifv_R->U  *n_y + ifv_R->V  *n_x;
-	d_v   = -ifv->d_u  *n_y + ifv->d_v  *n_x;
-	d_v_R = -ifv_R->d_u*n_y + ifv_R->d_v*n_x;
-	t_v   = -ifv->t_u  *n_y + ifv->t_v  *n_x;
-	t_v_R = -ifv_R->t_u*n_y + ifv_R->t_v*n_x;
+	double u, d_u, t_u, v, d_v, t_v;
+	u          =  ifv->U    *n_x + ifv->V    *n_y;
+	ifv_R->U   =  ifv_R->U  *n_x + ifv_R->V  *n_y;
+	ifv->U     =  u;
+	d_u        =  ifv->d_u  *n_x + ifv->d_v  *n_y;
+	ifv_R->d_u =  ifv_R->d_u*n_x + ifv_R->d_v*n_y;
+	ifv->d_u   =  d_u;
+	t_u        =  ifv->t_u  *n_x + ifv->t_v  *n_y;
+	ifv_R->t_u =  ifv_R->t_u*n_x + ifv_R->t_v*n_y;
+	ifv->t_u   =  t_u;
+	v          = -ifv->U    *n_y + ifv->V    *n_x;
+	ifv_R->V   = -ifv_R->U  *n_y + ifv_R->V  *n_x;
+	ifv->V     =  v;
+	d_v        = -ifv->d_u  *n_y + ifv->d_v  *n_x;
+	ifv_R->d_v = -ifv_R->d_u*n_y + ifv_R->d_v*n_x;
+	ifv->d_v   =  d_v;
+	t_v        = -ifv->t_u  *n_y + ifv->t_v  *n_x;
+	ifv_R->t_v = -ifv_R->t_u*n_y + ifv_R->t_v*n_x;
+	ifv->t_v   =  t_v;
 	
 	double wave_speed[2], dire[6], mid[6], star[6];
 	double rho_mid, p_mid, u_mid, v_mid;
@@ -31,13 +38,13 @@ void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double ta
 #ifdef MULTIFLUID_BASICS
 	double phi_mid, z_a_mid;
 
-	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, 0.0, 0.0, ifv->RHO, ifv_R->RHO, ifv->d_rho, ifv_R->d_rho, ifv->t_rho, ifv_R->t_rho, u, u_R, d_u, d_u_R, t_u, t_u_R, v, v_R, d_v, d_v_R, t_v, t_v_R, ifv->P, ifv_R->P, ifv->d_p, ifv_R->d_p, ifv->t_p, ifv_R->t_p, ifv->Z_a, ifv_R->Z_a, ifv->d_z_a, ifv_R->d_z_a, ifv->t_z_a, ifv_R->t_z_a, ifv->PHI, ifv_R->PHI, ifv->d_phi, ifv_R->d_phi, ifv->t_phi, ifv_R->t_phi, ifv->gamma, ifv_R->gamma, eps, -0.0);
-	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, 0.0, 0.0, ifv->RHO, ifv_R->RHO, ifv->d_rho, ifv_R->d_rho, ifv->t_rho, ifv_R->t_rho, u, u_R, d_u, d_u_R, t_u, t_u_R, v, v_R, d_v, d_v_R, t_v, t_v_R, ifv->P, ifv_R->P, ifv->d_p, ifv_R->d_p, ifv->t_p, ifv_R->t_p, ifv->Z_a, ifv_R->Z_a, ifv->d_z_a, ifv_R->d_z_a, ifv->t_z_a, ifv_R->t_z_a, ifv->PHI, ifv_R->PHI, ifv->d_phi, ifv_R->d_phi, ifv->t_phi, ifv_R->t_phi, ifv->gamma, ifv_R->gamma, eps, eps);
-	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, 0.0, 0.0, ifv->RHO, ifv_R->RHO, ifv->d_rho, ifv_R->d_rho, ifv->t_rho, ifv_R->t_rho, u, u_R, d_u, d_u_R, t_u, t_u_R, v, v_R, d_v, d_v_R, t_v, t_v_R, ifv->P, ifv_R->P, ifv->d_p, ifv_R->d_p, ifv->t_p, ifv_R->t_p, ifv->Z_a, ifv_R->Z_a, ifv->d_z_a, ifv_R->d_z_a, ifv->t_z_a, ifv_R->t_z_a, ifv->PHI, ifv_R->PHI, ifv->d_phi, ifv_R->d_phi, ifv->t_phi, ifv_R->t_phi, ifv->gamma, ifv_R->gamma, eps, -0.0);
+	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
+	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, eps);
+	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
 // Acoustic approximation
-	// linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, 0.0, 0.0, ifv->RHO, ifv_R->RHO, ifv->d_rho, ifv_R->d_rho, ifv->t_rho, ifv_R->t_rho, u, u_R, d_u, d_u_R, t_u, t_u_R, v, v_R, d_v, d_v_R, t_v, t_v_R, ifv->P, ifv_R->P, ifv->d_p, ifv_R->d_p, ifv->t_p, ifv_R->t_p, ifv->Z_a, ifv_R->Z_a, ifv->d_z_a, ifv_R->d_z_a, ifv->t_z_a, ifv_R->t_z_a, ifv->PHI, ifv_R->PHI, ifv->d_phi, ifv_R->d_phi, ifv->t_phi, ifv_R->t_phi, ifv->gamma, ifv_R->gamma, eps, 1.0/0.0);
+	// linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, INFINITY);
 #else
-	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, 0.0, 0.0, ifv->RHO, ifv_R->RHO, ifv->d_rho, ifv_R->d_rho, ifv->t_rho, ifv_R->t_rho, u, u_R, d_u, d_u_R, t_u, t_u_R, v, v_R, d_v, d_v_R, t_v, t_v_R, ifv->P, ifv_R->P, ifv->d_p, ifv_R->d_p, ifv->t_p, ifv_R->t_p, 1.0, 1.0, -0.0, -0.0, -0.0, -0.0, 1.0, 1.0, -0.0, -0.0, -0.0, -0.0, gamma_mid, gamma_mid, eps, -0.0);
+	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
 #endif
 
 	rho_mid =  mid[0] + 0.5*tau*dire[0];

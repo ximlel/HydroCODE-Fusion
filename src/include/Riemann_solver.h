@@ -7,6 +7,8 @@
 #ifndef RIEMANNSOLVER_H
 #define RIEMANNSOLVER_H
 
+#include "../include/var_struc.h"
+
 double Riemann_solver_exact(double * U_star, double * P_star, const double gammaL, const double gammaR,
 			    const double u_L, const double u_R, const double p_L, const double p_R, 
 			    const double c_L, const double c_R, _Bool * CRW,

@@ -3,8 +3,10 @@
 :::: Compile the program
 :: msbuild hydrocode.sln /t:build /p:configuration=Debug
 
+
 :::: Run the program
 set EXEcute=.\hydrocode.exe
+
 ::: GRP_Book
 goto !
  %EXEcute% GRP_Book\6_1_LAG GRP_Book\6_1_LAG 1 1     LAG 1=-1.0

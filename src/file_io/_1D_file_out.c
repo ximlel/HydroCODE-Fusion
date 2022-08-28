@@ -47,7 +47,7 @@
  * @param[in] name:     Name of the numerical results.
  */
 void _1D_file_write(const int m, const int N, const struct cell_var_stru CV, 
-                    double * X[], const double * cpu_time, const char * name)
+                    double * X[], const double * cpu_time, const char * name, const double * time_plot)
 {
   // Records the time when the program is running.
   /*
@@ -73,6 +73,17 @@ void _1D_file_write(const int m, const int N, const struct cell_var_stru CV,
     PRINT_NC(P, CV.P[k][j]);
     PRINT_NC(E, CV.E[k][j]);
     PRINT_NC(X, 0.5 * (X[k][j] + X[k][j+1]));
+
+    strcpy(file_data, add_out);
+    strcat(file_data, "/time_plot.dat");
+    if((fp_write = fopen(file_data, "w")) == NULL)
+	{
+	    printf("Cannot open solution output file: time_plot!\n");
+	    exit(1);
+	}
+    for(k = 0; k < N; ++k)
+	fprintf(fp_write, "%.10g\n", time_plot[k]);
+    fclose(fp_write);
 
 //======================Write Log File============================
     config_write(add_out, cpu_time, name);

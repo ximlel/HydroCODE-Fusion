@@ -21,11 +21,11 @@ struct flu_var _2D_initialize(const char * name);
 
 // _1D_file_out.c
 void _1D_file_write(const int m, const int N, const struct cell_var_stru CV, 
-                    double * X[], const double * cpu_time, const char * name);
+                    double * X[], const double * cpu_time, const char * name, const double * time_plot);
 void _2D_file_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
-		    double * X[], double * Y[], const double * cpu_time, const char * name);
+		    double * X[], double * Y[], const double * cpu_time, const char * name, const double * time_plot);
 void _2D_TEC_file_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
-			double * X[], double * Y[], const double * cpu_time, const char * problem, const double time_plot[]);
+			double * X[], double * Y[], const double * cpu_time, const char * problem, const double * time_plot);
 
 // config_in.c
 void configurate(const char * name);

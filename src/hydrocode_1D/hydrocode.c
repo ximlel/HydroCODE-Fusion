@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-    struct flu_var FV0 = _1D_initialize(argv[1]); // Structural body of initial data array pointer.
+  struct flu_var FV0 = _1D_initialize(argv[1]); // Structural body of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -216,6 +216,7 @@ int main(int argc, char *argv[])
   const double h = config[10], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
   const int N = 2; // (int)(config[5]) + 1;
+  double time_plot[2];
 
   struct cell_var_stru CV = {NULL}; // Structural body of fluid variables in computational cells array pointer.
   double ** X = NULL;
@@ -276,10 +277,10 @@ int main(int argc, char *argv[])
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_LAG_source(m, CV, X, cpu_time);
+		  Godunov_solver_LAG_source(m, CV, X, cpu_time, time_plot);
 		  break;
 	      case 2:
-		  GRP_solver_LAG_source(m, CV, X, cpu_time);
+		  GRP_solver_LAG_source(m, CV, X, cpu_time, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -296,10 +297,10 @@ int main(int argc, char *argv[])
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_EUL_source(m, CV, cpu_time);
+		  Godunov_solver_EUL_source(m, CV, cpu_time, time_plot);
 		  break;
 	      case 2:
-		  GRP_solver_EUL_source(m, CV, cpu_time);
+		  GRP_solver_EUL_source(m, CV, cpu_time, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -315,7 +316,7 @@ int main(int argc, char *argv[])
       }
 
   // Write the final data down.
-  _1D_file_write(m, N, CV, X, cpu_time, argv[2]);
+  _1D_file_write(m, N, CV, X, cpu_time, argv[2], time_plot);
 
  return_NULL:
   free(FV0.RHO);
