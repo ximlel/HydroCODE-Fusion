@@ -74,7 +74,7 @@
   *             The value of second of these variables is (column) number;
   *             The following (line*column) variables are the initial value.
   * @param[in]  name: Name of the test example.
-  * @return  \b FV0:  Structural body of initial data array pointer.
+  * @return  \b FV0:  Structure of initial data array pointer.
   */
 struct flu_var _2D_initialize(const char * name)
 {

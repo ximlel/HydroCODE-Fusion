@@ -1,3 +1,7 @@
+/**
+ * @file  slope_limiter_2D_x.c
+ * @brief This is a function of the minmod slope limiter in the x-direction of two dimension.
+ */
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -5,8 +9,28 @@
 #include "../include/tools.h"
 
 
+/**
+ * @brief This function apply the minmod limiter to the slope in the x-direction of two dimension.
+ * @param[in] NO_h:       Whether there are moving grid point coordinates.
+ *                  - true: There are moving x-spatial grid point coordinates *X.
+ *                  - false: There is fixed x-spatial grid length.
+ * @param[in] m:          Number of the x-grids.
+ * @param[in] i:          On the i-th line grid.
+ * @param[in] find_bound_x: Whether the boundary conditions in x-direction have been found.
+ *                        - true: interfacial variables at t_{n+1} are available, 
+ *                                and then trivariate minmod3() function is used.
+ *                        - false: bivariate minmod2() function is used.
+ * @param[in,out] s:      x-spatial derivatives of the fluid variable are stored here.
+ * @param[in] U:   Array to store fluid variable values.
+ * @param[in] UL:  Fluid variable value at left boundary.
+ * @param[in] UR:  Fluid variable value at right boundary.
+ * @param[in] HL:  x-spatial grid length at left boundary OR fixed spatial grid length.
+ * @param[in] ...: Variable parameter if NO_h is true.
+ *            - \b double \c HR: x-spatial grid length at right boundary.
+ *            - \b double \c *X: Array of moving spatial grid point x-coordinates.
+ */
 void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool find_bound_x, double ** s,
-			 double * U[], const double UL, const double UR, const double HL, ...)
+			 double ** U, const double UL, const double UR, const double HL, ...)
 {
     va_list ap;
     va_start(ap, HL);

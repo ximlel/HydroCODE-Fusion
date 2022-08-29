@@ -1,3 +1,8 @@
+/**
+ * @file flux_generator_x.c
+ * @brief This file is a function which generates Eulerian fluxes in x-direction of 
+ *        2-D Euler equations solved by 2-D GRP scheme.
+ */
 #include <stdio.h>
 
 #include "../include/var_struc.h"
@@ -6,13 +11,15 @@
 
 /**
  * @brief This function calculate Eulerian fluxes of 2-D Euler equations in x-direction by 2-D GRP solver.
+ * @details Passes variable values on both sides of the interface to the structure variables b_f_var bfv_L and bfv_R,
+ *          and use function GRP_2D_scheme() to calculate fluxes.
  * @param[in] m:      Number of the x-grids: n_x.
  * @param[in] n:      Number of the y-grids: n_y.
  * @param[in] nt:     Current plot time step for computing updates of conservative variables.
  * @param[in] tau:    The length of the time step.
- * @param[in,out] CV: Structural body of cell variable data.
- * @param[in] bfv_L:  Structural body pointer of fluid variables at left boundary.
- * @param[in] bfv_R:  Structural body pointer of fluid variables at right boundary.
+ * @param[in,out] CV: Structure of cell variable data.
+ * @param[in] bfv_L:  Structure pointer of fluid variables at left boundary.
+ * @param[in] bfv_R:  Structure pointer of fluid variables at right boundary.
  * @param[in] Transversal: Whether the tangential effect is considered.
  */
 void flux_generator_x(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,

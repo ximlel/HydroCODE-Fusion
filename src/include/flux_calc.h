@@ -11,9 +11,9 @@
 
 // Generate fluxes for 2-D Godunov/GRP scheme (Eulerian, single-component flow)
 void flux_generator_x(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
-		      struct b_f_var * bfv_L, struct b_f_var * bfv_R, const _Bool Transversa);
+		      struct b_f_var * bfv_L, struct b_f_var * bfv_R, const _Bool Transversal);
 void flux_generator_y(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
-		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversa);
+		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversal);
 
 // Flux of 2-D GRP solver (Eulerian, two-component flow)
 void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau);

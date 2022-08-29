@@ -1,3 +1,8 @@
+/**
+ * @file var_struc.h
+ * @brief This file is the header file of some globally common variables and structural bodies.
+ */
+
 #ifndef VARSTRUC_H
 #define VARSTRUC_H
 
@@ -13,12 +18,12 @@
 
 extern double config[]; //!< Initial configuration data array.
 
-//! pointer structural body of FLUid VARiables.
+//! pointer structure of FLUid VARiables.
 typedef struct flu_var {
 	double * RHO, * U, * V, * P;
 } Fluid_Variable;
 
-//! pointer structural body of VARiables on STRUctural computational grid CELLs.
+//! pointer structure of VARiables on STRUctural computational grid CELLs.
 typedef struct cell_var_stru {
 	double ** RHO, ** U, ** V, ** P, ** E;   //!< density, velocity components in direction x and y, pressure, specific total energy.
 	double  * d_rho,  * d_u,          * d_p; //!< spatial derivatives in one dimension.

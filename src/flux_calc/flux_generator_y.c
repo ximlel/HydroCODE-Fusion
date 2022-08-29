@@ -1,3 +1,8 @@
+/**
+ * @file flux_generator_y.c
+ * @brief This file is a function which generates Eulerian fluxes in y-direction of 
+ *        2-D Euler equations solved by 2-D GRP scheme.
+ */
 #include <stdio.h>
 
 #include "../include/var_struc.h"
@@ -6,17 +11,19 @@
 
 /**
  * @brief This function calculate Eulerian fluxes of 2-D Euler equations in y-direction by 2-D GRP solver.
+ * @details Passes variable values on both sides of the interface to the structure variables b_f_var bfv_L and bfv_R,
+ *          and use function GRP_2D_scheme() to calculate fluxes.
  * @param[in] m:      Number of the x-grids: n_x.
  * @param[in] n:      Number of the y-grids: n_y.
  * @param[in] nt:     Current plot time step for computing updates of conservative variables.
  * @param[in] tau:    The length of the time step.
- * @param[in,out] CV: Structural body of cell variable data.
- * @param[in] bfv_D:  Structural body pointer of fluid variables at downside boundary.
- * @param[in] bfv_U:  Structural body pointer of fluid variables at upper boundary.
+ * @param[in,out] CV: Structure of cell variable data.
+ * @param[in] bfv_D:  Structure pointer of fluid variables at downside boundary.
+ * @param[in] bfv_U:  Structure pointer of fluid variables at upper boundary.
  * @param[in] Transversal: Whether the tangential effect is considered.
  */
 void flux_generator_y(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
-		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversa)
+		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversal)
 {
   double const h_y = config[11]; // the length of the initial y spatial grids
   struct i_f_var ifv_D = {.n_x = 0.0, .n_y = 1.0}, ifv_U = {.n_x = 0.0, .n_y = 1.0};
@@ -71,7 +78,7 @@ void flux_generator_y(const int m, const int n, const int nt, const double tau, 
           ifv_U.P     = bfv_U[j].P   - 0.5*h_y*bfv_U[j].TP;
       }
 //===========================
-      if (Transversa)
+      if (Transversal)
 	  {
 	      if(i)
 		  {

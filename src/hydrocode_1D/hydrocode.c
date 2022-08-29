@@ -94,7 +94,7 @@
 double config[N_CONF]; //!< Initial configuration data array.
 
 /**
- * @brief N memory allocations to the initial fluid variable 'v' in the structural body cell_var_stru.
+ * @brief N memory allocations to the initial fluid variable 'v' in the structure cell_var_stru.
  */
 #define CV_INIT_MEM(v, N)						\
     do {								\
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-  struct flu_var FV0 = _1D_initialize(argv[1]); // Structural body of initial data array pointer.
+  struct flu_var FV0 = _1D_initialize(argv[1]); // Structure of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
   const int N = 2; // (int)(config[5]) + 1;
   double time_plot[2];
 
-  struct cell_var_stru CV = {NULL}; // Structural body of fluid variables in computational cells array pointer.
+  struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
   double ** X = NULL;
   double * cpu_time = malloc(N * sizeof(double));
   X = (double **)malloc(N * sizeof(double *));

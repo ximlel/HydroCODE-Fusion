@@ -13,6 +13,9 @@
  * @def EXACT_TANGENT_DERIVATIVE
  * @brief Switch whether the tangential derivatives are accurately computed.
  */
+#ifdef EXACT_TANGENT_DERIVATIVE
+#define EXACT_TANGENT_DERIVATIVE
+#endif
 
 
 /**

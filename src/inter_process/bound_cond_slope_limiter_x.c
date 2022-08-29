@@ -1,3 +1,7 @@
+/**
+ * @file  bound_cond_slope_limiter_x.c
+ * @brief This is a function to set boundary conditions and use the slope limiter in x-direction of two dimension.
+ */
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -5,6 +9,19 @@
 #include "../include/inter_process.h"
 
 
+/**
+ * @brief This function apply the minmod limiter to the slope in the x-direction of two dimension.
+ * @param[in] m:          Number of the x-grids: n_x.
+ * @param[in] n:          Number of the y-grids: n_y.
+ * @param[in] nt:         Current plot time step for computing updates of conservative variables.
+ * @param[in] CV:         Structure of cell variable data.
+ * @param[in,out] bfv_L:  Fluid variables at left boundary.
+ * @param[in,out] bfv_R:  Fluid variables at right boundary.
+ * @param[in] find_bound_x: Whether the boundary conditions in x-direction have been found.
+ * @param[in] Slope:      Are there slopes? (true: 2nd-order / false: 1st-order)
+ * @param[in] t_c:        Time of current time step.
+ * @return find_bound_x:  Whether the boundary conditions in x-direction have been found.
+ */
 _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct cell_var_stru * CV,
 				 struct b_f_var * bfv_L, struct b_f_var * bfv_R, _Bool find_bound_x, const _Bool Slope, const double t_c)
 {

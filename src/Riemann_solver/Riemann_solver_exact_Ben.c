@@ -15,7 +15,7 @@
  * @param[out] U_star, P_star: Velocity/Pressure in star region.
  * @param[in]  u_L, p_L, c_L: Initial Velocity/Pressure/sound_speed on left  state.
  * @param[in]  u_R, p_R, c_R: Initial Velocity/Pressure/sound_speed on right state.
- * @param[in]  gammaL, gamma_R: Ratio of specific heats.
+ * @param[in]  gammaL, gammaR: Ratio of specific heats.
  * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
  *                  - true: CRW
  *                  - false: Shock wave

@@ -41,7 +41,7 @@
  * @note  It is quite simple so there will be no more comments.
  * @param[in] m: The number of spatial points in the output data.
  * @param[in] N: The number of time steps in the output data.
- * @param[in] CV:  Structural body of grid variable data.
+ * @param[in] CV:  Structure of grid variable data.
  * @param[in] X[]: Array of the coordinate data.
  * @param[in] cpu_time:  Array of the CPU time recording.
  * @param[in] name:      Name of the numerical results.

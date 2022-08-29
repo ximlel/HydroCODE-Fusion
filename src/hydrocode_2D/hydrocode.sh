@@ -16,11 +16,14 @@ alias MRun='octave'
 EXEcute=./hydrocode.out
 
 ## 2D Riemnnn problem
-#:<<!
+:<<!
  cd ../../data_in/two-dim/RP2D/RP2D_3_Quad
  echo "value_start" | MRun
  cd $CPath
  $EXEcute RP2D/RP2D_3_Quad RP2D/RP2D_3_Quad 2 2_GRP EUL
+!
+ $EXEcute GRP_Book/6_1_Sod_10_lines GRP_Book/6_1_Sod_10_lines 2 2_GRP EUL 33=1
+ $EXEcute GRP_Book/6_1_Sod_10_columns GRP_Book/6_1_Sod_10_columns 2 2_GRP EUL 33=1
 #!
 :<<SHARE
 

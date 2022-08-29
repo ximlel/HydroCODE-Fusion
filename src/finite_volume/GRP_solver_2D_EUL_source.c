@@ -17,7 +17,7 @@
 
 
 /**
- * @brief M*N memory allocations to the variable 'v' in the structural body cell_var_stru.
+ * @brief M*N memory allocations to the variable 'v' in the structure cell_var_stru.
  */
 #define _2D_INIT_MEM(v, M, N)						\
     do {								\
@@ -39,7 +39,7 @@
     } while (0)
 
 /**
- * @brief M memory allocations to the structural body variable b_f_var 'bfv'.
+ * @brief M memory allocations to the structure variable b_f_var 'bfv'.
  */
 #define _1D_BC_INIT_MEM(bfv, M)				\
     do {						\
@@ -54,9 +54,9 @@
 /**
  * @brief This function use GRP scheme to solve 2-D Euler
  *        equations of motion on Eulerian coordinate without dimension splitting.
- * @param[in]  m:         Number of the x-grids: n_x.
- * @param[in]  n:         Number of the y-grids: n_y.
- * @param[in,out] CV:     Structural body of cell variable data.
+ * @param[in] m:         Number of the x-grids: n_x.
+ * @param[in] n:         Number of the y-grids: n_y.
+ * @param[in,out] CV:     Structure of cell variable data.
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */

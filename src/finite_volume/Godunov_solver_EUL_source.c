@@ -18,8 +18,8 @@
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
  *        equations of motion on Eulerian coordinate.
- * @param[in]  m:         Number of the grids.
- * @param[in,out] CV:     Structural body of cell variable data.
+ * @param[in] m:         Number of the grids.
+ * @param[in,out] CV:     Structure of cell variable data.
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */

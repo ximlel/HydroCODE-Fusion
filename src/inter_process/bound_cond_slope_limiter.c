@@ -1,3 +1,7 @@
+/**
+ * @file  bound_cond_slope_limiter.c
+ * @brief This is a function to set boundary conditions and use the slope limiter in one dimension.
+ */
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdarg.h>
@@ -6,6 +10,23 @@
 #include "../include/inter_process.h"
 
 
+/**
+ * @brief This function apply the minmod limiter to the slope in one dimension.
+ * @param[in] NO_h:       Whether there are moving grid point coordinates.
+ *                  - true: There are moving spatial grid point coordinates *X.
+ *                  - false: There is fixed spatial grid length.
+ * @param[in] m:          Number of the grids.
+ * @param[in] nt:         Current plot time step for computing updates of conservative variables.
+ * @param[in] CV:         Structure of cell variable data.
+ * @param[in,out] bfv_L:  Fluid variables at left boundary.
+ * @param[in,out] bfv_R:  Fluid variables at right boundary.
+ * @param[in] find_bound: Whether the boundary conditions have been found.
+ * @param[in] Slope:      Are there slopes? (true: 2nd-order / false: 1st-order)
+ * @param[in] t_c:        Time of current time step.
+ * @param[in] ...:        Variable parameter if NO_h is true.
+ *            - \b double \c *X: Array of moving spatial grid point coordinates.
+ * @return find_bound:    Whether the boundary conditions have been found.
+ */
 _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, struct cell_var_stru CV,
 			       struct b_f_var * bfv_L, struct b_f_var * bfv_R, _Bool find_bound, const _Bool Slope, const double t_c, ...)
 {

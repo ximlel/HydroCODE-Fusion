@@ -12,8 +12,8 @@
 
 /**
  * @brief This function calculate Eulerian fluxes of 2-D Euler equations by 2-D GRP solver.
- * @param[in,out] ifv: Structural body pointer of interfacial evaluated variables and fluxes and left state.
- * @param[in] ifv_R:   Structural body pointer of interfacial right state.
+ * @param[in,out] ifv: Structure pointer of interfacial evaluated variables and fluxes and left state.
+ * @param[in] ifv_R:   Structure pointer of interfacial right state.
  * @param[in] tau:     The length of the time step.
  */
 void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)

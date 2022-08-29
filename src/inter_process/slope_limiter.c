@@ -1,3 +1,7 @@
+/**
+ * @file  slope_limiter.c
+ * @brief This is a function of the minmod slope limiter in one dimension.
+ */
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -5,6 +9,25 @@
 #include "../include/tools.h"
 
 
+/**
+ * @brief This function apply the minmod limiter to the slope in one dimension.
+ * @param[in] NO_h:       Whether there are moving grid point coordinates.
+ *                  - true: There are moving spatial grid point coordinates *X.
+ *                  - false: There is fixed spatial grid length.
+ * @param[in] m:         Number of the x-grids: n_x.
+ * @param[in] find_bound: Whether the boundary conditions have been found.
+ *                        - true: interfacial variables at t_{n+1} are available, 
+ *                                and then trivariate minmod3() function is used.
+ *                        - false: bivariate minmod2() function is used.
+ * @param[in,out] s[]:    Spatial derivatives of the fluid variable are stored here.
+ * @param[in] U[]: Array to store fluid variable values.
+ * @param[in] UL:  Fluid variable value at left boundary.
+ * @param[in] UR:  Fluid variable value at right boundary.
+ * @param[in] HL:  Spatial grid length at left boundary OR fixed spatial grid length.
+ * @param[in] ...: Variable parameter if NO_h is true.
+ *            - \b double \c HR: Spatial grid length at right boundary.
+ *            - \b double \c *X: Array of moving spatial grid point coordinates.
+ */
 void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, double s[],
 		    const double U[], const double UL, const double UR, const double HL, ...)
 {
