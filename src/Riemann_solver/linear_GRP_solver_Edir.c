@@ -13,18 +13,19 @@
 /**
  * @brief A direct Eulerian GRP solver for unsteady compressible inviscid flow in one space dimension.
  * @param[out] D: the temporal derivative of fluid variables. \n
- *                         [rho, u, p]_t
- * @param[out] U:  the Riemann solutions. \n
- *                   [rho_star, u_star, p_star]
- * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, s_rho_L, s_u_L, s_p_L, gammaL).
- * @param[in] ifv_R: Right States (rho_R, u_R, p_R, s_rho_R, s_u_R, s_p_R, gammaR).
+ *                   [rho, u, p]_t
+ * @param[out] U:  the intermediate Riemann solutions at t-axis. \n
+ *                   [rho_mid, u_mid, p_mid]
+ * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, s_rho_L, s_u_L, s_p_L, gamma).
+ * @param[in] ifv_R: Right States (rho_R, u_R, p_R, s_rho_R, s_u_R, s_p_R).
  *                   - s_rho, s_u, s_p: x-spatial derivatives.
  *                   - gamma: the constant of the perfect gas.
  * @param[in] eps: the largest value could be seen as zero.
  * @param[in] atc: Parameter that determines the solver type.
  *              - INFINITY: acoustic approximation
- *              - eps:      GRP solver(nonlinear + acoustic case)
- *              - -0.0:     GRP solver(only nonlinear case)
+ *                - ifv_.s_ = -0.0: exact Riemann solver 
+ *              - eps:      1D GRP solver(nonlinear + acoustic case)
+ *              - -0.0:     1D GRP solver(only nonlinear case)
  * @par  Reference
  *       Theory is found in Reference [1]. \n
  *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
@@ -57,6 +58,31 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, 
   c_R = sqrt(gamma * p_R / rho_R);
 
   dist = sqrt((u_L-u_R)*(u_L-u_R) + (p_L-p_R)*(p_L-p_R));
+  if (dist < atc && atc < 2*eps)
+      {
+	  rho_star_L = rho_L;
+	  rho_star_R = rho_R;
+	  c_star_L = c_L;
+	  c_star_R = c_R;
+	  u_star = 0.5*(u_R+u_L);
+	  p_star = 0.5*(p_R+p_L);
+      }
+  else
+      {
+	  Riemann_solver_exact_single(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 50);
+
+	  if(p_star > p_L)
+	      rho_star_L = rho_L*(p_star+zeta*p_L)/(p_L+zeta*p_star);
+	  else
+	      rho_star_L = rho_L*pow(p_star/p_L,1.0/gamma);
+	  if(p_star > p_R)
+	      rho_star_R = rho_R*(p_star+zeta*p_R)/(p_R+zeta*p_star);
+	  else
+	      rho_star_R = rho_R*pow(p_star/p_R,1.0/gamma);
+	  c_star_L = sqrt(gamma * p_star / rho_star_L);
+	  c_star_R = sqrt(gamma * p_star / rho_star_R);
+      }
+
 //=========acoustic case==========
   if(dist < atc)
   {
@@ -88,31 +114,6 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, 
     //------non-trivial case------
     else
     {
-      if (atc > 2*eps)
-      {
-	  Riemann_solver_exact_single(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 50);
-
-	  if(p_star > p_L)
-	      rho_star_L = rho_L*(p_star+zeta*p_L)/(p_L+zeta*p_star);
-	  else
-	      rho_star_L = rho_L*pow(p_star/p_L,1.0/gamma);
-	  if(p_star > p_R)
-	      rho_star_R = rho_R*(p_star+zeta*p_R)/(p_R+zeta*p_star);
-	  else
-	      rho_star_R = rho_R*pow(p_star/p_R,1.0/gamma);
-	  c_star_L = sqrt(gamma * p_star / rho_star_L);
-	  c_star_R = sqrt(gamma * p_star / rho_star_R);
-      }
-      else
-      {
-	  rho_star_L = rho_L;
-	  rho_star_R = rho_R;
-	  c_star_L =   c_L;
-	  c_star_R =   c_R;
-	  u_star = 0.5*(u_R+u_L);
-	  p_star = 0.5*(p_R+p_L);
-      }
-
       if(u_star > 0.0)
       {
 	U[0] = rho_star_L;
@@ -140,24 +141,10 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, 
 	D[0] = (u_star*(s_p_R - s_rho_R*c_star_R*c_star_R) + D[2])/c_star_R/c_star_R;
       }
     }
-
     return;
   }
 
 //=========non-acoustic case==========
-  Riemann_solver_exact_single(&u_star, &p_star, gamma, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 50);
-
-  if(p_star > p_L)
-    rho_star_L = rho_L*(p_star+zeta*p_L)/(p_L+zeta*p_star);
-  else
-    rho_star_L = rho_L*pow(p_star/p_L,1.0/gamma);
-  if(p_star > p_R)
-    rho_star_R = rho_R*(p_star+zeta*p_R)/(p_R+zeta*p_star);
-  else
-    rho_star_R = rho_R*pow(p_star/p_R,1.0/gamma);
-  c_star_L = sqrt(gamma * p_star / rho_star_L);
-  c_star_R = sqrt(gamma * p_star / rho_star_R);
-
 //----------solving the LINEAR GRP----------
   if(CRW[0])
     speed_L = u_L - c_L;

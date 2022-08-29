@@ -20,10 +20,11 @@
  * @section Program_structure Program structure
  * <table>
  * <tr><th> include/                   <td> Header files
- * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> finite_volume/             <td> Finite volume scheme programs
- * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> tools/                     <td> Tool functions
+ * <tr><th> file_io/                   <td> Program reads and writes files
+ * <tr><th> Riemann_solver/            <td> Riemann solver programs
+ * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
+ * <tr><th> finite_volume/             <td> Finite volume scheme programs
  * <tr><th> hydrocode_2D/hydrocode.c   <td> Main program
  * <tr><th> hydrocode_2D/hydrocode.sh  <td> Bash script compiles and runs programs
  * </table>

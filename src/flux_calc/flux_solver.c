@@ -38,9 +38,9 @@ void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double ta
 #ifdef MULTIFLUID_BASICS
 	double phi_mid, z_a_mid;
 
-	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
 	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, eps);
 	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
+	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
 // Acoustic approximation
 	// linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, INFINITY);
 #else

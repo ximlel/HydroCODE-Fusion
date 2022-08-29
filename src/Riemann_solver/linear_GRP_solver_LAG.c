@@ -17,7 +17,7 @@
  * @param[out] U:  the Riemann solutions. \n
  *                   [rho_star_L, u_star, p_star, rho_star_R]
  * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, s_rho_L, s_u_L, s_p_L, gammaL).
- * @param[in] ifv_R: Right States (rho_R, u_R, p_R, s_rho_R, s_u_R, s_p_R, gammaR). \n
+ * @param[in] ifv_R: Right States (rho_R, u_R, p_R, s_rho_R, s_u_R, s_p_R, gammaR).
  *                   - s_rho, s_u, s_p: ξ-Lagrangian spatial derivatives.
  *                   - gamma: the constant of the perfect gas.
  * @param[in] eps: the largest value could be seen as zero.

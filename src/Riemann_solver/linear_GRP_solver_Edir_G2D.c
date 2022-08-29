@@ -1,21 +1,48 @@
+/**
+ * @file  linear_GRP_solver_Edir_G2D.c
+ * @brief This is a Genuinely-2D direct Eulerian GRP solver for compressible inviscid flow in Li's paper.
+ */
+
 #include <math.h>
 #include <stdio.h>
 
 #include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
 
-#ifndef EXACT_TANGENT_DERIVATIVE
-#undef  EXACT_TANGENT_DERIVATIVE
-#endif
+/**
+ * @def EXACT_TANGENT_DERIVATIVE
+ * @brief Switch whether the tangential derivatives are accurately computed.
+ */
 
-/*
-  atc=INFINITY     acoustic approximation
-  atc=eps          G2D GRP solver(nonlinear + acoustic case)
-  atc=-0.0         G2D GRP solver(only nonlinear case)
-  atc=INFINITY,d_,t_=-0.0   exact Riemann solver
-  atc=eps,t_=-0.0  P1D GRP solver
-*/
 
+/**
+ * @brief A Genuinely-2D direct Eulerian GRP solver for unsteady compressible inviscid two-component flow in two space dimension.
+ * @param[out] wave_speed: the velocity of left and right waves.
+ * @param[out] D: the temporal derivative of fluid variables. \n
+ *                   [rho, u, v, p, phi, z_a]_t
+ * @param[out] U:  the intermediate Riemann solutions at t-axis. \n
+ *                   [rho_mid, u_mid, v_mid, p_mid, phi_mid, z_a_mid]
+ * @param[out] U_star: the Riemann solutions in star region. \n
+ *                   [rho_star_L, u_star, rho_star_R, p_star, c_star_L, c_star_R]
+ * @param[in] ifv_L: Left  States (rho/u/v/p/phi/z, d_, t_, gammaL).
+ * @param[in] ifv_R: Right States (rho/u/v/p/phi/z, d_, t_, gammaR).
+ *                   - s_: normal derivatives.
+ *                   - t_: tangential derivatives.
+ *                   - gamma: the constant of the perfect gas.
+ * @param[in] eps: the largest value could be seen as zero.
+ * @param[in] atc: Parameter that determines the solver type.
+ *              - INFINITY: acoustic approximation
+ *                - ifv_.s_, ifv_.t_ = -0.0: exact Riemann solver 
+ *              - eps:      Genuinely-2D GRP solver(nonlinear + acoustic case)
+ *                - ifv_.t_ = -0.0: Planar-1D GRP solver
+ *              - -0.0:     Genuinely-2D GRP solver(only nonlinear case)
+ *                - ifv_.t_ = -0.0: Planar-1D GRP solver
+ * @remark macro definition \b EXACT_TANGENT_DERIVATIVE: \n
+ *         Switch whether the tangential derivatives are accurately computed.
+ * @par  Reference
+ *       Theory is found in Reference [1]. \n
+ *       [1] 齐进, 二维欧拉方程广义黎曼问题数值建模及其应用, Ph.D Thesis, Beijing Normal University, 2017.
+ */
 void linear_GRP_solver_Edir_G2D
 (double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double  eps, const double  atc)
 {
@@ -76,55 +103,56 @@ void linear_GRP_solver_Edir_G2D
 	double mid_up[6], star_up[6], mid_dn[6], star_dn[6];
 	double wave_speed_tmp[2], dire_tmp[6];
 #endif
+
 	c_L = sqrt(gammaL * p_L / rho_L);
 	c_R = sqrt(gammaR * p_R / rho_R);
 
 	dist = sqrt((rho_L-rho_R)*(rho_L-rho_R) + (u_L-u_R)*(u_L-u_R) + (v_L-v_R)*(v_L-v_R) + (p_L-p_R)*(p_L-p_R));
+	if (dist < atc && atc < 2*eps)
+	    {
+		u_star = 0.5*(u_R+u_L);
+		p_star = 0.5*(p_R+p_L);
+		rho_star_L = rho_L;
+		c_star_L = c_L;
+		speed_L = u_star - c_star_L;
+		rho_star_R = rho_R;
+		c_star_R = c_R;
+		speed_R = u_star + c_star_R;
+	    }
+	else //=========Riemann solver==========
+	    {
+		Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
+		if(CRW[0])
+		    {
+			rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
+			c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
+			speed_L = u_L - c_L;
+		    }
+		else
+		    {
+			rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
+			c_star_L = sqrt(gammaL * p_star / rho_star_L);
+			speed_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
+		    }
+		if(CRW[1])
+		    {
+			rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
+			c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
+			speed_R = u_R + c_R;
+		    }
+		else
+		    {
+			rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
+			c_star_R = sqrt(gammaR * p_star / rho_star_R);
+			speed_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
+		    }
+	    }
+	wave_speed[0] = speed_L;
+	wave_speed[1] = speed_R;
+
 	//=========acoustic case==========
 	if(dist < atc)
 		{
-			if (atc > 2*eps)  //=========acoustic approximation==========
-				{
-					Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
-					if(CRW[0])
-						{
-							rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
-							c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
-							speed_L = u_L - c_L;
-						}
-					else
-						{
-							rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
-							c_star_L = sqrt(gammaL * p_star / rho_star_L);
-							speed_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
-						}
-					if(CRW[1])
-						{
-							rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
-							c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
-							speed_R = u_R + c_R;
-						}
-					else
-						{
-							rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
-							c_star_R = sqrt(gammaR * p_star / rho_star_R);
-							speed_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
-						}
-				}
-			else
-				{
-					u_star = 0.5*(u_R+u_L);
-					p_star = 0.5*(p_R+p_L);
-					rho_star_L = rho_L;
-					c_star_L = c_L;
-					speed_L = u_star - c_star_L;
-					rho_star_R = rho_R;
-					c_star_R = c_R;
-					speed_R = u_star + c_star_R;
-				}
-			wave_speed[0] = speed_L;
-			wave_speed[1] = speed_R;
-
 			if(speed_L > lambda_u) //the direction is on the left side of all the three waves
 				{
 					U[0] = rho_L;
@@ -241,36 +269,6 @@ void linear_GRP_solver_Edir_G2D
 		}
 
 	//=========non-acoustic case==========
-	Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
-
-	if(CRW[0])
-		{
-			rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
-			c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
-			speed_L = u_L - c_L;
-		}
-	else
-		{
-			rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
-			c_star_L = sqrt(gammaL * p_star / rho_star_L);
-			speed_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
-		}
-	if(CRW[1])
-		{
-			rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
-			c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
-			speed_R = u_R + c_R;
-		}
-	else
-		{
-			rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
-			c_star_R = sqrt(gammaR * p_star / rho_star_R);
-			speed_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
-		}
-	wave_speed[0] = speed_L;
-	wave_speed[1] = speed_R;
-
-
 	//------trivial case------
 	if(speed_L > lambda_u) //the direction is on the left side of all the three waves
 		{
@@ -305,20 +303,7 @@ void linear_GRP_solver_Edir_G2D
 	else//----non-trivial case----
 		{
 			// calculate T_rho, T_u, T_v, T_p, T_z, T_phi
-#ifndef EXACT_TANGENT_DERIVATIVE
-			if(u_star < lambda_u)
-				{		   
-					T_p = 0.5*((t_u_L-t_u_R)*rho_star_R*c_star_R+t_p_L+t_p_R);
-					T_u = 0.5*(t_u_L+t_u_R+(t_p_L-t_p_R)/rho_star_R/c_star_R);
-					T_rho = t_rho_R - t_p_R/(c_star_R*c_star_R) + T_p/(c_star_R*c_star_R);
-				}
-			else
-				{	
-					T_p = 0.5*((t_u_L-t_u_R)*rho_star_L*c_star_L+t_p_L+t_p_R);
-					T_u = 0.5*(t_u_L+t_u_R+(t_p_L-t_p_R)/rho_star_L/c_star_L);
-					T_rho = t_rho_L - t_p_L/(c_star_L*c_star_L) + T_p/(c_star_L*c_star_L);
-				}
-#else
+#ifdef EXACT_TANGENT_DERIVATIVE
 			gammaL_up = 1.0/((z_L+da_y*t_z_L)/(config[6]-1.0)+(1.0-(z_L+da_y*t_z_L))/(config[106]-1.0))+1.0;
 			gammaR_up = 1.0/((z_R+da_y*t_z_R)/(config[6]-1.0)+(1.0-(z_R+da_y*t_z_R))/(config[106]-1.0))+1.0;
 			linear_GRP_solver_Edir_Q1D(wave_speed_tmp, dire_tmp, mid_up, star_up, 0.0, 0.0, rho_L+da_y*t_rho_L, rho_R+da_y*t_rho_R, -0.0, -0.0, -0.0, -0.0, u_L+da_y*t_u_L, u_R+da_y*t_u_R, -0.0, -0.0, -0.0, -0.0, 0.0, 0.0, -0.0, -0.0, -0.0, -0.0, p_L+da_y*t_p_L, p_R+da_y*t_p_R, -0.0, -0.0, -0.0, -0.0, 0.0, 0.0, -0.0, -0.0, -0.0, -0.0, 0.0, 0.0, -0.0, -0.0, -0.0, -0.0, gammaL_up, gammaR_up, eps*da_y, -0.0);
@@ -346,6 +331,19 @@ void linear_GRP_solver_Edir_G2D
 						T_rho = (star_up[2]-star_dn[2])/da_y*0.5;	
 					else
 						T_rho = (star_up[0]-star_dn[0])/da_y*0.5;	
+				}
+#else
+			if(u_star < lambda_u)
+				{		   
+					T_p = 0.5*((t_u_L-t_u_R)*rho_star_R*c_star_R+t_p_L+t_p_R);
+					T_u = 0.5*(t_u_L+t_u_R+(t_p_L-t_p_R)/rho_star_R/c_star_R);
+					T_rho = t_rho_R - t_p_R/(c_star_R*c_star_R) + T_p/(c_star_R*c_star_R);
+				}
+			else
+				{	
+					T_p = 0.5*((t_u_L-t_u_R)*rho_star_L*c_star_L+t_p_L+t_p_R);
+					T_u = 0.5*(t_u_L+t_u_R+(t_p_L-t_p_R)/rho_star_L/c_star_L);
+					T_rho = t_rho_L - t_p_L/(c_star_L*c_star_L) + T_p/(c_star_L*c_star_L);
 				}
 #endif
 			if(CRW[0] && ((u_star-c_star_L) > lambda_u)) // the direction is in a 1-CRW

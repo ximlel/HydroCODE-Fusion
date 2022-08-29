@@ -19,11 +19,17 @@
 \hline
 \textbf{data\_out} & 放置输出计算过程中RHO,U,P,E和拉式坐标X变化结果的文件夹\\
 \hline
+\textbf{tools}     & 一些小工具\\
+\hline
 \textbf{file\_io}  & 数据文件读入与读出的程序\\
+\hline
+\textbf{Riemann\_solver} & 精确Riemann解法器\\
 \hline
 \textbf{finite\_volume}  & 有限格式的算法程序\\
 \hline
-\textbf{Riemann\_solver} & 精确Riemann解法器\\
+\textbf{inter_process}   & 有限格式中间过程的算法程序\\
+\hline
+\textbf{include}         & 程序的所有头文件\\
 \hline
 \textbf{hydrocode/hydrocode.c} & 主程序\\
 \hline
@@ -32,7 +38,7 @@
 \end{tabular}
 \end{table}
 
-在Linux终端下运行make.sh即可使用gcc编译程序, 使用MATLAB软件画图.
+在Linux终端下运行make.sh即可使用gcc编译程序, 使用MATLAB/Octave软件画图.
 
 具体如何查看程序的使用指南, 请参考README.md中的介绍.
 

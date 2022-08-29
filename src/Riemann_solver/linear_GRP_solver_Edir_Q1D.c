@@ -1,17 +1,41 @@
+/**
+ * @file  linear_GRP_solver_Edir_Q1D.c
+ * @brief This is a Quasi-1D direct Eulerian GRP solver for compressible inviscid flow in Li's paper.
+ */
+
 #include <math.h>
 #include <stdio.h>
 
 #include "../include/var_struc.h"
 #include "../include/Riemann_solver.h"
 
-/*
-  atc=INFINITY     acoustic approximation
-  atc=eps          Q1D GRP solver(nonlinear + acoustic case)
-  atc=-0.0         Q1D GRP solver(only nonlinear case)
-  atc=INFINITY,d_,t_=-0.0   exact Riemann solver
-  atc=eps,t_=-0.0  P1D GRP solver
-*/
-
+/**
+ * @brief A Quasi-1D direct Eulerian GRP solver for unsteady compressible inviscid two-component flow in two space dimension.
+ * @param[out] wave_speed: the velocity of left and right waves.
+ * @param[out] D: the temporal derivative of fluid variables. \n
+ *                   [rho, u, v, p, phi, z_a]_t
+ * @param[out] U:  the intermediate Riemann solutions at t-axis. \n
+ *                   [rho_mid, u_mid, v_mid, p_mid, phi_mid, z_a_mid]
+ * @param[out] U_star: the Riemann solutions in star region. \n
+ *                   [rho_star_L, u_star, rho_star_R, p_star, c_star_L, c_star_R]
+ * @param[in] ifv_L: Left  States (rho/u/v/p/phi/z, d_, t_, gammaL).
+ * @param[in] ifv_R: Right States (rho/u/v/p/phi/z, d_, t_, gammaR).
+ *                   - s_: normal derivatives.
+ *                   - t_: tangential derivatives.
+ *                   - gamma: the constant of the perfect gas.
+ * @param[in] eps: the largest value could be seen as zero.
+ * @param[in] atc: Parameter that determines the solver type.
+ *              - INFINITY: acoustic approximation
+ *                - ifv_.s_, ifv_.t_ = -0.0: exact Riemann solver 
+ *              - eps:      Quasi-1D GRP solver(nonlinear + acoustic case)
+ *                - ifv_.t_ = -0.0: Planar-1D GRP solver
+ *              - -0.0:     Quasi-1D GRP solver(only nonlinear case)
+ *                - ifv_.t_ = -0.0: Planar-1D GRP solver
+ * @par  Reference
+ *       Theory is found in Reference [1]. \n
+ *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
+ *           Journal of Computational Physics, 218.1: 19-43, 2006.
+ */
 void linear_GRP_solver_Edir_Q1D
 (double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double  eps, const double  atc)
 {
@@ -70,51 +94,51 @@ void linear_GRP_solver_Edir_Q1D
 	c_R = sqrt(gammaR * p_R / rho_R);
 
 	dist = sqrt((rho_L-rho_R)*(rho_L-rho_R) + (u_L-u_R)*(u_L-u_R) + (p_L-p_R)*(p_L-p_R));
+	if (dist < atc && atc < 2*eps)
+	    {
+		u_star = 0.5*(u_R+u_L);
+		p_star = 0.5*(p_R+p_L);
+		rho_star_L = rho_L;
+		c_star_L = c_L;
+		speed_L = u_star - c_star_L;
+		rho_star_R = rho_R;
+		c_star_R = c_R;
+		speed_R = u_star + c_star_R;
+	    }
+	else //=========Riemann solver==========
+	    {
+		Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
+		if(CRW[0])
+		    {
+			rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
+			c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
+			speed_L = u_L - c_L;
+		    }
+		else
+		    {
+			rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
+			c_star_L = sqrt(gammaL * p_star / rho_star_L);
+			speed_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
+		    }
+		if(CRW[1])
+		    {
+			rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
+			c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
+			speed_R = u_R + c_R;
+		    }
+		else
+		    {
+			rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
+			c_star_R = sqrt(gammaR * p_star / rho_star_R);
+			speed_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
+		    }
+	    }
+	wave_speed[0] = speed_L;
+	wave_speed[1] = speed_R;
+
 	//=========acoustic case==========
 	if(dist < atc)
 		{
-			if (atc > 2*eps)  //=========acoustic approximation==========
-				{
-					Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
-					if(CRW[0])
-						{
-							rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
-							c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
-							speed_L = u_L - c_L;
-						}
-					else
-						{
-							rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
-							c_star_L = sqrt(gammaL * p_star / rho_star_L);
-							speed_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
-						}
-					if(CRW[1])
-						{
-							rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
-							c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
-							speed_R = u_R + c_R;
-						}
-					else
-						{
-							rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
-							c_star_R = sqrt(gammaR * p_star / rho_star_R);
-							speed_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
-						}
-				}
-			else
-				{
-					u_star = 0.5*(u_R+u_L);
-					p_star = 0.5*(p_R+p_L);
-					rho_star_L = rho_L;
-					c_star_L = c_L;
-					speed_L = u_star - c_star_L;
-					rho_star_R = rho_R;
-					c_star_R = c_R;
-					speed_R = u_star + c_star_R;
-				}
-			wave_speed[0] = speed_L;
-			wave_speed[1] = speed_R;
-
 			if(speed_L > lambda_u) //the direction is on the left side of all the three waves
 				{
 					U[0] = rho_L;
@@ -231,36 +255,6 @@ void linear_GRP_solver_Edir_Q1D
 		}
 
 	//=========non-acoustic case==========
-	Riemann_solver_exact(&u_star, &p_star, gammaL, gammaR, u_L, u_R, p_L, p_R, c_L, c_R, CRW, eps, eps, 500);
-
-	if(CRW[0])
-		{
-			rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
-			c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
-			speed_L = u_L - c_L;
-		}
-	else
-		{
-			rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
-			c_star_L = sqrt(gammaL * p_star / rho_star_L);
-			speed_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
-		}
-	if(CRW[1])
-		{
-			rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
-			c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
-			speed_R = u_R + c_R;
-		}
-	else
-		{
-			rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
-			c_star_R = sqrt(gammaR * p_star / rho_star_R);
-			speed_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
-		}
-	wave_speed[0] = speed_L;
-	wave_speed[1] = speed_R;
-
-
 	//------trivial case------
 	if(speed_L > lambda_u) //the direction is on the left side of all the three waves
 		{

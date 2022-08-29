@@ -1,7 +1,7 @@
-# 1D Godunov/GRP scheme for Lagrangian/Eulerian hydrodynamics
+# Godunov/GRP scheme for Lagrangian/Eulerian hydrodynamics
 What is it?
 -----------
-This is a implementation of fully explict forward Euler scheme for 1-D Euler equations of motion on Lagrangian/Eulerian coordinate.
+This is a implementation of fully explict forward Euler scheme for Euler equations of motion on Lagrangian/Eulerian coordinate.
 
 How to use it?
 -----------
@@ -12,14 +12,14 @@ It is made by Doxygen and LaTeX,
 Run the following command on the terminal.
 
 ```
-doxygen ./Doxyfile
-cd doc/latex
+doxygen src/*/Doxyfile
+cd doc/*/latex
 make
-cd ../Specification
+cd doc/Specification
 xelatex Specification.tex
 ```
 
-Open 'doc/html/index.html' in a browser to view the specific instructions of this program.
+Open 'doc/*/html/index.html' in a browser to view the specific instructions of this program.
 
 Licensing
 ---------
