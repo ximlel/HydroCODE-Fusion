@@ -4,6 +4,17 @@
 #include "../include/flux_calc.h"
 
 
+/**
+ * @brief This function calculate Eulerian fluxes of 2-D Euler equations in y-direction by 2-D GRP solver.
+ * @param[in] m:      Number of the x-grids: n_x.
+ * @param[in] n:      Number of the y-grids: n_y.
+ * @param[in] nt:     Current plot time step for computing updates of conservative variables.
+ * @param[in] tau:    The length of the time step.
+ * @param[in,out] CV: Structural body of cell variable data.
+ * @param[in] bfv_D:  Structural body pointer of fluid variables at downside boundary.
+ * @param[in] bfv_U:  Structural body pointer of fluid variables at upper boundary.
+ * @param[in] Transversal: Whether the tangential effect is considered.
+ */
 void flux_generator_y(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
 		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversa)
 {

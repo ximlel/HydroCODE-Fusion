@@ -37,14 +37,15 @@
     } while (0)
 
 /**
- * @brief This function write the solution into output files.
+ * @brief This function write the 1-D solution into output .dat files.
  * @note  It is quite simple so there will be no more comments.
  * @param[in] m: The number of spatial points in the output data.
  * @param[in] N: The number of time steps in the output data.
  * @param[in] CV:  Structural body of grid variable data.
  * @param[in] X[]: Array of the coordinate data.
- * @param[in] cpu_time: Array of the CPU time recording.
- * @param[in] name:     Name of the numerical results.
+ * @param[in] cpu_time:  Array of the CPU time recording.
+ * @param[in] name:      Name of the numerical results.
+ * @param[in] time_plot: Array of the plotting time recording.
  */
 void _1D_file_write(const int m, const int N, const struct cell_var_stru CV, 
                     double * X[], const double * cpu_time, const char * name, const double * time_plot)

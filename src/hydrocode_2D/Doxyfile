@@ -874,7 +874,14 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../include ../tools ../file_io ../Riemann_solver ../finite_volume ./
+INPUT                  = ../include \
+                         ../tools \
+                         ../file_io \
+                         ../Riemann_solver \
+                         ../inter_process \
+                         ../flux_calc \
+                         ../finite_volume \
+                         ./
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

@@ -12,7 +12,8 @@ It is made by Doxygen and LaTeX,
 Run the following command on the terminal.
 
 ```
-doxygen src/*/Doxyfile
+cd src/*
+doxygen Doxyfile
 cd doc/*/latex
 make
 cd doc/Specification

@@ -119,7 +119,7 @@ int format_string(char * str)
  * @brief This function transform a string consisting '1', '2',
  *        ..., and '.' into the real number that it represents.
  * @param[in]  number: String of the real number.
- * @return     The real number that the string represents.
+ * @return \b  result: The real number that the string represents.
  * @deprecated This function has been replaced by the 'strtod()'
  *             function in the standard Library <stdio.h>.
  */

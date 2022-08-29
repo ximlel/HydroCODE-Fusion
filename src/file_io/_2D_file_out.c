@@ -40,6 +40,17 @@
     fclose(fp_write);							\
     } while (0)
 
+/**
+ * @brief This function write the 2-D solution into output .dat files.
+ * @note  It is quite simple so there will be no more comments.
+ * @param[in] m: The number of spatial points in the output data.
+ * @param[in] N: The number of time steps in the output data.
+ * @param[in] CV:  Structural body of grid variable data.
+ * @param[in] X[]: Array of the coordinate data.
+ * @param[in] cpu_time:  Array of the CPU time recording.
+ * @param[in] name:      Name of the numerical results.
+ * @param[in] time_plot: Array of the plotting time recording.
+ */
 void _2D_file_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
 		    double * X[], double * Y[], const double * cpu_time, const char * name, const double * time_plot)
 {
@@ -76,6 +87,18 @@ void _2D_file_write(const int n_x, const int n_y, const int N, const struct cell
 }
 
 
+/**
+ * @brief This function write the 2-D solution into Tecplot output files.
+ * @param[in] n_x: The number of x-spatial points in the output data.
+ * @param[in] n_y: The number of y-spatial points in the output data.
+ * @param[in] N:   The number of time steps in the output data.
+ * @param[in] CV:  Structural body of grid variable data.
+ * @param[in] X[]: Array of the x-coordinate data.
+ * @param[in] Y[]: Array of the y-coordinate data.
+ * @param[in] cpu_time:  Array of the CPU time recording.
+ * @param[in] problem:   Name of the numerical results.
+ * @param[in] time_plot: Array of the plotting time recording.
+ */
 void _2D_TEC_file_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
 			double * X[], double * Y[], const double * cpu_time, const char * problem, const double * time_plot)
 {

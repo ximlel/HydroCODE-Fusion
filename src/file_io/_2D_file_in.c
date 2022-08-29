@@ -13,7 +13,7 @@
 
 
 /**
- * @brief Count out and read in data of the initial fluid variable 'sfv'.
+ * @brief Count out and read in 2-D data of the initial fluid variable 'sfv'.
  */
 #define STR_FLU_INI(sfv)						\
     do {								\
@@ -67,13 +67,14 @@
     } while(0)
 
 /** 
-  * @brief      This function reads the initial data file of velocity/pressure/density.
-  * @details    The function initialize the extern pointer FV0.RHO/U/P pointing to the
-  *             position of a block of memory consisting (m+1) variables* of type double.
-  *             The value of first of these variables is m.
-  *             The following m variables are the initial value.
+  * @brief      This function reads the 2-D initial data file of velocity/pressure/density.
+  * @details    The function initialize the extern pointer FV0.RHO/U/V/P pointing to the
+  *             position of a block of memory consisting (line*column+2) variables* of type double.
+  *             The value of first of these variables is (line) number;
+  *             The value of second of these variables is (column) number;
+  *             The following (line*column) variables are the initial value.
   * @param[in]  name: Name of the test example.
-  * @param[out] FV0:  Structural body pointer of initial data array pointer.
+  * @return  \b FV0:  Structural body of initial data array pointer.
   */
 struct flu_var _2D_initialize(const char * name)
 {

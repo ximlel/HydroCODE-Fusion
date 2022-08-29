@@ -1,5 +1,5 @@
 /**
- * @file  config_in.c
+ * @file  config_handle.c
  * @brief This is a set of functions which control the read-in of configuration data.
  */
 
@@ -123,7 +123,7 @@ static void config_check(void)
     // Dimensional splitting
     config[33] = isfinite(config[33]) ? config[31] : (double)false;
     // Parameter α in minmod limiter
-    config[41] = isfinite(config[41]) ? config[41] : (double)1.9;
+    config[41] = isfinite(config[41]) ? config[41] : 1.9;
     // v_fix
     config[61] = isfinite(config[61]) ? config[61] : (double)false;
     // offset_x

@@ -106,7 +106,7 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
  * @brief      This function counts how many numbers are there in the initial data file. 
  * @param[in]  fp:  The pointer to the input file.
  * @param[in]  add: The address of the input file.
- * @return     The number of the numbers in the initial data file.
+ * @return \b  num: The number of the numbers in the initial data file.
  */
 int flu_var_count(FILE * fp, const char * add)
 {
@@ -145,7 +145,7 @@ int flu_var_count(FILE * fp, const char * add)
  * @param[in]  fp:  The pointer to the input file.
  * @param[in]  add: The address of the input file.
  * @param[out] n_x: The colume number of the numbers in the initial data file.
- * @return     The line number of the numbers in the initial data file.
+ * @return \b line: The line number of the numbers in the initial data file.
  */
 int flu_var_count_line(FILE * fp, const char * add, int * n_x)
 {
@@ -198,12 +198,12 @@ int flu_var_count_line(FILE * fp, const char * add, int * n_x)
 
 
 /**
- * @brief This function reads the 1D initial data file to generate the initial data.
+ * @brief This function reads the initial data file to generate the initial data.
  * @param[in]  fp: The pointer to the input file.
  * @param[out]  U: The pointer to the data array of fluid variables.
  * @param[in] num: The number of the numbers in the input file. 
- * @return It returns 0 if successfully read the file,
- *         while returns the index of the wrong entry.
+ * @return  It returns 0 if successfully read the file,
+ *          while returns the index of the wrong entry.
  */
 int flu_var_read(FILE * fp, double * U, const int num)
 {

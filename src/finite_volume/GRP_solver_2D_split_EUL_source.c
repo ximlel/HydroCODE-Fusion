@@ -1,6 +1,6 @@
 /**
- * @file  GRP_solver_2D_EUL_source.c
- * @brief This is an Eulerian GRP scheme to solve 2-D Euler equations.
+ * @file  GRP_solver_2D_split_EUL_source.c
+ * @brief This is an Eulerian GRP scheme to solve 2-D Euler equations with dimension splitting.
  */
 
 #include <stdio.h>
@@ -16,18 +16,21 @@
 #include "../include/tools.h"
 
 
+/**
+ * @brief M*N memory allocations to the variable 'v' in the structural body cell_var_stru.
+ */
 #define _2D_INIT_MEM(v, M, N)						\
     do {								\
-	v = (double **)malloc((M) * sizeof(double *));			\
-	if(v == NULL)							\
+	CV->v = (double **)malloc((M) * sizeof(double *));			\
+	if(CV->v == NULL)							\
 	    {								\
 		printf("NOT enough memory! %s\n", #v);			\
 		goto return_NULL;					\
 	    }								\
 	for(j = 0; j < (M); ++j)					\
 	    {								\
-		v[j] = (double *)malloc((N) * sizeof(double));		\
-		if(v[j] == NULL)					\
+		CV->v[j] = (double *)malloc((N) * sizeof(double));		\
+		if(CV->v[j] == NULL)					\
 		    {							\
 			printf("NOT enough memory! %s[%d]\n", #v, j);	\
 			goto return_NULL;				\
@@ -35,23 +38,27 @@
 	    }								\
     } while (0)
 
-#define _1D_BC_INIT_MEM(v, M)				\
+/**
+ * @brief M memory allocations to the structural body variable b_f_var 'bfv'.
+ */
+#define _1D_BC_INIT_MEM(bfv, M)				\
     do {						\
-	v = (struct b_f_var *)calloc((M), sizeof(struct b_f_var));	\
-	if(v == NULL)					\
+	bfv = (struct b_f_var *)calloc((M), sizeof(struct b_f_var));	\
+	if(bfv == NULL)					\
 	    {						\
-		printf("NOT enough memory! %s\n", #v);	\
+		printf("NOT enough memory! %s\n", #bfv);	\
 		goto return_NULL;			\
 	    }						\
     } while (0)
 
 /**
  * @brief This function use GRP scheme to solve 2-D Euler
- *        equations of motion on Eulerian coordinate.
- * @param[in]  m:        Number of the x-grids: n_x.
- * @param[in]  n:        Number of the y-grids: n_y.
- * @param[in,out] CV:    Structural body of cell variable data.
- * @param[out] cpu_time: Array of the CPU time recording.
+ *        equations of motion on Eulerian coordinate with dimension splitting.
+ * @param[in]  m:         Number of the x-grids: n_x.
+ * @param[in]  n:         Number of the y-grids: n_y.
+ * @param[in,out] CV:     Structural body of cell variable data.
+ * @param[out] cpu_time:  Array of the CPU time recording.
+ * @param[out] time_plot: Array of the plotting time recording.
  */
 void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, double * time_plot)
 {
@@ -80,30 +87,30 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   double c; // the speeds of sound
   
   // Left/Right/Upper/Downside boundary condition
-  struct b_f_var * bfv_L = NULL, * bfv_R = NULL, * bfv_U = NULL, * bfv_D = NULL; 
+  struct b_f_var * bfv_L = NULL, * bfv_R = NULL, * bfv_U = NULL, * bfv_D = NULL;
   // the slopes of variable values.
-  _2D_INIT_MEM(CV->s_rho, m, n); _2D_INIT_MEM(CV->t_rho, m, n);
-  _2D_INIT_MEM(CV->s_u,   m, n); _2D_INIT_MEM(CV->t_u,   m, n);
-  _2D_INIT_MEM(CV->s_v,   m, n); _2D_INIT_MEM(CV->t_v,   m, n);
-  _2D_INIT_MEM(CV->s_p,   m, n); _2D_INIT_MEM(CV->t_p,   m, n);
+  _2D_INIT_MEM(s_rho, m, n); _2D_INIT_MEM(t_rho, m, n);
+  _2D_INIT_MEM(s_u,   m, n); _2D_INIT_MEM(t_u,   m, n);
+  _2D_INIT_MEM(s_v,   m, n); _2D_INIT_MEM(t_v,   m, n);
+  _2D_INIT_MEM(s_p,   m, n); _2D_INIT_MEM(t_p,   m, n);
   // the variable values at (x_{j-1/2}, t_{n+1}).
-  _2D_INIT_MEM(CV->rhoIx, m+1, n);
-  _2D_INIT_MEM(CV->uIx,   m+1, n);
-  _2D_INIT_MEM(CV->vIx,   m+1, n);
-  _2D_INIT_MEM(CV->pIx,   m+1, n);
-  _2D_INIT_MEM(CV->F_rho, m+1, n);
-  _2D_INIT_MEM(CV->F_u,   m+1, n);
-  _2D_INIT_MEM(CV->F_v,   m+1, n);
-  _2D_INIT_MEM(CV->F_e,   m+1, n); 
+  _2D_INIT_MEM(rhoIx, m+1, n);
+  _2D_INIT_MEM(uIx,   m+1, n);
+  _2D_INIT_MEM(vIx,   m+1, n);
+  _2D_INIT_MEM(pIx,   m+1, n);
+  _2D_INIT_MEM(F_rho, m+1, n);
+  _2D_INIT_MEM(F_u,   m+1, n);
+  _2D_INIT_MEM(F_v,   m+1, n);
+  _2D_INIT_MEM(F_e,   m+1, n); 
   // the variable values at (y_{j-1/2}, t_{n+1}).
-  _2D_INIT_MEM(CV->rhoIy, m, n+1);
-  _2D_INIT_MEM(CV->uIy,   m, n+1);
-  _2D_INIT_MEM(CV->vIy,   m, n+1);
-  _2D_INIT_MEM(CV->pIy,   m, n+1);
-  _2D_INIT_MEM(CV->G_rho, m, n+1);
-  _2D_INIT_MEM(CV->G_u,   m, n+1);
-  _2D_INIT_MEM(CV->G_v,   m, n+1);
-  _2D_INIT_MEM(CV->G_e,   m, n+1);
+  _2D_INIT_MEM(rhoIy, m, n+1);
+  _2D_INIT_MEM(uIy,   m, n+1);
+  _2D_INIT_MEM(vIy,   m, n+1);
+  _2D_INIT_MEM(pIy,   m, n+1);
+  _2D_INIT_MEM(G_rho, m, n+1);
+  _2D_INIT_MEM(G_u,   m, n+1);
+  _2D_INIT_MEM(G_v,   m, n+1);
+  _2D_INIT_MEM(G_e,   m, n+1);
   // boundary condition
   _1D_BC_INIT_MEM(bfv_L, n); _1D_BC_INIT_MEM(bfv_R, n);
   _1D_BC_INIT_MEM(bfv_D, m); _1D_BC_INIT_MEM(bfv_U, m);

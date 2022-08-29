@@ -18,10 +18,11 @@
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
  *        equations of motion on Lagrangian coordinate.
- * @param[in]  m:        Number of the grids.
- * @param[in,out] CV:    Structural body of cell variable data.
- * @param[in,out] X[]:   Array of the coordinate data.
- * @param[out] cpu_time: Array of the CPU time recording.
+ * @param[in]  m:         Number of the grids.
+ * @param[in,out] CV:     Structural body of cell variable data.
+ * @param[in,out] X[]:    Array of the coordinate data.
+ * @param[out] cpu_time:  Array of the CPU time recording.
+ * @param[out] time_plot: Array of the plotting time recording.
  */
 void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double * time_plot)
 {

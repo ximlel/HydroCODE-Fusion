@@ -27,7 +27,7 @@ void _2D_file_write(const int n_x, const int n_y, const int N, const struct cell
 void _2D_TEC_file_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
 			double * X[], double * Y[], const double * cpu_time, const char * problem, const double * time_plot);
 
-// config_in.c
+// config_handle.c
 void configurate(const char * name);
 
 void config_write(const char * add_out, const double * cpu_time, const char * name);
