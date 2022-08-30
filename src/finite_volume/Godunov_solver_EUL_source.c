@@ -124,12 +124,12 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
 //========================Solve Riemann Problem========================
 	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, INFINITY);
 
-	      if(mid[2] < eps)
+	      if(mid[2] < eps || mid[0] < eps)
 		  {
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(!isfinite(mid[1])|| !isfinite(mid[2]))
+	      if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0]))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
 		      time_c = t_all;
@@ -148,6 +148,12 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
 	    tau = CFL * h_S_max;
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
+	    else if(!isfinite(tau))
+		{
+		    printf("NAN or INFinite error on [%d, %g] (t_n, tau) - CFL\n", k, tau); 
+		    tau = t_all - time_c;
+		    goto return_NULL;
+		}
 	}
     nu = tau / h;
 
@@ -169,11 +175,6 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
 	    if(P[nt][j] < eps || RHO[nt][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
-		    time_c = t_all;
-		}
-	    if(!isfinite(P[nt][j])|| !isfinite(U[nt][j])|| !isfinite(RHO[nt][j]))
-		{
-		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;
 		}
 	}

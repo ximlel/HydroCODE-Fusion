@@ -6,6 +6,14 @@
 #ifndef VARSTRUC_H
 #define VARSTRUC_H
 
+/**
+ * @def MULTIFLUID_BASICS
+ * @brief Switch whether to compute multi-fluids.
+ */
+#ifdef DOXYGEN_PREDEFINED
+#define MULTIFLUID_BASICS
+#endif
+
 //! If the system does not set, the default largest value can be seen as zero is EPS.
 #ifndef EPS
 #define EPS 1e-9

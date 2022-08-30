@@ -82,6 +82,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   double       tau       = config[16];       // the length of the time step
 
   _Bool find_bound_x = false, find_bound_y = false;
+  int flux_err;
 
   double mom_x, mom_y, ene;
   double c; // the speeds of sound
@@ -128,8 +129,8 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
      * and evaluate the character speed to decide the length
      * of the time step by (tau * speed_max)/h = CFL
      */
-      h_S_max = INFINITY; // h/S_max = INFINITY
-      tic = clock();
+    h_S_max = INFINITY; // h/S_max = INFINITY
+    tic = clock();
 
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
@@ -144,6 +145,12 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	    tau = CFL * h_S_max;
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
+	    else if(!isfinite(tau))
+		{
+		    printf("NAN or INFinite error on [%d, %g] (t_n, tau) - CFL\n", k, tau); 
+		    tau = t_all - time_c;
+		    goto return_NULL;
+		}
 	}
     nu = tau / h_x;
     mu = tau / h_y;
@@ -156,8 +163,16 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
     if(!find_bound_y)
         goto return_NULL;
 
-    flux_generator_x(m, n, nt-1, tau, CV, bfv_L, bfv_R, true);
-    flux_generator_y(m, n, nt-1, tau, CV, bfv_D, bfv_U, true);
+    flux_err = flux_generator_x(m, n, nt-1, tau, CV, bfv_L, bfv_R, true);
+    if(flux_err == 1)
+        goto return_NULL;
+    else if(flux_err == 2)
+	time_c = t_all;
+    flux_err = flux_generator_y(m, n, nt-1, tau, CV, bfv_D, bfv_U, true);
+    if(flux_err == 1)
+        goto return_NULL;
+    else if(flux_err == 2)
+	time_c = t_all;
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)

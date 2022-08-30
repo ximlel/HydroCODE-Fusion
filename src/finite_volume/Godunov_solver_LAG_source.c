@@ -155,6 +155,12 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 	    tau = fmin(CFL * h_S_max, C_m * tau);
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
+	    else if(!isfinite(tau))
+		{
+		    printf("NAN or INFinite error on [%d, %g] (t_n, tau) - CFL\n", k, tau); 
+		    tau = t_all - time_c;
+		    goto return_NULL;
+		}
 	}
     
     for(j = 0; j <= m; ++j)
@@ -174,11 +180,6 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 	    if(P[nt][j] < eps || RHO[nt][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
-		    time_c = t_all;
-		}
-	    if(!isfinite(P[nt][j])|| !isfinite(U[nt][j])|| !isfinite(RHO[nt][j]))
-		{
-		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;
 		}
 	}

@@ -39,7 +39,7 @@
 void linear_GRP_solver_Edir_Q1D
 (double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double  eps, const double  atc)
 {
-	const double lambda_u = ifv_L.lambda_u, lambda_v = ifv_R.lambda_v;
+	const double lambda_u = ifv_L.lambda_u, lambda_v = ifv_L.lambda_v;
 	const double  gammaL = ifv_L.gamma,  gammaR = ifv_R.gamma;
 	const double   rho_L = ifv_L.RHO,     rho_R = ifv_R.RHO;
 	const double d_rho_L = ifv_L.d_rho, d_rho_R = ifv_R.d_rho;

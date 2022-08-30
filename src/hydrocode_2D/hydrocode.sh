@@ -22,8 +22,8 @@ EXEcute=./hydrocode.out
  cd $CPath
  $EXEcute RP2D/RP2D_3_Quad RP2D/RP2D_3_Quad 2 2_GRP EUL
 !
- $EXEcute GRP_Book/6_1_Sod_10_lines GRP_Book/6_1_Sod_10_lines 2 2_GRP EUL 33=1
- $EXEcute GRP_Book/6_1_Sod_10_columns GRP_Book/6_1_Sod_10_columns 2 2_GRP EUL 33=1
+ $EXEcute GRP_Book/6_1_Sod_10_lines GRP_Book/6_1_Sod_10_lines 2 1 EUL 33=1
+ $EXEcute GRP_Book/6_1_Sod_10_columns GRP_Book/6_1_Sod_10_columns 2 1 EUL 33=1
 #!
 :<<SHARE
 

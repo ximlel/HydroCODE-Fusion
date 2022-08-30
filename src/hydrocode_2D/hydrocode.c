@@ -89,6 +89,20 @@
 #include "../include/file_io.h"
 #include "../include/finite_volume.h"
 
+/**
+ * @def NODATPLOT
+ * @brief Switch whether to plot without Matrix data.
+ */
+#ifdef DOXYGEN_PREDEFINED
+#define NODATPLOT
+#endif
+/**
+ * @def NOTECPLOT
+ * @brief Switch whether to plot without Tecplot data.
+ */
+#ifdef DOXYGEN_PREDEFINED
+#define NOTECPLOT
+#endif
 
 double config[N_CONF]; //!< Initial configuration data array.
 

@@ -4,6 +4,7 @@
  *        2-D Euler equations solved by 2-D GRP scheme.
  */
 #include <stdio.h>
+#include <math.h>
 
 #include "../include/var_struc.h"
 #include "../include/flux_calc.h"
@@ -21,13 +22,18 @@
  * @param[in] bfv_D:  Structure pointer of fluid variables at downside boundary.
  * @param[in] bfv_U:  Structure pointer of fluid variables at upper boundary.
  * @param[in] Transversal: Whether the tangential effect is considered.
+ * @return    miscalculation indicator.
+ *   @retval  0: Successful calculation.
+ *   @retval  1: Calculation error of left/right states.
+ *   @retval  2: Calculation error of interfacial fluxes.
  */
-void flux_generator_y(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
+int flux_generator_y(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
 		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversal)
 {
+  double const eps = config[4];  // the largest value could be seen as zero
   double const h_y = config[11]; // the length of the initial y spatial grids
   struct i_f_var ifv_D = {.n_x = 0.0, .n_y = 1.0}, ifv_U = {.n_x = 0.0, .n_y = 1.0};
-  int i, j;
+  int i, j, data_err;
 
 //===========================
   for(j = 0; j < m; ++j)
@@ -35,10 +41,10 @@ void flux_generator_y(const int m, const int n, const int nt, const double tau, 
     {
       if(i)
       {
-          ifv_D.t_rho = CV->t_rho[j][i-1];
-          ifv_D.t_u   =   CV->t_u[j][i-1];
-          ifv_D.t_v   =   CV->t_v[j][i-1];
-          ifv_D.t_p   =   CV->t_p[j][i-1];
+          ifv_D.d_rho = CV->t_rho[j][i-1];
+          ifv_D.d_u   =   CV->t_u[j][i-1];
+          ifv_D.d_v   =   CV->t_v[j][i-1];
+          ifv_D.d_p   =   CV->t_p[j][i-1];
           ifv_D.RHO  = CV[nt].RHO[j][i-1] + 0.5*h_y*CV->t_rho[j][i-1];
           ifv_D.U    =   CV[nt].U[j][i-1] + 0.5*h_y*  CV->t_u[j][i-1];
           ifv_D.V    =   CV[nt].V[j][i-1] + 0.5*h_y*  CV->t_v[j][i-1];
@@ -46,10 +52,10 @@ void flux_generator_y(const int m, const int n, const int nt, const double tau, 
       }
       else
       {
-          ifv_D.t_rho = bfv_D[j].TRHO;
-          ifv_D.t_u   = bfv_D[j].TU;
-          ifv_D.t_v   = bfv_D[j].TV;
-          ifv_D.t_p   = bfv_D[j].TP;
+          ifv_D.d_rho = bfv_D[j].TRHO;
+          ifv_D.d_u   = bfv_D[j].TU;
+          ifv_D.d_v   = bfv_D[j].TV;
+          ifv_D.d_p   = bfv_D[j].TP;
           ifv_D.RHO   = bfv_D[j].RHO + 0.5*h_y*bfv_D[j].TRHO;
           ifv_D.U     = bfv_D[j].U   + 0.5*h_y*bfv_D[j].TU;
           ifv_D.V     = bfv_D[j].V   + 0.5*h_y*bfv_D[j].TV;
@@ -57,10 +63,10 @@ void flux_generator_y(const int m, const int n, const int nt, const double tau, 
       }
       if(i < n)
       {
-          ifv_U.t_rho = CV->t_rho[j][i];
-          ifv_U.t_u   =   CV->t_u[j][i];
-          ifv_U.t_v   =   CV->t_v[j][i];
-          ifv_U.t_p   =   CV->t_p[j][i];
+          ifv_U.d_rho = CV->t_rho[j][i];
+          ifv_U.d_u   =   CV->t_u[j][i];
+          ifv_U.d_v   =   CV->t_v[j][i];
+          ifv_U.d_p   =   CV->t_p[j][i];
           ifv_U.RHO  = CV[nt].RHO[j][i] - 0.5*h_y*CV->t_rho[j][i];
           ifv_U.U    =   CV[nt].U[j][i] - 0.5*h_y*  CV->t_u[j][i];
           ifv_U.V    =   CV[nt].V[j][i] - 0.5*h_y*  CV->t_v[j][i];
@@ -68,61 +74,89 @@ void flux_generator_y(const int m, const int n, const int nt, const double tau, 
       }
       else
       {
-          ifv_U.t_rho = bfv_U[j].TRHO;
-          ifv_U.t_u   = bfv_U[j].TU;
-          ifv_U.t_v   = bfv_U[j].TV;
-          ifv_U.t_p   = bfv_U[j].TP;
+          ifv_U.d_rho = bfv_U[j].TRHO;
+          ifv_U.d_u   = bfv_U[j].TU;
+          ifv_U.d_v   = bfv_U[j].TV;
+          ifv_U.d_p   = bfv_U[j].TP;
           ifv_U.RHO   = bfv_U[j].RHO - 0.5*h_y*bfv_U[j].TRHO;
           ifv_U.U     = bfv_U[j].U   - 0.5*h_y*bfv_U[j].TU;
           ifv_U.V     = bfv_U[j].V   - 0.5*h_y*bfv_U[j].TV;
           ifv_U.P     = bfv_U[j].P   - 0.5*h_y*bfv_U[j].TP;
       }
+      if(ifv_D.P < eps || ifv_U.P < eps || ifv_D.RHO < eps || ifv_U.RHO < eps)
+	  {
+	      printf("<0.0 error on [%d, %d, %d] (nt, x, y) - Reconstruction_y\n", nt, j, i);
+	      return 1;
+	  }
+      if(!isfinite(ifv_D.d_p)|| !isfinite(ifv_U.d_p)|| !isfinite(ifv_D.d_u)|| !isfinite(ifv_U.d_u)|| !isfinite(ifv_D.d_v)|| !isfinite(ifv_U.d_v)|| !isfinite(ifv_D.d_rho)|| !isfinite(ifv_U.d_rho))
+	  {
+	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - d_Slope_y\n", nt, j, i); 
+	      return 1;
+	  }
+
 //===========================
       if (Transversal)
 	  {
 	      if(i)
 		  {
-		      ifv_D.d_rho = CV->s_rho[j][i-1];
-		      ifv_D.d_u   =   CV->s_u[j][i-1];
-		      ifv_D.d_v   =   CV->s_v[j][i-1];
-		      ifv_D.d_p   =   CV->s_p[j][i-1];
+		      ifv_D.t_rho = -CV->s_rho[j][i-1];
+		      ifv_D.t_u   = -  CV->s_u[j][i-1];
+		      ifv_D.t_v   = -  CV->s_v[j][i-1];
+		      ifv_D.t_p   = -  CV->s_p[j][i-1];
 		  }
 	      else
 		  {
-		      ifv_D.d_rho = bfv_D[j].SRHO;
-		      ifv_D.d_u   = bfv_D[j].SU;
-		      ifv_D.d_v   = bfv_D[j].SV;
-		      ifv_D.d_p   = bfv_D[j].SP;
+		      ifv_D.t_rho = -bfv_D[j].SRHO;
+		      ifv_D.t_u   = -bfv_D[j].SU;
+		      ifv_D.t_v   = -bfv_D[j].SV;
+		      ifv_D.t_p   = -bfv_D[j].SP;
 		  }
 	      if(i < n)
 		  {
-		      ifv_U.d_rho = CV->s_rho[j][i];
-		      ifv_U.d_u   =   CV->s_u[j][i];
-		      ifv_U.d_v   =   CV->s_v[j][i];
-		      ifv_U.d_p   =   CV->s_p[j][i];
+		      ifv_U.t_rho = -CV->s_rho[j][i];
+		      ifv_U.t_u   = -  CV->s_u[j][i];
+		      ifv_U.t_v   = -  CV->s_v[j][i];
+		      ifv_U.t_p   = -  CV->s_p[j][i];
 		  }
 	      else
 		  {
-		      ifv_U.d_rho = bfv_U[j].SRHO;
-		      ifv_U.d_u   = bfv_U[j].SU;
-		      ifv_U.d_v   = bfv_U[j].SV;
-		      ifv_U.d_p   = bfv_U[j].SP;
+		      ifv_U.t_rho = -bfv_U[j].SRHO;
+		      ifv_U.t_u   = -bfv_U[j].SU;
+		      ifv_U.t_v   = -bfv_U[j].SV;
+		      ifv_U.t_p   = -bfv_U[j].SP;
+		  }
+	      if(!isfinite(ifv_D.t_p)|| !isfinite(ifv_U.t_p)|| !isfinite(ifv_D.t_u)|| !isfinite(ifv_U.t_u)|| !isfinite(ifv_D.t_v)|| !isfinite(ifv_U.t_v)|| !isfinite(ifv_D.t_rho)|| !isfinite(ifv_U.t_rho))
+		  {
+		      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - t_Slope_y\n", nt, j, i); 
+		      return 1;
 		  }
 	  }
       else
 	  {
-	      ifv_D.d_rho = 0.0;
-	      ifv_D.d_u   = 0.0;
-	      ifv_D.d_v   = 0.0;
-	      ifv_D.d_p   = 0.0;
-	      ifv_U.d_rho = 0.0;
-	      ifv_U.d_u   = 0.0;
-	      ifv_U.d_v   = 0.0;
-	      ifv_U.d_p   = 0.0;
+	      ifv_D.t_rho = -0.0;
+	      ifv_D.t_u   = -0.0;
+	      ifv_D.t_v   = -0.0;
+	      ifv_D.t_p   = -0.0;
+	      ifv_U.t_rho = -0.0;
+	      ifv_U.t_u   = -0.0;
+	      ifv_U.t_v   = -0.0;
+	      ifv_U.t_p   = -0.0;
 	  }
 //===========================
 
-      GRP_2D_scheme(&ifv_D, &ifv_U, tau);
+      data_err = GRP_2D_flux(&ifv_D, &ifv_U, tau);
+      switch (data_err)
+	  {
+	  case 1:
+	      printf("<0.0 error on [%d, %d, %d] (nt, x, y) - STAR_y\n", nt, j, i);
+	      return 2;
+	  case 2:
+	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - STAR_y\n", nt, j, i); 
+	      return 2;
+	  case 3:
+	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - DIRE_y\n", nt, j, i); 
+	      return 2;
+	  }
 
       CV->G_rho[j][i] = ifv_D.F_rho;
       CV->G_u[j][i]   = ifv_D.F_u;
@@ -134,4 +168,5 @@ void flux_generator_y(const int m, const int n, const int nt, const double tau, 
       CV->vIy[j][i]   = ifv_D.V_int;
       CV->pIy[j][i]   = ifv_D.P_int;
     }
+  return 0;
 }

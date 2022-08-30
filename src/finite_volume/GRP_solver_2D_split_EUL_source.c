@@ -82,6 +82,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   double       tau       = config[16];       // the length of the time step
 
   _Bool find_bound_x = false, find_bound_y = false;
+  int flux_err;
 
   double mom_x, mom_y, ene;
   double c; // the speeds of sound
@@ -128,8 +129,8 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
      * and evaluate the character speed to decide the length
      * of the time step by (tau * speed_max)/h = CFL
      */
-      h_S_max = INFINITY; // h/S_max = INFINITY
-      tic = clock();
+    h_S_max = INFINITY; // h/S_max = INFINITY
+    tic = clock();
 
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
@@ -144,6 +145,12 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	    tau = CFL * h_S_max;
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
+	    else if(!isfinite(tau))
+		{
+		    printf("NAN or INFinite error on [%d, %g] (t_n, tau) - CFL\n", k, tau); 
+		    tau = t_all - time_c;
+		    goto return_NULL;
+		}
 	}
     half_tau = tau * 0.5;
     half_nu = half_tau / h_x;
@@ -153,7 +160,11 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
     find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
     if(!find_bound_x)
         goto return_NULL;
-    flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R, false);
+    flux_err = flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R, false);
+    if(flux_err == 1)
+        goto return_NULL;
+    else if(flux_err == 2)
+	time_c = t_all;
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)
@@ -184,7 +195,11 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
     find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_D, bfv_U, find_bound_y, true, time_c);
     if(!find_bound_y)
         goto return_NULL;
-    flux_generator_y(m, n, nt, tau, CV, bfv_D, bfv_U, false);
+    flux_err = flux_generator_y(m, n, nt, tau, CV, bfv_D, bfv_U, false);
+    if(flux_err == 1)
+        goto return_NULL;
+    else if(flux_err == 2)
+	time_c = t_all;
 
 //===============THE CORE ITERATION=================
     for(j = 0; j < m; ++j)
@@ -212,7 +227,11 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 //==================================================
 
     bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
-    flux_generator_x(m, n, nt, half_tau, CV, bfv_L, bfv_R, false);
+    flux_err = flux_generator_x(m, n, nt, half_tau, CV, bfv_L, bfv_R, false);
+    if(flux_err == 1)
+        goto return_NULL;
+    else if(flux_err == 2)
+	time_c = t_all;
 
 //===============THE CORE ITERATION=================
     for(i = 0; i < n; ++i)

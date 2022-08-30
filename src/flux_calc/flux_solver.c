@@ -15,13 +15,19 @@
  * @param[in,out] ifv: Structure pointer of interfacial evaluated variables and fluxes and left state.
  * @param[in] ifv_R:   Structure pointer of interfacial right state.
  * @param[in] tau:     The length of the time step.
+ * @return    miscalculation indicator.
+ *   @retval  0: Successful calculation.
+ *   @retval  1: <0.0 error.
+ *   @retval  2: NAN or INFinite error of mid[].
+ *   @retval  3: NAN or INFinite error of dire[].
  */
-void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
+int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 {
 	const double eps = config[4];
-	double gamma_mid = config[6];
 	const double n_x = ifv->n_x, n_y = ifv->n_y;
-	ifv->lambda_u = 0.0; ifv->lambda_v = 0.0;
+	double gamma_mid = config[6];
+	ifv->gamma = config[6]; ifv_R->gamma = config[6];
+	ifv->lambda_u = 0.0;  ifv->lambda_v = 0.0;
 
 	double u, d_u, t_u, v, d_v, t_v;
 	u          =  ifv->U    *n_x + ifv->V    *n_y;
@@ -58,6 +64,13 @@ void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double ta
 	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, -0.0);
 #endif
 
+	if(mid[3] < eps || mid[0] < eps)
+	    return 1;
+	if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
+	    return 2;
+	if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0])|| !isfinite(dire[3]))
+	    return 3;
+
 	rho_mid =  mid[0] + 0.5*tau*dire[0];
 	u_mid   = (mid[1] + 0.5*tau*dire[1])*n_x - (mid[2] + 0.5*tau*dire[2])*n_y;
 	v_mid   = (mid[1] + 0.5*tau*dire[1])*n_y + (mid[2] + 0.5*tau*dire[2])*n_x;
@@ -92,4 +105,5 @@ void GRP_2D_scheme(struct i_f_var * ifv, struct i_f_var * ifv_R, const double ta
 	ifv->V_qt_star  = p_mid*n_y;
 	ifv->P_star     = p_mid/rho_mid*ifv->F_rho;
 #endif
+	return 0;
 }

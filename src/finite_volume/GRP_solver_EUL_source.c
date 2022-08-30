@@ -152,11 +152,6 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
 		      goto return_NULL;
 		  }
-	      if(!isfinite(ifv_L.P)|| !isfinite(ifv_R.P)|| !isfinite(ifv_L.U)|| !isfinite(ifv_R.U)|| !isfinite(ifv_L.RHO)|| !isfinite(ifv_R.RHO))
-		  {
-		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Reconstruction\n", k, j); 
-		      goto return_NULL;
-		  }
 
 	      c_L = sqrt(gamma * ifv_L.P / ifv_L.RHO);
 	      c_R = sqrt(gamma * ifv_R.P / ifv_R.RHO);
@@ -187,18 +182,28 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		      ifv_R.d_u   = bfv_R.SU;
 		      ifv_R.d_p   = bfv_R.SP;
 		  }
+	      if(!isfinite(ifv_L.d_p)|| !isfinite(ifv_R.d_p)|| !isfinite(ifv_L.d_u)|| !isfinite(ifv_R.d_u)|| !isfinite(ifv_L.d_rho)|| !isfinite(ifv_R.d_rho))
+		  {
+		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Slope\n", k, j); 
+		      goto return_NULL;
+		  }
 
 //========================Solve GRP========================
 	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, eps);
 
-	      if(mid[2] < eps)
+	      if(mid[2] < eps || mid[0] < eps)
 		  {
 		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
 		      time_c = t_all;
 		  }
-	      if(!isfinite(mid[1])|| !isfinite(mid[2]))
+	      if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0]))
 		  {
 		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
+		      time_c = t_all;
+		  }
+	      if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0]))
+		  {
+		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - DIRE\n", k, j); 
 		      time_c = t_all;
 		  }
 
@@ -217,6 +222,12 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	    tau = CFL * h_S_max;
 	    if ((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
+	    else if(!isfinite(tau))
+		{
+		    printf("NAN or INFinite error on [%d, %g] (t_n, tau) - CFL\n", k, tau); 
+		    tau = t_all - time_c;
+		    goto return_NULL;
+		}
 	}
     nu = tau / h;
     
@@ -254,11 +265,6 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	    if(P[nt][j] < eps || RHO[nt][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
-		    time_c = t_all;
-		}
-	    if(!isfinite(P[nt][j])|| !isfinite(U[nt][j])|| !isfinite(RHO[nt][j]))
-		{
-		    printf("NAN or INFinite error on [%d, %d] (t_n, x) - Update\n", k, j); 
 		    time_c = t_all;
 		}
 	    
