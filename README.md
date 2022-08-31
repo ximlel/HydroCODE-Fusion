@@ -16,7 +16,7 @@ cd src/*
 doxygen Doxyfile
 cd doc/*/latex
 make
-cd doc/Specification
+cd doc/*/Specification
 xelatex Specification.tex
 ```
 
@@ -33,3 +33,5 @@ If you want more available support for this program, please send an email to  [x
 Copyright
 --------
 Copyright © 2022 ximlel
+
+Part of the code is modified from the provision of Zhifang Du.

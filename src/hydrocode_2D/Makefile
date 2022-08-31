@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -Wall -pedantic -O -g -pg
+CFLAGS = -std=c99 -Wall -pedantic -O4 -g -pg
 #C compiler options
 CFLAGD = -DNODATPLOT
 #Macro definition
