@@ -157,7 +157,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
     mu = tau / h_y;
 
 
-    find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
+    find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_x, true, time_c);
     if(!find_bound_x)
         goto return_NULL;
     flux_err = flux_generator_x(m, n, nt-1, half_tau, CV, bfv_L, bfv_R, false);
@@ -192,7 +192,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 
 //==================================================
 
-    find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_D, bfv_U, find_bound_y, true, time_c);
+    find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_y, true, time_c);
     if(!find_bound_y)
         goto return_NULL;
     flux_err = flux_generator_y(m, n, nt, tau, CV, bfv_D, bfv_U, false);
@@ -226,7 +226,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
       }
 //==================================================
 
-    bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
+    bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_x, true, time_c);
     flux_err = flux_generator_x(m, n, nt, half_tau, CV, bfv_L, bfv_R, false);
     if(flux_err == 1)
         goto return_NULL;
@@ -288,7 +288,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   time_plot[0] = time_c - tau;
   time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
-  printf("The cost of CPU time for 2D-GRP dimension splitting Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for 2D-GRP Eulerian scheme with dimension splitting for this problem is %g seconds.\n", cpu_time_sum);
   //------------END OF THE MAIN LOOP-------------
   
 return_NULL:

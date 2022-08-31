@@ -93,8 +93,8 @@ int flux_generator_x(const int m, const int n, const int nt, const double tau, s
 	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - d_Slope_x\n", nt, j, i); 
 	      return 1;
 	  }
-//===========================
 
+//===========================
       if (Transversal)
 	  {
 	      if(j)
@@ -151,7 +151,7 @@ int flux_generator_x(const int m, const int n, const int nt, const double tau, s
 	      printf("<0.0 error on [%d, %d, %d] (nt, x, y) - STAR_x\n", nt, j, i);
 	      return 2;
 	  case 2:
-	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - STA_xR\n", nt, j, i); 
+	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - STA_x\n", nt, j, i); 
 	      return 2;
 	  case 3:
 	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - DIRE_x\n", nt, j, i); 

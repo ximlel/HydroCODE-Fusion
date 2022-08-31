@@ -139,8 +139,14 @@ int main(int argc, char *argv[])
 	printf("%s ", argv[k]);
     printf("\n");
     printf("TEST:\n  %s\n", argv[1]);
-    printf("Test Beginning: ARGuments Counter = %d.\n", argc);
-    
+    if(argc < 5)
+	{
+	    printf("Test Beginning: ARGuments Counter %d is less than 5.\n", argc);
+	    return 4;
+	}
+    else
+	printf("Test Beginning: ARGuments Counter = %d.\n", argc);
+
     // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
         config[k] = INFINITY;

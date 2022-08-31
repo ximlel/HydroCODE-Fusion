@@ -29,25 +29,25 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	ifv->gamma = config[6]; ifv_R->gamma = config[6];
 	ifv->lambda_u = 0.0;  ifv->lambda_v = 0.0;
 
-	double u, d_u, t_u, v, d_v, t_v;
+	double u, u_R, d_u, d_u_R, t_u, t_u_R;
 	u          =  ifv->U    *n_x + ifv->V    *n_y;
-	ifv_R->U   =  ifv_R->U  *n_x + ifv_R->V  *n_y;
-	ifv->U     =  u;
+	u_R        =  ifv_R->U  *n_x + ifv_R->V  *n_y;
 	d_u        =  ifv->d_u  *n_x + ifv->d_v  *n_y;
-	ifv_R->d_u =  ifv_R->d_u*n_x + ifv_R->d_v*n_y;
-	ifv->d_u   =  d_u;
+	d_u_R      =  ifv_R->d_u*n_x + ifv_R->d_v*n_y;
 	t_u        =  ifv->t_u  *n_x + ifv->t_v  *n_y;
-	ifv_R->t_u =  ifv_R->t_u*n_x + ifv_R->t_v*n_y;
-	ifv->t_u   =  t_u;
-	v          = -ifv->U    *n_y + ifv->V    *n_x;
+	t_u_R      =  ifv_R->t_u*n_x + ifv_R->t_v*n_y;
+	ifv->V     = -ifv->U    *n_y + ifv->V    *n_x;
 	ifv_R->V   = -ifv_R->U  *n_y + ifv_R->V  *n_x;
-	ifv->V     =  v;
-	d_v        = -ifv->d_u  *n_y + ifv->d_v  *n_x;
+	ifv->d_v   = -ifv->d_u  *n_y + ifv->d_v  *n_x;
 	ifv_R->d_v = -ifv_R->d_u*n_y + ifv_R->d_v*n_x;
-	ifv->d_v   =  d_v;
-	t_v        = -ifv->t_u  *n_y + ifv->t_v  *n_x;
+	ifv->t_v   = -ifv->t_u  *n_y + ifv->t_v  *n_x;
 	ifv_R->t_v = -ifv_R->t_u*n_y + ifv_R->t_v*n_x;
-	ifv->t_v   =  t_v;
+	ifv->U     =  u;
+	ifv_R->U   =  u_R;
+	ifv->d_u   =  d_u;
+	ifv_R->d_u =  d_u_R;
+	ifv->t_u   =  t_u;
+	ifv_R->t_u =  t_u_R;
 	
 	double wave_speed[2], dire[6], mid[6], star[6];
 	double rho_mid, p_mid, u_mid, v_mid;

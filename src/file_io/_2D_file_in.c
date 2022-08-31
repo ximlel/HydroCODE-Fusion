@@ -92,7 +92,8 @@ struct flu_var _2D_initialize(const char * name)
     configurate(add_in);
     printf("  delta_x\t= %g\n", config[10]);
     printf("  delta_y\t= %g\n", config[11]);
-    printf("  bondary\t= %d\n", (int)config[17]);
+    printf("  bondary_x\t= %d\n", (int)config[17]);
+    printf("  bondary_y\t= %d\n", (int)config[18]);
 
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
     FILE * fp; // The pointer to the above data files.

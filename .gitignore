@@ -112,14 +112,10 @@ octave-workspace
 latex/
 html/
 
-# ==============================TeX===========================
+# ==========================Tempfiles=========================
 
-# Text Backup
-.~*
-*.*~
-*.#*
-*#
-*.kate-swp
+# Hidden files
+.fuse_hidden*
 
 # Windows:
 Thumbs.db
@@ -128,6 +124,15 @@ Desktop.ini
 
 # Mac:
 .DS_Store
+
+# Text Backup
+.~*
+*.*~
+*.#*
+*#
+*.kate-swp
+
+# ==============================TeX===========================
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

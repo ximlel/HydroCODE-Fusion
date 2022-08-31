@@ -34,7 +34,7 @@ _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, stru
     va_start(ap, t_c);
     int const bound = (int)(config[17]);// the boundary condition in x-direction
     double const h  = config[10];       // the length of the initial x-spatial grids
-    double * X;
+    double * X = NULL;
     if (NO_h)
 	X  = va_arg(ap, double *);
 
@@ -119,7 +119,7 @@ _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, stru
 	    switch(bound)
 		{
 		case -2: // reflective boundary conditions
-		    bfv_L->SU = CV.d_u[0]; bfv_R->SU = CV.d_u[m-1];
+		    bfv_L->SU   =   CV.d_u[0];   bfv_R->SU = CV.d_u[m-1];
 		    break;
 		case -5: // periodic boundary conditions
 		    bfv_L->SU   =   CV.d_u[m-1]; bfv_R->SU   =   CV.d_u[0];
@@ -127,7 +127,7 @@ _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, stru
 		    bfv_L->SRHO = CV.d_rho[m-1]; bfv_R->SRHO = CV.d_rho[0];
 		    break;
 		case -24: // reflective + free boundary conditions
-		    bfv_L->SU = CV.d_u[0];
+		    bfv_L->SU   =   CV.d_u[0];
 		    break;
 		}
 	}

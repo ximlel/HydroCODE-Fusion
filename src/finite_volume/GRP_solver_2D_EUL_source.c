@@ -156,10 +156,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
     mu = tau / h_y;
 
 
-    find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, find_bound_x, true, time_c);
+    find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_x, true, time_c);
     if(!find_bound_x)
         goto return_NULL;
-    find_bound_y = bound_cond_slope_limiter_y(m, n, nt-1, CV, bfv_D, bfv_U, find_bound_y, true, time_c);
+    find_bound_y = bound_cond_slope_limiter_y(m, n, nt-1, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_y, true, time_c);
     if(!find_bound_y)
         goto return_NULL;
 
@@ -185,7 +185,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]) - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  mom_x = CV[nt-1].RHO[j][i]*CV[nt-1].U[j][i] - nu*(CV->F_u[j+1][i]  -CV->F_u[j][i])   - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
 	  mom_y = CV[nt-1].RHO[j][i]*CV[nt-1].V[j][i] - nu*(CV->F_v[j+1][i]  -CV->F_v[j][i])   - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
-	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - nu*(CV->F_e[j+1][i]  -CV->F_e[j][i])   - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
+	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - nu*(CV->F_e[j+1][i]  -CV->F_e[j][i])   - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
 	  
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
@@ -234,7 +234,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   time_plot[0] = time_c - tau;
   time_plot[1] = time_c;
   printf("\nTime is up at time step %d.\n", k);
-  printf("The cost of CPU time for genuinely 2D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
+  printf("The cost of CPU time for genuinely 2D-GRP Eulerian scheme without dimension splitting for this problem is %g seconds.\n", cpu_time_sum);
   //------------END OF THE MAIN LOOP-------------
   
 return_NULL:
