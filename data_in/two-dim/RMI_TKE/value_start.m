@@ -53,6 +53,14 @@ end
 end
 
 
+fid = fopen('PHI.dat','wt');
+for j=1:line
+fprintf(fid,'%14.12g\t',CC(j,:));
+fprintf(fid,'\n');
+end
+fclose(fid);
+
+
 fid = fopen('RHO.dat','wt');
 for j=1:shock
 fprintf(fid,'%14.12g\t',rho_sH*ones(column,1));

@@ -1,7 +1,10 @@
-line=700;
-column=700;
-line_discon=350;
-column_discon=350;
+function value_start(column)
+if nargin < 1
+column = input('Please input the column number: (Default 400 700) ')
+end
+line=column;
+line_discon=line/2;
+column_discon=column/2;
 
 rho_1=1.0
 u_1=0.1
@@ -119,3 +122,27 @@ fprintf(fid,'%g\t',p);
 fprintf(fid,'\n');
 end
 fclose(fid);
+
+
+eps=1e-9;
+t_all=0.25;
+step=5000000;
+gamma=1.4;
+CFL=0.45;
+d_x=1.0/column;
+d_y=1.0/line;
+
+fid = fopen('config.dat','wt');
+fprintf(fid,'1\t%g\n',t_all);
+fprintf(fid,'4\t%g\n',eps);
+fprintf(fid,'5\t%i\n',step);
+fprintf(fid,'6\t%g\n',gamma);
+fprintf(fid,'7\t%g\n',CFL);
+fprintf(fid,'10\t%g\n',d_x);
+fprintf(fid,'11\t%g\n',d_y);
+fprintf(fid,'13\t%i\n',column);
+fprintf(fid,'14\t%i\n',line);
+fprintf(fid,'17\t-4\n');
+fprintf(fid,'18\t-4\n');
+fclose(fid);
+end

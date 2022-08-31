@@ -15,19 +15,23 @@ MRun=`ls -l`
 alias MRun='octave'
 EXEcute=./hydrocode.out
 
-## 2D Riemnnn problem
+## GRP_Book
 :<<!
- cd ../../data_in/two-dim/RP2D/RP2D_3_Quad
+ $EXEcute GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   2 1     EUL 33=1
+ $EXEcute GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   2 2_GRP EUL 33=1
+ $EXEcute GRP_Book/6_1_Sod_10_columns GRP_Book/6_1_Sod_10_columns 2 1     EUL 33=1
+ $EXEcute GRP_Book/6_1_Sod_10_columns GRP_Book/6_1_Sod_10_columns 2 2_GRP EUL 33=1
+!
+## RP2D_Positive
+:<<!
+ cd ../../data_in/two-dim/RP2D_Positive/Config3
  echo "value_start" | MRun
  cd $CPath
- $EXEcute RP2D/RP2D_3_Quad RP2D/RP2D_3_Quad 2 2_GRP EUL
+ $EXEcute RP2D_Positive/Config3  RP2D_Positive/Config3  2 2_GRP EUL
+ $EXEcute RP2D_Positive/Config7  RP2D_Positive/Config7  2 2_GRP EUL
+ $EXEcute RP2D_Positive/Config12 RP2D_Positive/Config12 2 2_GRP EUL
 !
- $EXEcute GRP_Book/6_1_Sod_10_lines GRP_Book/6_1_Sod_10_lines 2 1 EUL 33=1
- $EXEcute GRP_Book/6_1_Sod_10_columns GRP_Book/6_1_Sod_10_columns 2 1 EUL 33=1
-#!
-:<<SHARE
 
-SHARE
 
 ### gprof
 gprof -b -A -p -q hydrocode.out gmon.out > pg

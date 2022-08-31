@@ -9,7 +9,7 @@
  *        for 1-D Euler equations of motion on Lagrangian/Eulerian coordinate.
  * @version 0.1
  *
- * @section File_directory File directory
+ * @section File_directories File directories
  * <table>
  * <tr><th> data_in/  <td> Folder to store input files RHO/U/P/config.txt
  * <tr><th> data_out/ <td> Folder to store output files RHO/U/P/E/X/log.txt
@@ -77,6 +77,9 @@
  * 
  *          - Output files can be found in folder '/data_out/one-dim/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
+ * 
+ * @section Precompiler_options Precompiler options
+ *          - Riemann_solver_exact_single: in Riemann_solver.h. (Default: Riemann_solver_exact_Ben)
  */
 
 

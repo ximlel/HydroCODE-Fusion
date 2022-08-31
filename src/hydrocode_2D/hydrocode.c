@@ -9,7 +9,7 @@
  *        for 2-D Euler equations of motion on Eulerian coordinate.
  * @version 0.2
  *
- * @section File_directory File directory
+ * @section File_directories File directories
  * <table>
  * <tr><th> data_in/  <td> Folder to store input files RHO/U/P/config.txt
  * <tr><th> data_out/ <td> Folder to store output files RHO/U/P/E/X/log.txt
@@ -76,6 +76,13 @@
  * 
  *          - Output files can be found in folder '/data_out/two-dim/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
+ *
+ * @section Precompiler_options Precompiler options
+ *          - NODATPLOT: Switch whether to plot without Matrix data.
+ *          - NOTECPLOT: Switch whether to plot without Tecplot data.
+ *          - MULTIFLUID_BASICS: Switch whether to compute multi-fluids. (Default: undef)
+ *          - Riemann_solver_exact_single: in Riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
+ *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.
  */
 
 

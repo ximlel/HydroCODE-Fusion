@@ -251,7 +251,7 @@ void config_write(const char * add_out, const double * cpu_time, const char * na
   fprintf(fp_write, "bond\t= %d\n", (int)config[17]);
   if(dim == 2)
       {
-	  fprintf(fp_write, "h_y\t= %g\n", config[11]);
+	  fprintf(fp_write, "h_y\t\t= %g\n", config[11]);
 	  fprintf(fp_write, "bond_y\t= %d\n", (int)config[18]);
       }
   fprintf(fp_write, "\nA total of %d time steps are computed.\n", (int)config[5]);

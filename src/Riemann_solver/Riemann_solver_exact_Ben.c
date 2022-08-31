@@ -1,6 +1,10 @@
 /**
  * @file  Riemann_solver_exact_Ben.c
  * @brief There are exact Riemann solvers in Ben-Artzi's book.
+ * @par  Reference
+ *       Theory is found in Appendix C of Reference [1]. \n
+ *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
+ *           Cambridge University Press, 2003
  */
 
 #include <math.h>
@@ -23,10 +27,6 @@
  * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
  * @param[in]  N:   Maximum iteration step.
  * @return \b gap: Relative pressure change after the last iteration.
- * @par  Reference
- *       Theory is found in Appendix C of Reference [1]. \n
- *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
- *           Cambridge University Press, 2003
  */
 double Riemann_solver_exact(double * U_star, double * P_star, const double gammaL, const double gammaR,
 			    const double u_L, const double u_R, const double p_L, const double p_R, 
@@ -227,10 +227,6 @@ double Riemann_solver_exact(double * U_star, double * P_star, const double gamma
  * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
  * @param[in]  N:   Maximum iteration step.
  * @return \b gap: Relative pressure change after the last iteration.
- * @par  Reference
- *       Theory is found in Appendix C of Reference [1]. \n
- *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
- *           Cambridge University Press, 2003
  */
 double Riemann_solver_exact_Ben(double * U_star, double * P_star, const double gamma,
 			    const double u_L, const double u_R, const double p_L, const double p_R,

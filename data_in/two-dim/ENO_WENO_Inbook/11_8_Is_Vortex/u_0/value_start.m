@@ -18,10 +18,10 @@ V = zeros(line,column);
 P = zeros(line,column);
 for j=1:column
 for i=1:line
-       RHO(i,j) = quad2d(rho_f,d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11);
-       U(i,j)   = quad2d(rho_u_f,  d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11)/RHO(i,j);
-       V(i,j)   = quad2d(rho_v_f,  d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11)/RHO(i,j);
-       P(i,j)   = (quad2d(E_f,  d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11)-0.5*RHO(i,j)*(U(i,j)*U(i,j)+V(i,j)*V(i,j)))*(gamma-1.0);   
+       RHO(i,j) =  quad2d(rho_f,  d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11);
+       U(i,j)   =  quad2d(rho_u_f,d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11)/RHO(i,j);
+       V(i,j)   =  quad2d(rho_v_f,d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11)/RHO(i,j);
+       P(i,j)   = (quad2d(E_f,    d*(j-center-1),d*(j-center),d*(i-center-1),d*(i-center),'AbsTol',1e-11)-0.5*RHO(i,j)*(U(i,j)*U(i,j)+V(i,j)*V(i,j)))*(gamma-1.0);   
 end
 end
 %U=U+0.5;
