@@ -2,7 +2,8 @@ CC = gcc
 #C compiler
 CFLAGS += -std=c99 -Wall
 #C compiler options
-CFLAGD = 
+CFLAGs += 
+CFLAGD  = 
 #Macro definition
 SRC = ..
 #Directory of sources

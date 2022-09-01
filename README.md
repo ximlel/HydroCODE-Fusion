@@ -1,7 +1,7 @@
 # Godunov/GRP scheme for Lagrangian/Eulerian hydrodynamics
 What is it?
 -----------
-This is a implementation of fully explict forward Euler scheme for Euler equations of motion on Lagrangian/Eulerian coordinate.
+This is a implementation of fully explict forward Euler scheme for single/multi-fluid Euler equations of motion on Lagrangian/Eulerian coordinate.
 
 How to use it?
 -----------
@@ -24,6 +24,8 @@ Open 'doc/*/html/index.html' in a browser to view the specific instructions of t
 
 Licensing
 ---------
+GNU Lesser General Public License v3.0 or later.
+
 Please see the file called LICENSE.
 
 Contacts
@@ -32,6 +34,6 @@ If you want more available support for this program, please send an email to  [x
 
 Copyright
 --------
-Copyright © 2022 ximlel
+Copyright © 2022 ximlel.
 
-Part of the code is modified from the provision of Zhifang Du.
+> Part of the code is modified from the provision of Zhifang Du.

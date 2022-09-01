@@ -24,6 +24,7 @@
  * <tr><th> file_io/                   <td> Program reads and writes files
  * <tr><th> Riemann_solver/            <td> Riemann solver programs
  * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
+ * <tr><th> flux_calc/                 <td> Program for calculating numerical fluxes in finite volume scheme
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
  * <tr><th> hydrocode_2D/hydrocode.c   <td> Main program
  * <tr><th> hydrocode_2D/hydrocode.sh  <td> Bash script compiles and runs programs
@@ -242,7 +243,7 @@ int main(int argc, char *argv[])
      * we do not use the name such as num_grid here to correspond to
      * notation in the math theory.
      */
-  const int n_x = (int)FV0.RHO[1], n_y = (int)FV0.RHO[0];
+  const int n_x = (int)config[13], n_y = (int)config[14];
   const double h_x = config[10], h_y = config[11], gamma = config[6];
   // The number of times steps of the fluid data stored for plotting.
   int N = 2; // (int)(config[5]) + 1;
@@ -300,10 +301,10 @@ int main(int argc, char *argv[])
   for(j = 0; j < n_x; ++j)
       for(i = 0; i < n_y; ++i)	
 	  {
-	      CV[0].RHO[j][i] = FV0.RHO[i*n_x + j + 2];
-	      CV[0].U[j][i]   = FV0.U[i*n_x + j + 2];
-	      CV[0].V[j][i]   = FV0.V[i*n_x + j + 2];
-	      CV[0].P[j][i]   = FV0.P[i*n_x + j + 2];
+	      CV[0].RHO[j][i] = FV0.RHO[i*n_x + j];
+	      CV[0].U[j][i]   = FV0.U[i*n_x + j];
+	      CV[0].V[j][i]   = FV0.V[i*n_x + j];
+	      CV[0].P[j][i]   = FV0.P[i*n_x + j];
 	      CV[0].E[j][i]   = 0.5*CV[0].U[j][i]*CV[0].U[j][i] + CV[0].P[j][i]/(gamma - 1.0)/CV[0].RHO[j][i];
 	      CV[0].E[j][i]  += 0.5*CV[0].V[j][i]*CV[0].V[j][i];
 	  }

@@ -43,14 +43,13 @@
 		printf("Input unequal! num_%s=%d, num_cell=%d.\n", #sfv, num_cell, (int)config[3]); \
 		exit(2);						\
 	    }								\
-	FV0.sfv = malloc((num_cell + 1) * sizeof(double));		\
+	FV0.sfv = malloc(num_cell * sizeof(double));		\
 	if(FV0.sfv == NULL)						\
 	    {								\
 		printf("NOT enough memory! %s\n", #sfv);		\
 		exit(5);						\
 	    }								\
- 	FV0.sfv[0] = (double)num_cell;					\
-	if(flu_var_read(fp, FV0.sfv + 1, num_cell))			\
+	if(flu_var_read(fp, FV0.sfv, num_cell))			\
 	    {								\
 		fclose(fp);						\
 		exit(2);						\

@@ -152,7 +152,7 @@ static int config_read(FILE * fp)
 	while (fgets(one_line, sizeof(one_line), fp) != NULL)
 		{
 			// A line that doesn't begin with digits is a comment.
-			i =strtol(one_line, &endptr, 10);
+			i = strtoul(one_line, &endptr, 10);
 			for ( ; isspace(*endptr); endptr++) ;
 
 			// If the value of config[i] doesn't exit, it is 0 by default.
@@ -204,6 +204,7 @@ void configurate(const char * add_in)
   if((fp_data = fopen(add, "r")) == NULL)
       {
 	  printf("Cannot open configuration data file!\n");
+	  perror(add_in);
 	  exit(1);
       }
 

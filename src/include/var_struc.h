@@ -6,12 +6,17 @@
 #ifndef VARSTRUC_H
 #define VARSTRUC_H
 
+#ifdef DOXYGEN_PREDEFINED
 /**
  * @def MULTIFLUID_BASICS
  * @brief Switch whether to compute multi-fluids.
  */
-#ifdef DOXYGEN_PREDEFINED
 #define MULTIFLUID_BASICS
+/**
+ * @def MULTIPHASE_BASICS
+ * @brief Switch whether to compute multi-phase flow. (essential macro: MULTIFLUID_BASICS)
+ */
+#define MULTIPHASE_BASICS
 #endif
 
 //! If the system does not set, the default largest value can be seen as zero is EPS.
@@ -28,7 +33,15 @@ extern double config[]; //!< Initial configuration data array.
 
 //! pointer structure of FLUid VARiables.
 typedef struct flu_var {
-	double * RHO, * U, * V, * P;
+	double * RHO,   * U,   * V,   * P;
+#ifdef MULTIFLUID_BASICS
+	double * Z_a;
+#ifdef MULTIPHASE_BASICS
+	double * RHO_b, * U_b, * V_b, * P_b;
+#else
+	double * PHI, * gamma;
+#endif
+#endif
 } Fluid_Variable;
 
 //! pointer structure of VARiables on STRUctural computational grid CELLs.
