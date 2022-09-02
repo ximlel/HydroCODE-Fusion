@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS += -std=c99 -Wall
 #C compiler options
-CFLAGS += -DMULTIFLUID_BASICS -DMULTIPHASE_BASICS
+CFLAGS += -DMULTIFLUID_BASICS
 CFLAGD  = 
 #Macro definition
 SRC = ..

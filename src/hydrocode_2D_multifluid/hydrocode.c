@@ -22,7 +22,7 @@
  * <tr><th> include/                   <td> Header files
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> Riemann_solver/            <td> Riemann solver programs
+ * <tr><th> riemann_solver/            <td> Riemann solver programs
  * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
  * <tr><th> flux_calc/                 <td> Program for calculating numerical fluxes in finite volume scheme
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
@@ -34,7 +34,7 @@
  * <table>
  * <tr><th> exit(0)  <td> EXIT_SUCCESS
  * <tr><th> exit(1)  <td> File directory error
- * <tr><th> exit(2)  <td> Data reading error
+ * <tr><th> exit(2)  <td> Data reading/writing error
  * <tr><th> exit(3)  <td> Calculation error
  * <tr><th> exit(4)  <td> Arguments error
  * <tr><th> exit(5)  <td> Memory error
@@ -82,7 +82,7 @@
  *          - NOVTKPLOT: Switch whether to plot without VTK data.
  *          - NOTECPLOT: Switch whether to plot without Tecplot data.
  *          - MULTIFLUID_BASICS: Switch whether to compute multi-fluids. (Default: undef)
- *          - Riemann_solver_exact_single: in Riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
+ *          - Riemann_solver_exact_single: in riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
  *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.
  */
 
@@ -236,23 +236,28 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-	struct flu_var FV0 = _2D_initialize(argv[1]);
+  struct flu_var FV0 = initialize_2D(argv[1]);
 
-    struct mesh_var mv= mesh_load(argv[1], argv[5]);
+  struct mesh_var mv= mesh_load(argv[1], argv[5]);
 
+  if ((_Bool)config[32])
+      {
 #ifndef NOTECPLOT
-	if ((_Bool)config[32])	
-		file_write_TEC(FV0, mv, argv[2], 0.0, dim);	
+	  file_write_TEC(FV0, mv, argv[2], 0.0);
 #endif
+#ifndef NOVTKPLOT
+	  file_write_3D_VTK(FV0, mv, argv[2], 0.0);
+#endif
+      }
 
-	finite_volume_scheme_GRP2D(&FV0, &mv, scheme, argv[2]);
+  finite_volume_scheme_GRP2D(&FV0, &mv, scheme, argv[2]);
 
   // Write the final data down.
 #ifndef NOTECPLOT
-	file_write_TEC(FV0, mv, argv[2], config[1], dim);
+  file_write_TEC(FV0, mv, argv[2], config[1]);
 #endif
 #ifndef NOVTKPLOT
-	file_write_VTK_3D(FV0, mv, argv[2]);
+  file_write_3D_VTK(FV0, mv, argv[2], config[1]);
 #endif
 
   return retval;

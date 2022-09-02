@@ -22,7 +22,7 @@
  * <tr><th> include/                   <td> Header files
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> Riemann_solver/            <td> Riemann solver programs
+ * <tr><th> riemann_solver/            <td> Riemann solver programs
  * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
  * <tr><th> flux_calc/                 <td> Fluxes calculation programs
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
@@ -79,7 +79,7 @@
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
  * 
  * @section Precompiler_options Precompiler options
- *          - Riemann_solver_exact_single: in Riemann_solver.h. (Default: Riemann_solver_exact_Ben)
+ *          - Riemann_solver_exact_single: in riemann_solver.h. (Default: Riemann_solver_exact_Ben)
  */
 
 
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-  struct flu_var FV0 = _1D_initialize(argv[1]); // Structure of initial data array pointer.
+  struct flu_var FV0 = initialize_1D(argv[1]); // Structure of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
       }
 
   // Write the final data down.
-  _1D_file_write(m, N, CV, X, cpu_time, argv[2], time_plot);
+  file_1D_write(m, N, CV, X, cpu_time, argv[2], time_plot);
 
  return_NULL:
   free(FV0.RHO);

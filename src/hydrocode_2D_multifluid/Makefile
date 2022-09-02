@@ -14,7 +14,7 @@ LIBS = -lm
 RM = rm -vf
 #Delete command
 
-HEAD = finite_volume flux_calc inter_process Riemann_solver file_io tools
+HEAD = finite_volume flux_calc inter_process Riemann_solver meshing file_io tools
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 

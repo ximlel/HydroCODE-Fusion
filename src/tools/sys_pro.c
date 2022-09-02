@@ -81,3 +81,41 @@ int CreateDir(const char * pPath)
 	else
 		return 1;
 }
+
+
+void init_mem(double * p[], const int n, const int * cell_pt[])
+{
+	for(int k = 0; k < n; ++k)
+		{
+			p[k] = calloc(cell_pt[k][0], sizeof(double));
+			if(p[k] == NULL)
+				{
+					printf("Initialize memory fail!\n");
+					for(int j = 0; j < k; j++)
+						{
+							free(p[k]);
+							p[k] = NULL;
+						}
+					exit(5);
+				}
+		}
+}
+
+
+void init_mem_int(int * p[], const int n, const int * cell_pt[])
+{
+	for(int k = 0; k < n; ++k)
+		{
+			p[k] = malloc(cell_pt[k][0] * sizeof(int));
+			if(p[k] == NULL)
+				{
+					printf("Initialize memory fail!\n");
+					for(int j = 0; j < k; j++)
+						{
+							free(p[k]);
+							p[k] = NULL;
+						}
+					exit(5);
+				}
+		}
+}

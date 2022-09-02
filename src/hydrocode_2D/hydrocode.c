@@ -22,7 +22,7 @@
  * <tr><th> include/                   <td> Header files
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> file_io/                   <td> Program reads and writes files
- * <tr><th> Riemann_solver/            <td> Riemann solver programs
+ * <tr><th> riemann_solver/            <td> Riemann solver programs
  * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
  * <tr><th> flux_calc/                 <td> Program for calculating numerical fluxes in finite volume scheme
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
@@ -82,7 +82,7 @@
  *          - NODATPLOT: Switch whether to plot without Matrix data.
  *          - NOTECPLOT: Switch whether to plot without Tecplot data.
  *          - MULTIFLUID_BASICS: Switch whether to compute multi-fluids. (Default: undef)
- *          - Riemann_solver_exact_single: in Riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
+ *          - Riemann_solver_exact_single: in riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
  *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.
  */
 
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-    struct flu_var FV0 = _2D_initialize(argv[1]); // Structure of initial data array pointer.
+    struct flu_var FV0 = initialize_2D(argv[1]); // Structure of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -341,10 +341,10 @@ int main(int argc, char *argv[])
 
   // Write the final data down.
 #ifndef NODATPLOT
-  _2D_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+  file_2D_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
 #endif
 #ifndef NOTECPLOT
-  _2D_TEC_file_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+  file_2D_write_POINT_TEC(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
 #endif
 
  return_NULL:

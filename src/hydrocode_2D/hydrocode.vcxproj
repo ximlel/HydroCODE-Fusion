@@ -105,10 +105,10 @@
   <ItemGroup>
     <ClCompile Include="..\file_io\config_handle.c" />
     <ClCompile Include="..\file_io\io_control.c" />
-    <ClCompile Include="..\file_io\_2D_file_in.c" />
-    <ClCompile Include="..\file_io\_2D_file_out.c" />
-    <ClCompile Include="..\finite_volume\GRP_solver_2D_EUL_source.c" />
-    <ClCompile Include="..\finite_volume\GRP_solver_2D_split_EUL_source.c" />
+    <ClCompile Include="..\file_io\file_2D_in.c" />
+    <ClCompile Include="..\file_io\file_2D_out.c" />
+    <ClCompile Include="..\finite_volume\grp_solver_2D_EUL_source.c" />
+    <ClCompile Include="..\finite_volume\grp_solver_2D_split_EUL_source.c" />
     <ClCompile Include="..\flux_calc\flux_generator_x.c" />
     <ClCompile Include="..\flux_calc\flux_generator_y.c" />
     <ClCompile Include="..\flux_calc\flux_solver.c" />
@@ -116,10 +116,10 @@
     <ClCompile Include="..\inter_process\bound_cond_slope_limiter_y.c" />
     <ClCompile Include="..\inter_process\slope_limiter.c" />
     <ClCompile Include="..\inter_process\slope_limiter_2D_x.c" />
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir_G2D.c" />
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir_Q1D.c" />
-    <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Ben.c" />
-    <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Toro.c" />
+    <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_G2D.c" />
+    <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_Q1D.c" />
+    <ClCompile Include="..\riemann_solver\riemann_solver_exact_Ben.c" />
+    <ClCompile Include="..\riemann_solver\riemann_solver_exact_Toro.c" />
     <ClCompile Include="..\tools\sys_pro.c" />
     <ClCompile Include="hydrocode.c" />
   </ItemGroup>
@@ -128,7 +128,7 @@
     <ClInclude Include="..\include\finite_volume.h" />
     <ClInclude Include="..\include\flux_calc.h" />
     <ClInclude Include="..\include\inter_process.h" />
-    <ClInclude Include="..\include\Riemann_solver.h" />
+    <ClInclude Include="..\include\riemann_solver.h" />
     <ClInclude Include="..\include\tools.h" />
     <ClInclude Include="..\include\var_struc.h" />
   </ItemGroup>

@@ -8,6 +8,44 @@
 #include <math.h>
 
 
+void mat_add(const double A[], const double B[], double C[], const int m, const int n) 
+{
+	int i,j;
+	for (i = 0; i < m; i++)
+		for (j = 0; j < n; j++)
+			C[i*n+j] = A[i*n+j] + B[i*n+j];
+}
+
+
+void mat_sub(const double A[], const double B[], double C[], const int m, const int n)
+{
+	int i, j;
+	for (i = 0; i < m; i++)
+		for (j = 0; j < n; j++)
+			C[i*n+j] = A[i*n+j] - B[i*n+j];
+}
+
+
+void mat_mul(const double A[], const double B[], double C[], const int m, const int p, const int n)
+{
+	int i,j,k;
+	double A0[m][n], B0[n][p];
+	for (i = 0; i < m; i++)
+		for (k = 0; k < n; k++)
+			A0[i][k] = A[i*n+k];
+	for (k = 0; k < n; k++)
+		for (j = 0; j < p; j++)
+			B0[k][j] = B[k*p+j];
+	for (i = 0; i < m; i++)
+		for (j = 0; j < p; j++)
+			{
+				C[i*p+j] = 0.0;
+				for (k = 0; k < n; k++)
+					C[i*p+j] += A0[i][k] * B0[k][j];
+			}
+}
+
+
 /**
  * @brief A function to caculate the inverse of the input square matrix.
  * @param[in,out] a: The pointer of the input/output square matrix.

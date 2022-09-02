@@ -12,8 +12,15 @@ void DispPro(const double pro, const int step);
 
 int CreateDir(const char* pPath);
 
+void init_mem(double * p[], const int n, const int * cell_pt[]);
+void init_mem_int(int * p[], const int n, const int * cell_pt[]);
+
 
 // math_algo.c
+void mat_mul(const double A[], const double B[], double C[], const int m, const int p, const int n);
+void mat_add(const double A[], const double B[], double C[], const int m, const int n);
+void mat_sub(const double A[], const double B[], double C[], const int m, const int n);
+
 int rinv(double a[], const int n);
 
 

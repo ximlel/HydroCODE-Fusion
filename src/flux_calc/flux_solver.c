@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "../include/Riemann_solver.h"
+#include "../include/riemann_solver.h"
 #include "../include/var_struc.h"
 
 

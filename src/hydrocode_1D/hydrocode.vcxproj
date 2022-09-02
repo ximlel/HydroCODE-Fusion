@@ -105,20 +105,20 @@
   <ItemGroup>
     <ClCompile Include="..\file_io\config_handle.c" />
     <ClCompile Include="..\file_io\io_control.c" />
-    <ClCompile Include="..\file_io\_1D_file_in.c" />
-    <ClCompile Include="..\file_io\_1D_file_out.c" />
-    <ClCompile Include="..\finite_volume\Godunov_solver_ALE_source.c" />
-    <ClCompile Include="..\finite_volume\Godunov_solver_EUL_source.c" />
-    <ClCompile Include="..\finite_volume\Godunov_solver_LAG_source.c" />
-    <ClCompile Include="..\finite_volume\GRP_solver_ALE_source.c" />
-    <ClCompile Include="..\finite_volume\GRP_solver_EUL_source.c" />
-    <ClCompile Include="..\finite_volume\GRP_solver_LAG_source.c" />
+    <ClCompile Include="..\file_io\file_1D_in.c" />
+    <ClCompile Include="..\file_io\file_1D_out.c" />
+    <ClCompile Include="..\finite_volume\godunov_solver_ALE_source.c" />
+    <ClCompile Include="..\finite_volume\godunov_solver_EUL_source.c" />
+    <ClCompile Include="..\finite_volume\godunov_solver_LAG_source.c" />
+    <ClCompile Include="..\finite_volume\grp_solver_ALE_source.c" />
+    <ClCompile Include="..\finite_volume\grp_solver_EUL_source.c" />
+    <ClCompile Include="..\finite_volume\grp_solver_LAG_source.c" />
     <ClCompile Include="..\inter_process\bound_cond_slope_limiter.c" />
     <ClCompile Include="..\inter_process\slope_limiter.c" />
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir.c" />
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_LAG.c" />
-    <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Ben.c" />
-    <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Toro.c" />
+    <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir.c" />
+    <ClCompile Include="..\riemann_solver\linear_grp_solver_LAG.c" />
+    <ClCompile Include="..\riemann_solver\riemann_solver_exact_Ben.c" />
+    <ClCompile Include="..\riemann_solver\riemann_solver_exact_Toro.c" />
     <ClCompile Include="..\tools\sys_pro.c" />
     <ClCompile Include="hydrocode.c" />
   </ItemGroup>
@@ -126,7 +126,7 @@
     <ClInclude Include="..\include\file_io.h" />
     <ClInclude Include="..\include\finite_volume.h" />
     <ClInclude Include="..\include\inter_process.h" />
-    <ClInclude Include="..\include\Riemann_solver.h" />
+    <ClInclude Include="..\include\riemann_solver.h" />
     <ClInclude Include="..\include\tools.h" />
     <ClInclude Include="..\include\var_struc.h" />
   </ItemGroup>
