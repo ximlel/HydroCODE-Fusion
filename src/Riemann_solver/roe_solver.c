@@ -2,10 +2,16 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "../include/var_struc.h"
 
 
-void Roe_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, double P_R, double RHO_R, double U_R, double *lambda_max, double delta)
-{	
+void Roe_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta)
+{
+	const double gamma = ifv_L.gamma;
+	const double P_L   = ifv_L.P,   P_R = ifv_R.P;
+	const double RHO_L = ifv_L.RHO, RHO_R = ifv_R.RHO;
+	const double U_L   = ifv_L.U,   U_R = ifv_R.U;
+
 	double C_L, C_R;
 	C_L = sqrt(gamma*P_L/RHO_L);
 	C_R = sqrt(gamma*P_R/RHO_R);
@@ -35,7 +41,6 @@ void Roe_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, d
 	U_S = (U_L*sqrt(RHO_L)+U_R*sqrt(RHO_R)) / (sqrt(RHO_L)+sqrt(RHO_R));
 	H_S = (H_L*sqrt(RHO_L)+H_R*sqrt(RHO_R)) / (sqrt(RHO_L)+sqrt(RHO_R));
 	C_S = sqrt((gamma-1.0)*(H_S-0.5*U_S*U_S));
-
 	
 	double R[3][3];
 	double lambda[3], W[3];
@@ -58,9 +63,8 @@ void Roe_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, d
 		
 	lambda[0] = fabs(U_S - C_S);
 	lambda[1] = fabs(U_S);
- 	lambda[2] = fabs(U_S + C_S);
+	lambda[2] = fabs(U_S + C_S);
 	
-
 	*lambda_max = fabs(U_S) + C_S;
 	
 	if(lambda_L_1<0&&lambda_R_1>0)
@@ -95,5 +99,4 @@ void Roe_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, d
 						}
 				}
 		}
-	
 }

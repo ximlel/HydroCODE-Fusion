@@ -2,10 +2,18 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "../include/var_struc.h"
 
 
-void Roe_2D_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, double V_L,double n_x, double n_y, double P_R, double RHO_R, double U_R,double V_R,double *lambda_max, double delta)
-{	
+void Roe_2D_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta)
+{
+	const double gamma = ifv_L.gamma;
+	const double n_x   = ifv_L.n_x, n_y = ifv_L.n_y;
+	const double P_L   = ifv_L.P,   P_R = ifv_R.P;
+	const double RHO_L = ifv_L.RHO, RHO_R = ifv_R.RHO;
+	const double U_L   = ifv_L.U,   U_R = ifv_R.U;
+	const double V_L   = ifv_L.V,   V_R = ifv_R.V;
+
 	double H_L, H_R;
 	H_L = gamma/(gamma-1.0)*P_L/RHO_L + 0.5*(U_L*U_L+V_L*V_L);
 	H_R = gamma/(gamma-1.0)*P_R/RHO_R + 0.5*(U_R*U_R+V_R*V_R);
@@ -58,12 +66,10 @@ void Roe_2D_solver(double *F, double gamma, double P_L, double RHO_L, double U_L
 	W[2] = 0.5*((P_R-P_L)+RHO_S*C_S*(qn_R-qn_L))/(C_S*C_S);
 	W[3] = RHO_S*(qt_R-qt_L);
 	
-		
 	lambda[0] = fabs(qn_S - C_S);
 	lambda[1] = fabs(qn_S);
- 	lambda[2] = fabs(qn_S + C_S);
+	lambda[2] = fabs(qn_S + C_S);
 	lambda[3] = fabs(qn_S);
-
 
 	double delta_1=0.01;
 	double delta_2=0.2;

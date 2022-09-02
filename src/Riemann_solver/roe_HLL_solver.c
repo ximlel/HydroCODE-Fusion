@@ -1,14 +1,20 @@
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define max(x,y)  ( x>y?x:y )
-#define min(x,y)  ( x<y?x:y )
+#include <math.h>
+
+#include "../include/var_struc.h"
 
 
-void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RHO_L, double U_L, double V_L, double P_R, double RHO_R, double U_R, double V_R, double *lambda_max, double delta)
+void Roe_HLL_solver(double *V_mk, double *F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta)
 {
-	//	double const  Q_user = 2.0;
+	const double gamma = ifv_L.gamma;
+	const double n_x   = ifv_L.n_x, n_y = ifv_L.n_y;
+	const double P_L   = ifv_L.P,   P_R = ifv_R.P;
+	const double RHO_L = ifv_L.RHO, RHO_R = ifv_R.RHO;
+	const double U_L   = ifv_L.U,   U_R = ifv_R.U;
+	const double V_L   = ifv_L.V,   V_R = ifv_R.V;
 	
+	//	double const  Q_user = 2.0;
 	
 	double C_L, C_R;
 	C_L = sqrt(gamma*P_L/RHO_L);
@@ -17,8 +23,8 @@ void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RH
 	
 	/*
 	double Q, P_pvrs, P_max, P_min, RHO_bar, C_bar;
-	P_min = min(P_L,P_R);
-	P_max = max(P_L,P_R);
+	P_min = fmin(P_L,P_R);
+	P_max = fmax(P_L,P_R);
 	Q = P_max/P_min;
 	RHO_bar = 0.5*(RHO_L+RHO_R);
 	C_bar = 0.5*(C_L+C_R);
@@ -34,7 +40,7 @@ void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RH
 
 	if(Q<Q_user&&P_min<P_pvrs&&P_pvrs<P_max) //PVRS
 		{
-			P_star = max(0,P_pvrs);
+			P_star = fmax(0,P_pvrs);
 			U_star = 0.5*(U_L+U_R)+0.5*(P_L-P_R)/(RHO_bar*C_bar);
 			RHO_star_L = RHO_L + (U_L-U_star)*RHO_bar/C_bar;
 			RHO_star_R = RHO_R + (U_star - U_R)*RHO_bar/C_bar;
@@ -53,7 +59,7 @@ void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RH
 		}
 	else //TSRS
 		{
-			P_0 = max(0,P_pvrs);
+			P_0 = fmax(0,P_pvrs);
 			g_L_0 = sqrt(A_L/(P_0+B_L));
 			g_R_0 = sqrt(A_R/(P_0+B_R));
 			P_star = (g_L_0*P_L+g_R_0*P_R-(U_R-U_L))/(g_L_0+g_R_0);
@@ -90,7 +96,6 @@ void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RH
 	U_S = (U_L*sqrt(RHO_L)+U_R*sqrt(RHO_R)) / (sqrt(RHO_L)+sqrt(RHO_R));
 	H_S = (H_L*sqrt(RHO_L)+H_R*sqrt(RHO_R)) / (sqrt(RHO_L)+sqrt(RHO_R));
 	C_S = sqrt((gamma-1.0)*(H_S-0.5*U_S*U_S));
-
 	
 	double R[3][3];
 	double lambda[3], W[3];
@@ -110,11 +115,9 @@ void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RH
 	W[1] = (RHO_R-RHO_L)-(P_R-P_L)/(C_S*C_S);
 	W[2] = 0.5*((P_R-P_L)+RHO_S*C_S*(U_R-U_L))/(C_S*C_S);
 	
-		
 	lambda[0] = U_S - C_S;
 	lambda[1] = U_S;
- 	lambda[2] = U_S + C_S;
-	
+	lambda[2] = U_S + C_S;
 
 	*lambda_max = fabs(U_S) + C_S;
 	
@@ -155,12 +158,10 @@ void Roe_HLL_solver(double *V_mk, double *F, double gamma, double P_L, double RH
 	F[2] = (U[2]/U[0] - 0.5*F[1]*F[1])*(gamma-1.0)*F[0];
 
 	double S_L, S_R;
-	S_L=min(U_S-C_S,U_L-C_L);
-	S_R=max(U_S+C_S,U_R+C_R);
-	S_L=min(0,S_L);
-	S_R=max(0,S_R);
+	S_L=fmin(U_S-C_S,U_L-C_L);
+	S_R=fmax(U_S+C_S,U_R+C_R);
+	S_L=fmin(0,S_L);
+	S_R=fmax(0,S_R);
 
-
-	*V_mk=(RHO_R*(S_R-U_R)*V_R-RHO_L*(S_L-U_L)*V_L)/(RHO_R*(S_R-U_R)-RHO_L*(S_L-U_L));	
-	
+	*V_mk=(RHO_R*(S_R-U_R)*V_R-RHO_L*(S_L-U_L)*V_L)/(RHO_R*(S_R-U_R)-RHO_L*(S_L-U_L));
 }

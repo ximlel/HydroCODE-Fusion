@@ -18,4 +18,8 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
 // Flux of 2-D GRP solver (Eulerian, two-component flow)
 int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau);
 
+void Roe_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
+void HLL_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
+void Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
+
 #endif

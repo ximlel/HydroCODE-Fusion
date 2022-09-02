@@ -9,6 +9,17 @@
 
 #include "../include/var_struc.h"
 
+
+void Roe_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta);
+
+void Roe_2D_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta);
+
+void Roe_Goundov_solver(double *F, double *lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta);
+
+void Roe_HLL_solver(double *V_mk, double *F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta);
+
+void HLL_2D_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R);
+
 // Riemann solver (two-component flow)
 double Riemann_solver_exact(double * U_star, double * P_star, const double gammaL, const double gammaR,
 			    const double u_L, const double u_R, const double p_L, const double p_R, 

@@ -1,4 +1,4 @@
-config[*],Representation ,Common Variable Name,Variable Types,Value Range,Default Value (INFINITY),Enumeration Type,Work condition,Precompiled macro
+config[*],Representation ,Common Variable Name,Variable Types,Value Range,Default Value (INFINITY),Enumeration Type / Variable Interpretation,Work condition,Precompiled macro
 0,Dimension,dim,unsigned int,"1, 2, 3",(ARGument Value),,,
 1,Total time,t_all,double,≥ 0.0,config[5]*config[16],,,
 2,Number of species (multi-fluids),multi,unsigned int,,1,,,
@@ -31,9 +31,10 @@ config[*],Representation ,Common Variable Name,Variable Types,Value Range,Defaul
 33,Dimensional splitting,dim_split,_Bool,,false: No,true: Yes,dim > 1,
 40,Slope limiter ,,enum,,0: Venkatakrishnan,1: Barth-Jespersen,order > 1,
 41,Parameter α in minmod limiter,alpha,double,"[0,2)",1.9,,order > 1 & minmod limiter,
-60,,,,,,,,
-61,,,,,,,,
-70,,,,,,,,
+60,Conservative variable (U_gamma) ργ,,_Bool,,false: Close,true: Open,,
+61,Shear velocity fix,v_fix,enum,,0: Close,1: Open,,
+70,Offset of the upper and downside periodic boundary,,int,,INFINITY: NO / 0,"—: upper <-
++: upper ->  ",,
 106,Polytropic index of fluid 2,gamma_b,double,> 1.0,,,multi > 1,
 110,Specific heat at constant volume,C_v,double,> 0.0,0.72 (air),,,
 111,Specific heat at constant volume of fluid 2,C_v_b,double,> 0.0,,,multi > 1,

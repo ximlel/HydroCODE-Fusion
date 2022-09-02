@@ -1,13 +1,19 @@
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define max(x,y)  ( x>y?x:y )
-#define min(x,y)  (x>y?y:x)
+#include <math.h>
+
+#include "../include/var_struc.h"
 
 
+void HLL_2D_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R)
+{
+	const double gamma = ifv_L.gamma;
+	const double n_x   = ifv_L.n_x, n_y = ifv_L.n_y;
+	const double P_L   = ifv_L.P,   P_R = ifv_R.P;
+	const double RHO_L = ifv_L.RHO, RHO_R = ifv_R.RHO;
+	const double U_L   = ifv_L.U,   U_R = ifv_R.U;
+	const double V_L   = ifv_L.V,   V_R = ifv_R.V;
 
-void HLL_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, double V_L,double n_x, double n_y, double P_R, double RHO_R, double U_R,double V_R,double *lambda_max)
-{	
 	double H_L, H_R;
 	H_L = gamma/(gamma-1.0)*P_L/RHO_L + 0.5*(U_L*U_L+V_L*V_L);
 	H_R = gamma/(gamma-1.0)*P_R/RHO_R + 0.5*(U_R*U_R+V_R*V_R);
@@ -37,11 +43,11 @@ void HLL_solver(double *F, double gamma, double P_L, double RHO_L, double U_L, d
 	E_R = 1.0/(gamma-1.0)*P_R/RHO_R + 0.5*(U_R*U_R+V_R*V_R);
 
 	double S_L, S_R;
-	S_L = min(qn_L-C_L, qn_S-C_S);
-	S_R = max(qn_R+C_R, qn_S+C_S);
+	S_L = fmin(qn_L-C_L, qn_S-C_S);
+	S_R = fmax(qn_R+C_R, qn_S+C_S);
 	
-	S_L = min(0,S_L);
-	S_R = max(0,S_R);
+	S_L = fmin(0,S_L);
+	S_R = fmax(0,S_R);
 	
 		
 	F[0] = (S_R*RHO_L*U_L-S_L*RHO_R*U_R)*n_x + (S_R*RHO_L*V_L-S_L*RHO_R*V_R)*n_y;

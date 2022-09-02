@@ -102,6 +102,11 @@ typedef struct i_f_var {
 #ifdef MULTIFLUID_BASICS
 	double PHI, d_phi, t_phi; //!< Mass fraction of fluid a.
 	double Z_a, d_z_a, t_z_a; //!< Volume fraction of fluid a.
+	double F_gamma, F_phi, F_e_a;
+#endif
+#ifdef MULTIFLUID_BASICS
+	double P_star, U_qt_star, V_qt_star;
+	double U_qt_add_c, V_qt_add_c;
 #endif
 } Interface_Fluid_Variable;
 
