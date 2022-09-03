@@ -72,7 +72,7 @@ static void flu_var_init(const char * add, double * sfv, FILE *fp)
 		exit(1);						\
 	    r = false;							\
 	}								\
-    else								\
+    if(r)								\
 	flu_var_init(add, FV0.sfv, fp);					\
     fclose(fp);								\
     } while(0)
@@ -125,7 +125,7 @@ struct flu_var initialize_2D(const char * name)
 #else
     STR_FLU_INI(PHI, 1);
     STR_FLU_INI(gamma, 0);
-    if (!r)
+    if(!r)
 	for(int i = 0; i < (int)config[3]; i++)
 	    FV0.gamma[i] = 1.0 + 1.0 / (FV0.Z_a[i]/(config[6]-1.0) + (1.0-FV0.Z_a[i])/(config[106]-1.0));
     r = true;

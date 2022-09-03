@@ -1,3 +1,13 @@
+/**
+ * @file meshing.h
+ * @brief This file is the header file of unstructured grid processing program.
+ * @details This header file declares functions in the folder 'meshing'.
+ */
+
+#ifndef MESHING_H
+#define MESHING_H
+
+
 void Sod_mesh(struct mesh_var * mv);
 void Shock_Bubble_mesh(struct mesh_var * mv);
 void Shear_mesh(struct mesh_var * mv);
@@ -24,3 +34,5 @@ struct mesh_var mesh_load(const char *example, const char *mesh_name);
 
 void period_cell_modi(struct mesh_var * mv);
 void period_ghost(struct cell_var * cv, struct mesh_var mv, struct flu_var * FV, double t);
+
+#endif

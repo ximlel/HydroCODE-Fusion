@@ -26,7 +26,6 @@ void Roe_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, con
 	lambda_R_1 = U_star_L - C_star_L;
 	lambda_L_3 = U_star_R + C_star_R;
 	lambda_R_3 = U_R + C_R;
-	
 
 	double H_L, H_R;
 	H_L = gamma/(gamma-1.0)*P_L/RHO_L + 0.5*(U_L*U_L);
@@ -60,13 +59,12 @@ void Roe_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, con
 	W[1] = (RHO_R-RHO_L)-(P_R-P_L)/(C_S*C_S);
 	W[2] = 0.5*((P_R-P_L)+RHO_S*C_S*(U_R-U_L))/(C_S*C_S);
 	
-		
 	lambda[0] = fabs(U_S - C_S);
 	lambda[1] = fabs(U_S);
 	lambda[2] = fabs(U_S + C_S);
 	
 	*lambda_max = fabs(U_S) + C_S;
-	
+
 	if(lambda_L_1<0&&lambda_R_1>0)
 		{
 			F[0] = RHO_L*U_L;

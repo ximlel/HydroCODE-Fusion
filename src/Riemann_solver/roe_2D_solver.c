@@ -71,8 +71,8 @@ void Roe_2D_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, 
 	lambda[2] = fabs(qn_S + C_S);
 	lambda[3] = fabs(qn_S);
 
-	double delta_1=0.01;
-	double delta_2=0.2;
+//	double delta_1=0.01;
+//	double delta_2=0.2;
 	
 	if(lambda[0]<delta)
 			lambda[0] = 0.5/delta*(lambda[0]*lambda[0] + delta*delta);	

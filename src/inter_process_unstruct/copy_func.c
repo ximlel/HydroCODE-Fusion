@@ -6,16 +6,11 @@
 
 
 void cons_qty_copy_cv2ifv(struct i_f_var * ifv, const struct cell_var * cv, const int c)
-{
-	const int dim = (int)config[0];
-	
+{	
 	ifv->U_rho = cv->U_rho[c];
 	ifv->U_e = cv->U_e[c];
 	ifv->U_u = cv->U_u[c];
-	if (dim > 1)
-		ifv->U_v = cv->U_v[c];
-	if (dim > 2)
-		ifv->U_w = cv->U_w[c];
+	ifv->U_v = cv->U_v[c];
 	if ((int)config[2] == 2)
 		{					
 			ifv->U_phi = cv->U_phi[c];
@@ -25,16 +20,11 @@ void cons_qty_copy_cv2ifv(struct i_f_var * ifv, const struct cell_var * cv, cons
 }
 
 void cons_qty_copy_ifv2cv(const struct i_f_var * ifv, struct cell_var * cv, const int c)
-{
-	const int dim = (int)config[0];
-	
+{	
 	cv->U_rho[c] = ifv->U_rho;
 	cv->U_e[c] = ifv->U_e;
 	cv->U_u[c] = ifv->U_u;
-	if (dim > 1)
-		cv->U_v[c] = ifv->U_v;
-	if (dim > 2)
-		cv->U_w[c] = ifv->U_w;
+	cv->U_v[c] = ifv->U_v;
 	if ((int)config[2] == 2)
 		{					
 			cv->U_phi[c] = ifv->U_phi;
@@ -45,15 +35,10 @@ void cons_qty_copy_ifv2cv(const struct i_f_var * ifv, struct cell_var * cv, cons
 
 void prim_var_copy_ifv2FV(const struct i_f_var * ifv, const struct flu_var * FV, const int c)
 {
-	const int dim = (int)config[0];
-
 	FV->RHO[c] = ifv->RHO;
 	FV->P[c]   = ifv->P;
 	FV->U[c]   = ifv->U;
-	if (dim > 1)
-		FV->V[c] = ifv->V;
-	if (dim > 2)
-		FV->W[c] = ifv->W;
+	FV->V[c] = ifv->V;
 	if ((int)config[2] == 2)
 		{					
 			FV->PHI[c] = ifv->PHI;
@@ -64,16 +49,10 @@ void prim_var_copy_ifv2FV(const struct i_f_var * ifv, const struct flu_var * FV,
 
 void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, const int k, const int j)
 {
-	const int dim = (int)config[0];
-	const int order = (int)config[9];
-	
 	cv->F_rho[k][j] = ifv->F_rho;
 	cv->F_e[k][j]   = ifv->F_e;
 	cv->F_u[k][j]   = ifv->F_u;
-	if (dim > 1)
-		cv->F_v[k][j] = ifv->F_v;
-	if (dim > 2)
-		cv->F_w[k][j] = ifv->F_w;
+	cv->F_v[k][j] = ifv->F_v;
 	if ((int)config[2] == 2)
 		{					
 			cv->F_phi[k][j] = ifv->F_phi;
@@ -84,8 +63,7 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 
 //	cv->RHO_p[k][j] = ifv->RHO;
 //	cv->U_p[k][j]   = ifv->U;
-//	if (dim > 1)
-//		cv->V_p[k][j] = ifv->V;
+//	cv->V_p[k][j] = ifv->V;
 //	cv->P_p[k][j] = ifv->P;	
 	cv->RHO_p[k][j] = ifv->RHO_int;
 	cv->U_p[k][j]   = ifv->U_int;
@@ -124,16 +102,10 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 
 void flux_add_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, const int k, const int j)
 {
-	const int dim = (int)config[0];
-	const int order = (int)config[9];
-
 	cv->F_rho[k][j] = 0.5*(cv->F_rho[k][j] + ifv->F_rho);
 	cv->F_e[k][j]   = 0.5*(cv->F_e[k][j]   + ifv->F_e);
 	cv->F_u[k][j]   = 0.5*(cv->F_u[k][j]   + ifv->F_u);
-	if (dim > 1)
-		cv->F_v[k][j] = 0.5*(cv->F_v[k][j] + ifv->F_v);
-	if (dim > 2)
-		cv->F_w[k][j] = 0.5*(cv->F_w[k][j] + ifv->F_w);
+	cv->F_v[k][j] = 0.5*(cv->F_v[k][j] + ifv->F_v);
 	if ((int)config[2] == 2)
 		{					
 			cv->F_phi[k][j] = 0.5*(cv->F_phi[k][j] + ifv->F_phi);
@@ -144,8 +116,7 @@ void flux_add_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, con
 
 	cv->RHO_p[k][j] = 0.5*(cv->RHO_p[k][j] + ifv->RHO);
 	cv->U_p[k][j]   = 0.5*(cv->U_p[k][j] + ifv->U);
-	if (dim > 1)
-		cv->V_p[k][j] = 0.5*(cv->V_p[k][j] + ifv->V);
+	cv->V_p[k][j] = 0.5*(cv->V_p[k][j] + ifv->V);
 	cv->P_p[k][j] = 0.5*(cv->P_p[k][j] + ifv->P);	
 	if ((int)config[2] == 2)
 		{

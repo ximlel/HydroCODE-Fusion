@@ -8,18 +8,17 @@
 void Roe_HLL_solver(double *V_mk, double *F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta)
 {
 	const double gamma = ifv_L.gamma;
-	const double n_x   = ifv_L.n_x, n_y = ifv_L.n_y;
 	const double P_L   = ifv_L.P,   P_R = ifv_R.P;
 	const double RHO_L = ifv_L.RHO, RHO_R = ifv_R.RHO;
 	const double U_L   = ifv_L.U,   U_R = ifv_R.U;
 	const double V_L   = ifv_L.V,   V_R = ifv_R.V;
-	
-	//	double const  Q_user = 2.0;
+
+	// double const Q_user = 2.0;
 	
 	double C_L, C_R;
 	C_L = sqrt(gamma*P_L/RHO_L);
 	C_R = sqrt(gamma*P_R/RHO_R);
-	double z = 0.5 *  (gamma-1.0) / gamma;
+	// double z = 0.5 *  (gamma-1.0) / gamma;
 	
 	/*
 	double Q, P_pvrs, P_max, P_min, RHO_bar, C_bar;
@@ -82,9 +81,10 @@ void Roe_HLL_solver(double *V_mk, double *F, double * lambda_max, const struct i
 	H_L = gamma/(gamma-1.0)*P_L/RHO_L + 0.5*(U_L*U_L);
 	H_R = gamma/(gamma-1.0)*P_R/RHO_R + 0.5*(U_R*U_R);
 
-	double E_L, E_R;
+	double E_L;
+	// double E_R;
 	E_L = 1.0/(gamma-1.0)*P_L/RHO_L + 0.5*(U_L*U_L);
-	E_R = 1.0/(gamma-1.0)*P_R/RHO_R + 0.5*(U_R*U_R);
+	// E_R = 1.0/(gamma-1.0)*P_R/RHO_R + 0.5*(U_R*U_R);
 
 	double U[3];
 	U[0] = RHO_L;
@@ -114,7 +114,7 @@ void Roe_HLL_solver(double *V_mk, double *F, double * lambda_max, const struct i
 	W[0] = 0.5*((P_R-P_L)-RHO_S*C_S*(U_R-U_L))/(C_S*C_S);
 	W[1] = (RHO_R-RHO_L)-(P_R-P_L)/(C_S*C_S);
 	W[2] = 0.5*((P_R-P_L)+RHO_S*C_S*(U_R-U_L))/(C_S*C_S);
-	
+
 	lambda[0] = U_S - C_S;
 	lambda[1] = U_S;
 	lambda[2] = U_S + C_S;

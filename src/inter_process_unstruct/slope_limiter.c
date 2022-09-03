@@ -22,7 +22,6 @@ static void lsq_limiter(const struct cell_var * cv, const struct mesh_var * mv,
 {
 	const double eps = config[4];
 	const int num_cell = (int)config[3];
-	const int n_x = (int)config[13], n_y = (int)config[14];
 	const int lim = isinf(config[40]) ? 0 : (int)config[40]; //limiter
 	double (*mu[])(double) = { mu_BJ, mu_Ven };
 	
@@ -127,7 +126,7 @@ static void lsq_limiter(const struct cell_var * cv, const struct mesh_var * mv,
 static void minmod_limiter(const struct cell_var * cv, const struct mesh_var * mv, 
 						   double * grad_W, double * W)
 {
-	const double eps = config[4];
+	// const double eps = config[4];
 	const int num_cell = (int)config[3];
 	double alpha = isinf(config[41]) ? 1.9 : config[41];
 	int **cc = cv->cell_cell;
@@ -177,7 +176,7 @@ static void minmod_limiter_2D(const struct cell_var * cv, const struct mesh_var 
 							  double * gradx_W, double * grady_W, const double * W,
 							  const int isUorV)//isUorV(U:1,V:-1,NO:0)
 {
-	const double eps = config[4];
+	// const double eps = config[4];
 	const int num_cell = (int)config[3];
 	double alpha = isinf(config[41]) ? 1.9 : config[41];
 	int **cc = cv->cell_cell;
@@ -299,165 +298,103 @@ static void minmod_limiter_2D(const struct cell_var * cv, const struct mesh_var 
 		}
 }
 
-static double minmod(const double a, const double b)
-{
-	const double alpha = 4.0;
-	if (a>0.0&&b>0.0)
-		return fmin(a,alpha*b);
-	if (a<0.0&&b<0.0)
-		return fmax(a,alpha*b);
-	else
-		return 0.0;
-}
 
 void slope_limiter(const struct cell_var * cv,const struct mesh_var * mv, const struct flu_var * FV)
 {
-	const int dim = (int)config[0];
 	const int num_cell = (int)config[3];
-	int **cc = cv->cell_cell;
-		
-	if (dim == 1)
-		{
-			if ((int)config[31] == 0)
-				{
-					for(int k = 0; k < num_cell; k++)
-						{
-							cv->gradx_rho[k] = (cv->RHO_p[k][1] - cv->RHO_p[k][0])/cv->vol[k];
-							cv->gradx_u[k]   = (cv->U_p[k][1]   - cv->U_p[k][0])  /cv->vol[k];
-							cv->gradx_e[k]   = (cv->P_p[k][1]   - cv->P_p[k][0])  /cv->vol[k];
-							if ((int)config[2] == 2)
-								{							   
-									cv->gradx_phi[k] = (cv->PHI_p[k][1] - cv->PHI_p[k][0])/cv->vol[k];
-									cv->gradx_phi[k] = (cv->Z_a_p[k][1] - cv->Z_a_p[k][0])/cv->vol[k];
-								}
-						}
-					minmod_limiter(cv, mv, cv->gradx_rho, FV->RHO);
-					minmod_limiter(cv, mv, cv->gradx_e, FV->P);
-					minmod_limiter(cv, mv, cv->gradx_u, FV->U);
-					if ((int)config[2] == 2)
-						{													
-							minmod_limiter(cv, mv, cv->gradx_phi, FV->PHI);
-							minmod_limiter(cv, mv, cv->gradx_z_a, FV->PHI);							
-						}
-				}
-			else if ((int)config[31] == 1)
-				{
-					for(int k = 0; k < num_cell; k++)
-						{
-							cv->gradx_rho[k] = (cv->RHO_p[k][1] - cv->RHO_p[k][0])/cv->vol[k];
-							cv->gradx_u[k]   = (cv->RHO_p[k][1]*cv->U_p[k][1] - cv->RHO_p[k][0]*cv->U_p[k][0])/cv->vol[k];
-							cv->gradx_e[k]   = ((cv->P_p[k][1]/(cv->gamma_p[k][1]-1.0) + 0.5*cv->RHO_p[k][1]*cv->U_p[k][1]*cv->U_p[k][1]) - (cv->P_p[k][0]/(cv->gamma_p[k][0]-1.0) + 0.5*cv->RHO_p[k][0]*cv->U_p[k][0]*cv->U_p[k][0]))/cv->vol[k];
-							if ((int)config[2] == 2)
-								{
-									cv->gradx_phi[k] = (cv->RHO_p[k][1]*cv->PHI_p[k][1] - cv->RHO_p[k][0]*cv->PHI_p[k][0])/cv->vol[k];
-									cv->gradx_phi[k] = (cv->Z_a_p[k][1] - cv->Z_a_p[k][0])/cv->vol[k];
-								}
-						}
-					minmod_limiter(cv, mv, cv->gradx_rho, cv->U_rho);
-					minmod_limiter(cv, mv, cv->gradx_e, cv->U_e);	
-					minmod_limiter(cv, mv, cv->gradx_u, cv->U_u);
-					if ((int)config[2] == 2)
-						{													
-							minmod_limiter(cv, mv, cv->gradx_phi, cv->U_phi);
-							minmod_limiter(cv, mv, cv->gradx_z_a, cv->U_e_a);							
-						}
-				}
-		}
-	else if (dim == 2)
-		{
-			if ((int)config[31] == 0)
-				{													
-					/*
-					lsq_limiter(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO);
-					lsq_limiter(cv, mv, cv->gradx_e, cv->grady_e, FV->P);
-					lsq_limiter(cv, mv, cv->gradx_u, cv->grady_u, FV->U);
-					lsq_limiter(cv, mv, cv->gradx_v, cv->grady_v, FV->V);
-					if ((int)config[2] == 2)
-						{													
-							lsq_limiter(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI);
-							lsq_limiter(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a);
-						}
-					*/					
-					for(int k = 0; k < num_cell; k++)
-						{
-					
-							cv->gradx_rho[k] = (cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10];
-							cv->grady_rho[k] = (cv->RHO_p[k][2] - cv->RHO_p[k][0])/config[11];
-							cv->gradx_u[k]   = (cv->U_p[k][1]   - cv->U_p[k][3])  /config[10];
-							cv->grady_u[k]   = (cv->U_p[k][2]   - cv->U_p[k][0])  /config[11];
-							cv->gradx_v[k]   = (cv->V_p[k][1]   - cv->V_p[k][3])  /config[10];
-							cv->grady_v[k]   = (cv->V_p[k][2]   - cv->V_p[k][0])  /config[11];
-							cv->gradx_e[k]   = (cv->P_p[k][1]   - cv->P_p[k][3])  /config[10];
-							cv->grady_e[k]   = (cv->P_p[k][2]   - cv->P_p[k][0])  /config[11];
-							if ((int)config[2] == 2)
-								{							   
-									cv->gradx_phi[k] = (cv->PHI_p[k][1] - cv->PHI_p[k][3])/config[10];
-									cv->grady_phi[k] = (cv->PHI_p[k][2] - cv->PHI_p[k][0])/config[11];
-									cv->gradx_z_a[k] = (cv->Z_a_p[k][1] - cv->Z_a_p[k][3])/config[10];
-									cv->grady_z_a[k] = (cv->Z_a_p[k][2] - cv->Z_a_p[k][0])/config[11];	
-								}	
-/*								
-							if (cc[k][0] < 0 || cc[k][1] < 0 || cc[k][2] < 0 || cc[k][3] < 0)
-								{
-									cv->gradx_u[k]   = 1.0/0.0;
-									cv->grady_u[k]   = 1.0/0.0;
-									cv->gradx_v[k]   = 1.0/0.0;
-									cv->grady_v[k]   = 1.0/0.0;
-									cv->gradx_e[k]   = 1.0/0.0;
-									cv->grady_e[k]   = 1.0/0.0;
-									if ((int)config[2] == 2)
-										{							   
-											cv->gradx_phi[k] = 1.0/0.0;
-											cv->grady_phi[k] = 1.0/0.0;
-											cv->gradx_z_a[k] = 1.0/0.0;
-											cv->grady_z_a[k] = 1.0/0.0;	
-										}	
-								}
-							else
-								{
-									cv->gradx_rho[k] = (FV->RHO[cc[k][1]]-FV->RHO[cc[k][3]]) /config[10]/2.0;
-									cv->grady_rho[k] = (FV->RHO[cc[k][2]]-FV->RHO[cc[k][0]]) /config[11]/2.0;
-									cv->gradx_u[k]   = (FV->U[cc[k][1]] - FV->U[cc[k][3]]) /config[10]/2.0;
-									cv->grady_u[k]   = (FV->U[cc[k][2]] - FV->U[cc[k][0]]) /config[11]/2.0;
-									cv->gradx_v[k]   = (FV->V[cc[k][1]] - FV->V[cc[k][3]]) /config[10]/2.0;
-									cv->grady_v[k]   = (FV->V[cc[k][2]] - FV->V[cc[k][0]]) /config[11]/2.0;
-									cv->gradx_e[k]   = (FV->P[cc[k][1]] - FV->P[cc[k][3]]) /config[10]/2.0;
-									cv->grady_e[k]   = (FV->P[cc[k][2]] - FV->P[cc[k][0]]) /config[11]/2.0;
-									if ((int)config[2] == 2)
-										{							   
-											cv->gradx_phi[k] = (FV->PHI[cc[k][1]] - FV->PHI[cc[k][3]])/config[10];
-											cv->grady_phi[k] = (FV->PHI[cc[k][2]] - FV->PHI[cc[k][0]])/config[11];
-											cv->gradx_z_a[k] = (FV->Z_a[cc[k][1]] - FV->Z_a[cc[k][3]])/config[10];
-											cv->grady_z_a[k] = (FV->Z_a[cc[k][2]] - FV->Z_a[cc[k][0]])/config[11];
-										}	
-								}
+	// int **cc = cv->cell_cell;
 
-							   if (fabs(cv->gradx_rho[k]-(cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10])>0.00001)
-{
-							   printf("X:%.10lf,%.10lf,%d\n",cv->gradx_rho[k],(cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10],k);
-							   printf("Y:%.10lf,%.10lf,%d\n",cv->grady_rho[k],(cv->RHO_p[k][2] - cv->RHO_p[k][0])/config[11],k);						
-							   }
-							*/
-						}
-/*
-					minmod_limiter_2D(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO, 0);
-					minmod_limiter_2D(cv, mv, cv->gradx_e,   cv->grady_e,   FV->P, 0);
-					minmod_limiter_2D(cv, mv, cv->gradx_u,   cv->grady_u,   FV->U, 1);
-					minmod_limiter_2D(cv, mv, cv->gradx_v,   cv->grady_v,   FV->V,-1);
-					if ((int)config[2] == 2)
-						{													
-							minmod_limiter_2D(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI, 0);
-							minmod_limiter_2D(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a, 0);
-						}
-*/
-				}
-		}
+	if ((int)config[31] == 0)
+	    {													
+		/*
+		  lsq_limiter(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO);
+		  lsq_limiter(cv, mv, cv->gradx_e, cv->grady_e, FV->P);
+		  lsq_limiter(cv, mv, cv->gradx_u, cv->grady_u, FV->U);
+		  lsq_limiter(cv, mv, cv->gradx_v, cv->grady_v, FV->V);
+		  if ((int)config[2] == 2)
+		  {													
+		  lsq_limiter(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI);
+		  lsq_limiter(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a);
+		  }
+		*/					
+		for(int k = 0; k < num_cell; k++)
+		    {
+					
+			cv->gradx_rho[k] = (cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10];
+			cv->grady_rho[k] = (cv->RHO_p[k][2] - cv->RHO_p[k][0])/config[11];
+			cv->gradx_u[k]   = (cv->U_p[k][1]   - cv->U_p[k][3])  /config[10];
+			cv->grady_u[k]   = (cv->U_p[k][2]   - cv->U_p[k][0])  /config[11];
+			cv->gradx_v[k]   = (cv->V_p[k][1]   - cv->V_p[k][3])  /config[10];
+			cv->grady_v[k]   = (cv->V_p[k][2]   - cv->V_p[k][0])  /config[11];
+			cv->gradx_e[k]   = (cv->P_p[k][1]   - cv->P_p[k][3])  /config[10];
+			cv->grady_e[k]   = (cv->P_p[k][2]   - cv->P_p[k][0])  /config[11];
+			if ((int)config[2] == 2)
+			    {							   
+				cv->gradx_phi[k] = (cv->PHI_p[k][1] - cv->PHI_p[k][3])/config[10];
+				cv->grady_phi[k] = (cv->PHI_p[k][2] - cv->PHI_p[k][0])/config[11];
+				cv->gradx_z_a[k] = (cv->Z_a_p[k][1] - cv->Z_a_p[k][3])/config[10];
+				cv->grady_z_a[k] = (cv->Z_a_p[k][2] - cv->Z_a_p[k][0])/config[11];	
+			    }	
+			/*
+			  if (cc[k][0] < 0 || cc[k][1] < 0 || cc[k][2] < 0 || cc[k][3] < 0)
+			  {
+			  cv->gradx_u[k]   = 1.0/0.0;
+			  cv->grady_u[k]   = 1.0/0.0;
+			  cv->gradx_v[k]   = 1.0/0.0;
+			  cv->grady_v[k]   = 1.0/0.0;
+			  cv->gradx_e[k]   = 1.0/0.0;
+			  cv->grady_e[k]   = 1.0/0.0;
+			  if ((int)config[2] == 2)
+			  {							   
+			  cv->gradx_phi[k] = 1.0/0.0;
+			  cv->grady_phi[k] = 1.0/0.0;
+			  cv->gradx_z_a[k] = 1.0/0.0;
+			  cv->grady_z_a[k] = 1.0/0.0;	
+			  }	
+			  }
+			  else
+			  {
+			  cv->gradx_rho[k] = (FV->RHO[cc[k][1]]-FV->RHO[cc[k][3]]) /config[10]/2.0;
+			  cv->grady_rho[k] = (FV->RHO[cc[k][2]]-FV->RHO[cc[k][0]]) /config[11]/2.0;
+			  cv->gradx_u[k]   = (FV->U[cc[k][1]] - FV->U[cc[k][3]]) /config[10]/2.0;
+			  cv->grady_u[k]   = (FV->U[cc[k][2]] - FV->U[cc[k][0]]) /config[11]/2.0;
+			  cv->gradx_v[k]   = (FV->V[cc[k][1]] - FV->V[cc[k][3]]) /config[10]/2.0;
+			  cv->grady_v[k]   = (FV->V[cc[k][2]] - FV->V[cc[k][0]]) /config[11]/2.0;
+			  cv->gradx_e[k]   = (FV->P[cc[k][1]] - FV->P[cc[k][3]]) /config[10]/2.0;
+			  cv->grady_e[k]   = (FV->P[cc[k][2]] - FV->P[cc[k][0]]) /config[11]/2.0;
+			  if ((int)config[2] == 2)
+			  {							   
+			  cv->gradx_phi[k] = (FV->PHI[cc[k][1]] - FV->PHI[cc[k][3]])/config[10];
+			  cv->grady_phi[k] = (FV->PHI[cc[k][2]] - FV->PHI[cc[k][0]])/config[11];
+			  cv->gradx_z_a[k] = (FV->Z_a[cc[k][1]] - FV->Z_a[cc[k][3]])/config[10];
+			  cv->grady_z_a[k] = (FV->Z_a[cc[k][2]] - FV->Z_a[cc[k][0]])/config[11];
+			  }	
+			  }
+
+			  if (fabs(cv->gradx_rho[k]-(cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10])>0.00001)
+			  {
+			  printf("X:%.10lf,%.10lf,%d\n",cv->gradx_rho[k],(cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10],k);
+			  printf("Y:%.10lf,%.10lf,%d\n",cv->grady_rho[k],(cv->RHO_p[k][2] - cv->RHO_p[k][0])/config[11],k);						
+			  }
+			*/
+		    }
+		/*
+		  minmod_limiter_2D(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO, 0);
+		  minmod_limiter_2D(cv, mv, cv->gradx_e,   cv->grady_e,   FV->P, 0);
+		  minmod_limiter_2D(cv, mv, cv->gradx_u,   cv->grady_u,   FV->U, 1);
+		  minmod_limiter_2D(cv, mv, cv->gradx_v,   cv->grady_v,   FV->V,-1);
+		  if ((int)config[2] == 2)
+		  {													
+		  minmod_limiter_2D(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI, 0);
+		  minmod_limiter_2D(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a, 0);
+		  }
+		*/
+	    }
 }
 
 /*
 void slope_limiter2(const struct cell_var * cv,const struct mesh_var * mv, const struct flu_var * FV)
 {
-	const int dim = (int)config[0];
 	const int num_cell = (int)config[3];
 	int **cp = mv->cell_pt;
 	int **cc = cv->cell_cell;
@@ -465,68 +402,65 @@ void slope_limiter2(const struct cell_var * cv,const struct mesh_var * mv, const
 	const double *Y = mv->Y;
 	int p_p,p_n;
 	double Xu,Xd,Xl,Xr, Yu,Yd,Yl,Yr;
-	
-	if (dim == 2)
-		{
-			if ((int)config[31] == 0)
-				{													
+
+	if ((int)config[31] == 0)
+	    {													
 					
-					lsq_limiter(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO);
-					lsq_limiter(cv, mv, cv->gradx_e, cv->grady_e, FV->P);
-					lsq_limiter(cv, mv, cv->gradx_u, cv->grady_u, FV->U);
-					lsq_limiter(cv, mv, cv->gradx_v, cv->grady_v, FV->V);
-					if ((int)config[2] == 2)
-					{													
-					lsq_limiter(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI);
-					lsq_limiter(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a);
-					}
+		lsq_limiter(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO);
+		lsq_limiter(cv, mv, cv->gradx_e, cv->grady_e, FV->P);
+		lsq_limiter(cv, mv, cv->gradx_u, cv->grady_u, FV->U);
+		lsq_limiter(cv, mv, cv->gradx_v, cv->grady_v, FV->V);
+		if ((int)config[2] == 2)
+		    {													
+			lsq_limiter(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI);
+			lsq_limiter(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a);
+		    }
 						
 									
-					for(int k = 0; k < num_cell; k++)
-						{
-							for(int j = 0; j < cp[k][0]; ++j)
-								{									
-									if(j == cp[k][0]-1) 
-										{
-											p_p=cp[k][1];
-											p_n=cp[k][j+1];
-										}				  
-									else
-										{
-											p_p=cp[k][j+2];
-											p_n=cp[k][j+1];
-										}											
-									(0.5*(X[p_p]+X[p_n]) - X_c[k]) (0.5*(Y[p_p]+Y[p_n]);
-																	}
+		for(int k = 0; k < num_cell; k++)
+		    {
+			for(int j = 0; j < cp[k][0]; ++j)
+			    {									
+				if(j == cp[k][0]-1) 
+				    {
+					p_p=cp[k][1];
+					p_n=cp[k][j+1];
+				    }				  
+				else
+				    {
+					p_p=cp[k][j+2];
+					p_n=cp[k][j+1];
+				    }											
+				(0.5*(X[p_p]+X[p_n]) - X_c[k]) (0.5*(Y[p_p]+Y[p_n]);
+								}
 					
-							cv->gradx_rho[k] = (cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10];
-							cv->grady_rho[k] = (cv->RHO_p[k][2] - cv->RHO_p[k][0])/config[11];
-							cv->gradx_u[k]   = (cv->U_p[k][1]   - cv->U_p[k][3])  /config[10];
-							cv->grady_u[k]   = (cv->U_p[k][2]   - cv->U_p[k][0])  /config[11];
-							cv->gradx_v[k]   = (cv->V_p[k][1]   - cv->V_p[k][3])  /config[10];
-							cv->grady_v[k]   = (cv->V_p[k][2]   - cv->V_p[k][0])  /config[11];
-							cv->gradx_e[k]   = (cv->P_p[k][1]   - cv->P_p[k][3])  /config[10];
-							cv->grady_e[k]   = (cv->P_p[k][2]   - cv->P_p[k][0])  /config[11];
-							if ((int)config[2] == 2)
-								{							   
-									cv->gradx_phi[k] = (cv->PHI_p[k][1] - cv->PHI_p[k][3])/config[10];
-									cv->grady_phi[k] = (cv->PHI_p[k][2] - cv->PHI_p[k][0])/config[11];
-									cv->gradx_z_a[k] = (cv->Z_a_p[k][1] - cv->Z_a_p[k][3])/config[10];
-									cv->grady_z_a[k] = (cv->Z_a_p[k][2] - cv->Z_a_p[k][0])/config[11];	
-								}	
+				    cv->gradx_rho[k] = (cv->RHO_p[k][1] - cv->RHO_p[k][3])/config[10];
+				cv->grady_rho[k] = (cv->RHO_p[k][2] - cv->RHO_p[k][0])/config[11];
+				cv->gradx_u[k]   = (cv->U_p[k][1]   - cv->U_p[k][3])  /config[10];
+				cv->grady_u[k]   = (cv->U_p[k][2]   - cv->U_p[k][0])  /config[11];
+				cv->gradx_v[k]   = (cv->V_p[k][1]   - cv->V_p[k][3])  /config[10];
+				cv->grady_v[k]   = (cv->V_p[k][2]   - cv->V_p[k][0])  /config[11];
+				cv->gradx_e[k]   = (cv->P_p[k][1]   - cv->P_p[k][3])  /config[10];
+				cv->grady_e[k]   = (cv->P_p[k][2]   - cv->P_p[k][0])  /config[11];
+				if ((int)config[2] == 2)
+				    {							   
+					cv->gradx_phi[k] = (cv->PHI_p[k][1] - cv->PHI_p[k][3])/config[10];
+					cv->grady_phi[k] = (cv->PHI_p[k][2] - cv->PHI_p[k][0])/config[11];
+					cv->gradx_z_a[k] = (cv->Z_a_p[k][1] - cv->Z_a_p[k][3])/config[10];
+					cv->grady_z_a[k] = (cv->Z_a_p[k][2] - cv->Z_a_p[k][0])/config[11];	
+				    }	
 
-						}
-					minmod_limiter_2D(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO, 0);
-					minmod_limiter_2D(cv, mv, cv->gradx_e,   cv->grady_e,   FV->P, 0);
-					minmod_limiter_2D(cv, mv, cv->gradx_u,   cv->grady_u,   FV->U, 1);
-					minmod_limiter_2D(cv, mv, cv->gradx_v,   cv->grady_v,   FV->V,-1);
-					if ((int)config[2] == 2)
-						{													
-							minmod_limiter_2D(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI, 0);
-							minmod_limiter_2D(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a, 0);
-						}
+			    }
+			minmod_limiter_2D(cv, mv, cv->gradx_rho, cv->grady_rho, FV->RHO, 0);
+			minmod_limiter_2D(cv, mv, cv->gradx_e,   cv->grady_e,   FV->P, 0);
+			minmod_limiter_2D(cv, mv, cv->gradx_u,   cv->grady_u,   FV->U, 1);
+			minmod_limiter_2D(cv, mv, cv->gradx_v,   cv->grady_v,   FV->V,-1);
+			if ((int)config[2] == 2)
+			    {													
+				minmod_limiter_2D(cv, mv, cv->gradx_phi, cv->grady_phi, FV->PHI, 0);
+				minmod_limiter_2D(cv, mv, cv->gradx_z_a, cv->grady_z_a, FV->Z_a, 0);
+			    }
 
-				}
-		}
+		    }
 }
 */

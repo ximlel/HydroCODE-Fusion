@@ -12,8 +12,8 @@ void DispPro(const double pro, const int step);
 
 int CreateDir(const char* pPath);
 
-void init_mem(double * p[], const int n, const int * cell_pt[]);
-void init_mem_int(int * p[], const int n, const int * cell_pt[]);
+void init_mem(double * p[], const int n, int ** cell_pt);
+void init_mem_int(int * p[], const int n, int ** cell_pt);
 
 
 // math_algo.c

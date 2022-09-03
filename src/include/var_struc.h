@@ -17,6 +17,11 @@
  * @brief Switch whether to compute multi-phase flow. (essential macro: MULTIFLUID_BASICS)
  */
 #define MULTIPHASE_BASICS
+/**
+ * @def PRIMITIVE_CONSERVATIVE_CONVERT
+ * @brief Switch whether to convert between primitive variables and conservative variables.
+ */
+#define UNSTRUCTURED_GRID
 #endif
 
 //! If the system does not set, the default largest value can be seen as zero is EPS.
@@ -56,7 +61,7 @@ typedef struct cell_var_stru {
 	double ** G_rho, ** G_e, ** G_u, ** G_v; //!< numerical fluxes at (y_{j-1/2}, t_{n}).
 } Cell_Variable_Structured;
 
-//! pointer structure of VARiables on unstructural computational grid CELLs.
+//! pointer structure of VARiables on unstructured computational grid CELLs.
 struct cell_var {
 	int **cell_cell;
 	double **n_x, **n_y;
@@ -95,18 +100,29 @@ typedef struct i_f_var {
 	double RHO,     P,     U,     V;     //!< variable values at t_{n}.
 	double RHO_int, P_int, U_int, V_int; //!< interfacial variables at t_{n+1}.
 	double F_rho, F_e, F_u, F_v;         //!< interfacial fluxes at t_{n+1/2}.
-	double d_rho, d_p, d_u, d_v;         //!< normal spatial derivatives.
-	double t_rho, t_p, t_u, t_v;         //!< tangential spatial derivatives OR spatial derivatives in Lagrangian coordinate ξ
-	double lambda_u, lambda_v;           //!< grid moving velocity components in direction x and y
+	double d_rho, d_e, d_u, d_v, d_p;    //!< normal spatial derivatives.
+	double t_rho, t_e, t_u, t_v, t_p;    //!< tangential spatial derivatives OR spatial derivatives in Lagrangian coordinate ξ
 	double gamma;                        //!< specific heat ratio
-#ifdef MULTIFLUID_BASICS
-	double PHI, d_phi, t_phi; //!< Mass fraction of fluid a.
-	double Z_a, d_z_a, t_z_a; //!< Volume fraction of fluid a.
-	double F_gamma, F_phi, F_e_a;
+	double lambda_u, lambda_v;           //!< grid moving velocity components in direction x and y
+	double delta_x, delta_y;
+	double length;
+#ifdef PRIMITIVE_CONSERVATIVE_CONVERT
+	double U_rho, U_e, U_u, U_v;
 #endif
 #ifdef MULTIFLUID_BASICS
-	double P_star, U_qt_star, V_qt_star;
-	double U_qt_add_c, V_qt_add_c;
+	double Z_a, d_z_a, t_z_a; //!< Volume fraction of fluid a.
+	double PHI, d_phi, t_phi, F_phi; //!< Mass fraction of fluid a.
+	double F_e_a;
+	double d_gamma, t_gamma, F_gamma;
+#ifdef PRIMITIVE_CONSERVATIVE_CONVERT
+	double U_phi, U_gamma, U_e_a;
+#endif
+#endif
+#ifdef MULTIFLUID_BASICS
+	double RHO_star,    P_star,    U_qt_star,    V_qt_star,    gamma_star;
+	double RHO_minus_c, P_minus_c, U_qt_minus_c, V_qt_minus_c, gamma_minus_c;
+	double RHO_add_c,   P_add_c,   U_qt_add_c,   V_qt_add_c,   gamma_add_c;
+	double u_star, u_minus_c, u_add_c;
 #endif
 } Interface_Fluid_Variable;
 

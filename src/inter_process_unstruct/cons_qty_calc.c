@@ -10,7 +10,6 @@
 //Initialize conserved quantities.
 void cons_qty_init(const struct cell_var * cv, const struct flu_var * FV)
 {
-	const int dim = (int)config[0];
 	const int num_cell = (int)config[3];
 	for(int k = 0; k < num_cell; k++)
 		{
@@ -19,16 +18,8 @@ void cons_qty_init(const struct cell_var * cv, const struct flu_var * FV)
 		
 			cv->U_e[k]     = FV->P[k]/(FV->gamma[k]-1.0) + 0.5*FV->RHO[k]*FV->U[k]*FV->U[k];
 			cv->U_u[k]     = FV->RHO[k] * FV->U[k];			
-			if (dim > 1)
-				{									
-					cv->U_v[k]  = FV->RHO[k] * FV->V[k];
-					cv->U_e[k] += 0.5*FV->RHO[k]*FV->V[k]*FV->V[k];
-				}
-			if (dim > 2)
-				{									
-					cv->U_w[k]  = FV->RHO[k] * FV->W[k];
-					cv->U_e[k] += 0.5*FV->RHO[k]*FV->W[k]*FV->W[k];
-				}
+			cv->U_v[k]  = FV->RHO[k] * FV->V[k];
+			cv->U_e[k] += 0.5*FV->RHO[k]*FV->V[k]*FV->V[k];
 			if ((int)config[2] == 2)
 				{									
 					cv->U_phi[k] = FV->RHO[k] * FV->PHI[k];			
@@ -40,18 +31,14 @@ void cons_qty_init(const struct cell_var * cv, const struct flu_var * FV)
 
 int cons2prim(struct i_f_var * ifv)
 {
-	const int dim = (int)config[0];
 	const double eps = config[4];
 	double phi_e_a, phi_e_b;
 	
 	ifv->RHO   = ifv->U_rho;
 	ifv->U     = ifv->U_u/ifv->U_rho;
-	if (dim > 1)
-		{
-			ifv->V  = ifv->U_v/ifv->U_rho;
-			if (isnan(ifv->V) || isinf(ifv->V))									
-				return 0;
-		}
+	ifv->V  = ifv->U_v/ifv->U_rho;
+	if (isnan(ifv->V) || isinf(ifv->V))									
+		return 0;
 	if ((int)config[2] == 2)
 		{
 			ifv->PHI = ifv->U_phi/ifv->U_rho;
@@ -78,18 +65,8 @@ int cons2prim(struct i_f_var * ifv)
 //			ifv->gamma = (phi_e_a*config[6] + phi_e_b*config[106])/(phi_e_a+phi_e_b);
 			ifv->gamma = 1.0/(ifv->Z_a/(config[6]-1.0)+(1.0-ifv->Z_a)/(config[106]-1.0))+1.0;
 		}
-	ifv->P     = (ifv->U_e - 0.5*(ifv->U_u*ifv->U_u)/ifv->U_rho) * (ifv->gamma-1.0);	
-	if (dim > 1)
-		{
-			ifv->P -= (0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho) * (ifv->gamma-1.0);
-		}
-	if (dim > 2)
-		{			
-			ifv->W  = ifv->U_w/ifv->U_rho;
-			ifv->P -= (0.5*(ifv->U_w*ifv->U_w)/ifv->U_rho) * (ifv->gamma-1.0);
-			if (isnan(ifv->W) || isinf(ifv->W))
-				return 0;
-		}
+	ifv->P  = (ifv->U_e - 0.5*(ifv->U_u*ifv->U_u)/ifv->U_rho) * (ifv->gamma-1.0);	
+	ifv->P -= (0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho) * (ifv->gamma-1.0);
 
 	
 	if (isnan(ifv->RHO + ifv->U + ifv->P) || isinf(ifv->RHO + ifv->U + ifv->P) || ifv->RHO < eps)
@@ -98,8 +75,7 @@ int cons2prim(struct i_f_var * ifv)
 		{
 			printf("P=%.10lf\n",ifv->P);		
 			ifv->U_e = 0.5*(ifv->U_u*ifv->U_u)/ifv->U_rho + eps/(ifv->gamma-1.0);
-			if (dim > 1)			
-				ifv->U_e += 0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho;	
+			ifv->U_e += 0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho;	
 			ifv->U_e_a = 0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V) + ifv->Z_a*eps/(config[6]-1.0);	
 		}
 	
@@ -110,18 +86,18 @@ int cons2prim(struct i_f_var * ifv)
 int cons_qty_update(const struct cell_var * cv, const struct mesh_var * mv,
 					const struct flu_var  * FV, const double tau)
 {
-	const int dim = (int)config[0];
 	const int num_cell = (int)config[3];
 	int ** cp = mv->cell_pt;
 	
 	int p_p, p_n;
-	double length, gamma, flux_v_fix, length2;
+	double length, flux_v_fix;
+	// double gamma, length2;
 	int i;
 	for(int k = 0; k < num_cell; ++k)
 		{
 			flux_v_fix = 0.0;				
-			if(isinf(config[60]))
-				gamma = cv->U_gamma[k]/cv->U_rho[k];
+			//if(isinf(config[60]))
+			//	gamma = cv->U_gamma[k]/cv->U_rho[k];
 			for(int j = 0; j < cp[k][0]; j++)
 				{
 					if(j == cp[k][0]-1) 
@@ -134,18 +110,12 @@ int cons_qty_update(const struct cell_var * cv, const struct mesh_var * mv,
 							p_p=cp[k][j+2];
 							p_n=cp[k][j+1];
 						}
-					if (dim == 1)
-						length = cv->n_x[k][j];
-					else if (dim == 2)
-						length = sqrt((mv->X[p_p] - mv->X[p_n])*(mv->X[p_p]-mv->X[p_n]) + (mv->Y[p_p] - mv->Y[p_n])*(mv->Y[p_p]-mv->Y[p_n]));
+					length = sqrt((mv->X[p_p] - mv->X[p_n])*(mv->X[p_p]-mv->X[p_n]) + (mv->Y[p_p] - mv->Y[p_n])*(mv->Y[p_p]-mv->Y[p_n]));
 					
 					cv->U_rho[k] += - tau*cv->F_rho[k][j] * length / cv->vol[k];
 					cv->U_e[k]   += - tau*cv->F_e[k][j]   * length / cv->vol[k];	
 					cv->U_u[k]   += - tau*cv->F_u[k][j]   * length / cv->vol[k];
-					if (dim > 1)
-						cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
-					if (dim > 2)
-						cv->U_w[k] += - tau*cv->F_w[k][j] * length / cv->vol[k];
+					cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
 					if ((int)config[2] == 2)
 						cv->U_phi[k] += - tau*cv->F_phi[k][j] * length / cv->vol[k];
 					if(!isinf(config[60]))
@@ -165,12 +135,8 @@ int cons_qty_update(const struct cell_var * cv, const struct mesh_var * mv,
 											p_p=cp[k][i+2];
 											p_n=cp[k][i+1];
 										}
-									if (dim == 1)
-										length2 = cv->n_x[k][i];
-									else if (dim == 2)
-										length2 = sqrt((mv->X[p_p] - mv->X[p_n])*(mv->X[p_p]-mv->X[p_n]) + (mv->Y[p_p] - mv->Y[p_n])*(mv->Y[p_p]-mv->Y[p_n]));
-						
-									//									flux_v_fix -= tau*length/cv->vol[k]*cv->RHO_p[k][j]*(cv->U_p[k][j]*cv->n_x[k][j]+cv->V_p[k][j]*cv->n_y[k][j])*tau*length2/cv->vol[k]*cv->RHO_p[k][i]*(cv->U_p[k][i]*cv->n_x[k][i]+cv->V_p[k][i]*cv->n_y[k][i])*((cv->U_p[k][j]-cv->U_p[k][i])*(cv->U_p[k][j]-cv->U_p[k][i])+(cv->V_p[k][j]-cv->V_p[k][i])*(cv->V_p[k][j]-cv->V_p[k][i]));
+									// length2 = sqrt((mv->X[p_p] - mv->X[p_n])*(mv->X[p_p]-mv->X[p_n]) + (mv->Y[p_p] - mv->Y[p_n])*(mv->Y[p_p]-mv->Y[p_n]));
+									// flux_v_fix -= tau*length/cv->vol[k]*cv->RHO_p[k][j]*(cv->U_p[k][j]*cv->n_x[k][j]+cv->V_p[k][j]*cv->n_y[k][j])*tau*length2/cv->vol[k]*cv->RHO_p[k][i]*(cv->U_p[k][i]*cv->n_x[k][i]+cv->V_p[k][i]*cv->n_y[k][i])*((cv->U_p[k][j]-cv->U_p[k][i])*(cv->U_p[k][j]-cv->U_p[k][i])+(cv->V_p[k][j]-cv->V_p[k][i])*(cv->V_p[k][j]-cv->V_p[k][i]));
 								}
 
 							flux_v_fix += tau*length/cv->vol[k]*cv->RHO_p[k][j]*(cv->U_p[k][j]*cv->n_x[k][j]+cv->V_p[k][j]*cv->n_y[k][j])*((cv->U_p[k][j]-FV->U[k])*(cv->U_p[k][j]-FV->U[k])+(cv->V_p[k][j]-FV->V[k])*(cv->V_p[k][j]-FV->V[k]))/2.0;

@@ -9,10 +9,8 @@
 int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 							   const struct flu_var * FV, double tau, const int stop_step)
 {
-	const int dim = (int)config[0];
 	const int num_cell = (int)config[3];
 	const int order = (int)config[9];
-	const double eps = config[4];
 	int ** cp = mv->cell_pt;
 
 	double U_u_a, U_v_a;
@@ -61,22 +59,14 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 							p_p=cp[k][j+2];
 							p_n=cp[k][j+1];
 						}
-					if (dim == 1)
-						length = cv->n_x[k][j];
-					else if (dim == 2)
-						length = sqrt((mv->X[p_p] - mv->X[p_n])*(mv->X[p_p]-mv->X[p_n]) + (mv->Y[p_p] - mv->Y[p_n])*(mv->Y[p_p]-mv->Y[p_n]));				
+					length = sqrt((mv->X[p_p] - mv->X[p_n])*(mv->X[p_p]-mv->X[p_n]) + (mv->Y[p_p] - mv->Y[p_n])*(mv->Y[p_p]-mv->Y[p_n]));				
 					cv->U_rho[k] += - tau*cv->F_rho[k][j] * length / cv->vol[k];
 					cv->U_e[k]   += - tau*cv->F_e[k][j]   * length / cv->vol[k];	
 					cv->U_e_a[k] += - tau*(cv->F_e_a[k][j] + Z_a*cv->P_star[k][j]) * length / cv->vol[k];
 					cv->U_u[k]   += - tau*cv->F_u[k][j]   * length / cv->vol[k];
 					U_u_a += - tau*(cv->U_qt_add_c[k][j] + Z_a*cv->U_qt_star[k][j]) * length / cv->vol[k];
-					if (dim > 1)
-						{													
-							cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
-							U_v_a += - tau*(cv->V_qt_add_c[k][j] + Z_a*cv->V_qt_star[k][j]) * length / cv->vol[k];
-						}
-					if (dim > 2)
-						cv->U_w[k] += - tau*cv->F_w[k][j] * length / cv->vol[k];
+					cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
+					U_v_a += - tau*(cv->V_qt_add_c[k][j] + Z_a*cv->V_qt_star[k][j]) * length / cv->vol[k];
 					if ((int)config[2] == 2)						
 						cv->U_phi[k] += - tau*cv->F_phi[k][j] * length / cv->vol[k];
 				}
