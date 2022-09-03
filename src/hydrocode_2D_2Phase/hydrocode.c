@@ -7,7 +7,7 @@
  * @mainpage 2D Godunov/GRP scheme for Eulerian hydrodynamics
  * @brief This is an implementation of fully explict forward Euler scheme
  *        for 2-D Euler equations of motion on Eulerian coordinate.
- * @version 0.2
+ * @version 0.4
  *
  * @section File_directories File directories
  * <table>
@@ -95,6 +95,7 @@
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
+#include "../include/meshing.h"
 #include "../include/finite_volume.h"
 
 /**
@@ -162,9 +163,9 @@ int main(int argc, char *argv[])
 	printf("%s ", argv[k]);
     printf("\n");
     printf("TEST:\n  %s\n", argv[1]);
-    if(argc < 5)
+    if(argc < 6)
 	{
-	    printf("Test Beginning: ARGuments Counter %d is less than 5.\n", argc);
+	    printf("Test Beginning: ARGuments Counter %d is less than 6.\n", argc);
 	    return 4;
 	}
     else
@@ -187,7 +188,7 @@ int main(int argc, char *argv[])
     printf("Configurating:\n");
     char * endptr;
     double conf_tmp;
-    for (k = 6; k < argc; k++)
+    for (k = 7; k < argc; k++)
 	{
 	    errno = 0;
 	    j = strtoul(argv[k], &endptr, 10);
@@ -238,27 +239,35 @@ int main(int argc, char *argv[])
      */
   struct flu_var FV0 = initialize_2D(argv[1]);
 
-  struct mesh_var mv= mesh_load(argv[1], argv[5]);
+  struct mesh_var mv= mesh_load(argv[1], argv[6]);
 
   if ((_Bool)config[32])
       {
 #ifndef NOTECPLOT
-	  file_write_TEC(FV0, mv, argv[2], 0.0);
+	  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], 0.0);
 #endif
 #ifndef NOVTKPLOT
 	  file_write_3D_VTK(FV0, mv, argv[2], 0.0);
 #endif
       }
 
-  finite_volume_scheme_GRP2D(&FV0, &mv, scheme, argv[2]);
+  if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
+      finite_volume_scheme_2D(&FV0, &mv, scheme, argv[2]);
+  else
+      {
+	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);
+	  retval = 4;
+	  goto return_NULL;
+      }
 
   // Write the final data down.
 #ifndef NOTECPLOT
-  file_write_TEC(FV0, mv, argv[2], config[1]);
+  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], config[1]);
 #endif
 #ifndef NOVTKPLOT
   file_write_3D_VTK(FV0, mv, argv[2], config[1]);
 #endif
 
+return_NULL:
   return retval;
 }

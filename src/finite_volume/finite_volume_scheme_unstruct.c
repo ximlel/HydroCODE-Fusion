@@ -7,10 +7,10 @@
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
-#include "../include/finite_volume.h"
-
-
 #include "../include/file_io.h"
+#include "../include/inter_process_unstruct.h"
+#include "../include/flux_calc.h"
+
 
 void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const char * scheme, const char * problem)
 {
@@ -43,8 +43,8 @@ config[53] = 1.0;//R-K
 	double t_all = 0.0;
 	struct i_f_var ifv, ifv_R, ifv_tmp;
 
-	const double delta_plot_t = 0.05;
-	double plot_t = 0.0;
+	// const double delta_plot_t = 0.05;
+	// double plot_t = 0.0;
 
 	int k, j, ivi, stop_step = 0, stop_t = 0;
 	int i;
@@ -123,11 +123,11 @@ config[53] = 1.0;//R-K
 									if (order == 1)
 										{
 											if (strcmp(scheme,"Roe") == 0)
-												Roe_scheme(&ifv, &ifv_R);
+												Roe_flux(&ifv, &ifv_R);
 											else if (strcmp(scheme,"HLL") == 0)
-												HLL_scheme(&ifv, &ifv_R);
+												HLL_flux(&ifv, &ifv_R);
 											else if(strcmp(scheme,"Riemann_exact") == 0)
-												Riemann_exact_scheme(&ifv, &ifv_R);
+												Riemann_exact_flux(&ifv, &ifv_R);
 											else
 												{
 													printf("No Riemann solver!\n");
@@ -136,12 +136,10 @@ config[53] = 1.0;//R-K
 										}
 									else if (order == 2)
 										{
-											if(strcmp(scheme,"GRP") == 0)					
-												GRP_scheme(&ifv, &ifv_R, tau);
-											else if(strcmp(scheme,"GRP_2D") == 0)
-												GRP_2D_scheme(&ifv, &ifv_R, tau);
+											if(strcmp(scheme,"GRP_2D") == 0)
+												GRP_2D_flux(&ifv, &ifv_R, tau);
 											else if(strcmp(scheme,"Riemann_exact") == 0)
-												Riemann_exact_scheme(&ifv, &ifv_R);
+												Riemann_exact_flux(&ifv, &ifv_R);
 											else
 												{
 													printf("No Riemann solver!\n");

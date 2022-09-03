@@ -85,19 +85,14 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 	if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
 	    return 2;
 
-	double rho_mid, p_mid, u_mid, v_mid;
-	rho_mid = mid[0];
-	p_mid   = mid[3];
+	double rho_mid = mid[0], p_mid = mid[3], u_mid = mid[1], v_mid;
 #ifdef MULTIFLUID_BASICS
-	double phi_mid, z_a_mid;
-	z_a_mid   = mid[4];
-	phi_mid   = mid[5];
+	double phi_mid = mid[4], z_a_mid = mid[5];
 	gamma_mid = mid[1] > 0.0 ? ifv->gamma : ifv_R->gamma;
 #endif
 	if (dim == 1)
 		{
 			u_mid = mid[1];
-
 			ifv->F_rho = rho_mid*u_mid;
 			ifv->F_u   = ifv->F_rho*u_mid + p_mid;
 		}
@@ -105,7 +100,6 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 		{
 			u_mid  = mid[1]*n_x - mid[2]*n_y;
 			v_mid  = mid[1]*n_y + mid[2]*n_x;
-
 			ifv->F_rho = rho_mid*(u_mid*n_x + v_mid*n_y);
 			ifv->F_u   = ifv->F_rho*u_mid + p_mid*n_x;
 			ifv->F_v   = ifv->F_rho*v_mid + p_mid*n_y;

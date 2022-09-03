@@ -5,6 +5,7 @@
 
 
 #include "../include/var_struc.h"
+#include "../include/var_struc_BN.h"
 #include "../include/tools.h"
 
 
@@ -27,7 +28,7 @@ static inline double V_norm(double * x)
 
 void NewtonRapshon_matrix(double * x_star, double * err, double * fun, double * dfun, double eps)
 {
-    double d[4]={0.0};
+    double d[4]={0.0, 0.0, 0.0, 0.0};
     rinv(dfun,4); //Matrix inv of dfun
     int i,j;
     if (V_norm(fun) > eps) {
@@ -43,7 +44,7 @@ void NewtonRapshon_matrix(double * x_star, double * err, double * fun, double * 
 
 static void NewtonRapshon_matrix2(double * x_star, double * err, double * fun, double * dfun, double eps)
 {
-    double d[2]={0.0};
+    double d[2]={0.0, 0.0};
     rinv(dfun,2); //Matrix inv of dfun
     int i,j;
     if (V_norm(fun) > eps) {
@@ -93,7 +94,6 @@ void RI2U_cal(struct U_var * U, const struct RI_var * RI, double z_s, const doub
 //From var U to calculate Riemann invariants.
 void U2RI_cal(const struct U_var * U, struct RI_var * RI)
 {
-    const double eps = config[4];
     const double gama_g = config[106];
     double z_s = U->z_s, rho_s = U->rho_s, u_s = U->u_s, p_s = U->p_s, rho_g = U->rho_g, u_g = U->u_g, p_g = U->p_g;
     double z_g = 1.0-z_s;
@@ -223,7 +223,7 @@ static void primitive_comp_bak(double * U, struct U_var * U_L, struct U_var * U_
     U_R->v_s = U_L->v_s;
     U_L->z_s = z_sL;
     U_R->z_s = z_sR;
-    double fun, dfun, x_star;
+    double fun, dfun;
     int it_max = 5000, k = 0;
     double err2 = 1e50;
     while (k<it_max && err2>eps && fabs(z_sL-z_sR)>eps) {			

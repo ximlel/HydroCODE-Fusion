@@ -4,6 +4,8 @@
 #include <math.h>
 
 #include "../include/var_struc.h"
+#include "../include/var_struc_BN.h"
+
 
 void FV_2_C_init(struct center_var C, struct flu_var FV)
 {

@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../include/tools.h"
 #include "../include/var_struc.h"
-#include "../include/Riemann_solver.h"
+#include "../include/var_struc_BN.h"
+#include "../include/tools.h"
+#include "../include/riemann_solver_BN.h"
 
 int linear_GRP_RI_solver_BN
 (struct RI_var *RI, const double D_z_s, const double z_s, const double *mid_g, const double *mid_s, 
@@ -17,7 +18,7 @@ int linear_GRP_RI_solver_BN
     double c_s, c_g;
     c_s = sqrt(gamma_s * p_s / rho_s);
     c_g = sqrt(gamma_g * p_g / rho_g);
-    double Lambda_v_p[7][7]={0.0}, Lambda_v_m[7][7]={0.0};
+    double Lambda_v_p[7][7]={0}, Lambda_v_m[7][7]={0};
     Lambda_v_p[0][0]=fmax(u_s,0.0);
     Lambda_v_m[0][0]=fmin(u_s,0.0);
     Lambda_v_p[1][1]=fmax(u_s-c_s,0.0);
@@ -67,7 +68,7 @@ int linear_GRP_RI_solver_BN
     }
     double GAMMA_g = gamma_g-1.0;
     double V = u_g-u_s, T_g = pow(rho_g,GAMMA_g)/GAMMA_g;
-    double R[7][7]={0.0};
+    double R[7][7]={0};
     R[0][0] = 1.0;
     R[1][1] = 1.0/c_s;
     R[1][2] = 1.0;

@@ -37,41 +37,20 @@ static int order2_i_f_var_init(const struct cell_var * cv, struct i_f_var * ifv,
 	const double n_x = ifv->n_x, n_y = ifv->n_y;
 	const double delta_x = ifv->delta_x, delta_y = ifv->delta_y;
 
-	ifv->d_rho  = cv->gradx_rho[k]*n_x;
-	ifv->d_e    = cv->gradx_e[k]  *n_x;
-	ifv->d_u    = cv->gradx_u[k]  *n_x;
-	if ((int)config[2] == 2)
-		{					
-			ifv->d_phi  = cv->gradx_phi[k]*n_x;
-			ifv->d_z_a  = cv->gradx_z_a[k]*n_x;
-		}
-	ifv->d_rho += cv->grady_rho[k]*n_y;
-	ifv->d_e   += cv->grady_e[k]  *n_y;
-	ifv->d_u   += cv->grady_u[k]  *n_y;
-	ifv->d_v    = cv->gradx_v[k]  *n_x + cv->grady_v[k]*n_y;
-	if ((int)config[2] == 2)
-		{
-			ifv->d_phi += cv->grady_phi[k]*n_y;
-			ifv->d_z_a += cv->grady_z_a[k]*n_y;
-		}
-
-	ifv->t_rho  = cv->gradx_rho[k]*(-n_y);
-	ifv->t_e    = cv->gradx_e[k]  *(-n_y);
-	ifv->t_u    = cv->gradx_u[k]  *(-n_y);
-	if ((int)config[2] == 2)
-		{					
-			ifv->t_phi  = cv->gradx_phi[k]*(-n_y);
-			ifv->t_z_a  = cv->gradx_z_a[k]*(-n_y);
-		}
-	ifv->t_rho += cv->grady_rho[k]*n_x;
-	ifv->t_e   += cv->grady_e[k]  *n_x;
-	ifv->t_u   += cv->grady_u[k]  *n_x;
-	ifv->t_v    = cv->gradx_v[k]  *(-n_y) + cv->grady_v[k]*n_x;
-	if ((int)config[2] == 2)
-		{
-			ifv->t_phi += cv->grady_phi[k]*n_x;
-			ifv->t_z_a += cv->grady_z_a[k]*n_x;
-		}
+	ifv->d_rho  =  cv->gradx_rho[k]*n_x + cv->grady_rho[k]*n_y;
+	ifv->d_e    =  cv->gradx_e[k]  *n_x + cv->grady_e[k]  *n_y;
+	ifv->d_u    =  cv->gradx_u[k]  *n_x + cv->grady_u[k]  *n_y;
+	ifv->d_v    =  cv->gradx_v[k]  *n_x + cv->grady_v[k]  *n_y;
+	ifv->t_rho  = -cv->gradx_rho[k]*n_y + cv->grady_rho[k]*n_x;
+	ifv->t_e    = -cv->gradx_e[k]  *n_y + cv->grady_e[k]  *n_x;
+	ifv->t_u    = -cv->gradx_u[k]  *n_y + cv->grady_u[k]  *n_x;
+	ifv->t_v    = -cv->gradx_v[k]  *n_y + cv->grady_v[k]  *n_x;
+#ifdef MULTIFLUID_BASICS
+	ifv->d_z_a  =  cv->gradx_z_a[k]*n_x + cv->grady_z_a[k]*n_y;
+	ifv->t_z_a  = -cv->gradx_z_a[k]*n_y + cv->grady_z_a[k]*n_x;
+	ifv->d_phi  =  cv->gradx_phi[k]*n_x + cv->grady_phi[k]*n_y;
+	ifv->t_phi  = -cv->gradx_phi[k]*n_y + cv->grady_phi[k]*n_x;
+#endif
 
 	if (cons2prim(ifv) == 0)
 		{
@@ -80,52 +59,37 @@ static int order2_i_f_var_init(const struct cell_var * cv, struct i_f_var * ifv,
 		}
 
 	if ((int)config[31] == 0)
-		{					
+		{
 			ifv->d_p = ifv->d_e;
 			ifv->t_p = ifv->t_e;
-			
-			ifv->RHO += cv->gradx_rho[k]*delta_x;
-			ifv->P   += cv->gradx_e[k]  *delta_x;
-			ifv->U   += cv->gradx_u[k]  *delta_x;
-			if ((int)config[2] == 2)
-				{									
-					ifv->PHI += cv->gradx_phi[k]*delta_x;
-					ifv->Z_a += cv->gradx_z_a[k]*delta_x;
-				}
-			ifv->RHO += cv->grady_rho[k]*delta_y;
-			ifv->P   += cv->grady_e[k]  *delta_y;
-			ifv->U   += cv->grady_u[k]  *delta_y;
-			ifv->V   += cv->gradx_v[k]  *delta_x + cv->grady_v[k]*delta_y;
-			if ((int)config[2] == 2)
-				{
-					ifv->PHI += cv->grady_phi[k]*delta_y;							
-					ifv->Z_a += cv->grady_z_a[k]*delta_y;
-				}
+
+			ifv->RHO += cv->gradx_rho[k]*delta_x + cv->grady_rho[k]*delta_y;
+			ifv->P   += cv->gradx_e[k]  *delta_x + cv->grady_e[k]  *delta_y;
+			ifv->U   += cv->gradx_u[k]  *delta_x + cv->grady_u[k]  *delta_y;
+			ifv->V   += cv->gradx_v[k]  *delta_x + cv->grady_v[k]  *delta_y;
+#ifdef MULTIFLUID_BASICS
+			ifv->Z_a += cv->gradx_z_a[k]*delta_x + cv->grady_z_a[k]*delta_y;
+			ifv->PHI += cv->gradx_phi[k]*delta_x + cv->grady_phi[k]*delta_y;
 			ifv->gamma = 1.0+1.0/(ifv->Z_a/(config[6]-1.0)+(1.0-ifv->Z_a)/(config[106]-1.0));
+#endif
 		}
 	else if ((int)config[31] == 1)
 		{
 			ifv->d_u = (ifv->d_u - ifv->U*ifv->d_rho)/ifv->RHO;
+			ifv->d_v = (ifv->d_v - ifv->V*ifv->d_rho)/ifv->RHO;
 			ifv->d_p = (ifv->d_e - 0.5*ifv->d_rho*ifv->U*ifv->U - ifv->RHO*ifv->U*ifv->d_u) * (ifv->gamma-1.0);	
-			ifv->d_v  = (ifv->d_v - ifv->V*ifv->d_rho)/ifv->RHO;
-			ifv->d_p += (- 0.5*ifv->d_rho*ifv->V*ifv->V - ifv->RHO*ifv->V*ifv->d_v) * (ifv->gamma-1.0);
-			if ((int)config[2] == 2)
-				ifv->d_phi = (ifv->d_phi - ifv->PHI*ifv->d_rho)/ifv->RHO;
+			ifv->d_p +=         (- 0.5*ifv->d_rho*ifv->V*ifv->V - ifv->RHO*ifv->V*ifv->d_v) * (ifv->gamma-1.0);
+
+			ifv->U_rho += cv->gradx_rho[k]*delta_x + cv->grady_rho[k]*delta_y;
+			ifv->U_e   += cv->gradx_e[k]  *delta_x + cv->grady_e[k]  *delta_y;
+			ifv->U_u   += cv->gradx_u[k]  *delta_x + cv->grady_u[k]  *delta_y;
+			ifv->U_v   += cv->gradx_v[k]  *delta_x + cv->grady_v[k]  *delta_y;
+#ifdef MULTIFLUID_BASICS
+			ifv->d_phi = (ifv->d_phi - ifv->PHI*ifv->d_rho)/ifv->RHO;
 			if (!isinf(config[60]))
 				ifv->d_gamma = (ifv->d_gamma - ifv->gamma*ifv->d_rho)/ifv->RHO;
-
-			ifv->U_rho += cv->gradx_rho[k]*delta_x;
-			ifv->U_e   += cv->gradx_e[k]  *delta_x;
-			ifv->U_u   += cv->gradx_u[k]  *delta_x;
-			if ((int)config[2] == 2)									
-				ifv->U_phi += cv->gradx_phi[k]*delta_x;
-			ifv->U_rho += cv->grady_rho[k]*delta_y;
-			ifv->U_e   += cv->grady_e[k]  *delta_y;
-			ifv->U_u   += cv->grady_u[k]  *delta_y;
-			ifv->U_v   += cv->gradx_v[k]  *delta_x + cv->grady_v[k]*delta_y;
-			if ((int)config[2] == 2)				
-				ifv->U_phi += cv->grady_phi[k]*delta_y;
-
+			ifv->U_phi += cv->gradx_phi[k]*delta_x + cv->grady_phi[k]*delta_y;
+#endif
 			if(cons2prim(ifv) == 0)
 				{
 					fprintf(stderr, "Error happens on primitive variable!\n");
@@ -147,14 +111,13 @@ static int order2_i_f_var0(struct i_f_var * ifv)
 	ifv->t_e   = 0.0;
 	ifv->t_u   = 0.0;
 	ifv->t_v = 0.0;
-			
-	if ((int)config[2] == 2)
-		{
-			ifv->d_phi = 0.0;
-			ifv->d_z_a = 0.0;
-			ifv->t_phi = 0.0;
-			ifv->t_z_a = 0.0;
-		}
+
+#ifdef MULTIFLUID_BASICS
+	ifv->d_z_a = 0.0;
+	ifv->t_z_a = 0.0;
+	ifv->d_phi = 0.0;
+	ifv->t_phi = 0.0;
+#endif
 
 	if(cons2prim(ifv) == 0)
 		{

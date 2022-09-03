@@ -64,88 +64,76 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 	struct cell_var cv;
 
 	CP_INIT_MEM_INT(cell_cell, num_cell_ghost);
-	CV_INIT_MEM(vol, num_cell_ghost);	
 	CP_INIT_MEM(n_x, num_cell_ghost);
-	
-	CP_INIT_MEM(F_u, num_cell);
-	CV_INIT_MEM(U_u, num_cell_ghost);
+	CP_INIT_MEM(n_y, num_cell_ghost);
+	CV_INIT_MEM(X_c, num_cell_ghost);
+	CV_INIT_MEM(Y_c, num_cell_ghost);
+	CV_INIT_MEM(vol, num_cell_ghost);
+
+	CP_INIT_MEM(F_u,   num_cell);
+	CP_INIT_MEM(F_v,   num_cell);
 	CP_INIT_MEM(F_rho, num_cell);
+	CP_INIT_MEM(F_e,   num_cell);
+	CV_INIT_MEM(U_u,   num_cell_ghost);
+	CV_INIT_MEM(U_v,   num_cell_ghost);
 	CV_INIT_MEM(U_rho, num_cell_ghost);
-	CP_INIT_MEM(F_e, num_cell);
-	CV_INIT_MEM(U_e, num_cell_ghost);
-	FV_RESET_MEM(U, num_cell_ghost);
-	FV_RESET_MEM(RHO, num_cell_ghost);
-	FV_RESET_MEM(P, num_cell_ghost);
-	CV_INIT_MEM(X_c, num_cell_ghost);	
+	CV_INIT_MEM(U_e,   num_cell_ghost);
+	FV_RESET_MEM(U,    num_cell_ghost);
+	FV_RESET_MEM(V,    num_cell_ghost);
+	FV_RESET_MEM(RHO,  num_cell_ghost);
+	FV_RESET_MEM(P,    num_cell_ghost);
+
+	CP_INIT_MEM(U_p,   num_cell_ghost);
+	CP_INIT_MEM(V_p,   num_cell_ghost);
+	CP_INIT_MEM(P_p,   num_cell);
+	CP_INIT_MEM(RHO_p, num_cell);
+	CP_INIT_MEM(F_p_x, num_cell);
+	CP_INIT_MEM(F_p_y, num_cell);
 	if (order > 1)
 		{
 			CV_INIT_MEM(gradx_rho, num_cell_ghost);
-			CV_INIT_MEM(gradx_e, num_cell_ghost);
-			CV_INIT_MEM(gradx_u, num_cell_ghost);			
-		}
-	
-	CP_INIT_MEM(n_y, num_cell_ghost);
-	CP_INIT_MEM(F_v, num_cell);
-	CV_INIT_MEM(U_v, num_cell_ghost);
-	FV_RESET_MEM(V, num_cell_ghost);
-	CV_INIT_MEM(Y_c, num_cell_ghost);
-	if (order > 1)
-		{
 			CV_INIT_MEM(grady_rho, num_cell_ghost);
-			CV_INIT_MEM(grady_e, num_cell_ghost);
-			CV_INIT_MEM(grady_u, num_cell_ghost);
-			CV_INIT_MEM(grady_v, num_cell_ghost);
-			CV_INIT_MEM(gradx_v, num_cell_ghost);
+			CV_INIT_MEM(gradx_e,   num_cell_ghost);
+			CV_INIT_MEM(grady_e,   num_cell_ghost);
+			CV_INIT_MEM(gradx_u,   num_cell_ghost);			
+			CV_INIT_MEM(grady_u,   num_cell_ghost);
+			CV_INIT_MEM(gradx_v,   num_cell_ghost);
+			CV_INIT_MEM(grady_v,   num_cell_ghost);
+
+			CP_INIT_MEM(dt_U_p,    num_cell_ghost);
+			CP_INIT_MEM(dt_V_p,    num_cell_ghost);
+			CP_INIT_MEM(dt_F_p_x,  num_cell);
+			CP_INIT_MEM(dt_F_p_y,  num_cell);
 		}
 
-	if ((int)config[2] == 2)
-		{	
-			CP_INIT_MEM(F_phi, num_cell);
-			CV_INIT_MEM(U_phi, num_cell_ghost);
-			FV_RESET_MEM(PHI, num_cell_ghost);
-			CP_INIT_MEM(F_e_a, num_cell);
-			CV_INIT_MEM(U_e_a, num_cell_ghost);
-			FV_RESET_MEM(Z_a, num_cell_ghost);
-			if (order > 1)
-				{
-					CV_INIT_MEM(gradx_phi, num_cell_ghost);
-					CV_INIT_MEM(gradx_z_a, num_cell_ghost);
-					CV_INIT_MEM(grady_phi, num_cell_ghost);
-					CV_INIT_MEM(grady_z_a, num_cell_ghost);
-				}
-		}
+#ifdef MULTIPHASE_BASICS
+	CP_INIT_MEM(F_phi, num_cell);
+	CV_INIT_MEM(U_phi, num_cell_ghost);
+	FV_RESET_MEM(PHI, num_cell_ghost);
+	CP_INIT_MEM(F_e_a, num_cell);
+	CV_INIT_MEM(U_e_a, num_cell_ghost);
+	FV_RESET_MEM(Z_a, num_cell_ghost);
 	CP_INIT_MEM(F_gamma, num_cell);
 	CV_INIT_MEM(U_gamma, num_cell_ghost);
 	FV_RESET_MEM(gamma, num_cell_ghost);
-	if (!isinf(config[60]))
-		{					
-			if (order > 1)
-				{
-					CV_INIT_MEM(gradx_gamma, num_cell_ghost);
-					CV_INIT_MEM(grady_gamma, num_cell_ghost);	
-				}
-		}
-	
-	CP_INIT_MEM(F_p_x, num_cell);
-	CP_INIT_MEM(U_p, num_cell_ghost);
-	CP_INIT_MEM(P_p, num_cell);
-	CP_INIT_MEM(RHO_p, num_cell);
-	if ((int)config[2] == 2)
-		{
-			CP_INIT_MEM(PHI_p, num_cell);
-			CP_INIT_MEM(Z_a_p, num_cell);
-		}
+	CP_INIT_MEM(PHI_p, num_cell);
+	CP_INIT_MEM(Z_a_p, num_cell);
 	CP_INIT_MEM(gamma_p, num_cell);
-	CP_INIT_MEM(V_p, num_cell_ghost);
-	CP_INIT_MEM(F_p_y, num_cell);
 	if (order > 1)
-		{	
-			CP_INIT_MEM(dt_U_p, num_cell_ghost);
-			CP_INIT_MEM(dt_F_p_x, num_cell);
-			CP_INIT_MEM(dt_V_p, num_cell_ghost);
-			CP_INIT_MEM(dt_F_p_y, num_cell);	
-		}
+	    {
+		CV_INIT_MEM(gradx_z_a, num_cell_ghost);
+		CV_INIT_MEM(grady_z_a, num_cell_ghost);
+		CV_INIT_MEM(gradx_phi, num_cell_ghost);
+		CV_INIT_MEM(grady_phi, num_cell_ghost);
+		if (!isinf(config[60]))
+		    {
+			CV_INIT_MEM(gradx_gamma, num_cell_ghost);
+			CV_INIT_MEM(grady_gamma, num_cell_ghost);
+		    }
+	    }
+#endif
 
+#ifdef MULTIPHASE_BASICS
 	CP_INIT_MEM(RHO_star, num_cell);
 	CP_INIT_MEM(P_star, num_cell);
 	CP_INIT_MEM(U_qt_star, num_cell);
@@ -167,7 +155,7 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 	CP_INIT_MEM(u_star, num_cell);
 	CP_INIT_MEM(u_minus_c, num_cell);
 	CP_INIT_MEM(u_add_c, num_cell);
-
+#endif
 	return cv;
 	
  return_NULL:

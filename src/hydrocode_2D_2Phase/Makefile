@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS = -std=c99 -Wall -pedantic -O4 -g -pg
 #C compiler options
-CFLAGD = -DMULTIFLUID_BASICS -DNODATPLOT
+CFLAGD = -DMULTIFLUID_BASICS -DMULTIPHASE_BASICS -DNODATPLOT
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -14,7 +14,7 @@ LIBS = -lm
 RM = rm -vf
 #Delete command
 
-HEAD = finite_volume flux_calc inter_process Riemann_solver meshing file_io tools
+HEAD = finite_volume flux_calc inter_process_BN Riemann_solver_BN file_io tools
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 

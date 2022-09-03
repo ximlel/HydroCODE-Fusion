@@ -13,15 +13,10 @@
  */
 #define MULTIFLUID_BASICS
 /**
- * @def MULTIPHASE_BASICS
- * @brief Switch whether to compute multi-phase flow. (essential macro: MULTIFLUID_BASICS)
- */
-#define MULTIPHASE_BASICS
-/**
  * @def PRIMITIVE_CONSERVATIVE_CONVERT
  * @brief Switch whether to convert between primitive variables and conservative variables.
  */
-#define UNSTRUCTURED_GRID
+#define PRIMITIVE_CONSERVATIVE_CONVERT
 #endif
 
 //! If the system does not set, the default largest value can be seen as zero is EPS.
@@ -62,7 +57,7 @@ typedef struct cell_var_stru {
 } Cell_Variable_Structured;
 
 //! pointer structure of VARiables on unstructured computational grid CELLs.
-struct cell_var {
+typedef struct cell_var {
 	int **cell_cell;
 	double **n_x, **n_y;
 	double **F_rho, **F_e, **F_u, **F_v;

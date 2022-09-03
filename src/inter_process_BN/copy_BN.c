@@ -4,8 +4,9 @@
 #include <math.h>
 
 #include "../include/var_struc.h"
+#include "../include/var_struc_BN.h"
 #include "../include/tools.h"
-#include "../include/finite_volume.h"
+#include "../include/inter_process_BN.h"
 
 //center_var to U
 void BN_C2U(struct center_var C, double *U, int i, int j, int x_or_y)

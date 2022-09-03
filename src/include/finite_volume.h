@@ -23,6 +23,8 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 
 // 2-D Godunov/GRP scheme (Eulerian, two-component flow, unstructured grid)
 void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const char * scheme, const char * problem);
+
+// 2-D Godunov/GRP scheme (Eulerian, BN two-phase flow, structured grid)
 void finite_volume_scheme_GRP2D(struct flu_var * FV, const struct mesh_var * mv, const char * phase, const char * problem);
 
 #endif

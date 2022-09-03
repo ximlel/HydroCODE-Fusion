@@ -3,8 +3,9 @@
 #include <stdlib.h>
 
 #include "../include/var_struc.h"
-#include "../include/Riemann_solver.h"
+#include "../include/var_struc_BN.h"
 #include "../include/tools.h"
+#include "../include/riemann_solver_BN.h"
 
 int Roe_GRP_solver_BN_1D
 (double *Dt_U_all, double *U_all,
@@ -195,8 +196,8 @@ if (U_all[1]/U_all[0]>1.1)
   u_g_S = U[2]/U[1];
   u_l_S = U[5]/U[4];
   U_INT = (U_all[2]+U_all[6])/(U_all[1]+U_all[5]);
-  double V_INT;
-  V_INT = (U_all[3]+U_all[7])/(U_all[1]+U_all[5]);
+  // double V_INT;
+  // V_INT = (U_all[3]+U_all[7])/(U_all[1]+U_all[5]);
   double p_g_S, p_l_S;
   p_g_S = (U[3]-0.5*U[2]*U[2]/U[1])*(gamma_g-1.0)/U[0];
   p_l_S = (U[6]-0.5*U[5]*U[5]/U[4])*(gamma_l-1.0)/(1.0-U[0]);
@@ -231,37 +232,40 @@ if (U_all[1]/U_all[0]>1.1)
       D_U_S[i] += R[i][j]*D_W_S[j];
       T_U_S[i] += R[i][j]*T_W_S[j];
     }
- double d_v_g_S, d_v_l_S, t_v_g_S, t_v_l_S;
+ double d_v_g_S, d_v_l_S;
+ // double t_v_g_S, t_v_l_S;
    if (u_g_S > 0.0)
    {
     d_v_g_S = d_v_g_L;
-    t_v_g_S = t_v_g_L;
+    // t_v_g_S = t_v_g_L;
    }
    else
    {
     d_v_g_S = d_v_g_R;
-    t_v_g_S = t_v_g_R;
+    // t_v_g_S = t_v_g_R;
    }
    if (u_l_S > 0.0)
    {
     d_v_l_S = d_v_l_L;
-    t_v_l_S = t_v_l_L;
+    // t_v_l_S = t_v_l_L;
    }
    else
    {
     d_v_l_S = d_v_l_R;
-    t_v_l_S = t_v_l_R;
+    // t_v_l_S = t_v_l_R;
    }
-  double d_u_g_S, d_u_l_S, t_u_g_S, t_u_l_S;
+  double d_u_g_S, d_u_l_S;
+  // double t_u_g_S, t_u_l_S;
   d_u_g_S = (D_U_S[2] - D_U_S[1]*u_g_S)/U[1];
-  t_u_g_S = (T_U_S[2] - T_U_S[1]*u_g_S)/U[1];
+  // t_u_g_S = (T_U_S[2] - T_U_S[1]*u_g_S)/U[1];
   d_u_l_S = (D_U_S[5] - D_U_S[4]*u_l_S)/U[4];
-  t_u_l_S = (T_U_S[5] - T_U_S[4]*u_l_S)/U[4];
-  double d_p_g_S, d_p_l_S, t_p_g_S, t_p_l_S;
+  // t_u_l_S = (T_U_S[5] - T_U_S[4]*u_l_S)/U[4];
+  double d_p_g_S, d_p_l_S;
+  // double t_p_g_S, t_p_l_S;
   d_p_g_S =  ((D_U_S[3] - 0.5*(D_U_S[2]*u_g_S + U[2]*d_u_g_S))*(gamma_g-1.0) - p_g_S*D_U_S[0])/U[0];
-  t_p_g_S =  ((T_U_S[3] - 0.5*(T_U_S[2]*u_g_S + U[2]*t_u_g_S))*(gamma_g-1.0) - p_g_S*T_U_S[0])/U[0];
+  // t_p_g_S =  ((T_U_S[3] - 0.5*(T_U_S[2]*u_g_S + U[2]*t_u_g_S))*(gamma_g-1.0) - p_g_S*T_U_S[0])/U[0];
   d_p_l_S =  ((D_U_S[6] - 0.5*(D_U_S[5]*u_l_S + U[5]*d_u_l_S))*(gamma_l-1.0) + p_l_S*D_U_S[0])/(1.0-U[0]);
-  t_p_l_S =  ((T_U_S[6] - 0.5*(T_U_S[5]*u_l_S + U[5]*t_u_l_S))*(gamma_l-1.0) + p_l_S*T_U_S[0])/(1.0-U[0]);
+  // t_p_l_S =  ((T_U_S[6] - 0.5*(T_U_S[5]*u_l_S + U[5]*t_u_l_S))*(gamma_l-1.0) + p_l_S*T_U_S[0])/(1.0-U[0]);
 
    Dt_U_all[0] = -U_INT*D_U_S[0];
    Dt_U_all[1] = -D_U_S[2];

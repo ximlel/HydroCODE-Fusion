@@ -15,7 +15,7 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 
 	double U_u_a, U_v_a;
 	int p_p, p_n;
-	double length, Z_a;
+	double length, Z_a = 1.0;
 	int k,j;
 	
 	static double U_rho_bak[412164], U_e_bak[412164], U_u_bak[412164], U_v_bak[412164], U_phi_bak[412164];
@@ -67,13 +67,15 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 					U_u_a += - tau*(cv->U_qt_add_c[k][j] + Z_a*cv->U_qt_star[k][j]) * length / cv->vol[k];
 					cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
 					U_v_a += - tau*(cv->V_qt_add_c[k][j] + Z_a*cv->V_qt_star[k][j]) * length / cv->vol[k];
-					if ((int)config[2] == 2)						
+#ifdef MULTIFLUID_BASICS
 						cv->U_phi[k] += - tau*cv->F_phi[k][j] * length / cv->vol[k];
+#endif
 				}
+#ifdef MULTIFLUID_BASICS
 			cv->U_e_a[k] += (cv->U_phi[k]*cv->U_u[k]/cv->U_rho[k]-U_u_a)*cv->U_u[k]/cv->U_rho[k];
 			cv->U_e_a[k] += (cv->U_phi[k]*cv->U_v[k]/cv->U_rho[k]-U_v_a)*cv->U_v[k]/cv->U_rho[k];
-
 			cv->U_e_a[k] = cv->U_e[k];
+#endif
 		}
 	return 1;
 }

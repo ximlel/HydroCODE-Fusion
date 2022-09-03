@@ -11,11 +11,10 @@ void cons_qty_copy_cv2ifv(struct i_f_var * ifv, const struct cell_var * cv, cons
 	ifv->U_e = cv->U_e[c];
 	ifv->U_u = cv->U_u[c];
 	ifv->U_v = cv->U_v[c];
-	if ((int)config[2] == 2)
-		{					
-			ifv->U_phi = cv->U_phi[c];
-			ifv->U_e_a = cv->U_e_a[c];
-		}
+#ifdef MULTIFLUID_BASICS
+	ifv->U_phi = cv->U_phi[c];
+	ifv->U_e_a = cv->U_e_a[c];
+#endif
 	ifv->U_gamma = cv->U_gamma[c];
 }
 
@@ -25,12 +24,11 @@ void cons_qty_copy_ifv2cv(const struct i_f_var * ifv, struct cell_var * cv, cons
 	cv->U_e[c] = ifv->U_e;
 	cv->U_u[c] = ifv->U_u;
 	cv->U_v[c] = ifv->U_v;
-	if ((int)config[2] == 2)
-		{					
-			cv->U_phi[c] = ifv->U_phi;
-			cv->U_e_a[c] = ifv->U_e_a;
-		}
+#ifdef MULTIFLUID_BASICS
+	cv->U_phi[c] = ifv->U_phi;
+	cv->U_e_a[c] = ifv->U_e_a;
 	cv->U_gamma[c] = ifv->U_gamma;
+#endif
 }
 
 void prim_var_copy_ifv2FV(const struct i_f_var * ifv, const struct flu_var * FV, const int c)
@@ -39,12 +37,11 @@ void prim_var_copy_ifv2FV(const struct i_f_var * ifv, const struct flu_var * FV,
 	FV->P[c]   = ifv->P;
 	FV->U[c]   = ifv->U;
 	FV->V[c] = ifv->V;
-	if ((int)config[2] == 2)
-		{					
-			FV->PHI[c] = ifv->PHI;
-			FV->Z_a[c] = ifv->Z_a;
-		}
+#ifdef MULTIFLUID_BASICS
+	FV->PHI[c] = ifv->PHI;
+	FV->Z_a[c] = ifv->Z_a;
 	FV->gamma[c] = ifv->gamma;
+#endif
 }
 
 void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, const int k, const int j)
@@ -53,13 +50,12 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 	cv->F_e[k][j]   = ifv->F_e;
 	cv->F_u[k][j]   = ifv->F_u;
 	cv->F_v[k][j] = ifv->F_v;
-	if ((int)config[2] == 2)
-		{					
-			cv->F_phi[k][j] = ifv->F_phi;
-			cv->F_e_a[k][j] = ifv->F_e_a;
-		}
+#ifdef MULTIFLUID_BASICS
+	cv->F_phi[k][j] = ifv->F_phi;
+	cv->F_e_a[k][j] = ifv->F_e_a;
 	if (!isinf(config[60]))
 		cv->F_gamma[k][j] = ifv->F_gamma;
+#endif
 
 //	cv->RHO_p[k][j] = ifv->RHO;
 //	cv->U_p[k][j]   = ifv->U;
@@ -69,13 +65,11 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 	cv->U_p[k][j]   = ifv->U_int;
 	cv->V_p[k][j]   = ifv->V_int;
 	cv->P_p[k][j]   = ifv->P_int;	
-	if ((int)config[2] == 2)
-		{
-			cv->PHI_p[k][j] = ifv->PHI;
-			cv->Z_a_p[k][j] = ifv->Z_a;
-		}
+#ifdef MULTIFLUID_BASICS
+	cv->PHI_p[k][j] = ifv->PHI;
+	cv->Z_a_p[k][j] = ifv->Z_a;
 	cv->gamma_p[k][j] = ifv->gamma;
-
+#endif
 
 	cv->RHO_star[k][j]     = ifv->RHO_star;
 	cv->P_star[k][j]       = ifv->P_star;
@@ -106,22 +100,20 @@ void flux_add_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, con
 	cv->F_e[k][j]   = 0.5*(cv->F_e[k][j]   + ifv->F_e);
 	cv->F_u[k][j]   = 0.5*(cv->F_u[k][j]   + ifv->F_u);
 	cv->F_v[k][j] = 0.5*(cv->F_v[k][j] + ifv->F_v);
-	if ((int)config[2] == 2)
-		{					
-			cv->F_phi[k][j] = 0.5*(cv->F_phi[k][j] + ifv->F_phi);
-			cv->F_e_a[k][j] = 0.5*(cv->F_e_a[k][j] + ifv->F_e_a);
-		}
-	if (!isinf(config[60]))
-		cv->F_gamma[k][j] = 0.5*(cv->F_gamma[k][j] + ifv->F_gamma);
 
 	cv->RHO_p[k][j] = 0.5*(cv->RHO_p[k][j] + ifv->RHO);
 	cv->U_p[k][j]   = 0.5*(cv->U_p[k][j] + ifv->U);
 	cv->V_p[k][j] = 0.5*(cv->V_p[k][j] + ifv->V);
-	cv->P_p[k][j] = 0.5*(cv->P_p[k][j] + ifv->P);	
-	if ((int)config[2] == 2)
-		{
-			cv->PHI_p[k][j] = 0.5*(cv->PHI_p[k][j] + ifv->PHI);
-			cv->Z_a_p[k][j] = 0.5*(cv->Z_a_p[k][j] + ifv->Z_a);
-		}
+	cv->P_p[k][j] = 0.5*(cv->P_p[k][j] + ifv->P);
+
+#ifdef MULTIFLUID_BASICS
+	cv->F_phi[k][j] = 0.5*(cv->F_phi[k][j] + ifv->F_phi);
+	cv->F_e_a[k][j] = 0.5*(cv->F_e_a[k][j] + ifv->F_e_a);
+	if (!isinf(config[60]))
+		cv->F_gamma[k][j] = 0.5*(cv->F_gamma[k][j] + ifv->F_gamma);
+
+	cv->Z_a_p[k][j] = 0.5*(cv->Z_a_p[k][j] + ifv->Z_a);
+	cv->PHI_p[k][j] = 0.5*(cv->PHI_p[k][j] + ifv->PHI);
 	cv->gamma_p[k][j] = 0.5*(cv->gamma_p[k][j] + ifv->gamma);
+#endif
 }

@@ -3,8 +3,9 @@
 #include <stdlib.h>
 
 #include "../include/var_struc.h"
-#include "../include/Riemann_solver.h"
+#include "../include/var_struc_BN.h"
 #include "../include/tools.h"
+#include "../include/riemann_solver_BN.h"
 
 int HLL_GRP_solver_BN
 (double *Dt_U_all, double *U_all,
