@@ -13,7 +13,7 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 	const int order = (int)config[9];
 	int ** cp = mv->cell_pt;
 
-	double U_u_a, U_v_a;
+	double U_u_a = 0.0, U_v_a = 0.0;
 	int p_p, p_n;
 	double length, Z_a = 1.0;
 	int k,j;

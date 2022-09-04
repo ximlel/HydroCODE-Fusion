@@ -21,19 +21,10 @@
     <ClCompile Include="..\file_io\config_handle.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\file_io\file_2D_in.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\file_io\io_control.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\finite_volume\finite_volume_scheme_unstruct.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flux_calc\flux_generator_x.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flux_calc\flux_generator_y.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\flux_calc\flux_solver.c">
@@ -97,6 +88,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\tools\sys_pro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_2D_unstruct_out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_2D_in.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

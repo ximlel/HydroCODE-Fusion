@@ -70,7 +70,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;MULTIFLUID_BASICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -79,7 +79,7 @@
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -100,10 +100,9 @@
   <ItemGroup>
     <ClCompile Include="..\file_io\config_handle.c" />
     <ClCompile Include="..\file_io\file_2D_in.c" />
+    <ClCompile Include="..\file_io\file_2D_unstruct_out.c" />
     <ClCompile Include="..\file_io\io_control.c" />
     <ClCompile Include="..\finite_volume\finite_volume_scheme_unstruct.c" />
-    <ClCompile Include="..\flux_calc\flux_generator_x.c" />
-    <ClCompile Include="..\flux_calc\flux_generator_y.c" />
     <ClCompile Include="..\flux_calc\flux_solver.c" />
     <ClCompile Include="..\inter_process_unstruct\assist_func.c" />
     <ClCompile Include="..\inter_process_unstruct\cell_init.c" />
