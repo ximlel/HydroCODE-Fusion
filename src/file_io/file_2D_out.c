@@ -54,7 +54,7 @@
  * @param[in] time_plot: Array of the plotting time recording.
  */
 void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
-		    double ** X, double ** Y, const double * cpu_time, const char * name, const double * time_plot)
+		    double ** X, double ** Y, const double * cpu_time, const char * name, const double time_plot[])
 {
     char add_out[FILENAME_MAX+40];
     // Get the address of the output data folder of the test example.
@@ -102,7 +102,7 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
  * @param[in] time_plot: Array of the plotting time recording.
  */
 void file_2D_write_POINT_TEC(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
-			double ** X, double ** Y, const double * cpu_time, const char * problem, const double * time_plot)
+			double ** X, double ** Y, const double * cpu_time, const char * problem, const double time_plot[])
 {
     char add_out[FILENAME_MAX+40];
     // Get the address of the output data folder of the test example.

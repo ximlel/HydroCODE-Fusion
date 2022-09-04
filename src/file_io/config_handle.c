@@ -190,11 +190,10 @@ static int config_read(FILE * fp)
  */
 void configurate(const char * add_in)
 {
-    FILE * fp_data;
-    char add[FILENAME_MAX+40];
-    strcpy(add, add_in);
-    strcat(add, "config.txt");
-    
+  FILE * fp_data;
+  char add[FILENAME_MAX+40];
+  strcpy(add, add_in);
+  strcat(add, "config.txt");
   // Open the configuration data file.
   if((fp_data = fopen(add, "r")) == NULL)
       {

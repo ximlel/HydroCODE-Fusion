@@ -20,7 +20,7 @@ goto !
 ::: 2D Riemnnn problem
 goto !
  cd ../../data_in/two-dim/RP2D/RP2D_3_Quad
- %MRun% "value_start; quit;"
+ %MRun% "value_start('INPUT'); quit;"
  cd %CPath%
  %EXEcute% RP2D_Positive/Config3  RP2D_Positive/Config3  2 2_GRP EUL
  %EXEcute% RP2D_Positive/Config7  RP2D_Positive/Config7  2 2_GRP EUL

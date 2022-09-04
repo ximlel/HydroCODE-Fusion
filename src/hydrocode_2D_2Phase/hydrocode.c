@@ -230,6 +230,9 @@ int main(int argc, char *argv[])
       }
   config[9] = (double)order;
 
+  // The number of times steps of the fluid data stored for plotting.
+  int N; // (int)(config[5]) + 1;
+  double *time_plot;
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
@@ -237,9 +240,9 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-  struct flu_var FV0 = initialize_2D(argv[1]);
+  struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot);
 
-  struct mesh_var mv= mesh_load(argv[1], argv[6]);
+  struct mesh_var mv = mesh_load(argv[1], argv[6]);
 
   if ((_Bool)config[32])
       {

@@ -24,7 +24,7 @@
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */
-void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double * time_plot)
+void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double time_plot[])
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -312,8 +312,11 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	}
   }
 
-  time_plot[0] = time_c - tau;
-  time_plot[1] = time_c;
+  if (fabs(time_plot[1]) < eps)
+      {
+	  time_plot[0] = time_c - tau;
+	  time_plot[1] = time_c;
+      }
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-GRP Lagrangian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------

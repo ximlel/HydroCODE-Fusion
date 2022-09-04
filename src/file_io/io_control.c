@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include <ctype.h>
 
@@ -246,3 +247,52 @@ int flu_var_read(FILE * fp, double * U, const int num)
   }
   return 0;
 }
+
+
+void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
+{
+    _Bool r = true; // r: Whether to read data file successfully.
+    FILE * fp;
+    char add[FILENAME_MAX+40];
+    strcpy(add, add_in);
+    strcat(add, "time_plot.txt");
+    // Open the time data file for plotting.
+    if((fp = fopen(add, "r")) == NULL)
+	{
+	    strcpy(add, add_in);
+	    strcat(add, "time_plot.dat");
+	}
+    if((fp = fopen(add, "r")) == NULL)
+	{
+	    printf("No time data file for plotting! Only the final result will be plotted.\n");
+	    *N_plot = 2;
+	    r = false;
+	}
+    else
+	*N_plot = flu_var_count(fp, add) + 1;
+    if (*N_plot < 2)
+	{
+	    printf("Error in counting time data file for plotting!\n");
+	    fclose(fp);
+	    exit(2);
+	}
+    *time_plot = calloc(*N_plot, sizeof(double));
+    if(*time_plot == NULL)
+	{
+	    printf("NOT enough memory! time_plot[]\n");
+	    exit(5);
+	}
+    if(r)
+	{
+	    if(flu_var_read(fp, *time_plot + 1, *N_plot - 1))
+		{
+		    fclose(fp);
+		    exit(2);
+		}
+	    printf("Load time data file for plotting! Plot time step is %d.\n", *N_plot - 1);
+	    *N_plot = 2;
+	    fclose(fp);
+	}
+}
+
+

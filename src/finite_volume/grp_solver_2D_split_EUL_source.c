@@ -60,7 +60,7 @@
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */
-void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, double * time_plot)
+void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, double time_plot[])
 {
     /* 
      * i is a frequently used index for y-spatial variables.
@@ -285,8 +285,11 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	    }
   }
 
-  time_plot[0] = time_c - tau;
-  time_plot[1] = time_c;
+  if (fabs(time_plot[1]) < eps)
+      {
+	  time_plot[0] = time_c - tau;
+	  time_plot[1] = time_c;
+      }
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 2D-GRP Eulerian scheme with dimension splitting for this problem is %g seconds.\n", cpu_time_sum);
   //------------END OF THE MAIN LOOP-------------

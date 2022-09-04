@@ -1,6 +1,15 @@
 function value_start(column)
 if nargin < 1
-column = input('Please input the column number: (Default 20 40 80 160 320 640 1280) ')
+    column = 20
+elseif strcmpi(column,{'INPUT'})
+    column = input('Please input the column number: (Default 20 40 80 160 320 640 1280) ')
+else
+    column
+    if isstring(column)
+        error("Not a string 'INPUT' was entered to represent the input!");
+    elseif column ~= fix(column) || column <= 0
+        error("Not a positive integer was entered to represent variable 'column'!")
+    end
 end
 
 line=3;

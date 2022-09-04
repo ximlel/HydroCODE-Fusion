@@ -14,8 +14,9 @@
 
 
 // r_or_c: 0 only count, 1 count and read.
-static void flu_var_init(const char * add, double * sfv, FILE *fp)
+static double * flu_var_init(const char * add, FILE *fp)
 {
+    double * sfv;
     int num_cell, line, column;  // The number of the numbers in the above data files.
 
     line = flu_var_count_line(fp, add, &column);
@@ -51,6 +52,7 @@ static void flu_var_init(const char * add, double * sfv, FILE *fp)
 	    fclose(fp);
 	    exit(2);
 	}
+	return sfv;
 }
 
 /**
@@ -73,8 +75,10 @@ static void flu_var_init(const char * add, double * sfv, FILE *fp)
 	    r = false;							\
 	}								\
     if(r)								\
-	flu_var_init(add, FV0.sfv, fp);					\
-    fclose(fp);								\
+	{								\
+	    FV0.sfv = flu_var_init(add, fp);				\
+	    fclose(fp);							\
+	}								\
     } while(0)
 
 /** 
@@ -87,13 +91,15 @@ static void flu_var_init(const char * add, double * sfv, FILE *fp)
   * @param[in]  name: Name of the test example.
   * @return  \b FV0:  Structure of initial data array pointer.
   */
-struct flu_var initialize_2D(const char * name)
+struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot[])
 {
     struct flu_var FV0 = {NULL};
 
     char add_in[FILENAME_MAX+40]; 
     // Get the address of the initial data folder of the test example.
     example_io(name, add_in, 1);
+
+    time_plot_read(add_in, N_plot, time_plot);
     
     /* 
      * Read the configuration data.
@@ -107,7 +113,7 @@ struct flu_var initialize_2D(const char * name)
     printf("  bondary_y\t= %d\n", (int)config[18]);
 
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
-    FILE * fp; // The pointer to the above data files.
+    FILE * fp;      // The pointer to the above data files.
     _Bool r = true; // r: Whether to read data file successfully.
 
      // Open the initial data files and initializes the reading of data.

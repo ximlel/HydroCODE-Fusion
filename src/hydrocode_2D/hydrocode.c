@@ -229,6 +229,9 @@ int main(int argc, char *argv[])
       }
   config[9] = (double)order;
 
+  // The number of times steps of the fluid data stored for plotting.
+  int N; // (int)(config[5]) + 1;
+  double * time_plot;
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
@@ -236,7 +239,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-    struct flu_var FV0 = initialize_2D(argv[1]); // Structure of initial data array pointer.
+  struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot); // Structure of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -245,9 +248,6 @@ int main(int argc, char *argv[])
      */
   const int n_x = (int)config[13], n_y = (int)config[14];
   const double h_x = config[10], h_y = config[11], gamma = config[6];
-  // The number of times steps of the fluid data stored for plotting.
-  int N = 2; // (int)(config[5]) + 1;
-  double time_plot[2];
 
   // Structure of fluid variables in computational cells array pointer.
   struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));

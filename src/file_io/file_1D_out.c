@@ -48,7 +48,7 @@
  * @param[in] time_plot: Array of the plotting time recording.
  */
 void file_1D_write(const int m, const int N, const struct cell_var_stru CV, 
-                    double * X[], const double * cpu_time, const char * name, const double * time_plot)
+                    double * X[], const double * cpu_time, const char * name, const double time_plot[])
 {
   // Records the time when the program is running.
   /*

@@ -25,7 +25,7 @@ EXEcute=./hydrocode.out
 ## RP2D_Positive
 #:<<!
  cd ../../data_in/two-dim/RP2D_Positive/Config3
- echo "value_start" | MRun
+ echo "value_start('INPUT')" | MRun
  cd $CPath
  $EXEcute RP2D_Positive/Config3  RP2D_Positive/Config3  2 2_GRP EUL
  $EXEcute RP2D_Positive/Config7  RP2D_Positive/Config7  2 2_GRP EUL

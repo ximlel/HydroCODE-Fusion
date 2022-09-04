@@ -877,8 +877,9 @@ WARN_LOGFILE           =
 INPUT                  = ../include \
                          ../tools \
                          ../file_io \
+                         ../meshing \
                          ../Riemann_solver \
-                         ../inter_process \
+                         ../inter_process_unstruct \
                          ../flux_calc \
                          ../finite_volume \
                          ./

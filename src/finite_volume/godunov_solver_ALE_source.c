@@ -25,7 +25,7 @@
  * @param[out] time_plot: Array of the plotting time recording.
  * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double * time_plot)
+void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double time_plot[])
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -216,8 +216,11 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
 	}
   }
 
-  time_plot[0] = time_c - tau;
-  time_plot[1] = time_c;
+  if (fabs(time_plot[1]) < eps)
+      {
+	  time_plot[0] = time_c - tau;
+	  time_plot[1] = time_c;
+      }
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-Godunov Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
