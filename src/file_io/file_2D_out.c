@@ -50,15 +50,15 @@
  * @param[in] X: Array of the x-coordinate data.
  * @param[in] Y: Array of the y-coordinate data.
  * @param[in] cpu_time:  Array of the CPU time recording.
- * @param[in] name:      Name of the numerical results.
+ * @param[in] problem:   Name of the numerical results for the test problem.
  * @param[in] time_plot: Array of the plotting time recording.
  */
 void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
-		    double ** X, double ** Y, const double * cpu_time, const char * name, const double time_plot[])
+		    double ** X, double ** Y, const double * cpu_time, const char * problem, const double time_plot[])
 {
     char add_out[FILENAME_MAX+40];
     // Get the address of the output data folder of the test example.
-    example_io(name, add_out, 0);
+    example_io(problem, add_out, 0);
     
     char file_data[FILENAME_MAX+40] = "";
     FILE * fp_write;
@@ -67,10 +67,10 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
 
     int k, i, j;
     PRINT_NC(RHO, CV[k].RHO[j][i]);
-    PRINT_NC(U, CV[k].U[j][i]);
-    PRINT_NC(V, CV[k].V[j][i]);
-    PRINT_NC(P, CV[k].P[j][i]);
-    PRINT_NC(E, CV[k].E[j][i]);
+    PRINT_NC(U,   CV[k].U[j][i]);
+    PRINT_NC(V,   CV[k].V[j][i]);
+    PRINT_NC(P,   CV[k].P[j][i]);
+    PRINT_NC(E,   CV[k].E[j][i]);
     PRINT_NC(X, 0.25*(X[j][i] + X[j][i+1] + X[j+1][i] + X[j+1][i+1]));
     PRINT_NC(Y, 0.25*(Y[j][i] + Y[j][i+1] + Y[j+1][i] + Y[j+1][i+1]));
     
@@ -85,7 +85,7 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
 	fprintf(fp_write, "%.10g\n", time_plot[k]);
     fclose(fp_write);
 
-    config_write(add_out, cpu_time, name);
+    config_write(add_out, cpu_time, problem);
 }
 
 

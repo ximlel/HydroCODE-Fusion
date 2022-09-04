@@ -113,7 +113,7 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
       h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      find_bound = bound_cond_slope_limiter(false, m, nt-1, CV, &bfv_L, &bfv_R, find_bound, true, time_c);
+      find_bound = bound_cond_slope_limiter(false, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, true, time_c);
       if(!find_bound)
 	  goto return_NULL;
 
@@ -189,7 +189,7 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_Edir(dire, mid, ifv_L, ifv_R, eps, eps);
+	      linear_GRP_solver_Edir(dire, mid, &ifv_L, &ifv_R, eps, eps);
 
 	      if(mid[2] < eps || mid[0] < eps)
 		  {

@@ -12,11 +12,6 @@
  * @brief Switch whether to compute multi-fluids.
  */
 #define MULTIFLUID_BASICS
-/**
- * @def PRIMITIVE_CONSERVATIVE_CONVERT
- * @brief Switch whether to convert between primitive variables and conservative variables.
- */
-#define PRIMITIVE_CONSERVATIVE_CONVERT
 #endif
 
 //! If the system does not set, the default largest value can be seen as zero is EPS.
@@ -101,17 +96,13 @@ typedef struct i_f_var {
 	double lambda_u, lambda_v;           //!< grid moving velocity components in direction x and y
 	double delta_x, delta_y;
 	double length;
-#ifdef PRIMITIVE_CONSERVATIVE_CONVERT
 	double U_rho, U_e, U_u, U_v;
-#endif
 #ifdef MULTIFLUID_BASICS
 	double Z_a, d_z_a, t_z_a; //!< Volume fraction of fluid a.
 	double PHI, d_phi, t_phi, F_phi; //!< Mass fraction of fluid a.
 	double F_e_a;
 	double d_gamma, t_gamma, F_gamma;
-#ifdef PRIMITIVE_CONSERVATIVE_CONVERT
 	double U_phi, U_gamma, U_e_a;
-#endif
 #endif
 #ifdef MULTIFLUID_BASICS
 	double RHO_star,    P_star,    U_qt_star,    V_qt_star,    gamma_star;
@@ -134,7 +125,7 @@ typedef struct mesh_var {
 	int num_border[10], *border_pt, *border_cond, *peri_cell;
 	double *normal_v;
 	double *X, *Y;
-	void (*bc)(struct cell_var * cv, struct mesh_var mv, struct flu_var * FV, double t);
+	void (*bc)(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, double t);
 } Mesh_Variable;
 
 #endif

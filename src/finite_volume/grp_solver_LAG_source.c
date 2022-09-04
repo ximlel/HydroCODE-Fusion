@@ -120,7 +120,7 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
       h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
 
-      find_bound = bound_cond_slope_limiter(true, m, nt-1, CV, &bfv_L, &bfv_R, find_bound, true, time_c, X[nt-1]);
+      find_bound = bound_cond_slope_limiter(true, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, true, time_c, X[nt-1]);
       if(!find_bound)
 	  goto return_NULL;
 
@@ -204,7 +204,7 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 		  }
 
 //========================Solve GRP========================
-	      linear_GRP_solver_LAG(dire, mid, ifv_L, ifv_R, eps, eps);
+	      linear_GRP_solver_LAG(dire, mid, &ifv_L, &ifv_R, eps, eps);
 
 	      if(mid[2] < eps || mid[0] < eps || mid[3] < eps)
 		  {

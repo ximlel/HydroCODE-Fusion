@@ -44,11 +44,11 @@
  * @param[in] CV:  Structure of grid variable data.
  * @param[in] X[]: Array of the coordinate data.
  * @param[in] cpu_time:  Array of the CPU time recording.
- * @param[in] name:      Name of the numerical results.
+ * @param[in] problem:   Name of the numerical results for the test problem.
  * @param[in] time_plot: Array of the plotting time recording.
  */
 void file_1D_write(const int m, const int N, const struct cell_var_stru CV, 
-                    double * X[], const double * cpu_time, const char * name, const double time_plot[])
+                    double * X[], const double * cpu_time, const char * problem, const double time_plot[])
 {
   // Records the time when the program is running.
   /*
@@ -61,7 +61,7 @@ void file_1D_write(const int m, const int N, const struct cell_var_stru CV,
   */
     char add_out[FILENAME_MAX+40];
     // Get the address of the output data folder of the test example.
-    example_io(name, add_out, 0);
+    example_io(problem, add_out, 0);
     
     char file_data[FILENAME_MAX+40] = "";
     FILE * fp_write;
@@ -70,9 +70,9 @@ void file_1D_write(const int m, const int N, const struct cell_var_stru CV,
 
     int k, j;
     PRINT_NC(RHO, CV.RHO[k][j]);
-    PRINT_NC(U, CV.U[k][j]);
-    PRINT_NC(P, CV.P[k][j]);
-    PRINT_NC(E, CV.E[k][j]);
+    PRINT_NC(U,   CV.U[k][j]);
+    PRINT_NC(P,   CV.P[k][j]);
+    PRINT_NC(E,   CV.E[k][j]);
     PRINT_NC(X, 0.5 * (X[k][j] + X[k][j+1]));
 
     strcpy(file_data, add_out);
@@ -87,5 +87,5 @@ void file_1D_write(const int m, const int N, const struct cell_var_stru CV,
     fclose(fp_write);
 
 //======================Write Log File============================
-    config_write(add_out, cpu_time, name);
+    config_write(add_out, cpu_time, problem);
 }

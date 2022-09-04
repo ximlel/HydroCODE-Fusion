@@ -5,14 +5,14 @@
 #include "../include/var_struc.h"
 
 
-void Roe_2D_solver(double * F, double * lambda_max, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double delta)
+void Roe_2D_solver(double * F, double * lambda_max, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double delta)
 {
-	const double gamma = ifv_L.gamma;
-	const double n_x   = ifv_L.n_x, n_y = ifv_L.n_y;
-	const double P_L   = ifv_L.P,   P_R = ifv_R.P;
-	const double RHO_L = ifv_L.RHO, RHO_R = ifv_R.RHO;
-	const double U_L   = ifv_L.U,   U_R = ifv_R.U;
-	const double V_L   = ifv_L.V,   V_R = ifv_R.V;
+	const double gamma = ifv_L->gamma;
+	const double n_x   = ifv_L->n_x, n_y   = ifv_L->n_y;
+	const double P_L   = ifv_L->P,   P_R   = ifv_R->P;
+	const double RHO_L = ifv_L->RHO, RHO_R = ifv_R->RHO;
+	const double U_L   = ifv_L->U,   U_R   = ifv_R->U;
+	const double V_L   = ifv_L->V,   V_R   = ifv_R->V;
 
 	double H_L, H_R;
 	H_L = gamma/(gamma-1.0)*P_L/RHO_L + 0.5*(U_L*U_L+V_L*V_L);

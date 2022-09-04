@@ -67,7 +67,7 @@ config[53] = 1.0;//R-K
 					if (el != 0 && i > 0)
 						cell_centroid(&cv, mv);
 					if (mv->bc != NULL)
-						mv->bc(&cv, *mv, FV, t_all);
+						mv->bc(&cv, mv, FV, t_all);
 					//if (!(dim == 1 && i == 0) && i > 50)
 //					if (i==0)
 //					   slope_limiter2(&cv, mv, FV);
@@ -76,7 +76,7 @@ config[53] = 1.0;//R-K
 				}
 
 			if (mv->bc != NULL)
-				mv->bc(&cv, *mv, FV, t_all);
+				mv->bc(&cv, mv, FV, t_all);
 			if(stop_step != 2)
 				tau = tau_calc(&cv, mv);					
 

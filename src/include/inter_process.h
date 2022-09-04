@@ -16,7 +16,7 @@ void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool
 			 double ** U, const double UL, const double UR, const double HL, ...);
 
 // Set boundary conditions & Use the slope limiter
-_Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, struct cell_var_stru CV,
+_Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, struct cell_var_stru * CV,
 			       struct b_f_var * bfv_L, struct b_f_var * bfv_R, _Bool find_bound, const _Bool Slope, const double t_c, ...);
 _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct cell_var_stru * CV, struct b_f_var * bfv_L, struct b_f_var * bfv_R,
 				 struct b_f_var * bfv_D, struct b_f_var * bfv_U, _Bool find_bound_x, const _Bool Slope, const double t_c);

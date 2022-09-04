@@ -13,17 +13,20 @@ void cons_qty_init(const struct cell_var * cv, const struct flu_var * FV)
 	const int num_cell = (int)config[3];
 	for(int k = 0; k < num_cell; k++)
 		{
-			cv->U_rho[k]   = FV->RHO[k];
-			cv->U_gamma[k] = FV->RHO[k] * FV->gamma[k];
-		
-			cv->U_e[k]     = FV->P[k]/(FV->gamma[k]-1.0) + 0.5*FV->RHO[k]*FV->U[k]*FV->U[k];
-			cv->U_u[k]     = FV->RHO[k] * FV->U[k];			
-			cv->U_v[k]  = FV->RHO[k] * FV->V[k];
-			cv->U_e[k] += 0.5*FV->RHO[k]*FV->V[k]*FV->V[k];
+			cv->U_rho[k] = FV->RHO[k];
 #ifdef MULTIFLUID_BASICS
-			cv->U_phi[k] = FV->RHO[k] * FV->PHI[k];			
-			cv->U_e_a[k] = FV->Z_a[k] * FV->P[k]/(config[6]-1.0) + 0.5*cv->U_phi[k]*(FV->U[k]*FV->U[k]+FV->V[k]*FV->V[k]);
+			cv->U_phi[k]   = FV->RHO[k] * FV->PHI[k];			
+			cv->U_gamma[k] = FV->RHO[k] * FV->gamma[k];
+			cv->U_e_a[k]   = FV->Z_a[k] * FV->P[k]/(config[6]-1.0) + 0.5*cv->U_phi[k]*(FV->U[k]*FV->U[k]+FV->V[k]*FV->V[k]);
+			cv->U_e[k]     = FV->P[k]/(FV->gamma[k]-1.0);
+#else
+			cv->U_e[k]     = FV->P[k]/(config[6]-1.0);
 #endif
+			cv->U_u[k]  = FV->RHO[k] * FV->U[k];	
+			cv->U_e[k] += FV->RHO[k] * FV->U[k] * FV->U[k] * 0.5;
+			cv->U_v[k]  = FV->RHO[k] * FV->V[k];
+			cv->U_e[k] += FV->RHO[k] * FV->V[k] * FV->V[k] * 0.5;
+
 		}
 }
 
@@ -31,7 +34,6 @@ void cons_qty_init(const struct cell_var * cv, const struct flu_var * FV)
 int cons2prim(struct i_f_var * ifv)
 {
 	const double eps = config[4];
-	double phi_e_a, phi_e_b;
 	
 	ifv->RHO   = ifv->U_rho;
 	ifv->U     = ifv->U_u/ifv->U_rho;
@@ -39,29 +41,30 @@ int cons2prim(struct i_f_var * ifv)
 	if (isnan(ifv->V) || isinf(ifv->V))									
 		return 0;
 #ifdef MULTIFLUID_BASICS
-			ifv->PHI = ifv->U_phi/ifv->U_rho;
-			phi_e_a  = ifv->U_e_a-0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V);
-			//phi_e_b  = (ifv->U_e-ifv->U_e_a)-0.5*(ifv->U_rho-ifv->U_phi)*(ifv->U*ifv->U+ifv->V*ifv->V);
-			phi_e_b  = ifv->U_e-0.5*(ifv->U_rho)*(ifv->U*ifv->U+ifv->V*ifv->V)-phi_e_a;
-			ifv->Z_a = phi_e_a*(config[6]-1.0)/(phi_e_a*(config[6]-1.0) + phi_e_b*(config[106]-1.0));
-			if (isnan(ifv->Z_a)||isnan(ifv->PHI)||ifv->PHI<(-0.01)||ifv->PHI>(1.0+0.01))
-				return 0;
-			else if (ifv->Z_a<(-0.001))
-				{
-					printf("Z_a=%.10lf,phi_a=%.10lf\n",ifv->Z_a,ifv->PHI);
-					ifv->Z_a = 0.0;
-					ifv->U_e_a = 0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V);
-				}
-			else if (ifv->Z_a>(1.0+0.001))
-				{
-					printf("Z_a=%.10lf,phi_a=%.10lf\n",ifv->Z_a,ifv->PHI);
-					ifv->Z_a = 1.0;
-					ifv->U_e_a = ifv->U_e-0.5*(ifv->U_rho-ifv->U_phi)*(ifv->U*ifv->U+ifv->V*ifv->V);
-				}
-			else if (ifv->PHI<(-0.001)||ifv->PHI>(1.0+0.001))
-				printf("Z_a=%.10lf,phi_a=%.10lf\n",ifv->Z_a,ifv->PHI);
-//			ifv->gamma = (phi_e_a*config[6] + phi_e_b*config[106])/(phi_e_a+phi_e_b);
-			ifv->gamma = 1.0/(ifv->Z_a/(config[6]-1.0)+(1.0-ifv->Z_a)/(config[106]-1.0))+1.0;
+	double phi_e_a, phi_e_b;
+	ifv->PHI = ifv->U_phi/ifv->U_rho;
+	phi_e_a  = ifv->U_e_a-0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V);
+	// phi_e_b  = (ifv->U_e-ifv->U_e_a)-0.5*(ifv->U_rho-ifv->U_phi)*(ifv->U*ifv->U+ifv->V*ifv->V);
+	phi_e_b  = ifv->U_e-0.5*(ifv->U_rho)*(ifv->U*ifv->U+ifv->V*ifv->V)-phi_e_a;
+	ifv->Z_a = phi_e_a*(config[6]-1.0)/(phi_e_a*(config[6]-1.0) + phi_e_b*(config[106]-1.0));
+	if (isnan(ifv->Z_a)||isnan(ifv->PHI)||ifv->PHI<(-0.01)||ifv->PHI>(1.0+0.01))
+	    return 0;
+	else if (ifv->Z_a<(-0.001))
+	    {
+		printf("Z_a=%.10lf,phi_a=%.10lf\n",ifv->Z_a,ifv->PHI);
+		ifv->Z_a = 0.0;
+		ifv->U_e_a = 0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V);
+	    }
+	else if (ifv->Z_a>(1.0+0.001))
+	    {
+		printf("Z_a=%.10lf,phi_a=%.10lf\n",ifv->Z_a,ifv->PHI);
+		ifv->Z_a = 1.0;
+		ifv->U_e_a = ifv->U_e-0.5*(ifv->U_rho-ifv->U_phi)*(ifv->U*ifv->U+ifv->V*ifv->V);
+	    }
+	else if (ifv->PHI<(-0.001)||ifv->PHI>(1.0+0.001))
+	    printf("Z_a=%.10lf,phi_a=%.10lf\n",ifv->Z_a,ifv->PHI);
+	// ifv->gamma = (phi_e_a*config[6] + phi_e_b*config[106])/(phi_e_a+phi_e_b);
+	ifv->gamma = 1.0/(ifv->Z_a/(config[6]-1.0)+(1.0-ifv->Z_a)/(config[106]-1.0))+1.0;
 #endif
 	ifv->P  = (ifv->U_e - 0.5*(ifv->U_u*ifv->U_u)/ifv->U_rho) * (ifv->gamma-1.0);	
 	ifv->P -= (0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho) * (ifv->gamma-1.0);
@@ -73,8 +76,10 @@ int cons2prim(struct i_f_var * ifv)
 		{
 			printf("P=%.10lf\n",ifv->P);		
 			ifv->U_e = 0.5*(ifv->U_u*ifv->U_u)/ifv->U_rho + eps/(ifv->gamma-1.0);
-			ifv->U_e += 0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho;	
-			ifv->U_e_a = 0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V) + ifv->Z_a*eps/(config[6]-1.0);	
+			ifv->U_e += 0.5*(ifv->U_v*ifv->U_v)/ifv->U_rho;
+#ifdef MULTIFLUID_BASICS
+			ifv->U_e_a = 0.5*ifv->U_phi*(ifv->U*ifv->U+ifv->V*ifv->V) + ifv->Z_a*eps/(config[6]-1.0);
+#endif
 		}
 	
 	return 1;

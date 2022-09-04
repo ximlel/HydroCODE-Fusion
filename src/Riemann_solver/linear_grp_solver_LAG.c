@@ -30,15 +30,15 @@
  *       [1] M. Ben-Artzi & J. Falcovitz, A second-order Godunov-type scheme for compressible fluid dynamics,
  *           Journal of Computational Physics, 55.1: 1-32, 1984
  */
-void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double eps, const double  atc)
+void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double  atc)
 {
-  const double   rho_L = ifv_L.RHO,     rho_R = ifv_R.RHO;
-  const double s_rho_L = ifv_L.t_rho, s_rho_R = ifv_R.t_rho;
-  const double     u_L = ifv_L.U,         u_R = ifv_R.U;
-  const double   s_u_L = ifv_L.t_u,     s_u_R = ifv_R.t_u;
-  const double     p_L = ifv_L.P,         p_R = ifv_R.P;
-  const double   s_p_L = ifv_L.t_p,     s_p_R = ifv_R.t_p;
-  const double  gammaL = ifv_L.gamma,  gammaR = ifv_R.gamma;
+  const double   rho_L = ifv_L->RHO,     rho_R = ifv_R->RHO;
+  const double s_rho_L = ifv_L->t_rho, s_rho_R = ifv_R->t_rho;
+  const double     u_L = ifv_L->U,         u_R = ifv_R->U;
+  const double   s_u_L = ifv_L->t_u,     s_u_R = ifv_R->t_u;
+  const double     p_L = ifv_L->P,         p_R = ifv_R->P;
+  const double   s_p_L = ifv_L->t_p,     s_p_R = ifv_R->t_p;
+  const double  gammaL = ifv_L->gamma,  gammaR = ifv_R->gamma;
 
   const double zetaL = (gammaL-1.0)/(gammaL+1.0);
   const double zetaR = (gammaR-1.0)/(gammaR+1.0);

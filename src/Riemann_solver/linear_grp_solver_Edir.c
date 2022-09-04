@@ -31,15 +31,15 @@
  *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
  *           Journal of Computational Physics, 218.1: 19-43, 2006.
  */
-void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var ifv_L, const struct i_f_var ifv_R, const double eps, const double  atc)
+void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double atc)
 {
-  const double   rho_L = ifv_L.RHO,     rho_R = ifv_R.RHO;
-  const double s_rho_L = ifv_L.d_rho, s_rho_R = ifv_R.d_rho;
-  const double     u_L = ifv_L.U,         u_R = ifv_R.U;
-  const double   s_u_L = ifv_L.d_u,     s_u_R = ifv_R.d_u;
-  const double     p_L = ifv_L.P,         p_R = ifv_R.P;
-  const double   s_p_L = ifv_L.d_p,     s_p_R = ifv_R.d_p;
-  const double   gamma = ifv_L.gamma;
+  const double   rho_L = ifv_L->RHO,     rho_R = ifv_R->RHO;
+  const double s_rho_L = ifv_L->d_rho, s_rho_R = ifv_R->d_rho;
+  const double     u_L = ifv_L->U,         u_R = ifv_R->U;
+  const double   s_u_L = ifv_L->d_u,     s_u_R = ifv_R->d_u;
+  const double     p_L = ifv_L->P,         p_R = ifv_R->P;
+  const double   s_p_L = ifv_L->d_p,     s_p_R = ifv_R->d_p;
+  const double   gamma = ifv_L->gamma;
 
   double dist;
   double c_L, c_R;

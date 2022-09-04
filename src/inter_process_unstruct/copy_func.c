@@ -6,7 +6,7 @@
 
 
 void cons_qty_copy_cv2ifv(struct i_f_var * ifv, const struct cell_var * cv, const int c)
-{	
+{
 	ifv->U_rho = cv->U_rho[c];
 	ifv->U_e = cv->U_e[c];
 	ifv->U_u = cv->U_u[c];
@@ -14,12 +14,12 @@ void cons_qty_copy_cv2ifv(struct i_f_var * ifv, const struct cell_var * cv, cons
 #ifdef MULTIFLUID_BASICS
 	ifv->U_phi = cv->U_phi[c];
 	ifv->U_e_a = cv->U_e_a[c];
-#endif
 	ifv->U_gamma = cv->U_gamma[c];
+#endif
 }
 
 void cons_qty_copy_ifv2cv(const struct i_f_var * ifv, struct cell_var * cv, const int c)
-{	
+{
 	cv->U_rho[c] = ifv->U_rho;
 	cv->U_e[c] = ifv->U_e;
 	cv->U_u[c] = ifv->U_u;
@@ -71,6 +71,7 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 	cv->gamma_p[k][j] = ifv->gamma;
 #endif
 
+#ifdef MULTIFLUID_BASICS
 	cv->RHO_star[k][j]     = ifv->RHO_star;
 	cv->P_star[k][j]       = ifv->P_star;
 	cv->U_qt_star[k][j]    = ifv->U_qt_star;
@@ -92,6 +93,7 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 	cv->u_star[k][j]  = ifv->u_star;
 	cv->u_minus_c[k][j] = ifv->u_minus_c;
 	cv->u_add_c[k][j] = ifv->u_add_c;
+#endif
 }
 
 void flux_add_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, const int k, const int j)

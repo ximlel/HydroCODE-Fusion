@@ -19,14 +19,14 @@ void Roe_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 	double lambda_max;
 	if (dim == 1)
 		{
-			Roe_solver(F, &lambda_max, *ifv, *ifv_R, delta);
+			Roe_solver(F, &lambda_max, ifv, ifv_R, delta);
 			ifv->F_rho = F[0];
 			ifv->F_u   = F[1];
 			ifv->F_e   = F[2];
 		}
 	else if (dim == 2)
 		{
-			Roe_2D_solver(F, &lambda_max, *ifv, *ifv_R, delta);
+			Roe_2D_solver(F, &lambda_max, ifv, ifv_R, delta);
 			ifv->F_rho = F[0];
 			ifv->F_u   = F[1];
 			ifv->F_v   = F[2];
@@ -39,7 +39,7 @@ void HLL_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 {
 	double F[4];
 	double lambda_max;
-	HLL_2D_solver(F, &lambda_max, *ifv, *ifv_R);
+	HLL_2D_solver(F, &lambda_max, ifv, ifv_R);
 	ifv->F_rho = F[0];
 	ifv->F_u   = F[1];
 	ifv->F_v   = F[2];
@@ -78,7 +78,7 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 
 	double wave_speed[2], dire[6], mid[6], star[6];
 
-	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, INFINITY);
+	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, ifv, ifv_R, eps, INFINITY);
 
 	if(mid[3] < eps || mid[0] < eps)
 	    return 1;
@@ -171,10 +171,10 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	
 	double wave_speed[2], dire[6], mid[6], star[6];
 
-	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, eps);
-	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, INFINITY);
-	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, eps);
-	// linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, *ifv, *ifv_R, eps, INFINITY);
+	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, ifv, ifv_R, eps, eps);
+	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, ifv, ifv_R, eps, INFINITY);
+	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, ifv, ifv_R, eps, eps);
+	// linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, ifv, ifv_R, eps, INFINITY);
 
 	if(mid[3] < eps || mid[0] < eps)
 	    return 1;

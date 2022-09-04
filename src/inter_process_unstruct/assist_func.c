@@ -19,10 +19,8 @@ int fluid_var_update(struct flu_var * FV, struct cell_var * cv)
 			if(cons2prim(&ifv) == 0)
 				{
 					fprintf(stderr, "Wrong in copying cons_var to prim_var!\n");
-					fprintf(stderr, "%d,%.10lf,%.10lf,%.10lf,%.10lf\n",k,ifv.RHO,ifv.P,ifv.PHI,ifv.Z_a);
 					return 0;
 				}
-			cv->U_e_a[k] = ifv.U_e_a; 
 			prim_var_copy_ifv2FV(&ifv, FV, k);
 
 			cons_qty_copy_ifv2cv(&ifv, cv, k);			
