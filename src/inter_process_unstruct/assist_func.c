@@ -84,7 +84,7 @@ static int order2_i_f_var_init(const struct cell_var * cv, struct i_f_var * ifv,
 			ifv->U_v   += cv->gradx_v[k]  *delta_x + cv->grady_v[k]  *delta_y;
 #ifdef MULTIFLUID_BASICS
 			ifv->d_phi = (ifv->d_phi - ifv->PHI*ifv->d_rho)/ifv->RHO;
-			if (!isinf(config[60]))
+			if ((_Bool)config[60])
 				ifv->d_gamma = (ifv->d_gamma - ifv->gamma*ifv->d_rho)/ifv->RHO;
 			ifv->U_phi += cv->gradx_phi[k]*delta_x + cv->grady_phi[k]*delta_y;
 #endif

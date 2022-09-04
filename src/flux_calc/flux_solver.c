@@ -111,7 +111,7 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 
 #ifdef MULTIFLUID_BASICS
 	ifv->F_phi = ifv->F_rho * phi_mid;
-	if (!isinf(config[60]))
+	if ((_Bool)config[60])
 		ifv->F_gamma = ifv->F_rho*gamma_mid;
 	ifv->F_e_a  = z_a_mid/(config[6]-1.0)*p_mid/rho_mid + 0.5*phi_mid*u_mid*u_mid;
 	if (dim == 2)
@@ -208,7 +208,7 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 
 #ifdef MULTIFLUID_BASICS
 	ifv->F_phi = ifv->F_rho*phi_mid;
-	if (!isinf(config[60]))
+	if ((_Bool)config[60])
 		ifv->F_gamma = ifv->F_rho*gamma_mid;
 	ifv->F_e_a = z_a_mid/(config[6]-1.0)*p_mid/rho_mid + 0.5*phi_mid*(u_mid*u_mid + v_mid*v_mid);
 	ifv->F_e_a = ifv->F_rho*ifv->F_e_a;	

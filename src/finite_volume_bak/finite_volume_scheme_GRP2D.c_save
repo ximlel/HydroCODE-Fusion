@@ -264,8 +264,6 @@ void finite_volume_scheme_GRP2D(struct flu_var * FV, const struct mesh_var * mv,
 	clock_t start_clock;
 	double cpu_time = 0.0;
 
-//config[53] = 1.0;//R-K
-
 	const int dim = (int)config[0];
 	const int order = (int)config[9];
 	const double eps = config[4];

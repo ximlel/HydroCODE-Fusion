@@ -255,7 +255,10 @@ int main(int argc, char *argv[])
       }
 
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
-      finite_volume_scheme_2D(&FV0, &mv, scheme, argv[2]);
+      {
+	  config[8] = (double)0;
+	  finite_volume_scheme_2D(&FV0, &mv, scheme, argv[2]);
+      }
   else
       {
 	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);

@@ -451,5 +451,4 @@ void Saltzman_mesh_Lag(struct mesh_var * mv)
 	
 	quad_border_cond(mv, n_x_a, n_y_a, -2, -2, -2, -2);
 	quad_border_normal_velocity(mv, n_x_a, n_y_a, 0.0, 0.0, 0.0, -1.0);
-	config[8] = 1;  	
 }

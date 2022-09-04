@@ -22,7 +22,7 @@ static void lsq_limiter(const struct cell_var * cv, const struct mesh_var * mv,
 {
 	const double eps = config[4];
 	const int num_cell = (int)config[3];
-	const int lim = isinf(config[40]) ? 0 : (int)config[40]; //limiter
+	const int lim = (int)config[40]; //limiter
 	double (*mu[])(double) = { mu_BJ, mu_Ven };
 	
 	int **cp = mv->cell_pt;
@@ -128,7 +128,7 @@ static void minmod_limiter(const struct cell_var * cv, const struct mesh_var * m
 {
 	// const double eps = config[4];
 	const int num_cell = (int)config[3];
-	double alpha = isinf(config[41]) ? 1.9 : config[41];
+	double alpha = config[41];
 	int **cc = cv->cell_cell;
 
 	int cell_R;
@@ -178,7 +178,7 @@ static void minmod_limiter_2D(const struct cell_var * cv, const struct mesh_var 
 {
 	// const double eps = config[4];
 	const int num_cell = (int)config[3];
-	double alpha = isinf(config[41]) ? 1.9 : config[41];
+	double alpha = config[41];
 	int **cc = cv->cell_cell;
 	int **cp = mv->cell_pt;
 

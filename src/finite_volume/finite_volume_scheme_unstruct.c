@@ -17,12 +17,10 @@ void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const
 	clock_t start_clock;
 	double cpu_time = 0.0;
 
-config[53] = 1.0;//R-K
-
-	const int dim = (int)config[0];
-	const int order = (int)config[9];
-	const int el = isinf(config[8]) ? 0 : (int)config[8];
+	const int dim      = (int)config[0];
 	const int num_cell = (int)config[3];
+	const int el       = (int)config[8];
+	const int order    = (int)config[9];
 	const double eps = config[4];
 	int ** cp = mv->cell_pt;
 
@@ -90,11 +88,11 @@ config[53] = 1.0;//R-K
 				{
 					printf("\nThe time is enough at step %d.\n",i);				
 					tau = config[1] - t_all;
-					if (isinf(config[53]) || stop_step == 2)
+					if (!(_Bool)config[53] || stop_step == 2)
 						stop_t = 1;
 				} // Time
 
-			if (isinf(config[53]) || stop_step == 2)
+			if (!(_Bool)config[53] || stop_step == 2)
 				t_all += tau;
 			config[16] = tau;
 
@@ -184,7 +182,7 @@ config[53] = 1.0;//R-K
 						stop_step = 1;
 				}
 
-			if(!isinf(config[53]))
+			if(!(_Bool)config[53])
 				{
 					if (stop_step == 0)
 						stop_step = 2;

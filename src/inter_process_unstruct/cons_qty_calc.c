@@ -99,7 +99,7 @@ int cons_qty_update(const struct cell_var * cv, const struct mesh_var * mv,
 	for(int k = 0; k < num_cell; ++k)
 		{
 			flux_v_fix = 0.0;				
-			//if(isinf(config[60]))
+			//if((_Bool)config[60])
 			//	gamma = cv->U_gamma[k]/cv->U_rho[k];
 			for(int j = 0; j < cp[k][0]; j++)
 				{
@@ -121,7 +121,7 @@ int cons_qty_update(const struct cell_var * cv, const struct mesh_var * mv,
 					cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
 #ifdef MULTIFLUID_BASICS
 					cv->U_phi[k] += - tau*cv->F_phi[k][j] * length / cv->vol[k];
-					if(!isinf(config[60]))
+					if((_Bool)config[60])
 						cv->U_gamma[k] += - tau*cv->F_gamma[k][j] * length / cv->vol[k];
 #endif
 					if ((int)config[61] == 1)
@@ -155,7 +155,7 @@ int cons_qty_update(const struct cell_var * cv, const struct mesh_var * mv,
 						gamma /= cv->U_phi[k]/cv->U_rho[k]*config[110] + (1.0-cv->U_phi[k]/cv->U_rho[k])*config[111];
 						cv->U_gamma[k] = gamma*cv->U_rho[k];
 						}
-						else if(isinf(config[60]))
+						else if((_Bool)config[60])
 						cv->U_gamma[k] = gamma*cv->U_rho[k];
 			*/
 			

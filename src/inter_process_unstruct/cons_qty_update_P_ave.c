@@ -24,7 +24,7 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 //	for(k = (int)config[13]; k < num_cell; ++k)
 	for(k = 0; k < num_cell; ++k)
 		{
-			if (stop_step == 0 && (!isinf(config[53])))
+			if (stop_step == 0 && (_Bool)config[53])
 				{
 					U_rho_bak[k] = cv->U_rho[k];
 					U_e_bak[k]   = cv->U_e[k];

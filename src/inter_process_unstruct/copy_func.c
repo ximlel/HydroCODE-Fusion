@@ -53,7 +53,7 @@ void flux_copy_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, co
 #ifdef MULTIFLUID_BASICS
 	cv->F_phi[k][j] = ifv->F_phi;
 	cv->F_e_a[k][j] = ifv->F_e_a;
-	if (!isinf(config[60]))
+	if ((_Bool)config[60])
 		cv->F_gamma[k][j] = ifv->F_gamma;
 #endif
 
@@ -111,7 +111,7 @@ void flux_add_ifv2cv(const struct i_f_var * ifv, const struct cell_var * cv, con
 #ifdef MULTIFLUID_BASICS
 	cv->F_phi[k][j] = 0.5*(cv->F_phi[k][j] + ifv->F_phi);
 	cv->F_e_a[k][j] = 0.5*(cv->F_e_a[k][j] + ifv->F_e_a);
-	if (!isinf(config[60]))
+	if ((_Bool)config[60])
 		cv->F_gamma[k][j] = 0.5*(cv->F_gamma[k][j] + ifv->F_gamma);
 
 	cv->Z_a_p[k][j] = 0.5*(cv->Z_a_p[k][j] + ifv->Z_a);

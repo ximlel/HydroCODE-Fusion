@@ -125,7 +125,7 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 		CV_INIT_MEM(grady_z_a, num_cell_ghost);
 		CV_INIT_MEM(gradx_phi, num_cell_ghost);
 		CV_INIT_MEM(grady_phi, num_cell_ghost);
-		if (!isinf(config[60]))
+		if ((_Bool)config[60])
 		    {
 			CV_INIT_MEM(gradx_gamma, num_cell_ghost);
 			CV_INIT_MEM(grady_gamma, num_cell_ghost);

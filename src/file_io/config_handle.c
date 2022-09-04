@@ -34,6 +34,7 @@
 
 /**
  * @brief This function check whether the configuration data is reasonable and set the default.
+ *        All configuration data is in tha array 'config[]'.
  */
 static void config_check(void)
 {
@@ -73,7 +74,7 @@ static void config_check(void)
     printf("  eps\t\t= %g\n", eps);
 
     if(isinf(config[6]))
-	config[6] = 1.4;	
+	config[6] = 1.4;
     else if(config[6] < 1.0 + eps)
 	{
 	    fprintf(stderr, "The constant of the perfect gas(%f) should be larger than 1.0!\n", config[6]);
@@ -115,30 +116,40 @@ static void config_check(void)
 	}
 
     // Specie number
-    config[2] = isfinite(config[2]) ? config[2] : (double)1;	
+    config[2]   = isfinite(config[2])   ? config[2]   : (double)1;	
     // Coordinate framework (EUL/LAG/ALE)
-    config[8] = isfinite(config[8]) ? config[8] : (double)0;
+    config[8]   = isfinite(config[8])   ? config[8]   : (double)0;
     // Reconstruction (prim_var/cons_var)
-    config[31] = isfinite(config[31]) ? config[31] : (double)0;
+    config[31]  = isfinite(config[31])  ? config[31]  : (double)0;
+    // Output initial data
+    config[32]  = isfinite(config[32])  ? config[32]  : (double)true;
     // Dimensional splitting
-    config[33] = isfinite(config[33]) ? config[31] : (double)false;
+    config[33]  = isfinite(config[33])  ? config[33]  : (double)false;
+    // Slope limiter (Venkatakrishnan/Barth-Jespersen)
+    config[40]  = isfinite(config[40])  ? config[40]  : (double)0;
     // Parameter α in minmod limiter
-    config[41] = isfinite(config[41]) ? config[41] : 1.9;
-    // v_fix
-    config[61] = isfinite(config[61]) ? config[61] : (double)false;
-    // offset_x
+    config[41]  = isfinite(config[41])  ? config[41]  : 1.9;
+    // Runge-Kutta time discretization
+    config[53]  = isfinite(config[53])  ? config[53]  : (double)false;
+    // Conservative variable (U_gamma) ργ
+    config[60]  = isfinite(config[60])  ? config[60]  : (double)false;
+    // v_fix: Shear velocity
+    config[61]  = isfinite(config[61])  ? config[61]  : (double)0;
+    // Offset of the upper and downside periodic boundary
+    config[70]  = isfinite(config[70])  ? config[70]  : (double)0;
+    // offset_x: Grid offset in x direction
     config[210] = isfinite(config[210]) ? config[210] : 0.0;
-    // offset_y
+    // offset_y: Grid offset in y direction
     config[211] = isfinite(config[211]) ? config[211] : 0.0;
-    // offset_z
+    // offset_z: Grid offset in z direction
     config[212] = isfinite(config[212]) ? config[212] : 0.0;
 }
 
 /**
  * @brief This function read the configuration data file, and
- *        store the configuration data in the array "config".
+ *        store the configuration data in the array 'config[]'.
  * @param[in] fp: The pointer to the configuration data file.
- * @return       Configuration data file read status.
+ * @return    Configuration data file read status.
  *    @retval 1: Success to read in configuration data file. 
  *    @retval 0: Failure to read in configuration data file. 
  */
@@ -221,6 +232,14 @@ void configurate(const char * add_in)
 }
 
 
+/**
+ * @brief This function write configuration data and program record into the file 'log.dat'.
+ * @details The parameters in the log file refer to 'doc/config.csv'.
+ * @remark  The code of recording CPU time is commented out.
+ * @param[in] add_out:  Address of the output data folder of the test example.
+ * @param[in] cpu_time: Array of the CPU time recording.
+ * @param[in] name:     Name of the test example.
+ */
 void config_write(const char * add_out, const double * cpu_time, const char * name)
 {
     char file_data[FILENAME_MAX+40];
