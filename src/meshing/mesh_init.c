@@ -16,7 +16,8 @@ static void cell_pt_clockwise(const struct mesh_var * mv)
 	int **cp = mv->cell_pt;
 	int p_p, p, p_n;
 
-	int X_max, n_max, tmp;
+	double X_max;
+	int n_max, tmp;
 	for(int k = 0; k < num_cell; k++)
 	    {
 		n_max = 1;

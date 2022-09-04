@@ -418,7 +418,7 @@ static int quad_border_normal_velocity
 
 	for(k = 0; k < n_x; k++)
 		{
-			mv->normal_v[k] = down;		
+			mv->normal_v[k] = down;
 		}
 	for(k = n_x; k < n_x+n_y; k++)
 		{

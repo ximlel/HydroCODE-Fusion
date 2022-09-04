@@ -66,7 +66,8 @@ void period_cell_modi(struct mesh_var * mv)
 	const int num_cell = mv->num_ghost + (int)config[3];
 	int *pc = mv->peri_cell;
 	
-	int per_num[num_cell], per_n = 0;
+	int *per_num = malloc(num_cell*sizeof(int));
+	int per_n = 0;
 	int i, j;
 	for (i = 0; i < num_cell; i++)
 		{

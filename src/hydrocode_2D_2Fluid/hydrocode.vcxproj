@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{AAD4ADA0-2ABA-41A4-9804-EC9B95EF85DD}</ProjectGuid>
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{109B65DA-3386-4B2B-8C9F-19248BF208B4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -97,32 +97,33 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Link>
-      <SubSystem>Console</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\file_io\config_handle.c" />
-    <ClCompile Include="..\file_io\io_control.c" />
     <ClCompile Include="..\file_io\file_2D_in.c" />
-    <ClCompile Include="..\file_io\file_2D_out.c" />
-    <ClCompile Include="..\finite_volume\grp_solver_2D_EUL_source.c" />
-    <ClCompile Include="..\finite_volume\grp_solver_2D_split_EUL_source.c" />
+    <ClCompile Include="..\file_io\io_control.c" />
+    <ClCompile Include="..\finite_volume\finite_volume_scheme_unstruct.c" />
     <ClCompile Include="..\flux_calc\flux_generator_x.c" />
     <ClCompile Include="..\flux_calc\flux_generator_y.c" />
     <ClCompile Include="..\flux_calc\flux_solver.c" />
-    <ClCompile Include="..\inter_process\bound_cond_slope_limiter_x.c" />
-    <ClCompile Include="..\inter_process\bound_cond_slope_limiter_y.c" />
-    <ClCompile Include="..\inter_process\slope_limiter.c" />
-    <ClCompile Include="..\inter_process\slope_limiter_2D_x.c" />
-    <ClCompile Include="..\Riemann_solver\hll_solver.c" />
+    <ClCompile Include="..\inter_process_unstruct\assist_func.c" />
+    <ClCompile Include="..\inter_process_unstruct\cell_init.c" />
+    <ClCompile Include="..\inter_process_unstruct\cons_qty_calc.c" />
+    <ClCompile Include="..\inter_process_unstruct\cons_qty_update_P_ave.c" />
+    <ClCompile Include="..\inter_process_unstruct\copy_func.c" />
+    <ClCompile Include="..\inter_process_unstruct\slope_limiter.c" />
+    <ClCompile Include="..\meshing\ghost_value.c" />
+    <ClCompile Include="..\meshing\mesh_init.c" />
+    <ClCompile Include="..\meshing\msh_load.c" />
+    <ClCompile Include="..\meshing\quad_mesh.c" />
+    <ClCompile Include="..\riemann_solver\hll_solver.c" />
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_G2D.c" />
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_Q1D.c" />
     <ClCompile Include="..\riemann_solver\riemann_solver_exact_Ben.c" />
     <ClCompile Include="..\riemann_solver\riemann_solver_exact_Toro.c" />
-    <ClCompile Include="..\Riemann_solver\roe_2D_solver.c" />
-    <ClCompile Include="..\Riemann_solver\roe_solver.c" />
+    <ClCompile Include="..\riemann_solver\roe_2D_solver.c" />
+    <ClCompile Include="..\riemann_solver\roe_HLL_solver.c" />
+    <ClCompile Include="..\riemann_solver\roe_solver.c" />
+    <ClCompile Include="..\tools\math_algo.c" />
     <ClCompile Include="..\tools\sys_pro.c" />
     <ClCompile Include="hydrocode.c" />
   </ItemGroup>
@@ -130,10 +131,12 @@
     <ClInclude Include="..\include\file_io.h" />
     <ClInclude Include="..\include\finite_volume.h" />
     <ClInclude Include="..\include\flux_calc.h" />
-    <ClInclude Include="..\include\inter_process.h" />
+    <ClInclude Include="..\include\inter_process_unstruct.h" />
+    <ClInclude Include="..\include\meshing.h" />
     <ClInclude Include="..\include\riemann_solver.h" />
     <ClInclude Include="..\include\tools.h" />
     <ClInclude Include="..\include\var_struc.h" />
+    <ClInclude Include="..\include\var_struc_BN.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
