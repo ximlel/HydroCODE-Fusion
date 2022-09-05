@@ -59,17 +59,20 @@
     } while(0)
 
 /** 
-  * @brief      This function reads the 1-D initial data file of velocity/pressure/density.
+  * @brief      This function reads the 1-D initial data file of density/velocity/pressure
+  *             and performs some other initialization function procedures.
   * @details    The function initialize the extern pointer FV0.RHO/U/P pointing to the
-  *             position of a block of memory consisting (m+1) variables* of type double.
-  *             The value of first of these variables is m.
-  *             The following m variables are the initial value.
-  * @param[in]  name: Name of the test example.
+  *             position of a block of memory consisting m variables* of type double.
+  *             These m variables are the initial value and the value of m is stored in config[3].
+  * @param[in]  name:      Name of the test example.
+  * @param[out] N_plot:    Pointer to the number of time steps for plotting.
+  * @param[out] time_plot: Pointer to the array of the plotting time recording.
   * @return  \b FV0:  Structure of initial data array pointer.
+  * @note This function contains the function procedures 'time_plot_read()' and 'configurate()'.
   */
 struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot[])
 {
-    struct flu_var FV0;
+    struct flu_var FV0; // Structure of initial data array pointer.
 
     char add_in[FILENAME_MAX+40]; 
     // Get the address of the initial data folder of the test example.

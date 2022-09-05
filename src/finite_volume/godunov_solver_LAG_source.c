@@ -18,7 +18,7 @@
 /**
  * @brief This function use Godunov scheme to solve 1-D Euler
  *        equations of motion on Lagrangian coordinate.
- * @param[in] m:         Number of the grids.
+ * @param[in] m:          Number of the grids.
  * @param[in,out] CV:     Structure of cell variable data.
  * @param[in,out] X[]:    Array of the coordinate data.
  * @param[out] cpu_time:  Array of the CPU time recording.

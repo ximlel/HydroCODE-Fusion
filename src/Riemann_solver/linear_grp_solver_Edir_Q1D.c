@@ -31,8 +31,7 @@
  *                - ifv_.t_ = -0.0: Planar-1D GRP solver
  *              - -0.0:     Quasi-1D GRP solver(only nonlinear case)
  *                - ifv_.t_ = -0.0: Planar-1D GRP solver
- * @par  Reference
- *       Theory is found in Reference [1]. \n
+ * @sa   Theory is found in Reference [1]. \n
  *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
  *           Journal of Computational Physics, 218.1: 19-43, 2006.
  */

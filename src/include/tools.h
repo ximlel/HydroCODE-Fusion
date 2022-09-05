@@ -7,6 +7,8 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+
 // sys_pro.c
 void DispPro(const double pro, const int step);
 

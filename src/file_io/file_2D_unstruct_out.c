@@ -1,14 +1,21 @@
+/**
+ * @file  file_2D_unstruct_out.c
+ * @brief This is a set of functions which control the readout of two-dimensional data on unstructured grid.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
 #include "../include/var_struc.h"
+#include "../include/tools.h"
 #include "../include/file_io.h"
 
 
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-
+/**
+ * @brief Print out 'v'(X/Y) coordinates of spatial points.
+ */
 #define PRINT_NP(v)					\
     do {						\
 	if (mv.v == NULL)				\
@@ -20,6 +27,9 @@
 	fprintf(fp,"\n");				\
     } while (0)
 
+/**
+ * @brief Print out values of fluid variable 'v' in computational grid cells.
+ */
 #define PRINT_NC(v)					\
     do {						\
 	if (FV.v == NULL)				\
@@ -31,6 +41,13 @@
 	fprintf(fp,"\n");				\
 	} while (0)
 
+/**
+ * @brief This function write the 2-D solution into Tecplot output files with block data.
+ * @param[in] FV: Structure of fluid variable data array in computational grid.
+ * @param[in] mv: Structure of meshing variable data.
+ * @param[in] problem:   Name of the numerical results for the test problem.
+ * @param[in] time_plot: Array of the plotting time recording.
+ */
 void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, const char * problem, const double time)
 {
     const double eps = config[4];
@@ -126,6 +143,9 @@ void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, 
 }
 
 
+/**
+ * @brief Print out values of scalar fluid variable 'v' in computational grid cells.
+ */
 #define PRINT_SCA(v)				\
     do {					\
 	fprintf(fp, "SCALARS " #v " double\n");	\
@@ -135,6 +155,13 @@ void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, 
 	fprintf(fp, "\n");			\
     } while (0)
 
+/**
+ * @brief This function write the 2-D solution into VTK 3D output files with brick data.
+ * @param[in] FV: Structure of fluid variable data array in computational grid.
+ * @param[in] mv: Structure of meshing variable data.
+ * @param[in] problem:   Name of the numerical results for the test problem.
+ * @param[in] time_plot: Array of the plotting time recording.
+ */
 void file_write_3D_VTK(const struct flu_var FV, const struct mesh_var mv, const char * problem, const double time)
 {
     const double eps = config[4];
@@ -182,12 +209,8 @@ void file_write_3D_VTK(const struct flu_var FV, const struct mesh_var mv, const 
 	fprintf(fp, "\n");
 
 	fprintf(fp, "CELL_TYPES %d\n",num_cell);
-	if (mv.cell_type == NULL)
-		for(k = 0; k < num_cell; k++)
-			fprintf(fp, "\t7\n");
-	else
-		for(k = 0; k < num_cell; k++)
-			fprintf(fp, "\t7\n");
+	for(k = 0; k < num_cell; k++)
+		fprintf(fp, "\t7\n");
 	fprintf(fp, "\n");
 
 	fprintf(fp, "CELL_DATA %d\n",num_cell);

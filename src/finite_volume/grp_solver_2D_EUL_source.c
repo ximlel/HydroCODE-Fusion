@@ -54,8 +54,8 @@
 /**
  * @brief This function use GRP scheme to solve 2-D Euler
  *        equations of motion on Eulerian coordinate without dimension splitting.
- * @param[in] m:         Number of the x-grids: n_x.
- * @param[in] n:         Number of the y-grids: n_y.
+ * @param[in] m:          Number of the x-grids: n_x.
+ * @param[in] n:          Number of the y-grids: n_y.
  * @param[in,out] CV:     Structure of cell variable data.
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.

@@ -16,10 +16,13 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
 		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversal);
 
 // Flux of 2-D GRP solver (Eulerian, two-component flow)
-int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau);
+int GRP_2D_flux       (struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau);
 
+// Flux of exact Riemann solver (Eulerian, two-component flow)
+int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
+
+// Flux of approximate Riemann solver (Eulerian, two-component flow)
 void Roe_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
 void HLL_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
-void Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R);
 
 #endif

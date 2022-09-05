@@ -34,8 +34,8 @@
  *  @param[in]  example:   Name of the test example/numerical results.
  *  @param[out] add_mkdir: Folder path for data input or output.
  *  @param[in]  i_or_o:    Conversion parameters for data input/output.
- *                         - 0:             data output.
- *                         - else (e.g. 1): data input.
+ *    @arg 0:              data output.
+ *    @arg 1(non-0 value): data input.
  */
 void example_io(const char *example, char *add_mkdir, const int i_or_o)
 {
@@ -249,6 +249,13 @@ int flu_var_read(FILE * fp, double * U, const int num)
 }
 
 
+/**
+ * @brief This function reads the time data file for plotting 'time_plot.dat' and 
+ *        initialize tha array 'time_plot[]'.
+ * @param[in]  add_in:    Adress of the initial data folder of the test example.
+ * @param[out] N_plot:    Pointer to the number of time steps for plotting.
+ * @param[out] time_plot: Pointer to the array of the plotting time recording.
+ */
 void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
 {
     _Bool r = true; // r: Whether to read data file successfully.

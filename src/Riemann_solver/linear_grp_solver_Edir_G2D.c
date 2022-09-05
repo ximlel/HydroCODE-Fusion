@@ -42,8 +42,7 @@
  *                - ifv_.t_ = -0.0: Planar-1D GRP solver
  * @remark macro definition \b EXACT_TANGENT_DERIVATIVE: \n
  *         Switch whether the tangential derivatives are accurately computed.
- * @par  Reference
- *       Theory is found in Reference [1]. \n
+ * @sa   Theory is found in Reference [1]. \n
  *       [1] 齐进, 二维欧拉方程广义黎曼问题数值建模及其应用, Ph.D Thesis, Beijing Normal University, 2017.
  */
 void linear_GRP_solver_Edir_G2D

@@ -13,7 +13,15 @@
 #include "../include/file_io.h"
 
 
-// r_or_c: 0 only count, 1 count and read.
+/**
+ * @brief  This function count out and read in 2-D data file with (line*column) data and initialize pointer to these data.
+ * @details The value of (line*column) is stored in config[3];
+ *          the value (line) number is stored in config[13];
+ *          the value (column) number is stored in config[14];
+ * @param[in]  add: Adress of the initial data file.
+ * @param[in]  fp:  Pointer to the input data file.
+ * @return  Pointer to the position of a block of memory consisting (line*column) variables* of type double.
+ */
 static double * flu_var_init(const char * add, FILE *fp)
 {
     double * sfv;
@@ -55,8 +63,9 @@ static double * flu_var_init(const char * add, FILE *fp)
 	return sfv;
 }
 
+
 /**
- * @brief Count out and read in 2-D data of the initial fluid variable 'sfv'.
+ * @brief Count out and read in 2-D data of the initial fluid variable 'sfv' using function 'flu_var_init()'.
  */
 #define STR_FLU_INI(sfv, err_exit)					\
     do {								\
@@ -82,14 +91,15 @@ static double * flu_var_init(const char * add, FILE *fp)
     } while(0)
 
 /** 
-  * @brief      This function reads the 2-D initial data file of velocity/pressure/density.
+  * @brief      This function reads the 2-D initial data file of density/velocity/pressure.
   * @details    The function initialize the extern pointer FV0.RHO/U/V/P pointing to the
-  *             position of a block of memory consisting (line*column+2) variables* of type double.
-  *             The value of first of these variables is (line) number;
-  *             The value of second of these variables is (column) number;
-  *             The following (line*column) variables are the initial value.
-  * @param[in]  name: Name of the test example.
+  *             position of a block of memory consisting (line*column) variables* of type double.
+  *             These (line*column) variables are the initial value.
+  * @param[in]  name:      Name of the test example.
+  * @param[out] N_plot:    Pointer to the number of time steps for plotting.
+  * @param[out] time_plot: Pointer to the array of the plotting time recording.
   * @return  \b FV0:  Structure of initial data array pointer.
+  * @note This function contains the function procedures 'time_plot_read()' and 'configurate()'.
   */
 struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot[])
 {

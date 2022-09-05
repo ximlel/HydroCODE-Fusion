@@ -9,9 +9,6 @@
 #include "../include/inter_process_unstruct.h"
 
 
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-
-
 #define FV_RESET_MEM(v, n)						\
     do {								\
 	FV->v = realloc(FV->v, (n) * sizeof(double));			\
@@ -134,10 +131,14 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 #endif
 
 #ifdef MULTIPHASE_BASICS
-	CP_INIT_MEM(RHO_star, num_cell);
 	CP_INIT_MEM(P_star, num_cell);
 	CP_INIT_MEM(U_qt_star, num_cell);
 	CP_INIT_MEM(V_qt_star, num_cell);
+	CP_INIT_MEM(U_qt_add_c, num_cell);
+	CP_INIT_MEM(V_qt_add_c, num_cell);
+#endif
+#ifdef MULTIPHASE_BASICS_abandoned
+	CP_INIT_MEM(RHO_star, num_cell);
 	CP_INIT_MEM(gamma_star, num_cell);
 
 	CP_INIT_MEM(RHO_minus_c, num_cell);
@@ -148,8 +149,6 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 
 	CP_INIT_MEM(RHO_add_c, num_cell);
 	CP_INIT_MEM(P_add_c, num_cell);
-	CP_INIT_MEM(U_qt_add_c, num_cell);
-	CP_INIT_MEM(V_qt_add_c, num_cell);
 	CP_INIT_MEM(gamma_add_c, num_cell);
 
 	CP_INIT_MEM(u_star, num_cell);

@@ -25,8 +25,7 @@
  * @return \b gap: Relative pressure change after the last iteration.
  * @author E. F. Toro
  * @date February 1st 1999
- * @par  Reference
- *       Theory is found in Chapter 4 of Reference [1]. \n
+ * @sa   Theory is found in Chapter 4 of Reference [1]. \n
  *       [1] Toro, E. F., "Riemann Solvers and Numerical Methods for Fluid Dynamics", 
  *           Springer-Verlag, Second Edition, 1999
  * @copyright This program is part of NUMERICA —— \n

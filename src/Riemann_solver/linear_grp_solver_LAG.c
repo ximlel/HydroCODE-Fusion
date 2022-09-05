@@ -25,8 +25,7 @@
  *              - INFINITY: acoustic approximation
  *              - eps:      GRP solver(nonlinear + acoustic case)
  *              - -0.0:     GRP solver(only nonlinear case)
- * @par  Reference
- *       Theory is found in Reference [1]. \n
+ * @sa   Theory is found in Reference [1]. \n
  *       [1] M. Ben-Artzi & J. Falcovitz, A second-order Godunov-type scheme for compressible fluid dynamics,
  *           Journal of Computational Physics, 55.1: 1-32, 1984
  */

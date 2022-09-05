@@ -1,5 +1,5 @@
 /**
- * @file  _2D_file_out.c
+ * @file  file_2D_out.c
  * @brief This is a set of functions which control the readout of two-dimensional data.
  */
 
@@ -41,14 +41,14 @@
     } while (0)
 
 /**
- * @brief This function write the 2-D solution into output .dat files.
+ * @brief This function write the 2-D solution into output '.dat' files.
  * @note  It is quite simple so there will be no more comments.
  * @param[in] n_x: The number of x-spatial points in the output data.
  * @param[in] n_y: The number of y-spatial points in the output data.
- * @param[in] N: The number of time steps in the output data.
- * @param[in] CV:  Structure of grid variable data.
- * @param[in] X: Array of the x-coordinate data.
- * @param[in] Y: Array of the y-coordinate data.
+ * @param[in] N:   The number of time steps in the output data.
+ * @param[in] CV:  Structure of variable data in computational grid cells.
+ * @param[in] X:   Array of the x-coordinate data.
+ * @param[in] Y:   Array of the y-coordinate data.
  * @param[in] cpu_time:  Array of the CPU time recording.
  * @param[in] problem:   Name of the numerical results for the test problem.
  * @param[in] time_plot: Array of the plotting time recording.
@@ -90,13 +90,13 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
 
 
 /**
- * @brief This function write the 2-D solution into Tecplot output files.
+ * @brief This function write the 2-D solution into Tecplot output files with point data.
  * @param[in] n_x: The number of x-spatial points in the output data.
  * @param[in] n_y: The number of y-spatial points in the output data.
  * @param[in] N:   The number of time steps in the output data.
- * @param[in] CV:  Structure of grid variable data.
- * @param[in] X: Array of the x-coordinate data.
- * @param[in] Y: Array of the y-coordinate data.
+ * @param[in] CV:  Structure of variable data in computational grid cells.
+ * @param[in] X:   Array of the x-coordinate data.
+ * @param[in] Y:   Array of the y-coordinate data.
  * @param[in] cpu_time:  Array of the CPU time recording.
  * @param[in] problem:   Name of the numerical results.
  * @param[in] time_plot: Array of the plotting time recording.

@@ -37,11 +37,11 @@
     } while (0)
 
 /**
- * @brief This function write the 1-D solution into output .dat files.
+ * @brief This function write the 1-D solution into output '.dat' files.
  * @note  It is quite simple so there will be no more comments.
- * @param[in] m: The number of spatial points in the output data.
- * @param[in] N: The number of time steps in the output data.
- * @param[in] CV:  Structure of grid variable data.
+ * @param[in] m:   The number of spatial points in the output data.
+ * @param[in] N:   The number of time steps in the output data.
+ * @param[in] CV:  Structure of grid variable data in computational grid cells.
  * @param[in] X[]: Array of the coordinate data.
  * @param[in] cpu_time:  Array of the CPU time recording.
  * @param[in] problem:   Name of the numerical results for the test problem.

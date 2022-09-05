@@ -10,6 +10,11 @@
 #include "../include/riemann_solver.h"
 
 
+/**
+ * @brief This function calculate Eulerian fluxes of Euler equations by Roe solver.
+ * @param[in,out] ifv: Structure pointer of interfacial evaluated variables and fluxes and left state.
+ * @param[in] ifv_R:   Structure pointer of interfacial right state.
+ */
 void Roe_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 {
 	const int dim = (int)config[0];
@@ -35,15 +40,25 @@ void Roe_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 }
 
 
+/**
+ * @brief This function calculate Eulerian fluxes of 2-D Euler equations by HLL solver.
+ * @param[in,out] ifv: Structure pointer of interfacial evaluated variables and fluxes and left state.
+ * @param[in] ifv_R:   Structure pointer of interfacial right state.
+ */
 void HLL_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 {
+	const int dim = (int)config[0];
+
 	double F[4];
 	double lambda_max;
-	HLL_2D_solver(F, &lambda_max, ifv, ifv_R);
-	ifv->F_rho = F[0];
-	ifv->F_u   = F[1];
-	ifv->F_v   = F[2];
-	ifv->F_e   = F[3];
+	if (dim == 2)
+		{
+			HLL_2D_solver(F, &lambda_max, ifv, ifv_R);
+			ifv->F_rho = F[0];
+			ifv->F_u   = F[1];
+			ifv->F_v   = F[2];
+			ifv->F_e   = F[3];
+		}
 }
 
 
@@ -51,7 +66,6 @@ void HLL_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
  * @brief This function calculate Eulerian fluxes of 2-D Euler equations by Riemann solver.
  * @param[in,out] ifv: Structure pointer of interfacial evaluated variables and fluxes and left state.
  * @param[in] ifv_R:   Structure pointer of interfacial right state.
- * @param[in] tau:     The length of the time step.
  * @return    miscalculation indicator.
  *   @retval  0: Successful calculation.
  *   @retval  1: < 0.0 error.
@@ -85,7 +99,7 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 	if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
 	    return 2;
 
-	double rho_mid = mid[0], p_mid = mid[3], u_mid = mid[1], v_mid;
+	double rho_mid = mid[0], p_mid = mid[3], u_mid = mid[1], v_mid = mid[2];
 #ifdef MULTIFLUID_BASICS
 	double phi_mid = mid[4], z_a_mid = mid[5];
 	gamma_mid = mid[1] > 0.0 ? ifv->gamma : ifv_R->gamma;
@@ -105,7 +119,7 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 			ifv->F_v   = ifv->F_rho*v_mid + p_mid*n_y;
 		}
 	ifv->F_e   = (gamma_mid/(gamma_mid-1.0))*p_mid/rho_mid + 0.5*u_mid*u_mid;
-	if (dim == 2)
+	if (dim >= 2)
 	    ifv->F_e += 0.5*v_mid*v_mid;
 	ifv->F_e = ifv->F_rho*ifv->F_e;
 
@@ -114,14 +128,12 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 	if ((_Bool)config[60])
 		ifv->F_gamma = ifv->F_rho*gamma_mid;
 	ifv->F_e_a  = z_a_mid/(config[6]-1.0)*p_mid/rho_mid + 0.5*phi_mid*u_mid*u_mid;
-	if (dim == 2)
+	if (dim >= 2)
 	    ifv->F_e_a += 0.5*phi_mid*v_mid*v_mid;
 	ifv->F_e_a  = ifv->F_rho*ifv->F_e_a;
-#endif
-	
-#ifdef MULTIFLUID_BASICS
+
 	ifv->U_qt_add_c = ifv->F_rho*u_mid*phi_mid;
-	if (dim == 2)
+	if (dim >= 2)
 	    ifv->V_qt_add_c = ifv->F_rho*v_mid*phi_mid;
 	ifv->U_qt_star  = p_mid*n_x;
 	ifv->V_qt_star  = p_mid*n_y;
@@ -214,9 +226,7 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	ifv->F_e_a = ifv->F_rho*ifv->F_e_a;	
 	ifv->PHI = mid[5] + tau*dire[5];
 	ifv->Z_a = mid[4] + tau*dire[4];
-#endif
 
-#ifdef MULTIFLUID_BASICS
 	ifv->U_qt_add_c = ifv->F_rho*u_mid*phi_mid;
 	ifv->V_qt_add_c = ifv->F_rho*v_mid*phi_mid;
 	ifv->U_qt_star  = p_mid*n_x;
