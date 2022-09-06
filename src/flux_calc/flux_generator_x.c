@@ -32,7 +32,7 @@ int flux_generator_x(const int m, const int n, const int nt, const double tau, s
 {
   double const eps = config[4];  // the largest value could be seen as zero
   double const h_x = config[10]; // the length of the initial x spatial grids
-  struct i_f_var ifv_L = {.gamma = config[6], .n_x = 1.0, .n_y = 0.0};
+  struct i_f_var ifv_L = {.n_x = 1.0, .n_y = 0.0, .gamma = config[6]};
   struct i_f_var ifv_R = ifv_L;
   int i, j, data_err;
 

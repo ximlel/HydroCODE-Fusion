@@ -184,7 +184,7 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var *ifv_L,
   {
     if((CRW[0]) && ((u_star-c_star_L) > 0.0)) // the t-axe is in a 1-CRW
     {
-      shk_spd = (rho_star_L*u_star - rho_L*u_L)/(rho_star_L - rho_L);
+      // shk_spd = (rho_star_L*u_star - rho_L*u_L)/(rho_star_L - rho_L);
 
       U[1] = zeta*(u_L+2.0*c_L/(gamma-1.0));
       U[2] = U[1]*U[1]*rho_L/gamma/pow(p_L, 1.0/gamma);
@@ -202,7 +202,7 @@ void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var *ifv_L,
     }
     else if((CRW[1]) && ((u_star+c_star_R) < 0.0)) // the t-axe is in a 3-CRW
     {
-      shk_spd = (rho_star_R*u_star - rho_R*u_R)/(rho_star_R - rho_R);
+      // shk_spd = (rho_star_R*u_star - rho_R*u_R)/(rho_star_R - rho_R);
 
       U[1] = zeta*(u_R-2.0*c_R/(gamma-1.0));
       U[2] = U[1]*U[1]*rho_R/gamma/pow(p_R, 1.0/gamma);

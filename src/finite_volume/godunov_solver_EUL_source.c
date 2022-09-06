@@ -52,28 +52,27 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
    */
   double dire[3], mid[3];
 
-  double ** RHO  = CV.RHO;
-  double ** U    = CV.U;
-  double ** P    = CV.P;
-  double ** E    = CV.E;
-  // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F_rho = malloc((m+1) * sizeof(double));
-  double * F_u   = malloc((m+1) * sizeof(double));
-  double * F_e   = malloc((m+1) * sizeof(double));
-  if(F_rho == NULL || F_u == NULL || F_e == NULL)
-      {
-	  printf("NOT enough memory! Flux\n");
-	  goto return_NULL;
-      }
-
   double nu;  // nu = tau/h
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
 
-  struct b_f_var bfv_L = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
-  struct b_f_var bfv_R = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
-  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
+  struct b_f_var bfv_L = {.SRHO = 0.0, .SP = 0.0, .SU = 0.0}, bfv_R = bfv_L; // Left/Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = ifv_L;
+
+  double ** RHO  = CV.RHO;
+  double ** U    = CV.U;
+  double ** P    = CV.P;
+  double ** E    = CV.E;
+  // the numerical flux at (x_{j-1/2}, t_{n}).
+  double * F_rho = (double*)malloc((m+1) * sizeof(double));
+  double * F_u   = (double*)malloc((m+1) * sizeof(double));
+  double * F_e   = (double*)malloc((m+1) * sizeof(double));
+  if(F_rho == NULL || F_u == NULL || F_e == NULL)
+      {
+	  printf("NOT enough memory! Flux\n");
+	  goto return_NULL;
+      }
   
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)

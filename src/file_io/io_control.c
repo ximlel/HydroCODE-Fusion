@@ -43,15 +43,15 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 	const int el    = (int)config[8];
 	const int order = (int)config[9];
 
-	char *str_tmp, str_order[11];
+	char str_tmp[11], str_order[11];
 	switch (dim)
 	    {
 	    case 1 :
-		str_tmp = "one-dim/";   break;
+		strcpy(str_tmp, "one-dim/");   break;
 	    case 2 :
-		str_tmp = "two-dim/";   break;
+		strcpy(str_tmp, "two-dim/");   break;
 	    case 3 :
-		str_tmp = "three-dim/"; break;
+		strcpy(str_tmp, "three-dim/"); break;
 	    default :
 		fprintf(stderr, "Strange computational dimension!\n");
 		exit(2);
@@ -63,11 +63,11 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 			switch (el)
 			    {
 			    case 0 :
-				str_tmp = "EUL_"; break;
+				strcpy(str_tmp, "EUL_"); break;
 			    case 1 :
-				str_tmp = "LAG_"; break;
+				strcpy(str_tmp, "LAG_"); break;
 			    case 2 :
-				str_tmp = "ALE_"; break;
+				strcpy(str_tmp, "ALE_"); break;
 			    default :
 				fprintf(stderr, "Strange description method of fluid motion!\n");
 				exit(2);
@@ -250,6 +250,21 @@ int flu_var_read(FILE * fp, double * U, const int num)
 
 
 /**
+ * @brief Compare function of double for sort function 'qsort()'.
+ */
+static int compare_double(const void *a,const void *b)
+{
+    double ret = *(double*)a - *(double*)b;
+    if(ret > 0.0)
+	return 1;
+    else if(ret < 0.0)
+	return -1;
+    else
+	return 0;
+}
+
+
+/**
  * @brief This function reads the time data file for plotting 'time_plot.dat' and 
  *        initialize tha array 'time_plot[]'.
  * @param[in]  add_in:    Adress of the initial data folder of the test example.
@@ -283,7 +298,7 @@ void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
 	    fclose(fp);
 	    exit(2);
 	}
-    *time_plot = calloc(*N_plot, sizeof(double));
+    *time_plot = (double*)calloc(*N_plot, sizeof(double));
     if(*time_plot == NULL)
 	{
 	    printf("NOT enough memory! time_plot[]\n");
@@ -297,9 +312,11 @@ void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
 		    exit(2);
 		}
 	    printf("Load time data file for plotting! Plot time step is %d.\n", *N_plot - 1);
-	    *N_plot = 2;
+	    qsort(*time_plot, *N_plot, sizeof(double), compare_double);
 	    fclose(fp);
 	}
+    else
+	(*time_plot)[1] = config[1];
 }
 
 

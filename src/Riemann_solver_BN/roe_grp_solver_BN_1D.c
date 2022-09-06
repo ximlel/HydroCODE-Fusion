@@ -230,7 +230,7 @@ if (U_all[1]/U_all[0]>1.1)
    for(int j=0; j<7; j++)
     {
       D_U_S[i] += R[i][j]*D_W_S[j];
-      T_U_S[i] += R[i][j]*T_W_S[j];
+      // T_U_S[i] += R[i][j]*T_W_S[j];
     }
  double d_v_g_S, d_v_l_S;
  // double t_v_g_S, t_v_l_S;

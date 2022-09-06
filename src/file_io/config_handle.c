@@ -275,7 +275,7 @@ void config_write(const char * add_out, const double * cpu_time, const char * na
       }
   fprintf(fp_write, "\nA total of %d time steps are computed.\n", (int)config[5]);
   /*
-  double * sum = calloc(N, sizeof(double));
+  double * sum = (double*)calloc(N, sizeof(double));
   sum[0] = 0.0;
   fprintf(fp_write, "CPU time for each step:");
   for(k = 1; k < N; ++k)

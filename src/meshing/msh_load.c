@@ -41,8 +41,8 @@ static int msh_border_build(struct mesh_var * mv, int num_bc_all)
 			return 0;
 		}
 
-	mv->border_pt = malloc((num_border+1)* sizeof(int));
-	mv->border_cond = malloc(num_border* sizeof(int));
+	mv->border_pt   = (int*)malloc((num_border+1)* sizeof(int));
+	mv->border_cond = (int*)malloc(num_border* sizeof(int));
 
 	int  * bp = mv->border_pt;
 	int ** cp = mv->cell_pt;
@@ -177,9 +177,9 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 					if (num_of > 0)
 						{
 							mv->num_pt = num_of;
-							idx_N = malloc(mv->num_pt * sizeof(double));
-							mv->X = malloc(mv->num_pt * sizeof(double));
-							mv->Y = malloc(mv->num_pt * sizeof(double));
+							idx_N = (int*)   malloc(mv->num_pt * sizeof(int));
+							mv->X = (double*)malloc(mv->num_pt * sizeof(double));
+							mv->Y = (double*)malloc(mv->num_pt * sizeof(double));
 							if(mv->X == NULL || mv->Y == NULL)
 								{
 									printf("Not enough memory in msh_read!\n");
@@ -190,8 +190,8 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 			else if (s_now == 2)
 				{
 					idx_N[--num_of] = strtol(headptr, &headptr, 10);
-					mv->X[num_of] = strtod(headptr, &headptr);
-					mv->Y[num_of] = strtod(headptr, &headptr);
+					mv->X[num_of]   = strtod(headptr, &headptr);
+					mv->Y[num_of]   = strtod(headptr, &headptr);
 				}
 			else if (s_now == 3 && num_of <= 0 && idx_N != NULL)
 				{
@@ -202,8 +202,8 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 					num_cell = 0;
 					num_border = 0;
 					num_bc_all = num_of;
-					mv->cell_type = malloc(num_bc_all * sizeof(int));
-					mv->cell_pt = malloc(num_bc_all * sizeof(void *));
+					mv->cell_type = (int*) malloc(num_bc_all * sizeof(int));
+					mv->cell_pt   = (int**)malloc(num_bc_all * sizeof(int *));
 					if(mv->cell_type == NULL || mv->cell_pt == NULL)
 						{
 							fprintf(stderr, "Not enough memory in msh_read!\n");
@@ -246,7 +246,7 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 						n_c++;
 
 
-					mv->cell_pt[n_bc] = malloc((n_c+1) * sizeof(int));
+					mv->cell_pt[n_bc] = (int*)malloc((n_c+1) * sizeof(int));
 					if(mv->cell_pt[n_bc] == NULL)
 						{
 							fprintf(stderr, "Not enough memory in msh_read!\n");

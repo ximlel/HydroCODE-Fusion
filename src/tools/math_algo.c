@@ -51,8 +51,8 @@ int rinv(double a[], const int n)
 {
 	int *is,*js,i,j,k,l,u,v;
     double d,p;
-    is=malloc(n*sizeof(int));
-    js=malloc(n*sizeof(int));
+    is=(int*)malloc(n*sizeof(int));
+    js=(int*)malloc(n*sizeof(int));
     for (k=0; k<=n-1; k++)
 		{
 			d=0.0;

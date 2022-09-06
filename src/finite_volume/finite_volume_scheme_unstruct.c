@@ -14,14 +14,15 @@
 
 void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const char * scheme, const char * problem)
 {
-	clock_t start_clock;
-	double cpu_time = 0.0;
-
 	const int dim      = (int)config[0];
 	const int num_cell = (int)config[3];
 	const int el       = (int)config[8];
 	const int order    = (int)config[9];
-	const double eps = config[4];
+	const double eps   =      config[4];
+
+	clock_t start_clock;
+	double cpu_time = 0.0;
+
 	int ** cp = mv->cell_pt;
 
 	struct cell_var cv = cell_mem_init(mv, FV);
@@ -173,7 +174,6 @@ void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const
 */
 						}
 				}
-			start_clock = clock();
 
 			if (stop_step != 1)
 				{

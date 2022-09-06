@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS = -std=c99 -Wall -pedantic -O4 -g -pg
 #C compiler options
-CFLAGD = -DNODATPLOT
+CFLAGD = -DNODATPLOT #-D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -28,7 +28,7 @@ modules:
 #Enter each subdirectory
 #Call the Makefile in the subdirectory
 	@for n in $(HEAD); do \
-	( $(MAKE) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
+	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
 	done;
 .PHONYP:modules
 

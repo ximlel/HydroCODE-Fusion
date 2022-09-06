@@ -248,11 +248,12 @@ int main(int argc, char *argv[])
      */
   const int n_x = (int)config[13], n_y = (int)config[14];
   const double h_x = config[10], h_y = config[11], gamma = config[6];
+  const _Bool dim_split = (_Bool)config[33]; // Dimensional splitting?
 
   // Structure of fluid variables in computational cells array pointer.
-  struct cell_var_stru * CV = malloc(N * sizeof(struct cell_var_stru));
+  struct cell_var_stru * CV = (struct cell_var_stru*)malloc(N * sizeof(struct cell_var_stru));
   double ** X, ** Y;
-  double * cpu_time = malloc(N * sizeof(double));
+  double * cpu_time = (double *)malloc(N * sizeof(double));
   X = (double **)malloc((n_x+1) * sizeof(double *));
   Y = (double **)malloc((n_x+1) * sizeof(double *));
   if(cpu_time == NULL)
@@ -309,7 +310,6 @@ int main(int argc, char *argv[])
 	      CV[0].E[j][i]  += 0.5*CV[0].V[j][i]*CV[0].V[j][i];
 	  }
 
-  _Bool const dim_split = (_Bool)config[33]; // Dimensional splitting?
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;

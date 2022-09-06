@@ -51,13 +51,21 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
   _Bool CRW[2]; // Centred Rarefaction Wave (CRW) Indicator
   double u_star, p_star; // the Riemann solutions
 
+  double h_S_max; // h/S_max, S_max is the maximum wave speed
+  double time_c = 0.0; // the current time
+  double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
+  int nt = 1; // the number of times storing plotting data
+
+  struct b_f_var bfv_L = {.H = h}, bfv_R = bfv_L; // Left/Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = ifv_L;
+
   double ** RHO  = CV.RHO;
   double ** U    = CV.U;
   double ** P    = CV.P;
   double ** E    = CV.E;
-  double * U_F  = malloc((m+1) * sizeof(double));
-  double * P_F  = malloc((m+1) * sizeof(double));
-  double * MASS = malloc(m * sizeof(double)); // Array of the mass data in computational cells.
+  double * U_F  = (double*)malloc((m+1) * sizeof(double));
+  double * P_F  = (double*)malloc((m+1) * sizeof(double));
+  double * MASS = (double*)malloc(m * sizeof(double)); // Array of the mass data in computational cells.
   if(U_F == NULL || P_F == NULL || MASS == NULL)
       {
 	  printf("NOT enough memory! Variables_F or MASS\n");
@@ -65,15 +73,6 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
       }
   for(k = 0; k < m; ++k) // Initialize the values of mass in computational cells
       MASS[k] = h * RHO[0][k];
-
-  double h_S_max; // h/S_max, S_max is the maximum wave speed
-  double time_c = 0.0; // the current time
-  double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
-  int nt = 1; // the number of times storing plotting data
-
-  struct b_f_var bfv_L = {.H = h}; // Left  boundary condition
-  struct b_f_var bfv_R = {.H = h}; // Right boundary condition
-  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
   
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)

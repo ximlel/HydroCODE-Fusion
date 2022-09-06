@@ -141,14 +141,22 @@ int main(int argc, char *argv[])
     for (k = 0; k < argc; k++)
 	printf("%s ", argv[k]);
     printf("\n");
+#ifdef _WIN32
     printf("TEST:\n  %s\n", argv[1]);
+#elif __linux__
+	printf("\x1b[0;34mTEST:\n  %s\x1b[0m\n", argv[1]);
+#endif
     if(argc < 5)
 	{
 	    printf("Test Beginning: ARGuments Counter %d is less than 5.\n", argc);
 	    return 4;
 	}
     else
+#ifdef _WIN32
 	printf("Test Beginning: ARGuments Counter = %d.\n", argc);
+#elif __linux__
+	printf("\x1b[47;30mTest Beginning: ARGuments Counter = %d.\x1b[0m\n", argc);
+#endif
 
     // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
@@ -164,7 +172,26 @@ int main(int argc, char *argv[])
 	}
     config[0] = (double)dim;
 
-    printf("Configurating:\n");
+  // Set order and scheme.
+  int order; // 1, 2
+  char * scheme; // Riemann_exact(Godunov), GRP
+  printf("Order[_Scheme]: %s\n",argv[4]);
+  errno = 0;
+  order = strtoul(argv[4], &scheme, 10);
+  if (*scheme == '_')
+      scheme++;
+  else if (*scheme != '\0' || errno == ERANGE)
+      {
+	  printf("No order or Wrog scheme!\n");
+	  return 4;
+      }
+  config[9] = (double)order;
+
+#ifdef _WIN32
+	printf("Configurating:\n");
+#elif __linux__
+	printf("\x1b[0;42mConfigurating:\x1b[0m\n");
+#endif
     char * endptr;
     double conf_tmp;
     for (k = 6; k < argc; k++)
@@ -193,21 +220,6 @@ int main(int argc, char *argv[])
 		    return 4;
 		}
 	}
-	
-  // Set order and scheme.
-  int order; // 1, 2
-  char * scheme; // Riemann_exact(Godunov), GRP
-  printf("Order[_Scheme]: %s\n",argv[4]);
-  errno = 0;
-  order = strtoul(argv[4], &scheme, 10);
-  if (*scheme == '_')
-      scheme++;
-  else if (*scheme != '\0' || errno == ERANGE)
-      {
-	  printf("No order or Wrog scheme!\n");
-	  return 4;
-      }
-  config[9] = (double)order;
 
   // The number of times steps of the fluid data stored for plotting.
   int N; // (int)(config[5]) + 1;
@@ -231,7 +243,7 @@ int main(int argc, char *argv[])
 
   struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
   double ** X = NULL;
-  double * cpu_time = malloc(N * sizeof(double));
+  double * cpu_time = (double *)malloc(N * sizeof(double));
   X = (double **)malloc(N * sizeof(double *));
   if(cpu_time == NULL)
       {

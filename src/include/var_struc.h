@@ -12,6 +12,11 @@
  * @brief Switch whether to compute multi-fluids.
  */
 #define MULTIFLUID_BASICS
+/**
+ * @def LAGRANGIAN_MAIRE
+ * @brief Switch whether to use Maire's cell-centered schemes for Lagrangian hydrodynamics.
+ */
+#define LAGRANGIAN_MAIRE
 #endif
 
 //! If the system does not set, the default largest value can be seen as zero is EPS.
@@ -54,18 +59,24 @@ typedef struct cell_var_stru {
 
 //! pointer structure of VARiables on unstructured computational grid CELLs.
 typedef struct cell_var {
-	int    **cell_cell;
+	/**
+	 * @brief Topological relationships between grid cells.
+	 *  @arg  cell_cell[i][0], number of cells adjacent to the i-th cell.
+	 *  @arg  cell_cell[i][j](j>0), serial number of j-th adjacent cell to the i-th cell.
+	 */
+	int    **cell_cell;  
+	double * vol;        //!< area(volume) of each grid cell.
 	double **n_x, **n_y; //!< x- and y-coordinates of the interfacial unit normal vector.
 	double * X_c, * Y_c; //!< x- and y-coordinates of the center point of grid cells.
 	double **   F_rho, **   F_e, **   F_u, **   F_v; //!< interfacial fluxes.
 	double *    U_rho, *    U_e, *    U_u, *    U_v; //!< conservative variables.
+	double **   RHO_p, **   U_p, **   V_p, **   P_p;
 	double *gradx_rho, *gradx_e, *gradx_u, *gradx_v; //!< spatial derivatives in coordinate x (gradients).
 	double *grady_rho, *grady_e, *grady_u, *grady_v; //!< spatial derivatives in coordinate y (gradients).
 #ifdef MULTIFLUID_BASICS
-	double                       *gradx_z_a,   *grady_z_a;   //!< Volume fraction of fluid a.
-	double **F_phi,   * U_phi,   *gradx_phi,   *grady_phi;   //!< Mass fraction of fluid a.
-	double **F_gamma, * U_gamma, *gradx_gamma, *grady_gamma; //!< Specific heat ratio.
-	double **F_e_a,   * U_e_a;                               //!< Total energy of fluid a.
+	double **F_e_a,   *U_e_a,   **Z_a_p,   *gradx_z_a,   *grady_z_a;   //!< Total energy OR volume fraction of fluid a.
+	double **F_phi,   *U_phi,   **PHI_p,   *gradx_phi,   *grady_phi;   //!< Mass fraction of fluid a.
+	double **F_gamma, *U_gamma, **gamma_p, *gradx_gamma, *grady_gamma; //!< Specific heat ratio.
 	double **P_star;
 	double **U_qt_star,  **V_qt_star;
 	double **U_qt_add_c, **V_qt_add_c;
@@ -76,11 +87,10 @@ typedef struct cell_var {
 	double **RHO_add_c,   **gamma_add_c,   **P_add_c;
 	double **u_star, **u_minus_c, **u_add_c;
 #endif
-#ifdef Maire
-	double **RHO_p, **U_p, **V_p, **P_p, **PHI_p, **gamma_p, **Z_a_p;
-	double  **F_p_x,  **F_p_y;
+#ifdef LAGRANGIAN_MAIRE
+	double **F_p_x,  **F_p_y;
 	double **dt_U_p, **dt_V_p, **dt_F_p_x, **dt_F_p_y;
-	double *vol, *c, *dist_p;
+	double  *c, *dist_p;
 #endif
 } Cell_Variable;
 
@@ -90,18 +100,17 @@ typedef struct i_f_var {
 	double delta_x, delta_y;             //!< distance from the interfacial center to the grid cell center in direction x and y.
 	double length;                       //!< length of the interface.
 	double lambda_u, lambda_v;           //!< grid moving velocity components in direction x and y.
+	double gamma;                        //!< specific heat ratio.
 	double RHO,     P,     U,     V;     //!< primitive variable values at t_{n}.
 	double RHO_int, P_int, U_int, V_int; //!< interfacial primitive variables at t_{n+1}.
 	double F_rho, F_e, F_u, F_v;         //!< interfacial fluxes at t_{n+1/2}.
 	double U_rho, U_e, U_u, U_v;         //!< interfacial conservative variables at t_{n}.
 	double d_rho, d_e, d_u, d_v, d_p;    //!< normal spatial derivatives.
 	double t_rho, t_e, t_u, t_v, t_p;    //!< tangential spatial derivatives OR spatial derivatives in Lagrangian coordinate ξ.
-	double gamma;                        //!< specific heat ratio.
 #ifdef MULTIFLUID_BASICS
-	double Z_a, d_z_a,   t_z_a;                     //!< Volume fraction of fluid a.
+	double Z_a, d_z_a,   t_z_a,   F_e_a,   U_e_a;   //!< Volume fraction OR total energy of fluid a.
 	double PHI, d_phi,   t_phi,   F_phi,   U_phi;   //!< Mass fraction of fluid a.
 	double      d_gamma, t_gamma, F_gamma, U_gamma; //!< Specific heat ratio.
-	double                        F_e_a,   U_e_a;   //!< Total energy of fluid a.
 	double P_star;
 	double U_qt_star,  V_qt_star;
 	double U_qt_add_c, V_qt_add_c;
@@ -116,17 +125,34 @@ typedef struct i_f_var {
 
 //! Fluid VARiables at Boundary in one direction.
 typedef struct b_f_var {
-	double  RHO,  P,  U,  V,  H;  //!< H is the grid cell width.
-	double SRHO, SP, SU, SV;      //!< spatial derivatives in coordinate x (slopes).
-	double TRHO, TP, TU, TV;      //!< spatial derivatives in coordinate y (slopes).
+	double    H;              //!< cell width of the ghost grid at boundary.
+	double  RHO,  P,  U,  V;  //!< primitive variables on the ghost grid cell at boundary.
+	double SRHO, SP, SU, SV;  //!< spatial derivatives in coordinate x (slopes).
+	double TRHO, TP, TU, TV;  //!< spatial derivatives in coordinate y (slopes).
 } Boundary_Fluid_Variable;
 
 //! MESHing VARiables.
 typedef struct mesh_var {
-	int num_pt, num_ghost, *cell_type, **cell_pt;
-	int num_border[10], *border_pt, *border_cond, *peri_cell;
-	double *normal_v;
-	double *X, *Y;
+	int num_pt;      //!< Total number of grid nodes.
+	int num_ghost;   //!< Total number of ghost grid cells.
+	int *cell_type;  //!< @todo Grid cell type read from mesh file '*.msh' 
+	int **cell_pt;   //!< Serial number of each grid node on a grid cell in the clockwise direction.
+	/**
+	 * @brief num_border[0] is the total number of connected boundaries on the entire computational domain.
+	 * @details num_border[i](i = 1,2,…,9) is the total number of grid cell interfaces at the i-th connected boundary.
+	 */
+	int num_border[10]; 
+	int *border_pt;   //!< Serial number of each grid node on the connected boundary in the clockwise direction.
+	/**
+	 * @brief Boudary condition indicator of i-th grid cell interface at the boundary.
+	 *  @arg  border_cond[i] < 0, refer to 'config[17]' in'doc/config.csv'.
+	 *  @arg  border_cond[i] > 0, serial number of the ghost grid cell at the periodic boundary is i.
+	 */
+	int *border_cond;
+	int *peri_cell;   //!< Serial number of ghost grid cells at the periodic boundary.
+	double *normal_v; //!< @todo Normal velocity on grid cell interfaces at the boundary.
+	double *X, *Y;    //!< x- and y-coordinates of the grid nodes with fixed serial number.
+	//! Pointer to the boundary condition function.
 	void (*bc)(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, double t);
 } Mesh_Variable;
 

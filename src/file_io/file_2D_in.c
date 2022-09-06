@@ -49,7 +49,7 @@ static double * flu_var_init(const char * add, FILE *fp)
 	    printf(" line=%d, n_y=%d.\n", line, (int)config[14]);
 	    exit(2);
 	}
-    sfv = malloc(num_cell * sizeof(double));
+    sfv = (double*)malloc(num_cell * sizeof(double));
     if(sfv == NULL)
 	{
 	    printf("NOT enough memory! %s\n", add);
@@ -98,7 +98,7 @@ static double * flu_var_init(const char * add, FILE *fp)
   * @param[in]  name:      Name of the test example.
   * @param[out] N_plot:    Pointer to the number of time steps for plotting.
   * @param[out] time_plot: Pointer to the array of the plotting time recording.
-  * @return  \b FV0:  Structure of initial data array pointer.
+  * @return  \b FV0:  Structure of initial fluid variable data array pointer.
   * @note This function contains the function procedures 'time_plot_read()' and 'configurate()'.
   */
 struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot[])
@@ -108,8 +108,6 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
     char add_in[FILENAME_MAX+40]; 
     // Get the address of the initial data folder of the test example.
     example_io(name, add_in, 1);
-
-    time_plot_read(add_in, N_plot, time_plot);
     
     /* 
      * Read the configuration data.
@@ -121,6 +119,8 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
     printf("  delta_y\t= %g\n", config[11]);
     printf("  bondary_x\t= %d\n", (int)config[17]);
     printf("  bondary_y\t= %d\n", (int)config[18]);
+
+    time_plot_read(add_in, N_plot, time_plot);
 
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
     FILE * fp;      // The pointer to the above data files.

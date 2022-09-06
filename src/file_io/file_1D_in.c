@@ -44,7 +44,7 @@
 		printf("Input unequal! num_%s=%d, num_cell=%d.\n", #sfv, num_cell, (int)config[3]); \
 		exit(2);						\
 	    }								\
-	FV0.sfv = malloc(num_cell * sizeof(double));			\
+	FV0.sfv = (double*)malloc(num_cell * sizeof(double));			\
 	if(FV0.sfv == NULL)						\
 	    {								\
 		printf("NOT enough memory! %s\n", #sfv);		\
@@ -67,7 +67,7 @@
   * @param[in]  name:      Name of the test example.
   * @param[out] N_plot:    Pointer to the number of time steps for plotting.
   * @param[out] time_plot: Pointer to the array of the plotting time recording.
-  * @return  \b FV0:  Structure of initial data array pointer.
+  * @return  \b FV0:  Structure of initial fluid variable data array pointer.
   * @note This function contains the function procedures 'time_plot_read()' and 'configurate()'.
   */
 struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot[])
@@ -77,7 +77,6 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
     char add_in[FILENAME_MAX+40]; 
     // Get the address of the initial data folder of the test example.
     example_io(name, add_in, 1);
-    time_plot_read(add_in, N_plot, time_plot);
     
     /* 
      * Read the configuration data.
@@ -87,7 +86,9 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
     configurate(add_in);
     printf("  delta_x\t= %g\n", config[10]);
     printf("  bondary\t= %d\n", (int)config[17]);
-  
+
+    time_plot_read(add_in, N_plot, time_plot);
+
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
     FILE * fp;    // The pointer to the above data files.
     int num_cell; // The number of the numbers in the above data files.

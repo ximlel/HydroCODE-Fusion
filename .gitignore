@@ -84,6 +84,10 @@ dkms.conf
 pg
 pg.png
 
+# Valgrind
+callgrind.out.*
+callgrind.png
+
 # =====================MATLAB/Octave project=================
 
 # mexFunction

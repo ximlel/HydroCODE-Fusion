@@ -86,6 +86,12 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 
   double mom_x, mom_y, ene;
   double c; // the speeds of sound
+
+  double half_tau, half_nu, mu;  // nu = tau/h_x, mu = tau/h_y.
+
+  double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
+  double time_c = 0.0; // the current time
+  int nt = 1; // the number of times storing plotting data
   
   // Left/Right/Upper/Downside boundary condition
   struct b_f_var * bfv_L = NULL, * bfv_R = NULL, * bfv_U = NULL, * bfv_D = NULL;
@@ -115,12 +121,6 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   // boundary condition
   BC_INIT_MEM_1D(bfv_L, n); BC_INIT_MEM_1D(bfv_R, n);
   BC_INIT_MEM_1D(bfv_D, m); BC_INIT_MEM_1D(bfv_U, m);
-  
-  double half_tau, half_nu, mu;  // nu = tau/h_x, mu = tau/h_y.
-
-  double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
-  double time_c = 0.0; // the current time
-  int nt = 1; // the number of times storing plotting data
 
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; ++k)

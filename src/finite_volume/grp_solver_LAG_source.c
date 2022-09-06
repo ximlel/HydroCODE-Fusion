@@ -57,31 +57,39 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
    */
   double dire[4], mid[4];
 
+  double h_S_max; // h/S_max, S_max is the maximum wave speed
+  double time_c = 0.0; // the current time
+  double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
+  int nt = 1; // the number of times storing plotting data
+
+  struct b_f_var bfv_L = {.H = h, .SRHO = 0.0, .SP = 0.0, .SU = 0.0}, bfv_R = bfv_L; // Left/Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = ifv_L;
+
   double ** RHO  = CV.RHO;
   double ** U    = CV.U;
   double ** P    = CV.P;
   double ** E    = CV.E;
   // the slopes of variable values
-  double * s_rho = calloc(m, sizeof(double));
-  double * s_u   = calloc(m, sizeof(double));
-  double * s_p   = calloc(m, sizeof(double));
+  double * s_rho = (double*)calloc(m, sizeof(double));
+  double * s_u   = (double*)calloc(m, sizeof(double));
+  double * s_p   = (double*)calloc(m, sizeof(double));
   CV.d_rho = s_rho;
   CV.d_u   = s_u;
   CV.d_p   = s_p;
   // the variable values at (x_{j-1/2}, t_{n+1}).
-  double * U_next     = malloc((m+1) * sizeof(double));
-  double * P_next     = malloc((m+1) * sizeof(double));
-  double * RHO_next_L = malloc((m+1) * sizeof(double));
-  double * RHO_next_R = malloc((m+1) * sizeof(double));
+  double * U_next     = (double*)malloc((m+1) * sizeof(double));
+  double * P_next     = (double*)malloc((m+1) * sizeof(double));
+  double * RHO_next_L = (double*)malloc((m+1) * sizeof(double));
+  double * RHO_next_R = (double*)malloc((m+1) * sizeof(double));
   // the temporal derivatives at (x_{j-1/2}, t_{n}).
-  double * U_t     = malloc((m+1) * sizeof(double));
-  double * P_t     = malloc((m+1) * sizeof(double));
-  double * RHO_t_L = malloc((m+1) * sizeof(double));
-  double * RHO_t_R = malloc((m+1) * sizeof(double));
+  double * U_t     = (double*)malloc((m+1) * sizeof(double));
+  double * P_t     = (double*)malloc((m+1) * sizeof(double));
+  double * RHO_t_L = (double*)malloc((m+1) * sizeof(double));
+  double * RHO_t_R = (double*)malloc((m+1) * sizeof(double));
   // the numerical flux at (x_{j-1/2}, t_{n+1/2}).
-  double * U_F  = malloc((m+1) * sizeof(double));
-  double * P_F  = malloc((m+1) * sizeof(double));
-  double * MASS = malloc(m * sizeof(double)); // Array of the mass data in computational cells.
+  double * U_F  = (double*)malloc((m+1) * sizeof(double));
+  double * P_F  = (double*)malloc((m+1) * sizeof(double));
+  double * MASS = (double*)malloc(m * sizeof(double)); // Array of the mass data in computational cells.
   if(s_rho == NULL || s_u == NULL || s_p == NULL)
       {
 	  printf("NOT enough memory! Slope\n");
@@ -105,15 +113,6 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
   for(k = 0; k < m; ++k) // Initialize the values of mass in computational cells
       MASS[k] = h * RHO[0][k];
 
-  double h_S_max; // h/S_max, S_max is the maximum wave speed
-  double time_c = 0.0; // the current time
-  double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
-  int nt = 1; // the number of times storing plotting data
-
-  struct b_f_var bfv_L = {.H = h, .SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
-  struct b_f_var bfv_R = {.H = h, .SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
-  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
-  
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {

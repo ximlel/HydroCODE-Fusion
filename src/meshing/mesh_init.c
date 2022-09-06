@@ -8,7 +8,10 @@
 #include "../include/meshing.h"
 
 
-
+/**
+ * @brief This function 
+ * @param[in] mv: Structure of meshing variable data.
+ */
 static void cell_pt_clockwise(const struct mesh_var * mv)
 {
 	const int num_cell = mv->num_ghost + (int)config[3];
@@ -45,7 +48,7 @@ static void cell_pt_clockwise(const struct mesh_var * mv)
 			p_p=cp[k][n_max+1];
 			p_n=cp[k][n_max-1];
 		    }
-			
+
 		if ((X[p_p]-X[p])*(Y[p_n]-Y[p]) - (Y[p_p]-Y[p])*(X[p_n]-X[p]) < 0.0)
 		    for(int j = 1; j < cp[k][0]/2; j++)
 			{
@@ -58,7 +61,7 @@ static void cell_pt_clockwise(const struct mesh_var * mv)
 
 
 struct mesh_var mesh_load(const char *example, const char *mesh_name)
-{	
+{
 	struct mesh_var mv = {0, 0, NULL, NULL, {1}, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 	char add_mkdir[FILENAME_MAX];
@@ -83,7 +86,7 @@ struct mesh_var mesh_load(const char *example, const char *mesh_name)
 			    return mv;
 			}
 		}
-		
+
 	if (strcmp(mesh_name,"Sod") == 0)
 	    Sod_mesh(&mv);
 	else if (strcmp(mesh_name,"Shear") == 0)

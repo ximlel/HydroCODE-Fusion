@@ -68,10 +68,10 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 					cv->U_rho[k] += - tau*cv->F_rho[k][j] * length / cv->vol[k];
 					cv->U_e[k]   += - tau*cv->F_e[k][j]   * length / cv->vol[k];	
 					cv->U_u[k]   += - tau*cv->F_u[k][j]   * length / cv->vol[k];
-					U_u_a += - tau*(cv->U_qt_add_c[k][j] + Z_a*cv->U_qt_star[k][j]) * length / cv->vol[k];
 					cv->U_v[k] += - tau*cv->F_v[k][j] * length / cv->vol[k];
-					U_v_a += - tau*(cv->V_qt_add_c[k][j] + Z_a*cv->V_qt_star[k][j]) * length / cv->vol[k];
 #ifdef MULTIFLUID_BASICS
+					U_u_a += - tau*(cv->U_qt_add_c[k][j] + Z_a*cv->U_qt_star[k][j]) * length / cv->vol[k];
+					U_v_a += - tau*(cv->V_qt_add_c[k][j] + Z_a*cv->V_qt_star[k][j]) * length / cv->vol[k];
 					cv->U_e_a[k] += - tau*(cv->F_e_a[k][j] + Z_a*cv->P_star[k][j]) * length / cv->vol[k];
 					cv->U_phi[k] += - tau*cv->F_phi[k][j] * length / cv->vol[k];
 #endif

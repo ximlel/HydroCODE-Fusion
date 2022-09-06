@@ -11,7 +11,7 @@
 
 #define FV_RESET_MEM(v, n)						\
     do {								\
-	FV->v = realloc(FV->v, (n) * sizeof(double));			\
+	FV->v = (double *)realloc(FV->v, (n) * sizeof(double));			\
 	if(FV->v == NULL)						\
 	    {								\
 		fprintf(stderr, "Not enough memory in fluid var init!\n"); \
@@ -22,7 +22,7 @@
 
 #define CV_INIT_MEM(v, n)						\
     do {								\
-	cv.v = calloc(n, sizeof(double));				\
+	cv.v = (double *)calloc(n, sizeof(double));				\
 	if(cv.v == NULL)						\
 	    {								\
 		fprintf(stderr, "Not enough memory in cell var init!\n"); \
@@ -32,7 +32,7 @@
 
 #define CP_INIT_MEM(v, n)						\
     do {								\
-	cv.v = malloc((n) * sizeof(void *));				\
+	cv.v = (double **)malloc((n) * sizeof(double *));				\
 	if(cv.v == NULL)						\
 	    {								\
 		fprintf(stderr, "Not enough memory in cell var init!\n"); \
@@ -43,7 +43,7 @@
 
 #define CP_INIT_MEM_INT(v, n)						\
     do {								\
-	cv.v = malloc((n) * sizeof(void *));				\
+	cv.v = (int **)malloc((n) * sizeof(int *));				\
 	if(cv.v == NULL)						\
 	    {								\
 		fprintf(stderr, "Not enough memory in cell var init!\n"); \
@@ -52,12 +52,20 @@
 	init_mem_int(cv.v, n, mv->cell_pt);				\
     } while (0)								\
 
+
+/**
+ * @brief Initialize memory for variables on the grid cell in newly defined struct 'cv'
+ *        and reset memory for initial data in struct 'FV' passed in the function.
+ * @param[in] FV: Structure of initial fluid variable data array pointer.
+ * @param[in] mv: Structure of meshing variable data.
+ * @return \b cv: Structure of grid variable data in computational grid cells.
+ */
 struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 {
 	const int order = (int)config[9];
 	const int num_cell_ghost = mv->num_ghost + (int)config[3];
 	const int num_cell = (int)config[3];
-	
+
 	struct cell_var cv;
 
 	CP_INIT_MEM_INT(cell_cell, num_cell_ghost);
@@ -82,10 +90,9 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 
 	CP_INIT_MEM(U_p,   num_cell_ghost);
 	CP_INIT_MEM(V_p,   num_cell_ghost);
-	CP_INIT_MEM(P_p,   num_cell);
 	CP_INIT_MEM(RHO_p, num_cell);
-	CP_INIT_MEM(F_p_x, num_cell);
-	CP_INIT_MEM(F_p_y, num_cell);
+	CP_INIT_MEM(P_p,   num_cell);
+
 	if (order > 1)
 		{
 			CV_INIT_MEM(gradx_rho, num_cell_ghost);
@@ -96,11 +103,6 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 			CV_INIT_MEM(grady_u,   num_cell_ghost);
 			CV_INIT_MEM(gradx_v,   num_cell_ghost);
 			CV_INIT_MEM(grady_v,   num_cell_ghost);
-
-			CP_INIT_MEM(dt_U_p,    num_cell_ghost);
-			CP_INIT_MEM(dt_V_p,    num_cell_ghost);
-			CP_INIT_MEM(dt_F_p_x,  num_cell);
-			CP_INIT_MEM(dt_F_p_y,  num_cell);
 		}
 
 #ifdef MULTIPHASE_BASICS
@@ -155,6 +157,16 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 	CP_INIT_MEM(u_minus_c, num_cell);
 	CP_INIT_MEM(u_add_c, num_cell);
 #endif
+
+#ifdef LAGRANGIAN_MAIRE
+	CP_INIT_MEM(F_p_x, num_cell);
+	CP_INIT_MEM(F_p_y, num_cell);
+	CP_INIT_MEM(dt_U_p,    num_cell_ghost);
+	CP_INIT_MEM(dt_V_p,    num_cell_ghost);
+	CP_INIT_MEM(dt_F_p_x,  num_cell);
+	CP_INIT_MEM(dt_F_p_y,  num_cell);
+#endif
+
 	return cv;
 	
  return_NULL:
@@ -162,12 +174,16 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 }
 
 
-//Calculate volume.
+/**
+ * @brief Compute the area(volume) of each grid cell and store it in array 'cv->vol[]'.
+ * @param[in,out] cv: Structure of grid variable data in computational grid cells.
+ * @param[in]     mv: Structure of meshing variable data.
+ */
 void vol_comp(const struct cell_var * cv, const struct mesh_var * mv)
 {
 	const int num_cell = mv->num_ghost + (int)config[3];
 	int **cp = mv->cell_pt;
-	
+
 	int p_p, p_n;
 
 	for(int k = 0; k < num_cell; k++)
@@ -191,12 +207,15 @@ void vol_comp(const struct cell_var * cv, const struct mesh_var * mv)
 }
 
 
-
-//Determine the normal direction and relationship between cells.
+/**
+ * @brief Determine normal directions ('cv->n_x/n_y[][]') and relationship between cells ('cv->cell_cell[][]').
+ * @param[in,out] cv: Structure of grid variable data in computational grid cells.
+ * @param[in]     mv: Structure of meshing variable data.
+ */
 void cell_rel(const struct cell_var * cv, const struct mesh_var * mv)
 {
 	const int num_cell = mv->num_ghost + (int)config[3];
-	
+
 	int **cp = mv->cell_pt;
 	int p_p, p_n, p2_p, p2_n;
 
@@ -223,7 +242,7 @@ void cell_rel(const struct cell_var * cv, const struct mesh_var * mv)
 			cv->n_y[k][j] = (mv->X[p_n] - mv->X[p_p]) / length;
 			//Inner normal 
 
-			      cell_rec = 0;							   		
+			cell_rec = 0;
 			ts = 1;
 			while (ts <= MAX(num_cell-k-1, k))
 			    {
@@ -235,7 +254,7 @@ void cell_rel(const struct cell_var * cv, const struct mesh_var * mv)
 				    ts = -ts + 1;
 				if (i < 0 || i >= num_cell)
 				    continue;
-								
+
 				for(l = 0; l < cp[i][0]; l++)
 				    {
 					if(l == cp[i][0]-1) 
@@ -251,17 +270,17 @@ void cell_rel(const struct cell_var * cv, const struct mesh_var * mv)
 					if((p_p == p2_n) && (p2_p == p_n))
 					    {
 						cv->cell_cell[k][j] = i;
-						cell_rec = 1;;
+						cell_rec = 1;
 						break;
 					    }
 				    }
 				if (cell_rec)
 				    break;
 			    }
-				
+
 			if (cell_rec)
-			    continue;								
-					
+			    continue;
+
 			for(l = 1, n_border = -1; l <= mv->num_border[0]; l++)
 			    {
 				n_border += mv->num_border[l] + 1; 
@@ -279,7 +298,7 @@ void cell_rel(const struct cell_var * cv, const struct mesh_var * mv)
 				if (cell_rec)
 				    break;
 			    }
-			
+
 			if(!cell_rec && k < (int)config[3])
 			    {
 				fprintf(stderr, "Ther are some wrong cell relationships!\n");
@@ -290,12 +309,17 @@ void cell_rel(const struct cell_var * cv, const struct mesh_var * mv)
 }
 
 
+/**
+ * @brief Compute x- and y-coordinates of the cell centroid and store them in array 'cv->X_c[]' and 'cv->Y_c[]'.
+ * @param[in,out] cv: Structure of grid variable data in computational grid cells.
+ * @param[in]     mv: Structure of meshing variable data.
+ */
 void cell_centroid(const struct cell_var * cv, const struct mesh_var * mv)
 {
 	const int num_cell = mv->num_ghost + (int)config[3];
 	const double *X = mv->X, *Y = mv->Y;
 	int **cp = mv->cell_pt;
-	
+
 	double S, S_tri;
 
 	for(int k = 0; k < num_cell; ++k)
@@ -310,7 +334,7 @@ void cell_centroid(const struct cell_var * cv, const struct mesh_var * mv)
 			cv->X_c[k] += (X[cp[k][1]] + X[cp[k][j]] + X[cp[k][j+1]]) * S_tri;
 			cv->Y_c[k] += (Y[cp[k][1]] + Y[cp[k][j]] + Y[cp[k][j+1]]) * S_tri;
 			S += S_tri;
-		    }			 
+		    }
 		cv->X_c[k] /= S*3.0;
 		cv->Y_c[k] /= S*3.0;
 	    }

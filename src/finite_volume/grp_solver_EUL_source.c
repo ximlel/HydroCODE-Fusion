@@ -54,29 +54,37 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
    */
   double dire[3], mid[3];
 
+  double nu;  // nu = tau/h
+  double h_S_max; // h/S_max, S_max is the maximum wave speed
+  double time_c = 0.0; // the current time
+  int nt = 1; // the number of times storing plotting data
+
+  struct b_f_var bfv_L = {.SRHO = 0.0, .SP = 0.0, .SU = 0.0}, bfv_R = bfv_L; // Left/Right boundary condition
+  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = ifv_L;
+
   double ** RHO  = CV.RHO;
   double ** U    = CV.U;
   double ** P    = CV.P;
   double ** E    = CV.E;
   // the slopes of variable values
-  double * s_rho = calloc(m, sizeof(double));
-  double * s_u   = calloc(m, sizeof(double));
-  double * s_p   = calloc(m, sizeof(double));
+  double * s_rho = (double*)calloc(m, sizeof(double));
+  double * s_u   = (double*)calloc(m, sizeof(double));
+  double * s_p   = (double*)calloc(m, sizeof(double));
   CV.d_rho = s_rho;
   CV.d_u   = s_u;
   CV.d_p   = s_p;
   // the variable values at (x_{j-1/2}, t_{n+1}).
-  double * U_next   = malloc((m+1) * sizeof(double));
-  double * P_next   = malloc((m+1) * sizeof(double));
-  double * RHO_next = malloc((m+1) * sizeof(double));
+  double * U_next   = (double*)malloc((m+1) * sizeof(double));
+  double * P_next   = (double*)malloc((m+1) * sizeof(double));
+  double * RHO_next = (double*)malloc((m+1) * sizeof(double));
   // the temporal derivatives at (x_{j-1/2}, t_{n}).
-  double * U_t   = malloc((m+1) * sizeof(double));
-  double * P_t   = malloc((m+1) * sizeof(double));
-  double * RHO_t = malloc((m+1) * sizeof(double));
+  double * U_t   = (double*)malloc((m+1) * sizeof(double));
+  double * P_t   = (double*)malloc((m+1) * sizeof(double));
+  double * RHO_t = (double*)malloc((m+1) * sizeof(double));
   // the numerical flux at (x_{j-1/2}, t_{n}).
-  double * F_rho = malloc((m+1) * sizeof(double));
-  double * F_u   = malloc((m+1) * sizeof(double));
-  double * F_e   = malloc((m+1) * sizeof(double));
+  double * F_rho = (double*)malloc((m+1) * sizeof(double));
+  double * F_u   = (double*)malloc((m+1) * sizeof(double));
+  double * F_e   = (double*)malloc((m+1) * sizeof(double));
   if(s_rho == NULL || s_u == NULL || s_p == NULL)
       {
 	  printf("NOT enough memory! Slope\n");
@@ -97,15 +105,6 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	  printf("NOT enough memory! Flux\n");
 	  goto return_NULL;
       }
-
-  double nu;  // nu = tau/h
-  double h_S_max; // h/S_max, S_max is the maximum wave speed
-  double time_c = 0.0; // the current time
-  int nt = 1; // the number of times storing plotting data
-
-  struct b_f_var bfv_L = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Left  boundary condition
-  struct b_f_var bfv_R = {.SU = 0.0, .SP = 0.0, .SRHO = 0.0}; // Right boundary condition
-  struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = {.gamma = gamma};
   
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)

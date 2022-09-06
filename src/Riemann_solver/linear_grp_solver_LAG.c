@@ -63,25 +63,25 @@ void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var *ifv_L, 
       {
 	  rho_star_L = rho_L*pow(p_star/p_L, 1.0/gammaL);
 	  c_star_L = c_L*pow(p_star/p_L, 0.5*(gammaL-1.0)/gammaL);
-	  W_L = u_L - c_L;
+	  // W_L = u_L - c_L;
       }
   else
       {
 	  rho_star_L = rho_L*(p_star+zetaL*p_L)/(p_L+zetaL*p_star);
 	  c_star_L = sqrt(gammaL * p_star / rho_star_L);
-	  W_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
+	  // W_L = u_L - c_L*sqrt(0.5*((gammaL+1.0)*(p_star/p_L) + (gammaL-1.0))/gammaL);
       }
   if(CRW[1])
       {
 	  rho_star_R = rho_R*pow(p_star/p_R,1.0/gammaR);
 	  c_star_R = c_R*pow(p_star/p_R, 0.5*(gammaR-1.0)/gammaR);
-	  W_R = u_R + c_R;
+	  // W_R = u_R + c_R;
       }
   else
       {
 	  rho_star_R = rho_R*(p_star+zetaR*p_R)/(p_R+zetaR*p_star);
 	  c_star_R = sqrt(gammaR * p_star / rho_star_R);
-	  W_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
+	  // W_R = u_R + c_R*sqrt(0.5*((gammaR+1.0)*(p_star/p_R) + (gammaR-1.0))/gammaR);
       }
   g_star_R = rho_star_R*c_star_R;
   g_star_L = rho_star_L*c_star_L;
