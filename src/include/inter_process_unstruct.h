@@ -18,7 +18,7 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 							   const struct flu_var * FV, double tau, const int stop_step);
 
 
-struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV);
+void cell_mem_init_free(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const int i_or_f);
 void vol_comp(const struct cell_var * cv, const struct mesh_var * mv);
 void cell_pt_clockwise(const struct mesh_var * mv);
 void cell_rel(const struct cell_var * cv, const struct mesh_var * mv);

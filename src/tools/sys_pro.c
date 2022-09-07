@@ -91,7 +91,7 @@ void init_mem(double * p[], const int n, int ** cell_pt)
 			p[k] = (double *)calloc(cell_pt[k][0], sizeof(double));
 			if(p[k] == NULL)
 				{
-					printf("Initialize memory fail!\n");
+					printf("Initialize memory fail! DOUBLE data at grid cell points.\n");
 					for(int j = 0; j < k; j++)
 						{
 							free(p[k]);
@@ -110,7 +110,7 @@ void init_mem_int(int * p[], const int n, int ** cell_pt)
 			p[k] = (int *)malloc(cell_pt[k][0] * sizeof(int));
 			if(p[k] == NULL)
 				{
-					printf("Initialize memory fail!\n");
+					printf("Initialize memory fail! INT data at grid cell points.\n");
 					for(int j = 0; j < k; j++)
 						{
 							free(p[k]);

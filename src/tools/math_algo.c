@@ -49,10 +49,22 @@ void mat_mul(const double A[], const double B[], double C[], const int m, const 
  */
 int rinv(double a[], const int n)
 {
-	int *is,*js,i,j,k,l,u,v;
+    int *is,*js,i,j,k,l,u,v;
     double d,p;
     is=(int*)malloc(n*sizeof(int));
+    if(is == NULL)
+	{
+	    printf("NOT enough memory! INT variable 'is' in 'rinv()' function 'rinv()'.\n");
+	    return 0;
+	}
     js=(int*)malloc(n*sizeof(int));
+    if(js == NULL)
+	{
+	    free(is);
+	    is = NULL;
+	    printf("NOT enough memory! INT variable 'js' in 'rinv()' function 'rinv()'.\n");
+	    return 0;
+	}
     for (k=0; k<=n-1; k++)
 		{
 			d=0.0;
@@ -70,8 +82,8 @@ int rinv(double a[], const int n)
 					}
 			if (d+1.0==1.0)
 				{
-					free(is);
-					free(js);
+					free(is);  free(js);
+					is = NULL; js = NULL;
 					fprintf(stderr, "Error: no inverse matrix!\n");
 					return 0;
 				}
@@ -137,6 +149,7 @@ int rinv(double a[], const int n)
 						a[v]=p;
 					}
 		}
-    free(is); free(js);
+    free(is);  free(js);
+    is = NULL; js = NULL;
     return 1;
 }

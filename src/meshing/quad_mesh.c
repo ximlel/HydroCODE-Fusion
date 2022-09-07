@@ -4,6 +4,7 @@
 #include <math.h>
 #include <time.h>
 
+#include "../include_cii/mem.h"
 #include "../include/var_struc.h"
 #include "../include/meshing.h"
 
@@ -33,8 +34,8 @@ static int quad_mesh(struct mesh_var * mv, int n_x_add, int n_y_add)
 		printf("There are %d ghost cell!\n", mv->num_ghost = num_cell - (int)config[3]);
 
 	mv->num_pt = (n_x+1)*(n_y+1);
-	mv->X = (double*)malloc(mv->num_pt * sizeof(double));
-	mv->Y = (double*)malloc(mv->num_pt * sizeof(double));
+	mv->X = (double*)ALLOC(mv->num_pt * sizeof(double));
+	mv->Y = (double*)ALLOC(mv->num_pt * sizeof(double));
 	if(mv->X == NULL || mv->Y == NULL)
 		{
 			printf("Not enough memory in quadrilateral mesh constructed!\n");
@@ -47,7 +48,7 @@ static int quad_mesh(struct mesh_var * mv, int n_x_add, int n_y_add)
 			mv->Y[k] = (k/(n_x+1)-n_y/2)*config[11];
 		}	
 	
-	mv->cell_pt = (int**)malloc(num_cell * sizeof(int *));
+	mv->cell_pt = (int**)ALLOC(num_cell * sizeof(int *));
 	if(mv->cell_pt == NULL)
 		{
 			fprintf(stderr, "Not enough memory in quadrilateral mesh constructed!\n");
@@ -55,7 +56,7 @@ static int quad_mesh(struct mesh_var * mv, int n_x_add, int n_y_add)
 		}
 	for(k = 0; k < num_cell; k++)
 		{
-			mv->cell_pt[k] = (int*)malloc(5 * sizeof(int));
+			mv->cell_pt[k] = (int*)ALLOC(5 * sizeof(int));
 			if(mv->cell_pt[k] == NULL)
 				{
 					fprintf(stderr, "Not enough memory in CELL_POINT[%d]!\n", k);
@@ -70,7 +71,7 @@ static int quad_mesh(struct mesh_var * mv, int n_x_add, int n_y_add)
 
 	mv->num_border[0] = 1;	
 	mv->num_border[1] = num_border;	
-	mv->border_pt = (int*)malloc((num_border+1) * sizeof(int));	
+	mv->border_pt = (int*)ALLOC((num_border+1) * sizeof(int));	
 	if(mv->border_pt == NULL)
 		{
 			printf("Not enough memory in quadrilateral mesh constructed!\n");
@@ -137,7 +138,7 @@ static int quad_border_cond
 	const int num_border = mv->num_border[1];
 	int k;
 
-	mv->border_cond = (int*)malloc(num_border * sizeof(int));
+	mv->border_cond = (int*)ALLOC(num_border * sizeof(int));
 	if(mv->border_cond == NULL)
 		{
 			printf("Not enough memory in quadrilateral boundary constructed!\n");
@@ -145,7 +146,7 @@ static int quad_border_cond
 		}	
 	if(mv->num_ghost > 0)
 		{					
-			mv->peri_cell = (int*)malloc(num_cell * sizeof(int));
+			mv->peri_cell = (int*)ALLOC(num_cell * sizeof(int));
 			if(mv->peri_cell == NULL)
 				{
 					printf("Not enough memory in quadrilateral periodic boundary constructed!\n");
@@ -406,7 +407,7 @@ static int quad_border_normal_velocity
 	const int num_border = mv->num_border[1];
 	int k;
 	
-	mv->normal_v = (double*)malloc(num_border * sizeof(double));
+	mv->normal_v = (double*)ALLOC(num_border * sizeof(double));
 	if(mv->normal_v == NULL)
 		{
 			printf("Not enough memory in quadrilateral boundary constructed!\n");

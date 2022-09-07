@@ -4,13 +4,12 @@
 #include <math.h>
 #include <ctype.h>
 
+#include "../include_cii/mem.h"
 #include "../include/var_struc.h"
 
 
 //default boundary condition
 #define DEFAULT_BC -3
-
-
 
 
 static int msh_border_cell_dis(int type)
@@ -41,8 +40,8 @@ static int msh_border_build(struct mesh_var * mv, int num_bc_all)
 			return 0;
 		}
 
-	mv->border_pt   = (int*)malloc((num_border+1)* sizeof(int));
-	mv->border_cond = (int*)malloc(num_border* sizeof(int));
+	mv->border_pt   = (int*)ALLOC((num_border+1)* sizeof(int));
+	mv->border_cond = (int*)ALLOC(num_border* sizeof(int));
 
 	int  * bp = mv->border_pt;
 	int ** cp = mv->cell_pt;
@@ -177,9 +176,9 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 					if (num_of > 0)
 						{
 							mv->num_pt = num_of;
-							idx_N = (int*)   malloc(mv->num_pt * sizeof(int));
-							mv->X = (double*)malloc(mv->num_pt * sizeof(double));
-							mv->Y = (double*)malloc(mv->num_pt * sizeof(double));
+							idx_N = (int*)   ALLOC(mv->num_pt * sizeof(int));
+							mv->X = (double*)ALLOC(mv->num_pt * sizeof(double));
+							mv->Y = (double*)ALLOC(mv->num_pt * sizeof(double));
 							if(mv->X == NULL || mv->Y == NULL)
 								{
 									printf("Not enough memory in msh_read!\n");
@@ -202,8 +201,8 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 					num_cell = 0;
 					num_border = 0;
 					num_bc_all = num_of;
-					mv->cell_type = (int*) malloc(num_bc_all * sizeof(int));
-					mv->cell_pt   = (int**)malloc(num_bc_all * sizeof(int *));
+					mv->cell_type = (int*) ALLOC(num_bc_all * sizeof(int));
+					mv->cell_pt   = (int**)ALLOC(num_bc_all * sizeof(int *));
 					if(mv->cell_type == NULL || mv->cell_pt == NULL)
 						{
 							fprintf(stderr, "Not enough memory in msh_read!\n");
@@ -246,7 +245,7 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 						n_c++;
 
 
-					mv->cell_pt[n_bc] = (int*)malloc((n_c+1) * sizeof(int));
+					mv->cell_pt[n_bc] = (int*)ALLOC((n_c+1) * sizeof(int));
 					if(mv->cell_pt[n_bc] == NULL)
 						{
 							fprintf(stderr, "Not enough memory in msh_read!\n");
@@ -288,30 +287,19 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 			goto return_0;
 		}
 
-	free(idx_N);
-	idx_N = NULL;
-	
+	FREE(idx_N);
 	return 1;
 
  return_0:
-	free(idx_N);
-	idx_N = NULL;
-	free(mv->X);
-	mv->X = NULL;
-	free(mv->Y);
-	mv->Y = NULL;
-	free(mv->cell_type);
-	mv->cell_type = NULL;
+	FREE(idx_N);
+	FREE(mv->X);
+	FREE(mv->Y);
+	FREE(mv->cell_type);
 	if (mv->cell_pt != NULL)
 		{
 			for(int i = 0; i < num_bc_all; ++i)
-				{
-					free(mv->cell_pt[i]);
-					mv->cell_pt[i] = NULL;
-				}
-			free(mv->cell_pt);
-			mv->cell_pt = NULL;
+				FREE(mv->cell_pt[i]);
+			FREE(mv->cell_pt);
 		}
-
 	return 0;
 }

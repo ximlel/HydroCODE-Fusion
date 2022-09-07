@@ -267,7 +267,8 @@ void finite_volume_scheme_GRP2D(struct flu_var * FV, const struct mesh_var * mv,
 	const int dim = (int)config[0];
 	const int order = (int)config[9];
 	const double eps = config[4];
-	struct cell_var cv = cell_mem_init(mv, FV);
+	struct cell_var cv;
+	cell_mem_init_free(&cv, mv, FV, 1);
 
 	vol_comp(&cv, mv);
 

@@ -25,7 +25,8 @@ void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const
 
 	int ** cp = mv->cell_pt;
 
-	struct cell_var cv = cell_mem_init(mv, FV);
+	struct cell_var cv;
+	cell_mem_init_free(&cv, mv, FV, 1);
 
 	cons_qty_init(&cv, FV);
 
@@ -208,4 +209,6 @@ void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const
 
 
 	printf("\nThe cost of CPU time for the Eulerian method is %g seconds.\n", cpu_time);
+
+	cell_mem_init_free(&cv, mv, FV, 0);
 }

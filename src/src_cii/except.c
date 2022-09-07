@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "assert.h"
+#include <assert.h>
 #include "except.h"
 #define T Except_T
 #ifdef WIN32
@@ -16,7 +16,7 @@ void Except_raise(const T *e, const char *file,
 		if (e->reason)
 			fprintf(stderr, " %s", e->reason);
 		else
-			fprintf(stderr, " at 0x%p", e);
+			fprintf(stderr, " at 0x%p", (void *)e);
 		if (file && line > 0)
 			fprintf(stderr, " raised at %s:%d\n", file, line);
 		fprintf(stderr, "aborting...\n");

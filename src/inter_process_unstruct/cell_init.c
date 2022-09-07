@@ -11,62 +11,100 @@
 
 #define FV_RESET_MEM(v, n)						\
     do {								\
-	FV->v = (double *)realloc(FV->v, (n) * sizeof(double));			\
-	if(FV->v == NULL)						\
+	if(i_or_f)							\
 	    {								\
-		fprintf(stderr, "Not enough memory in fluid var init!\n"); \
-		goto return_NULL;					\
+		FV->v = (double *)realloc(FV->v, (n) * sizeof(double));	\
+		if(FV->v == NULL)					\
+		    {							\
+			fprintf(stderr, "Not enough memory in fluid variable reset!\n"); \
+			exit(5);					\
+		    }							\
 	    }								\
     } while (0)								\
 		
 
 #define CV_INIT_MEM(v, n)						\
     do {								\
-	cv.v = (double *)calloc(n, sizeof(double));				\
-	if(cv.v == NULL)						\
+	if(i_or_f)							\
 	    {								\
-		fprintf(stderr, "Not enough memory in cell var init!\n"); \
-		goto return_NULL;					\
+		cv->v = (double *)calloc(n, sizeof(double));		\
+		if(cv->v == NULL)					\
+		    {							\
+			fprintf(stderr, "Not enough memory in DOUBLE cell center variable initialize!\n"); \
+			exit(5);					\
+		    }							\
+	    }								\
+	else								\
+	    {								\
+		free(cv->v);						\
+		cv->v = NULL;						\
 	    }								\
     } while (0)								\
-
+	
 #define CP_INIT_MEM(v, n)						\
     do {								\
-	cv.v = (double **)malloc((n) * sizeof(double *));				\
-	if(cv.v == NULL)						\
+	if(i_or_f)							\
 	    {								\
-		fprintf(stderr, "Not enough memory in cell var init!\n"); \
-		goto return_NULL;					\
+		cv->v = (double **)malloc((n) * sizeof(double *));	\
+		if(cv->v == NULL)					\
+		    {							\
+			fprintf(stderr, "Not enough memory in DOUBLE cell point variable initialize!\n"); \
+			exit(5);					\
+		    }							\
+		init_mem(cv->v, n, mv->cell_pt);			\
 	    }								\
-	init_mem(cv.v, n, mv->cell_pt);					\
+	else								\
+	    {								\
+		for(int j = 0; j < (n); j++)				\
+		    {							\
+			free(cv->v[j]);					\
+			cv->v[j] = NULL;				\
+		    }							\
+		free(cv->v);						\
+		cv->v = NULL;						\
+	    }								\
     } while (0)								\
 
 #define CP_INIT_MEM_INT(v, n)						\
     do {								\
-	cv.v = (int **)malloc((n) * sizeof(int *));				\
-	if(cv.v == NULL)						\
+	if(i_or_f)							\
 	    {								\
-		fprintf(stderr, "Not enough memory in cell var init!\n"); \
-		goto return_NULL;					\
+		cv->v = (int **)malloc((n) * sizeof(int *));		\
+		if(cv->v == NULL)					\
+		    {							\
+			fprintf(stderr, "Not enough memory in INT cell point variable initialize!\n"); \
+			exit(5);					\
+		    }							\
+		init_mem_int(cv->v, n, mv->cell_pt);			\
 	    }								\
-	init_mem_int(cv.v, n, mv->cell_pt);				\
+ 	else								\
+	    {								\
+		for(int j = 0; j < (n); j++)				\
+		    {							\
+			free(cv->v[j]);					\
+			cv->v[j] = NULL;				\
+		    }							\
+		free(cv->v);						\
+		cv->v = NULL;						\
+	    }								\
     } while (0)								\
 
 
 /**
- * @brief Initialize memory for variables on the grid cell in newly defined struct 'cv'
- *        and reset memory for initial data in struct 'FV' passed in the function.
- * @param[in] FV: Structure of initial fluid variable data array pointer.
- * @param[in] mv: Structure of meshing variable data.
- * @return \b cv: Structure of grid variable data in computational grid cells.
+ * @brief Initialize or free memory for pointers in struct 'cv'. While initialize, reset memory for pointers in struct 'FV'.
+ * @param[in] cv:     Structure of grid variable data in computational grid cells.
+ * @param[in] mv:     Structure of meshing variable data.
+ * @param[in] FV:     Structure of initial fluid variable data array pointer.
+ * @param[in] i_or_f: initialize OR free memory.
+ *       @arg 1(non-0 value): initialize memory for variables on the grid cell in newly defined struct 'cv'
+ *                            and reset memory for initial data in struct 'FV' passed in the function.
+ *       @arg 0:      free memory for variables in struct 'cv'.
  */
-struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
+void cell_mem_init_free(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const int i_or_f)
 {
 	const int order = (int)config[9];
 	const int num_cell_ghost = mv->num_ghost + (int)config[3];
 	const int num_cell = (int)config[3];
-
-	struct cell_var cv;
 
 	CP_INIT_MEM_INT(cell_cell, num_cell_ghost);
 	CP_INIT_MEM(n_x, num_cell_ghost);
@@ -166,11 +204,6 @@ struct cell_var cell_mem_init(const struct mesh_var * mv, struct flu_var * FV)
 	CP_INIT_MEM(dt_F_p_x,  num_cell);
 	CP_INIT_MEM(dt_F_p_y,  num_cell);
 #endif
-
-	return cv;
-	
- return_NULL:
-	exit(5);
 }
 
 

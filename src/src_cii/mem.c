@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stddef.h>
-#include "assert.h"
+#include <assert.h>
 #include "except.h"
 #include "mem.h"
-const Except_T Mem_Failed = { "Allocation Failed" };
+const Except_T Mem_Failed = { (char*)"Allocation Failed" };
 void *Mem_alloc(long nbytes, const char *file, int line){
 	void *ptr;
 	assert(nbytes > 0);

@@ -3,12 +3,13 @@
 #include <string.h>
 #include <math.h>
 
+#include "../include_cii/mem.h"
 #include "../include/var_struc.h"
-
 
 
 #define CV_COPY(var)  cv->var[i] = cv->var[pc[i]]
 #define FV_COPY(var)  FV->var[i] = FV->var[pc[i]]
+
 
 void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, double t)
 {
@@ -66,7 +67,7 @@ void period_cell_modi(struct mesh_var * mv)
 	const int num_cell = mv->num_ghost + (int)config[3];
 	int *pc = mv->peri_cell;
 	
-	int *per_num = (int*)malloc(num_cell*sizeof(int));
+	int *per_num = (int*)ALLOC(num_cell*sizeof(int));
 	int per_n = 0;
 	int i, j;
 	for (i = 0; i < num_cell; i++)
@@ -83,6 +84,7 @@ void period_cell_modi(struct mesh_var * mv)
 				if (pc[i] < 0)
 					pc[i] = 0;
 			}
+	FREE(per_num);
 
 	int *cc_tmp, pc_tmp; 
 	for (i = 1; i < num_cell; i++)

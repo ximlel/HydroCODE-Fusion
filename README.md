@@ -22,6 +22,10 @@ xelatex Specification.tex
 
 Open 'doc/*/html/index.html' in a browser to view the specific instructions of this program.
 
+Debugging tools
+---------
+gprof, gcov, lcov, Valgrind, Cppcheck, gprof2dot.
+
 Licensing
 ---------
 GNU Lesser General Public License v3.0 or later.
@@ -36,4 +40,5 @@ Copyright
 --------
 Copyright © 2022 ximlel.
 
-> Part of the code is modified from the provision of Zhifang Du.
+> Part of this code is modified from the provision of Zhifang Du.
+> The source code in the book "C Interfaces and Implementations" by David Hanson is used.
