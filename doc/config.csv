@@ -21,7 +21,7 @@ config[*],Representation ,Common Variable Name,Variable Types,Value Range,Defaul
 17,Boudary conditions in x direction   ,bound_x / bound,enum,< 0,—4: free,"—1: initial
 —2: reflective
 —3: prescribed
-—5: periodic
+—7: periodic
 —24: reflective + free",,,
 18,Boudary conditions in y direction   ,bound_y,enum,< 0,(Ditto),(Ditto),,,
 19,Boudary conditions in z direction   ,bound_z,enum,< 0,(Ditto),(Ditto),,,

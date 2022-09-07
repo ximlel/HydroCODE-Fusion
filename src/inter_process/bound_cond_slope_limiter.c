@@ -63,7 +63,7 @@ _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, stru
 	    bfv_L->P   =   CV->P[nt][0]; bfv_R->P   =   CV->P[nt][m-1];
 	    bfv_L->RHO = CV->RHO[nt][0]; bfv_R->RHO = CV->RHO[nt][m-1];
 	    break;
-	case -5: // periodic boundary conditions
+	case -7: // periodic boundary conditions
 	    if(!find_bound)
 		printf("Periodic boudary conditions in x direction.\n");
 	    bfv_L->U   =   CV->U[nt][m-1]; bfv_R->U   =   CV->U[nt][0];
@@ -89,7 +89,7 @@ _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, stru
 		case -1: // initial boudary conditions
 		    bfv_L->H  = h; bfv_R->H = h;
 		    break;
-		case -5: // periodic boundary conditions
+		case -7: // periodic boundary conditions
 		    bfv_L->H = X[m] - X[m-1];
 		    bfv_R->H = X[1] - X[0];
 		    break;
@@ -121,7 +121,7 @@ _Bool bound_cond_slope_limiter(const _Bool NO_h, const int m, const int nt, stru
 		case -2: // reflective boundary conditions
 		    bfv_L->SU   =   CV->d_u[0];   bfv_R->SU = CV->d_u[m-1];
 		    break;
-		case -5: // periodic boundary conditions
+		case -7: // periodic boundary conditions
 		    bfv_L->SU   =   CV->d_u[m-1]; bfv_R->SU   =   CV->d_u[0];
 		    bfv_L->SP   =   CV->d_p[m-1]; bfv_R->SP   =   CV->d_p[0];
 		    bfv_L->SRHO = CV->d_rho[m-1]; bfv_R->SRHO = CV->d_rho[0];

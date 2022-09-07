@@ -79,7 +79,7 @@ fprintf(fid,'10\t%g\n',d_x);
 fprintf(fid,'11\t%g\n',d_x);
 fprintf(fid,'13\t%i\n',column);
 fprintf(fid,'14\t%i\n',line);
-fprintf(fid,'17\t-5\n');
-fprintf(fid,'18\t-5\n');
+fprintf(fid,'17\t-7\n');
+fprintf(fid,'18\t-7\n');
 fclose(fid);
 end

@@ -131,12 +131,12 @@ static int quad_border_cond
 			fprintf(stderr, "Periodic boundary condition error!\n");
 			exit(2);
 		}
-	
+
 	const int n_x = (int)config[13] + n_x_add, n_y = (int)config[14] + n_y_add;
 	const int num_cell = n_x * n_y;
 	const int num_border = mv->num_border[1];
 	int k;
-	
+
 	mv->border_cond = (int*)malloc(num_border * sizeof(int));
 	if(mv->border_cond == NULL)
 		{
@@ -154,7 +154,7 @@ static int quad_border_cond
 			for(k = 0; k < num_cell; k++)
 				mv->peri_cell[k] = -1;
 		}
-	
+
 	for(k = 0; k < n_x; k++)
 		{
 			if (down == -7)
@@ -292,14 +292,12 @@ void RMI_mesh(struct mesh_var * mv)
 	quad_border_cond(mv, n_x_a, n_y_a, -4, -7, -4, -7);
 }
 
-
 void RMI_S_mesh(struct mesh_var * mv)
 {	
 	const int n_x_a = 0, n_y_a = 0;		
 	quad_mesh(mv, n_x_a, n_y_a);
 	quad_border_cond(mv, n_x_a, n_y_a, -4, -4, -4, -4);
 }
-
 
 void R2D_mesh(struct mesh_var * mv)
 {	
@@ -399,7 +397,6 @@ void oblique_periodic_mesh(struct mesh_var * mv)
 	quad_mesh(mv, n_x_a, n_y_a);
 	quad_border_cond(mv, n_x_a, n_y_a, -70, -3, -70, -3);
 }
-
 
 static int quad_border_normal_velocity
 (struct mesh_var * mv, int n_x_add, int n_y_add,

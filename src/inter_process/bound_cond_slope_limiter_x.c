@@ -60,7 +60,7 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 		bfv_L[i].P   =   CV[nt].P[0][i]; bfv_R[i].P   =   CV[nt].P[m-1][i];
 		bfv_L[i].RHO = CV[nt].RHO[0][i]; bfv_R[i].RHO = CV[nt].RHO[m-1][i];
 		break;
-	    case -5: // periodic boundary conditions
+	    case -7: // periodic boundary conditions
 		if(!find_bound_x && !i)
 		    printf("Periodic boudary conditions in x direction.\n");
 		bfv_L[i].U   =   CV[nt].U[m-1][i]; bfv_R[i].U   =   CV[nt].U[0][i];
@@ -96,7 +96,7 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 		    case -2: // reflective boundary conditions
 			bfv_L[i].SU   =   CV->s_u[0][i];   bfv_R[i].SU   =   CV->s_u[m-1][i];
 			break;
-		    case -5: // periodic boundary conditions
+		    case -7: // periodic boundary conditions
 			bfv_L[i].SU   =   CV->s_u[m-1][i]; bfv_R[i].SU   =   CV->s_u[0][i];
 			bfv_L[i].SV   =   CV->s_v[m-1][i]; bfv_R[i].SV   =   CV->s_v[0][i];
 			bfv_L[i].SP   =   CV->s_p[m-1][i]; bfv_R[i].SP   =   CV->s_p[0][i];
@@ -116,7 +116,7 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 			bfv_D[j].SP   =   CV->s_p[j][0];   bfv_U[j].SP   =   CV->s_p[j][n-1];
 			bfv_D[j].SRHO = CV->s_rho[j][0];   bfv_U[j].SRHO = CV->s_rho[j][n-1];
 			break;
-		    case -5: // periodic boundary conditions in y-direction
+		    case -7: // periodic boundary conditions in y-direction
 			bfv_D[j].SU   =   CV->s_u[j][n-1]; bfv_U[j].SU   =   CV->s_u[j][0];
 			bfv_D[j].SV   =   CV->s_v[j][n-1]; bfv_U[j].SV   =   CV->s_v[j][0];
 			bfv_D[j].SP   =   CV->s_p[j][n-1]; bfv_U[j].SP   =   CV->s_p[j][0];

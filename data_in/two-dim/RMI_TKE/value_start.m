@@ -125,7 +125,7 @@ fprintf(fid,'5\t%i\n',step);
 fprintf(fid,'6\t%g\n',gamma);
 fprintf(fid,'10\t%g\n',L_x);
 fprintf(fid,'11\t%g\n',L_y);
-fprintf(fid,'17\t-5\n');
+fprintf(fid,'17\t-7\n');
 fprintf(fid,'18\t-4\n');
 fclose(fid);
 end
