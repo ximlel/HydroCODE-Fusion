@@ -27,8 +27,13 @@ int rinv(double a[], const int n);
 
 
 // minmod function
+#ifdef _WIN32
+inline double minmod2(const double s_L, const double s_R);
+inline double minmod3(const double s_L, const double s_R, const double s_m);
+#elif __linux__
 inline double minmod2(const double s_L, const double s_R)                   __attribute__((always_inline));
 inline double minmod3(const double s_L, const double s_R, const double s_m) __attribute__((always_inline));
+#endif
 
 /**
  * @brief Minmod limiter function of two variables.

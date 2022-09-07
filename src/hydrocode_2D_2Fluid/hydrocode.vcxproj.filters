@@ -60,9 +60,6 @@
     <ClCompile Include="..\meshing\quad_mesh.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\riemann_solver\hll_solver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_G2D.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,6 +91,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\file_io\file_2D_in.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Riemann_solver\hll_2D_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

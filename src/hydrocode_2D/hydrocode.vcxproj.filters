@@ -78,7 +78,7 @@
     <ClCompile Include="..\Riemann_solver\roe_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Riemann_solver\hll_solver.c">
+    <ClCompile Include="..\Riemann_solver\hll_2D_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
