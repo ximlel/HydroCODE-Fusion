@@ -39,6 +39,9 @@ gprof -b -A -p -q hydrocode.out gmon.out > pg
 gprof -b ./hydrocode.out gmon.out | gprof2dot | dot -Tpng -o pg.png
 
 ### Valgrind
-valgrind --tool=callgrind $EXEcute GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   2 1     EUL 33=1
-gprof2dot -f callgrind callgrind.out.* | dot  -Tpng -o callgrind.png
-rm ./callgrind.out.*
+valgrind --tool=callgrind --callgrind-out-file=callgrind.out \
+$EXEcute GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   2 1     EUL 33=1
+gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
+
+### gcov 
+make html

@@ -41,11 +41,15 @@ SHARE
  $EXEcute Artifi_Heat_Conduct/4_5 Artifi_Heat_Conduct/4_5 1 2_GRP LAG 7=0.25
 !
 
+
 ### gprof
 gprof -b -A -p -q hydrocode.out gmon.out > pg
 gprof -b ./hydrocode.out gmon.out | gprof2dot | dot -Tpng -o pg.png
 
 ### Valgrind
-valgrind --tool=callgrind $EXEcute GRP_Book/6_1_LAG GRP_Book/6_1_LAG 1 1     LAG 1=-1.0
-gprof2dot -f callgrind callgrind.out.* | dot  -Tpng -o callgrind.png
-rm ./callgrind.out.*
+valgrind --tool=callgrind --callgrind-out-file=callgrind.out \
+$EXEcute GRP_Book/6_1_LAG GRP_Book/6_1_LAG 1 1     LAG 1=-1.0
+gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
+
+### gcov 
+make html

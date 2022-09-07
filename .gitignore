@@ -84,8 +84,15 @@ dkms.conf
 pg
 pg.png
 
+# gconv
+*.gcda
+*.gcno
+*.gcov
+*.info
+gcovdir/
+
 # Valgrind
-callgrind.out.*
+callgrind.out
 callgrind.png
 
 # =====================MATLAB/Octave project=================

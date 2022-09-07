@@ -54,4 +54,5 @@ clean:
 	@echo "******************Cleaning*******************"
 	$(call rm_o_file)
 	@$(RM) $(DIR_NAME).a
+	@$(RM) *.gcov *.gcda *.gcno
 .PHONYP:clean
