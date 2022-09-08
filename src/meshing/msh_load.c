@@ -90,7 +90,7 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 	int num_of = 0, num_tag; // number of section or tags.
 	int *idx_N = NULL; // order of NODE;
 	int num_cell = (int)config[3], num_border = 0;
-	int b_or_c, n_bc, num_bc_all = 0; // boundary_or_cell
+	int b_or_c, n_bc = 0, num_bc_all = 0; // boundary_or_cell
 	int temp[30]; // store cell_point data
 	int n_c, type, phy_entity;
 

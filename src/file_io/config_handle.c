@@ -226,7 +226,11 @@ void configurate(const char * add_in)
       }
   fclose(fp_data);
 
+#ifdef _WIN32
   printf("Configurated:\n");
+#elif __linux__
+  printf("\x1b[42;36mConfigurated:\x1b[0m\n");
+#endif
   // Check the configuration data.
   config_check();
 }

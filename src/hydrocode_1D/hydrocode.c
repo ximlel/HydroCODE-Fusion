@@ -136,26 +136,30 @@ double config[N_CONF]; //!< Initial configuration data array.
  */
 int main(int argc, char *argv[])
 {
-    printf("\n");
     int k, j, retval = 0;
+    printf("\n");
     for (k = 0; k < argc; k++)
 	printf("%s ", argv[k]);
-    printf("\n");
+    printf("\n\n");
 #ifdef _WIN32
-    printf("TEST:\n  %s\n", argv[1]);
+    printf("TEST:\n %s\n", argv[1]);
 #elif __linux__
-	printf("\x1b[0;34mTEST:\n  %s\x1b[0m\n", argv[1]);
+    printf("\x1b[47;34mTEST:\x1b[0m\n \x1b[1;31m%s\x1b[0m\n", argv[1]);
 #endif
     if(argc < 5)
 	{
-	    printf("Test Beginning: ARGuments Counter %d is less than 5.\n", argc);
+#ifdef _WIN32
+	    printf("Test Beginning: ARGuments Counter %d is less than 5\n", argc);
+#elif __linux__
+	    printf("Test Beginning: \x1b[43;37mARGuments Counter %d is less than 5\x1b[0m\n", argc);
+#endif
 	    return 4;
 	}
     else
 #ifdef _WIN32
-	printf("Test Beginning: ARGuments Counter = %d.\n", argc);
+	printf("Test Beginning: ARGuments Counter = %d\n", argc);
 #elif __linux__
-	printf("\x1b[47;30mTest Beginning: ARGuments Counter = %d.\x1b[0m\n", argc);
+	printf("Test Beginning: \x1b[43;37mARGuments Counter = %d\x1b[0m\n", argc);
 #endif
 
     // Initialize configuration data array
@@ -175,7 +179,11 @@ int main(int argc, char *argv[])
   // Set order and scheme.
   int order; // 1, 2
   char * scheme; // Riemann_exact(Godunov), GRP
+#ifdef _WIN32
   printf("Order[_Scheme]: %s\n",argv[4]);
+#elif __linux__
+  printf("Order[_Scheme]: \x1b[41;37m%s\x1b[0m\n",argv[4]);
+#endif
   errno = 0;
   order = strtoul(argv[4], &scheme, 10);
   if (*scheme == '_')
@@ -190,7 +198,7 @@ int main(int argc, char *argv[])
 #ifdef _WIN32
 	printf("Configurating:\n");
 #elif __linux__
-	printf("\x1b[0;42mConfigurating:\x1b[0m\n");
+	printf("\x1b[42;36mConfigurating:\x1b[0m\n");
 #endif
     char * endptr;
     double conf_tmp;
@@ -223,7 +231,7 @@ int main(int argc, char *argv[])
 
   // The number of times steps of the fluid data stored for plotting.
   int N; // (int)(config[5]) + 1;
-  double *time_plot;
+  double * time_plot;
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position

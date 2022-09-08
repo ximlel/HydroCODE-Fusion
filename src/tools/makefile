@@ -2,7 +2,7 @@ CC = gcc
 #C compiler
 CFLAGS += -std=c99 -Wall
 #C compiler options
-CFLAGs += 
+CFLAGS += 
 CFLAGD  = 
 #Macro definition
 SRC = ..
@@ -24,7 +24,7 @@ FILES_C = $(shell ls *.c)
 
 define compile_c_file #Compile all .c files
 @for file in $(FILES_C); do \
-( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && $(CC) $(CFLAGS) -c $$file $(INCLUDE) ) \
+( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && $(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE) ) \
 done;
 endef
 

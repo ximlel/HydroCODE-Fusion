@@ -1,10 +1,9 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -Wall
+CFLAGS += -std=c99 -Wall
 #C compiler options
 CFLAGS += -DMULTIFLUID_BASICS
-CFLAGD  = -DRiemann_solver_exact_single=Riemann_solver_exact_Ben
-# CFLAGD += -DEXACT_TANGENT_DERIVATIVE
+CFLAGD  = -DRiemann_solver_exact_single=Riemann_solver_exact_Ben #-DEXACT_TANGENT_DERIVATIVE
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -25,7 +24,7 @@ FILES_C = $(shell ls *.c)
 
 define compile_c_file #Compile all .c files
 @for file in $(FILES_C); do \
-( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && $(CC) $(CFLAGS) -c $$file $(INCLUDE) ) \
+( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && $(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE) ) \
 done;
 endef
 

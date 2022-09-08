@@ -97,18 +97,16 @@
 #include "../include/file_io.h"
 #include "../include/finite_volume.h"
 
+#ifdef DOXYGEN_PREDEFINED
 /**
  * @def NODATPLOT
  * @brief Switch whether to plot without Matrix data.
  */
-#ifdef DOXYGEN_PREDEFINED
 #define NODATPLOT
-#endif
 /**
  * @def NOTECPLOT
  * @brief Switch whether to plot without Tecplot data.
  */
-#ifdef DOXYGEN_PREDEFINED
 #define NOTECPLOT
 #endif
 
@@ -156,19 +154,31 @@ double config[N_CONF]; //!< Initial configuration data array.
  */
 int main(int argc, char *argv[])
 {
-    printf("\n");
     int k, i, j, retval = 0;
+    printf("\n");
     for (k = 0; k < argc; k++)
 	printf("%s ", argv[k]);
-    printf("\n");
-    printf("TEST:\n  %s\n", argv[1]);
+    printf("\n\n");
+#ifdef _WIN32
+    printf("TEST:\n %s\n", argv[1]);
+#elif __linux__
+    printf("\x1b[47;34mTEST:\x1b[0m\n \x1b[1;31m%s\x1b[0m\n", argv[1]);
+#endif
     if(argc < 5)
 	{
-	    printf("Test Beginning: ARGuments Counter %d is less than 5.\n", argc);
+#ifdef _WIN32
+	    printf("Test Beginning: ARGuments Counter %d is less than 5\n", argc);
+#elif __linux__
+	    printf("Test Beginning: \x1b[43;37mARGuments Counter %d is less than 5\x1b[0m\n", argc);
+#endif
 	    return 4;
 	}
     else
-	printf("Test Beginning: ARGuments Counter = %d.\n", argc);
+#ifdef _WIN32
+	printf("Test Beginning: ARGuments Counter = %d\n", argc);
+#elif __linux__
+	printf("Test Beginning: \x1b[43;37mARGuments Counter = %d\x1b[0m\n", argc);
+#endif
 
     // Initialize configuration data array
     for(k = 1; k < N_CONF; k++)
@@ -184,7 +194,30 @@ int main(int argc, char *argv[])
 	}
     config[0] = (double)dim;
 
-    printf("Configurating:\n");
+  // Set order and scheme.
+  int order; // 1, 2
+  char * scheme; // Riemann_exact(Godunov), GRP
+#ifdef _WIN32
+  printf("Order[_Scheme]: %s\n",argv[4]);
+#elif __linux__
+  printf("Order[_Scheme]: \x1b[41;37m%s\x1b[0m\n",argv[4]);
+#endif
+  errno = 0;
+  order = strtoul(argv[4], &scheme, 10);
+  if (*scheme == '_')
+      scheme++;
+  else if (*scheme != '\0' || errno == ERANGE)
+      {
+	  printf("No order or Wrog scheme!\n");
+	  return 4;
+      }
+  config[9] = (double)order;
+
+#ifdef _WIN32
+	printf("Configurating:\n");
+#elif __linux__
+	printf("\x1b[42;36mConfigurating:\x1b[0m\n");
+#endif
     char * endptr;
     double conf_tmp;
     for (k = 6; k < argc; k++)
@@ -213,21 +246,6 @@ int main(int argc, char *argv[])
 		    return 4;
 		}
 	}
-	
-  // Set order and scheme.
-  int order; // 1, 2
-  char * scheme; // Riemann_exact(Godunov), GRP
-  printf("Order[_Scheme]: %s\n",argv[4]);
-  errno = 0;
-  order = strtoul(argv[4], &scheme, 10);
-  if (*scheme == '_')
-      scheme++;
-  else if (*scheme != '\0' || errno == ERANGE)
-      {
-	  printf("No order or Wrog scheme!\n");
-	  return 4;
-      }
-  config[9] = (double)order;
 
   // The number of times steps of the fluid data stored for plotting.
   int N; // (int)(config[5]) + 1;
@@ -262,7 +280,6 @@ int main(int argc, char *argv[])
 	  retval = 5;
 	  goto return_NULL;
       }
-
   if(X == NULL || Y == NULL)
       {
 	  printf("NOT enough memory! X or Y\n");

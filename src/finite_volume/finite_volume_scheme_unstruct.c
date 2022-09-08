@@ -39,7 +39,7 @@ void finite_volume_scheme(struct flu_var * FV, const struct mesh_var * mv, const
 
 	printf("Grid has been constructed.\n");
 
-	double tau; // the length of the time step
+	double tau = config[16]; // the length of the time step
 	double t_all = 0.0;
 	struct i_f_var ifv, ifv_R, ifv_tmp;
 

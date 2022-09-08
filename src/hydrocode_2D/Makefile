@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -Wall -pedantic -g -pg -fprofile-arcs -ftest-coverage
+CFLAGS = -std=c99 -Wall -pedantic -Og -g -pg -fprofile-arcs -ftest-coverage
 #C compiler options
 CFLAGD = -DNODATPLOT #-D_Bool=bool
 #Macro definition
@@ -47,10 +47,12 @@ html:
 
 clean:
 #Clean in the subdirectory
-	@$(RM) $(SOURCE).o
+	@$(RM) $(SOURCE).out $(SOURCE).exe
 	@for n in $(HEAD); do \
 	( $(MAKE) --directory=$(SRC)/$$n clean ) \
 	done;
 	@$(RM) *.gcov *.gcda *.gcno
 	@$(RM) -R gcovdir
+	@$(RM) $(SOURCE).info gmon.out pg callgrind.out
+	@$(RM) pg.png callgrind.png
 .PHONYP:clean

@@ -87,15 +87,23 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 	    {
 		if(CreateDir(add_mkdir) == 1)
 		    {
-			fprintf(stderr, "Output directory '%s' construction failed.\n", add_mkdir);
+#ifdef _WIN32
+			fprintf(stderr, "Output directory '%s' construction failed!\n", add_mkdir);
+#elif __linux__
+			fprintf(stderr, "\x1b[47;34mOutput directory '%s' construction failed!\x1b[0m\n", add_mkdir);
+#endif
 			exit(1);
 		    }
 		else
-		    printf("Output directory '%s' is constructed.\n", add_mkdir);				
+#ifdef _WIN32
+		    printf("Output directory '%s' has been constructed.\n", add_mkdir);				
+#elif __linux__
+		    printf("\x1b[47;34mOutput directory '%s' has been constructed.\x1b[0m\n", add_mkdir);				
+#endif
 	    }
 	else if (ACCESS(add_mkdir,4) == -1)
 	    {
-		fprintf(stderr, "Input directory '%s' is unreadable!\n", add_mkdir);
+		fprintf(stderr, "Input directory '%s' is nonexistent or unreadable!\n", add_mkdir);
 		exit(1);
 	    }
 
