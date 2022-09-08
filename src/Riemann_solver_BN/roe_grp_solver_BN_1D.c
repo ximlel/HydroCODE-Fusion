@@ -212,18 +212,19 @@ if (U_all[1]/U_all[0]>1.1)
     T_W_L[i] += R_inv[i][j]*T_U_L[j];
     T_W_R[i] += R_inv[i][j]*T_U_R[j];
   }
- double D_W_S[7], T_W_S[7], D_U_S[7]={0}, T_U_S[7]={0};
+ double D_W_S[7], D_U_S[7]={0};
+ // double T_W_S[7], T_U_S[7]={0};
  for(int i = 0; i < 7; i++)
    {
      if(lambda[i]>0.0)
         {
           D_W_S[i] = D_W_L[i];
-          T_W_S[i] = T_W_L[i];
+          // T_W_S[i] = T_W_L[i];
         }
      else
         {
           D_W_S[i] = D_W_R[i];
-          T_W_S[i] = T_W_R[i];
+          // T_W_S[i] = T_W_R[i];
         }
    }
   for(int i=0; i<7; i++)

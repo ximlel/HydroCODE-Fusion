@@ -40,4 +40,7 @@ void configurate(const char * name);
 void config_write(const char * add_out, const double * cpu_time, const char * name);
 
 
+// terminal_io.c
+void arg_preprocess(const int argc_least, const int argc, char *argv[], char * scheme);
+
 #endif

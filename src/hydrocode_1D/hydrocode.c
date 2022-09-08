@@ -124,109 +124,29 @@ double config[N_CONF]; //!< Initial configuration data array.
 /**
  * @brief This is the main function which constructs the
  *        main structure of the Lagrangian/Eulerian hydrocode.
- * @param[in] argc: ARGument counter.
- * @param[in] argv: ARGument values.
- *            - argv[1]: Folder name of test example (input path).
- *            - argv[2]: Folder name of numerical results (output path).
- *            - argv[3]: Dimensionality (= 1).
- *            - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
- *            - argv[5]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
- *            - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
+ * @param[in] argc: ARGument Counter.
+ * @param[in] argv: ARGument Values.
+ *          - argv[1]: Folder name of test example (input path).
+ *          - argv[2]: Folder name of numerical results (output path).
+ *          - argv[3]: Dimensionality (= 1).
+ *          - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
+ *          - argv[5]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
+ *          - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
  * @return Program exit status code.
  */
 int main(int argc, char *argv[])
 {
-    int k, j, retval = 0;
-    printf("\n");
-    for (k = 0; k < argc; k++)
-	printf("%s ", argv[k]);
-    printf("\n\n");
-#ifdef _WIN32
-    printf("TEST:\n %s\n", argv[1]);
-#elif __linux__
-    printf("\x1b[47;34mTEST:\x1b[0m\n \x1b[1;31m%s\x1b[0m\n", argv[1]);
-#endif
-    if(argc < 5)
-	{
-#ifdef _WIN32
-	    printf("Test Beginning: ARGuments Counter %d is less than 5\n", argc);
-#elif __linux__
-	    printf("Test Beginning: \x1b[43;37mARGuments Counter %d is less than 5\x1b[0m\n", argc);
-#endif
-	    return 4;
-	}
-    else
-#ifdef _WIN32
-	printf("Test Beginning: ARGuments Counter = %d\n", argc);
-#elif __linux__
-	printf("Test Beginning: \x1b[43;37mARGuments Counter = %d\x1b[0m\n", argc);
-#endif
+  int k, j, retval = 0;
+  // Initialize configuration data array
+  for(k = 1; k < N_CONF; k++)
+      config[k] = INFINITY;
 
-    // Initialize configuration data array
-    for(k = 1; k < N_CONF; k++)
-        config[k] = INFINITY;
-
-    // Set dimension.
-    int dim;
-    dim = atoi(argv[3]);
-    if (dim != 1)
+  char * scheme = NULL; // Riemann_exact(Godunov), GRP
+  arg_preprocess(5, argc, argv, scheme);
+  if ((int)config[0] != 1)
 	{
 	    printf("No appropriate dimension was entered!\n");
 	    return 4;
-	}
-    config[0] = (double)dim;
-
-  // Set order and scheme.
-  int order; // 1, 2
-  char * scheme; // Riemann_exact(Godunov), GRP
-#ifdef _WIN32
-  printf("Order[_Scheme]: %s\n",argv[4]);
-#elif __linux__
-  printf("Order[_Scheme]: \x1b[41;37m%s\x1b[0m\n",argv[4]);
-#endif
-  errno = 0;
-  order = strtoul(argv[4], &scheme, 10);
-  if (*scheme == '_')
-      scheme++;
-  else if (*scheme != '\0' || errno == ERANGE)
-      {
-	  printf("No order or Wrog scheme!\n");
-	  return 4;
-      }
-  config[9] = (double)order;
-
-#ifdef _WIN32
-	printf("Configurating:\n");
-#elif __linux__
-	printf("\x1b[42;36mConfigurating:\x1b[0m\n");
-#endif
-    char * endptr;
-    double conf_tmp;
-    for (k = 6; k < argc; k++)
-	{
-	    errno = 0;
-	    j = strtoul(argv[k], &endptr, 10);
-	    if (errno != ERANGE && *endptr == '=')
-		{							
-		    endptr++;
-		    errno = 0;
-		    conf_tmp = strtod(endptr, &endptr);
-		    if (errno != ERANGE && *endptr == '\0')
-			{
-			    config[j] = conf_tmp;
-			    printf("%3d-th configuration: %g (ARGument)\n", j, conf_tmp);
-			}
-		    else
-			{
-			    printf("Configuration error in ARGument variable %d! ERROR after '='!\n", k);
-			    return 4;
-			}
-		}
-	    else
-		{
-		    printf("Configuration error in ARGument variable %d! ERROR before '='!\n", k);
-		    return 4;
-		}
 	}
 
   // The number of times steps of the fluid data stored for plotting.
@@ -248,6 +168,7 @@ int main(int argc, char *argv[])
      */
   const int m = (int)config[3];
   const double h = config[10], gamma = config[6];
+  const int order = (int)config[9];
 
   struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
   double ** X = NULL;
