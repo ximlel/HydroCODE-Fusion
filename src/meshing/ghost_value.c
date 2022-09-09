@@ -11,12 +11,12 @@
 #define FV_COPY(var)  FV->var[i] = FV->var[pc[i]]
 
 
-void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, double t)
+void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const double t)
 {
 	const int order = (int)config[9];
 	const int num_cell = (int)config[3];
 	const int num_cell_ghost = mv->num_ghost + num_cell;
-	const int *pc = mv->peri_cell;	
+	const int *pc = mv->peri_cell;
 	
 	for(int i = num_cell; i < num_cell_ghost; i++)
 		{

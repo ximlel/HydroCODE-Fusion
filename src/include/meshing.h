@@ -33,6 +33,6 @@ struct mesh_var mesh_load(const char *example, const char *mesh_name);
 
 
 void period_cell_modi(struct mesh_var * mv);
-void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, double t);
+void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const double t);
 
 #endif

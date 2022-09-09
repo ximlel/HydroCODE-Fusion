@@ -16,30 +16,22 @@
 /**
  * @brief Print out 'v'(X/Y) coordinates of spatial points.
  */
-#define PRINT_NP(v)					\
-    do {						\
-	if (mv.v == NULL)				\
-	    for(k = 0; k < mv.num_pt; k++)		\
-		fprintf(fp, "%.10g\n", 0.0);		\
-	else						\
-	    for(k = 0; k < mv.num_pt; k++)		\
-		fprintf(fp, "%.10g\n", mv.v[k]);	\
-	fprintf(fp,"\n");				\
+#define PRINT_NP(v)				\
+    do {					\
+	for(k = 0; k < mv.num_pt; k++)		\
+	    fprintf(fp, "%.10g\n", mv.v[k]);	\
+	fprintf(fp,"\n");			\
     } while (0)
 
 /**
  * @brief Print out values of fluid variable 'v' in computational grid cells.
  */
-#define PRINT_NC(v)					\
-    do {						\
-	if (FV.v == NULL)				\
-	    for(k = 0; k < num_cell; k++)		\
-		fprintf(fp, "%.10g\n", 0.0);		\
-	else						\
-	    for(k = 0; k < num_cell; k++)		\
-		fprintf(fp, "%.10g\n", FV.v[k]);	\
-	fprintf(fp,"\n");				\
-	} while (0)
+#define PRINT_NC(FV_v_k)			\
+    do {					\
+	for(k = 0; k < num_cell; k++)		\
+	    fprintf(fp, "%.10g\n", (FV_v_k));	\
+	fprintf(fp,"\n");			\
+    } while (0)
 
 /**
  * @brief This function write the 2-D solution into Tecplot output files with block data.
@@ -78,6 +70,12 @@ void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, 
 	num_data  = 2;
 	fprintf(fp, ", \"P\", \"RHO\", \"U\", \"V\"");
 	num_data += 4;
+	// internal energy
+	// fprintf(fp, ", \"e\"");
+	// num_data += 1;
+	// entropy
+	// fprintf(fp, ", \"S\"");
+	// num_data += 1;
 #ifdef MULTIFLUID_BASICS
 	fprintf(fp, ", \"Z_a\"");
 	num_data += 1;
@@ -110,20 +108,24 @@ void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, 
 
 	PRINT_NP(X);
 	PRINT_NP(Y);
-	PRINT_NC(P);
-	PRINT_NC(RHO);
-	PRINT_NC(U);
-	PRINT_NC(V);
+	PRINT_NC(FV.P[k]);
+	PRINT_NC(FV.RHO[k]);
+	PRINT_NC(FV.U[k]);
+	PRINT_NC(FV.V[k]);
+	// internal energy
+	// PRINT_NC(FV.P[k]/FV.RHO[k]/(config[6]-1.0));
+	// entropy
+	// PRINT_NC(FV.P[k]/pow(FV.RHO[k],config[6]));
 #ifdef MULTIFLUID_BASICS
-	PRINT_NC(Z_a);
+	PRINT_NC(FV.Z_a[k]);
 #ifdef MULTIPHASE_BASICS
-	PRINT_NC(P_b);
-	PRINT_NC(RHO_b);
-	PRINT_NC(U_b);
-	PRINT_NC(V_b);
+	PRINT_NC(FV.P_b[k]);
+	PRINT_NC(FV.RHO_b[k]);
+	PRINT_NC(FV.U_b[k]);
+	PRINT_NC(FV.V_b[k]);
 #else
-	PRINT_NC(PHI);
-	PRINT_NC(gamma);
+	PRINT_NC(FV.PHI[k]);
+	PRINT_NC(FV.gamma[k]);
 #endif
 #endif
 	

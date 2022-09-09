@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
   if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
-	  finite_volume_scheme(&FV0, &mv, scheme, argv[2]);
+	  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], N, time_plot);
       }
   else
       {
@@ -204,10 +204,10 @@ int main(int argc, char *argv[])
 
   // Write the final data down.
 #ifndef NOTECPLOT
-  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], config[1]);
+  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], time_plot[N-1]);
 #endif
 #ifndef NOVTKPLOT
-  file_write_3D_VTK(FV0, mv, argv[2], config[1]);
+  file_write_3D_VTK(FV0, mv, argv[2], time_plot[N-1]);
 #endif
 
 return_NULL:

@@ -241,7 +241,7 @@ void vol_comp(const struct cell_var * cv, const struct mesh_var * mv)
 
 
 /**
- * @brief Determine normal directions ('cv->n_x/n_y[][]') and relationship between cells ('cv->cell_cell[][]').
+ * @brief Determine interfacial normal directions ('cv->n_x/n_y[][]') and relationship between cells ('cv->cell_cell[][]').
  * @param[in,out] cv: Structure of grid variable data in computational grid cells.
  * @param[in]     mv: Structure of meshing variable data.
  */

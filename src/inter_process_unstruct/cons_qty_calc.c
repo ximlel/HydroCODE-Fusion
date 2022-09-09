@@ -7,26 +7,29 @@
 #include "../include/var_struc.h"
 
 
-//Initialize conserved quantities.
+/**
+ * @brief Initialize conservative variables on grid cells in struct 'cv' according to primitive variables in struct 'FV'.
+ * @param[in] cv:     Structure of grid variable data in computational grid cells.
+ * @param[in] FV:     Structure of initial fluid variable data array pointer.
+ */
 void cons_qty_init(const struct cell_var * cv, const struct flu_var * FV)
 {
 	const int num_cell = (int)config[3];
 	for(int k = 0; k < num_cell; k++)
 		{
 			cv->U_rho[k] = FV->RHO[k];
+			cv->U_u[k]   = FV->RHO[k] * FV->U[k];	
+			cv->U_e[k]   = FV->RHO[k] * FV->U[k] * FV->U[k] * 0.5;
+			cv->U_v[k]   = FV->RHO[k] * FV->V[k];
+			cv->U_e[k]  += FV->RHO[k] * FV->V[k] * FV->V[k] * 0.5;
 #ifdef MULTIFLUID_BASICS
 			cv->U_phi[k]   = FV->RHO[k] * FV->PHI[k];			
 			cv->U_gamma[k] = FV->RHO[k] * FV->gamma[k];
 			cv->U_e_a[k]   = FV->Z_a[k] * FV->P[k]/(config[6]-1.0) + 0.5*cv->U_phi[k]*(FV->U[k]*FV->U[k]+FV->V[k]*FV->V[k]);
-			cv->U_e[k]     = FV->P[k]/(FV->gamma[k]-1.0);
+			cv->U_e[k]    += FV->P[k]/(FV->gamma[k]-1.0);
 #else
-			cv->U_e[k]     = FV->P[k]/(config[6]-1.0);
+			cv->U_e[k]    += FV->P[k]/(config[6]-1.0);
 #endif
-			cv->U_u[k]  = FV->RHO[k] * FV->U[k];	
-			cv->U_e[k] += FV->RHO[k] * FV->U[k] * FV->U[k] * 0.5;
-			cv->U_v[k]  = FV->RHO[k] * FV->V[k];
-			cv->U_e[k] += FV->RHO[k] * FV->V[k] * FV->V[k] * 0.5;
-
 		}
 }
 

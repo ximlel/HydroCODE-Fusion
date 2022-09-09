@@ -119,13 +119,15 @@ static void config_check(void)
     config[2]   = isfinite(config[2])   ? config[2]   : (double)1;	
     // Coordinate framework (EUL/LAG/ALE)
     config[8]   = isfinite(config[8])   ? config[8]   : (double)0;
-    // Reconstruction (prim_var/cons_var)
+    // Reconstruction approach (interfacial value / lsq)
+    config[30]  = isfinite(config[30])  ? config[30]  : (double)0;
+    // Reconstruction variable (prim_var/cons_var)
     config[31]  = isfinite(config[31])  ? config[31]  : (double)0;
     // Output initial data
     config[32]  = isfinite(config[32])  ? config[32]  : (double)true;
     // Dimensional splitting
     config[33]  = isfinite(config[33])  ? config[33]  : (double)false;
-    // Slope limiter (Venkatakrishnan/Barth-Jespersen)
+    // Slope limiter for least square procedure (Venkatakrishnan/Barth-Jespersen)
     config[40]  = isfinite(config[40])  ? config[40]  : (double)0;
     // Parameter α in minmod limiter
     config[41]  = isfinite(config[41])  ? config[41]  : 1.9;

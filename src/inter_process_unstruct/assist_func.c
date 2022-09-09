@@ -187,7 +187,7 @@ int interface_var_init(const struct cell_var * cv, const struct mesh_var * mv,
 		}
 	else if (cc[k][j] == -1)//initial boundary condition.
 		{
-			if (i > 0)
+			if (i > 1)
 				return -1;
 			cons_qty_copy_cv2ifv(ifv_R, cv, k);
 

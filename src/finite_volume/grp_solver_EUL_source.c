@@ -29,18 +29,18 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
      * j is a frequently used index for spatial variables.
      * k is a frequently used index for the time step.
      */
-  int j, k;
+  int j, k = 0;
 
   clock_t tic, toc;
   double cpu_time_sum = 0.0;
 
-  double const t_all = config[1];        // the total time
-  double const eps   = config[4];        // the largest value could be seen as zero
-  int    const N     = (int)(config[5]); // the maximum number of time steps
-  double const gamma = config[6];        // the constant of the perfect gas
-  double const CFL   = config[7];        // the CFL number
-  double const h     = config[10];       // the length of the initial spatial grids
-  double       tau   = config[16];       // the length of the time step
+  double const t_all = config[1];      // the total time
+  double const eps   = config[4];      // the largest value could be seen as zero
+  int    const N     = (int)config[5]; // the maximum number of time steps
+  double const gamma = config[6];      // the constant of the perfect gas
+  double const CFL   = config[7];      // the CFL number
+  double const h     = config[10];     // the length of the initial spatial grids
+  double       tau   = config[16];     // the length of the time step
 
   _Bool find_bound = false;
 
@@ -216,14 +216,19 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 
 //====================Time step and grid fixed======================
     // If no total time, use fixed tau and time step N.
-    if (isfinite(t_all) || !isfinite(config[16]) || config[16] <= 0.0)
+    if(isfinite(t_all) || !isfinite(config[16]) || config[16] <= 0.0)
 	{
 	    tau = CFL * h_S_max;
-	    if ((time_c + tau) > (t_all - eps))
+	    if(tau < eps)
+		{
+		    printf("\nThe length of the time step is so small on [%d, %g, %g] (t_n, time_c, tau)\n", k, time_c, tau);
+		    time_c = t_all;
+		}
+	    else if((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
 	    else if(!isfinite(tau))
 		{
-		    printf("NAN or INFinite error on [%d, %g] (t_n, tau) - CFL\n", k, tau); 
+		    printf("NAN or INFinite error on [%d, %g, %g] (t_n, time_c, tau) - CFL\n", k, time_c, tau); 
 		    tau = t_all - time_c;
 		    goto return_NULL;
 		}
@@ -280,15 +285,12 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
     cpu_time_sum += cpu_time[nt];
 
     time_c += tau;
-    if (isfinite(t_all))
+    if(isfinite(t_all))
         DispPro(time_c*100.0/t_all, k);
     else
         DispPro(k*100.0/N, k);
     if(time_c > (t_all - eps) || isinf(time_c))
-	{
-	    config[5] = (double)k;
-	    break;
-	}
+	break;
 
 //===========================Fixed variable location=======================	
     for(j = 0; j < m; ++j)
@@ -300,16 +302,18 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
 	}
   }
 
-  if (fabs(time_plot[1]) < eps)
-      {
-	  time_plot[0] = time_c - tau;
-	  time_plot[1] = time_c;
-      }
   printf("\nTime is up at time step %d.\n", k);
   printf("The cost of CPU time for 1D-GRP Eulerian scheme for this problem is %g seconds.\n", cpu_time_sum);
 //---------------------END OF THE MAIN LOOP----------------------
 
 return_NULL:
+  config[5] = (double)k;
+  if(fabs(time_plot[1]) < eps)
+      {
+	  time_plot[0] = time_c - tau;
+	  time_plot[1] = time_c;
+      }
+
   free(s_u);
   free(s_p);
   free(s_rho);

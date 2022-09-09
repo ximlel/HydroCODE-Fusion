@@ -7,7 +7,7 @@
 #include "../include/var_struc.h"
 
 int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
-							   const struct flu_var * FV, double tau, const int stop_step)
+							   const struct flu_var * FV, double tau, const int RK)
 {
 	const int num_cell = (int)config[3];
 	const int order = (int)config[9];
@@ -19,12 +19,12 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 	int k,j;
 	
 	static double U_rho_bak[412164], U_e_bak[412164], U_u_bak[412164], U_v_bak[412164], U_phi_bak[412164];
-	if (stop_step == 2)
+	if (RK == 1)
 		tau = 0.5*tau;
 //	for(k = (int)config[13]; k < num_cell; ++k)
 	for(k = 0; k < num_cell; ++k)
 		{
-			if (stop_step == 0 && (_Bool)config[53])
+			if (RK == 0 && (_Bool)config[53])
 				{
 					U_rho_bak[k] = cv->U_rho[k];
 					U_e_bak[k]   = cv->U_e[k];
@@ -34,7 +34,7 @@ int cons_qty_update_corr_ave_P(struct cell_var * cv, const struct mesh_var * mv,
 					U_phi_bak[k] = cv->U_phi[k];
 #endif
 				}
-			if (stop_step == 2)
+			if (RK == 1)
 				{
 					cv->U_rho[k] = 0.5*(cv->U_rho[k] + U_rho_bak[k]);
 					cv->U_e[k]   = 0.5*(cv->U_e[k]   + U_e_bak[k]);

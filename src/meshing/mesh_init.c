@@ -62,7 +62,8 @@ static void cell_pt_clockwise(const struct mesh_var * mv)
 
 struct mesh_var mesh_load(const char *example, const char *mesh_name)
 {
-	struct mesh_var mv = {0, 0, NULL, NULL, {1}, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	struct mesh_var mv = {0};
+	mv.num_border[0] = 1;
 
 	char add_mkdir[FILENAME_MAX];
 	example_io(example, add_mkdir, 1);
