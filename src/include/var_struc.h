@@ -135,8 +135,8 @@ typedef struct b_f_var {
 typedef struct mesh_var {
 	int num_pt;      //!< Total number of grid nodes.
 	int num_ghost;   //!< Total number of ghost grid cells.
-	int *cell_type;  //!< @todo Grid cell type read from mesh file '*.msh' 
 	int **cell_pt;   //!< Serial number of each grid node on a grid cell in the clockwise direction.
+	int * cell_type; //!< @todo Grid cell type read from mesh file '*.msh' 
 	/**
 	 * @brief num_border[0] is the total number of connected boundaries on the entire computational domain.
 	 * @details num_border[i](i = 1,2,…,9) is the total number of grid cell interfaces at the i-th connected boundary.
@@ -149,7 +149,7 @@ typedef struct mesh_var {
 	 *  @arg  border_cond[i] > 0, serial number of the ghost grid cell at the periodic boundary is i.
 	 */
 	int *border_cond;
-	int *peri_cell;   //!< Serial number of ghost grid cells at the periodic boundary.
+	int *period_cell;   //!< Serial number of ghost grid cells at the periodic boundary.
 	double *normal_v; //!< @todo Normal velocity on grid cell interfaces at the boundary.
 	double *X, *Y;    //!< x- and y-coordinates of the grid nodes with fixed serial number.
 	//! Pointer to the boundary condition function.

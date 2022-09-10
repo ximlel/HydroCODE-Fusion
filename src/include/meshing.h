@@ -29,10 +29,10 @@ void Saltzman_mesh_Lag(struct mesh_var * mv);
 int msh_read(FILE * fp, struct mesh_var * mv);
 
 
-struct mesh_var mesh_load(const char *example, const char *mesh_name);
+struct mesh_var mesh_init(const char *example, const char *mesh_name);
+void mesh_mem_free(struct mesh_var * mv);
 
-
-void period_cell_modi(struct mesh_var * mv);
+void period_cell_modify(struct mesh_var * mv);
 void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const double t);
 
 #endif

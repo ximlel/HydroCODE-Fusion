@@ -235,8 +235,8 @@ int interface_var_init(const struct cell_var * cv, const struct mesh_var * mv,
 		{
 			*ifv_R = *ifv;
 			u_R =  ifv_R->U*ifv_R->n_x + ifv_R->V*ifv_R->n_y;
-			u_R = -u_R;
 			v_R = -ifv_R->U*ifv_R->n_y + ifv_R->V*ifv_R->n_x;
+			u_R = -u_R;
 			ifv_R->U = u_R*ifv_R->n_x - v_R*ifv_R->n_y;
 			ifv_R->V = u_R*ifv_R->n_y + v_R*ifv_R->n_x;
 		}
@@ -285,6 +285,6 @@ double tau_calc(const struct cell_var * cv, const struct mesh_var * mv)
 						}
 				}
 			tau = fmin(tau, cv->vol[k]/cum * CFL);
-		}	//To decide tau.
+		} //To decide tau.
 	return tau;
 }

@@ -13,7 +13,6 @@
 #endif
 
 
-
 static int quad_mesh(struct mesh_var * mv, int n_x_add, int n_y_add)
 {
 	if(isinf(config[13]) || isinf(config[14]))
@@ -146,117 +145,118 @@ static int quad_border_cond
 		}	
 	if(mv->num_ghost > 0)
 		{					
-			mv->peri_cell = (int*)ALLOC(num_cell * sizeof(int));
-			if(mv->peri_cell == NULL)
+			mv->period_cell = (int*)ALLOC(num_cell * sizeof(int));
+			if(mv->period_cell == NULL)
 				{
 					printf("Not enough memory in quadrilateral periodic boundary constructed!\n");
 					goto return_NULL;
 				}
 			for(k = 0; k < num_cell; k++)
-				mv->peri_cell[k] = -1;
+				mv->period_cell[k] = -1;
 		}
 
 	for(k = 0; k < n_x; k++)
 		{
 			if (down == -7)
-				mv->peri_cell[k] = k + n_x * (n_y-2);
+				mv->period_cell[k] = k + n_x * (n_y-2);
 			else if (down == -70)
 				{
 					if (k-(int)config[70] < 0)
-						mv->peri_cell[k] = n_x*(n_y-2);
+						mv->period_cell[k] = n_x*(n_y-2);
 					else if (k-(int)config[70] >= n_x)
-						mv->peri_cell[k] = n_x*(n_y-1) - 1;
+						mv->period_cell[k] = n_x*(n_y-1) - 1;
 					else
-						mv->peri_cell[k] = n_x*(n_y-2)+k - (int)config[70];
+						mv->period_cell[k] = n_x*(n_y-2)+k - (int)config[70];
 				}
 			else if (down == -71)
 				{
 					if (k-(int)config[70] < 0)
-						mv->peri_cell[k] = n_x*(n_y-1)+k - (int)config[70];
+						mv->period_cell[k] = n_x*(n_y-1)+k - (int)config[70];
 					else if (k-(int)config[70] >= n_x)
-						mv->peri_cell[k] = n_x*(n_y-3)+k - (int)config[70];
+						mv->period_cell[k] = n_x*(n_y-3)+k - (int)config[70];
 					else
-						mv->peri_cell[k] = n_x*(n_y-2)+k - (int)config[70];
+						mv->period_cell[k] = n_x*(n_y-2)+k - (int)config[70];
 				}
 			else if (down == -77)
 				{
 					if (k < n_x/2)
-						mv->peri_cell[k] = k + n_x + 1;
+						mv->period_cell[k] = k + n_x + 1;
 					else
-						mv->peri_cell[k] = k + n_x - 1;
+						mv->period_cell[k] = k + n_x - 1;
 				}
 			mv->border_cond[k] = down;
 		}
 	for(k = n_x; k < n_x+n_y; k++)
 		{
 			if (right == -7)				
-				mv->peri_cell[n_x * (k-n_x+1) - 1] = n_x * (k-n_x) + 1;			
+				mv->period_cell[n_x * (k-n_x+1) - 1] = n_x * (k-n_x) + 1;			
 			else if (right == -77)
 				{
 					if (k < n_x + n_y/2)
-						mv->peri_cell[n_x * (k-n_x+1) - 1] = n_x * (k-n_x+2) - 2;
+						mv->period_cell[n_x * (k-n_x+1) - 1] = n_x * (k-n_x+2) - 2;
 					else
-						mv->peri_cell[n_x * (k-n_x+1) - 1] = n_x * (k-n_x) - 2;
+						mv->period_cell[n_x * (k-n_x+1) - 1] = n_x * (k-n_x) - 2;
 				}	
 			mv->border_cond[k] = right;
 		}
 	for(k = n_x + n_y; k < n_x*2 + n_y; k++)
 		{
 			if (up == -7)
-				mv->peri_cell[n_x*(n_y+1) + n_y - k - 1] = n_x*3 + n_y - k - 1;
+				mv->period_cell[n_x*(n_y+1) + n_y - k - 1] = n_x*3 + n_y - k - 1;
 			else if (up == -70)
 				{					
 					if (n_x*2+n_y-k-1 + (int)config[70] < 0)
-						mv->peri_cell[n_x*(n_y+1)+n_y-k-1] = n_x;
+						mv->period_cell[n_x*(n_y+1)+n_y-k-1] = n_x;
 					else if (n_x*2+n_y-k-1 + (int)config[70] >= n_x)
-						mv->peri_cell[n_x*(n_y+1)+n_y-k-1] = n_x*2 - 1;
+						mv->period_cell[n_x*(n_y+1)+n_y-k-1] = n_x*2 - 1;
 					else
-						mv->peri_cell[n_x*(n_y+1)+n_y-k-1] = n_x*3+n_y-k-1 + (int)config[70];
+						mv->period_cell[n_x*(n_y+1)+n_y-k-1] = n_x*3+n_y-k-1 + (int)config[70];
 				}
 			else if (up == -71)
 				{					
 					if (n_x*2+n_y-k-1 + (int)config[70] < 0)
-						mv->peri_cell[n_x*(n_y+1)+n_y-k-1] = n_x*4+n_y-k-1 + (int)config[70];
+						mv->period_cell[n_x*(n_y+1)+n_y-k-1] = n_x*4+n_y-k-1 + (int)config[70];
 					else if (n_x*2+n_y-k-1 + (int)config[70] >= n_x)
-						mv->peri_cell[n_x*(n_y+1)+n_y-k-1] = n_x*2+n_y-k-1 + (int)config[70];
+						mv->period_cell[n_x*(n_y+1)+n_y-k-1] = n_x*2+n_y-k-1 + (int)config[70];
 					else
-						mv->peri_cell[n_x*(n_y+1)+n_y-k-1] = n_x*3+n_y-k-1 + (int)config[70];
+						mv->period_cell[n_x*(n_y+1)+n_y-k-1] = n_x*3+n_y-k-1 + (int)config[70];
 				}
 			else if (up == -77)
 				{
 					if (k < n_x + n_y + n_x/2)
-						mv->peri_cell[n_x*(n_y+1) + n_y - k - 1] = n_x * n_y + n_y-k-2;
+						mv->period_cell[n_x*(n_y+1) + n_y - k - 1] = n_x * n_y + n_y-k-2;
 					else
-						mv->peri_cell[n_x*(n_y+1) + n_y - k - 1] = n_x * n_y + n_y-k;
+						mv->period_cell[n_x*(n_y+1) + n_y - k - 1] = n_x * n_y + n_y-k;
 				}
 			mv->border_cond[k] = up;
 		}
 	for(k = n_x*2 + n_y; k < num_border; k++)
 		{
 			if (left == -7)
-				mv->peri_cell[(num_border-k-1) * n_x] = (num_border-k) * n_x - 2;				
+				mv->period_cell[(num_border-k-1) * n_x] = (num_border-k) * n_x - 2;				
 			else if (left == -77)
 				{
 					if (k < n_x*2 + n_y + n_y/2)
-						mv->peri_cell[(num_border-k-1) * n_x] = (num_border-k-2) * n_x + 1;
+						mv->period_cell[(num_border-k-1) * n_x] = (num_border-k-2) * n_x + 1;
 					else
-						mv->peri_cell[(num_border-k-1) * n_x] = (num_border-k) * n_x + 1;
+						mv->period_cell[(num_border-k-1) * n_x] = (num_border-k) * n_x + 1;
 				}
 			mv->border_cond[k] = left;
 		}
 
 	if(mv->num_ghost > 0)
-		period_cell_modi(mv);
+		period_cell_modify(mv);
 
 	return 1;
 
  return_NULL:
 	free(mv->border_cond);
 	mv->border_cond = NULL;	
-	free(mv->peri_cell);
-	mv->peri_cell = NULL;
+	free(mv->period_cell);
+	mv->period_cell = NULL;
 	exit(5);	
 }
+
 
 void Sod_mesh(struct mesh_var * mv)
 {
@@ -265,12 +265,14 @@ void Sod_mesh(struct mesh_var * mv)
 	quad_border_cond(mv, n_x_a, n_y_a, -2, -4, -2, -4);
 }
 
+/*
 void Shock_Bubble_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 0, n_y_a = 0;
 	quad_mesh(mv, n_x_a, n_y_a);
 	quad_border_cond(mv, n_x_a, n_y_a, -4, -4, -4, -4);
 }
+*/
 
 void Shear_mesh(struct mesh_var * mv)
 {	
@@ -279,25 +281,28 @@ void Shear_mesh(struct mesh_var * mv)
 	quad_border_cond(mv, n_x_a, n_y_a, -1, -4, -4, -4);
 }
 
+/*
 void free_mesh(struct mesh_var * mv)
 {		
 	const int n_x_a = 0, n_y_a = 0;	
 	quad_mesh(mv, n_x_a, n_y_a);
 	quad_border_cond(mv, n_x_a, n_y_a, -3, -3, -3, -3);
 }
+*/
 
-void RMI_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 2, n_y_a = 0;		
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -4, -7, -4, -7);
-}
-
-void RMI_S_mesh(struct mesh_var * mv)
+// void RMI_S_mesh(struct mesh_var * mv)
+void free_mesh(struct mesh_var * mv)
 {	
 	const int n_x_a = 0, n_y_a = 0;		
 	quad_mesh(mv, n_x_a, n_y_a);
 	quad_border_cond(mv, n_x_a, n_y_a, -4, -4, -4, -4);
+}
+
+void RMI_vertical_mesh(struct mesh_var * mv)
+{	
+	const int n_x_a = 2, n_y_a = 0;		
+	quad_mesh(mv, n_x_a, n_y_a);
+	quad_border_cond(mv, n_x_a, n_y_a, -4, -7, -4, -7);
 }
 
 void R2D_mesh(struct mesh_var * mv)
@@ -320,6 +325,7 @@ void Shell_mesh(struct mesh_var * mv)
 	quad_mesh(mv, n_x_a, n_y_a);
 	quad_border_cond(mv, n_x_a, n_y_a, -2, -4, -4, -2);
 }
+
 
 void cylinder_mesh(struct mesh_var * mv)
 {

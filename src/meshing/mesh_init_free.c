@@ -1,8 +1,14 @@
+/**
+ * @file  mesh_init_free.c
+ * @brief This is a set of functions which initialize or free mesh data.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
+#include "../include_cii/mem.h"
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 #include "../include/meshing.h"
@@ -60,7 +66,7 @@ static void cell_pt_clockwise(const struct mesh_var * mv)
 }
 
 
-struct mesh_var mesh_load(const char *example, const char *mesh_name)
+struct mesh_var mesh_init(const char *example, const char *mesh_name)
 {
 	struct mesh_var mv = {0};
 	mv.num_border[0] = 1;
@@ -75,16 +81,16 @@ struct mesh_var mesh_load(const char *example, const char *mesh_name)
 	FILE * fp;
 	if ((fp = fopen(add, "r")) != NULL)
 		{
-		    if(msh_read(fp, &mv) == 0)
-			{
-			    fclose(fp);
-			    exit(2);
-			}
-		    else
+		    if(msh_read(fp, &mv))
 			{									
 			    fclose(fp);
 			    printf("Mesh file(%s.msh) has been read!\n", mesh_name);
 			    return mv;
+			}
+			else
+			{
+			    fclose(fp);
+			    exit(2);
 			}
 		}
 
@@ -127,7 +133,21 @@ struct mesh_var mesh_load(const char *example, const char *mesh_name)
 	    }
 
 	cell_pt_clockwise(&mv);
-	
 	return mv;
 }
 
+void mesh_mem_free(struct mesh_var * mv)
+{
+	const int num_cell = (int)config[3];
+
+	for(int k = 0; k < num_cell; k++)
+	    FREE(mv->cell_pt[k]);
+	FREE(mv->cell_pt);
+	FREE(mv->cell_type);
+	FREE(mv->border_pt);
+	FREE(mv->border_cond);
+	FREE(mv->period_cell);
+	FREE(mv->normal_v);
+	FREE(mv->X);
+	FREE(mv->Y);
+}

@@ -8,7 +8,9 @@
 #include "../include/var_struc.h"
 
 
-//default boundary condition
+/**
+ * @bried Default boundary condition.
+ */
 #define DEFAULT_BC -3
 
 
@@ -21,8 +23,6 @@ static int msh_border_cell_dis(int type)
     else
 	return -1;
 }
-
-
 
 
 static int msh_border_build(struct mesh_var * mv, int num_bc_all)
@@ -101,7 +101,6 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 	char one_line[1000]; // input one line
 	char *headptr, *endptr; // PTR of read data
 	char Endsection[25];
-
 
 	while (fgets(one_line, sizeof(one_line), fp) != NULL)
 		{
@@ -280,10 +279,8 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 
 	if(msh_border_build(mv, num_bc_all) == 0)
 		{
-			free(mv->border_pt);
-			mv->border_pt = NULL;
-			free(mv->border_cond);
-			mv->border_cond = NULL;
+			FREE(mv->border_pt);
+			FREE(mv->border_cond);
 			goto return_0;
 		}
 
@@ -291,6 +288,7 @@ int msh_read(FILE * fp, struct mesh_var * mv)
 	return 1;
 
  return_0:
+
 	FREE(idx_N);
 	FREE(mv->X);
 	FREE(mv->Y);

@@ -163,8 +163,6 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 			if (cons_qty_update_corr_ave_P(&cv, mv, FV, tau, RK) == 0)
 			    time_c = t_all;
 
-			cpu_time += (clock() - start_clock) / (double)CLOCKS_PER_SEC;
-
 			if((_Bool)config[53])
 			    RK = RK ? 0 : 1;
 			if(!(_Bool)config[53] || RK == 1)
@@ -175,6 +173,8 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 			    DispPro(i*100.0/N, i);
 			if(time_c > (t_all - eps) || isinf(time_c))
 			    break;
+
+			cpu_time += (clock() - start_clock) / (double)CLOCKS_PER_SEC;
 		}
 	printf("\nTime is up at time step %d.\n", i);
 	printf("\nThe cost of CPU time for the finite volume scheme on unstructured grids in Eulerian coordinate is %g seconds.\n", cpu_time);

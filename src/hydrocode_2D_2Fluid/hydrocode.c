@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
      * The following m variables are the initial value.
      */
   struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot);
-  struct mesh_var mv = mesh_load(argv[1], argv[6]);
+  struct mesh_var mv = mesh_init(argv[1], argv[6]);
 
   if ((_Bool)config[32])
       {
@@ -211,5 +211,24 @@ int main(int argc, char *argv[])
 #endif
 
 return_NULL:
+  mesh_mem_free(&mv);
+
+  free(FV0.RHO);
+  free(FV0.U);
+  free(FV0.V);
+  free(FV0.P);
+  FV0.RHO = NULL;
+  FV0.U   = NULL;
+  FV0.V   = NULL;
+  FV0.P   = NULL;
+#ifdef MULTIFLUID_BASICS
+  free(FV0.Z_a);
+  free(FV0.PHI);
+  free(FV0.gamma);
+  FV0.Z_a   = NULL;
+  FV0.PHI   = NULL;
+  FV0.gamma = NULL;
+#endif
+
   return retval;
 }

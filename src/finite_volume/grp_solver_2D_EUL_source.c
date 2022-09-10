@@ -124,12 +124,12 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; ++k)
   {
+    tic = clock();
     /* evaluate f and a at some grid points for the iteration
      * and evaluate the character speed to decide the length
      * of the time step by (tau * speed_max)/h = CFL
      */
     h_S_max = INFINITY; // h/S_max = INFINITY
-    tic = clock();
 
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
@@ -186,10 +186,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]) - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  mom_x = CV[nt-1].RHO[j][i]*CV[nt-1].U[j][i] - nu*(CV->F_u[j+1][i]  -CV->F_u[j][i])   - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
 	  mom_y = CV[nt-1].RHO[j][i]*CV[nt-1].V[j][i] - nu*(CV->F_v[j+1][i]  -CV->F_v[j][i])   - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
 	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - nu*(CV->F_e[j+1][i]  -CV->F_e[j][i])   - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]) - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 	  
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
@@ -207,10 +207,6 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
       }
 
 //==================================================
-
-    toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    cpu_time_sum += cpu_time[nt];
     
     time_c += tau;
     if(isfinite(t_all))
@@ -230,6 +226,10 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 		CV[nt-1].E[j][i]   =   CV[nt].E[j][i];  
 		CV[nt-1].P[j][i]   =   CV[nt].P[j][i];
 	    }
+
+    toc = clock();
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time_sum += cpu_time[nt];
   }
 
   printf("\nTime is up at time step %d.\n", k);

@@ -92,6 +92,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
   double time_c = 0.0; // the current time
   int nt = 1; // the number of times storing plotting data
+  int DS = 1; // dimension splitting indicator
   
   // Left/Right/Upper/Downside boundary condition
   struct b_f_var * bfv_L = NULL, * bfv_R = NULL, * bfv_U = NULL, * bfv_D = NULL;
@@ -123,15 +124,15 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   BC_INIT_MEM_1D(bfv_D, m); BC_INIT_MEM_1D(bfv_U, m);
 
 //------------THE MAIN LOOP-------------
-  for(k = 1; k <= N; ++k)
+  for(k = 1; k <= N; DS ? k : ++k)
   {
+    tic = clock();
     /* evaluate f and a at some grid points for the iteration
      * and evaluate the character speed to decide the length
      * of the time step by (tau * speed_max)/h = CFL
      */
+    if(DS) {
     h_S_max = INFINITY; // h/S_max = INFINITY
-    tic = clock();
-
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
 	    {
@@ -160,7 +161,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
     half_tau = tau * 0.5;
     half_nu = half_tau / h_x;
     mu = tau / h_y;
-
+    }
 
     find_bound_x = bound_cond_slope_limiter_x(m, n, nt-1, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_x, true, time_c);
     if(!find_bound_x)
@@ -179,15 +180,15 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	 *   o-----X-----o-----X-----o-----X--...
 	 */
-	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 	  mom_x = CV[nt-1].RHO[j][i]*CV[nt-1].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
 	  mom_y = CV[nt-1].RHO[j][i]*CV[nt-1].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
 	  ene   = CV[nt-1].RHO[j][i]*CV[nt-1].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
+	  CV[nt].RHO[j][i] = CV[nt-1].RHO[j][i]       - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 	  
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
 	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
-	  CV[nt].P[j][i] = (ene - 0.5*mom_x*CV[nt].U[j][i]- 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
+	  CV[nt].P[j][i] = (ene - 0.5*mom_x*CV[nt].U[j][i] - 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
 	  
 	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
 	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
@@ -197,6 +198,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 
 //==================================================
 
+    if(DS) {
     find_bound_y = bound_cond_slope_limiter_y(m, n, nt, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_y, true, time_c);
     if(!find_bound_y)
         goto return_NULL;
@@ -230,51 +232,17 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	  CV->t_p[j][i]   = (  CV->pIy[j][i+1] -   CV->pIy[j][i])/h_y;
       }
 //==================================================
-
-    bound_cond_slope_limiter_x(m, n, nt, CV, bfv_L, bfv_R, bfv_D, bfv_U, find_bound_x, true, time_c);
-    flux_err = flux_generator_x(m, n, nt, half_tau, CV, bfv_L, bfv_R, false);
-    if(flux_err == 1)
-        goto return_NULL;
-    else if(flux_err == 2)
-	time_c = t_all;
-
-//===============THE CORE ITERATION=================
-    for(i = 0; i < n; ++i)
-      for(j = 0; j < m; ++j)
-      { /*
-	 *  j-1          j          j+1
-	 * j-1/2  j-1  j+1/2   j   j+3/2  j+1
-	 *   o-----X-----o-----X-----o-----X--...
-	 */
-	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
-	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
-	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
-	  CV[nt].RHO[j][i] = CV[nt].RHO[j][i]     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
-	  
-	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
-	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
-	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];
-	  CV[nt].P[j][i] = (ene  - 0.5*mom_x*CV[nt].U[j][i] - 0.5*mom_y*CV[nt].V[j][i])*(gamma-1.0);
-	  
-	  CV->s_rho[j][i] = (CV->rhoIx[j+1][i] - CV->rhoIx[j][i])/h_x;
-	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
-	  CV->s_v[j][i]   = (  CV->vIx[j+1][i] -   CV->vIx[j][i])/h_x;
-	  CV->s_p[j][i]   = (  CV->pIx[j+1][i] -   CV->pIx[j][i])/h_x;
-      }
-//==================================================
-
-    toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    cpu_time_sum += cpu_time[nt];
     
     time_c += tau;
     if(isfinite(t_all))
         DispPro(time_c*100.0/t_all, k);
     else
         DispPro(k*100.0/N, k);
+    }
     if(time_c > (t_all - eps) || isinf(time_c))
 	break;
 
+    DS = DS ? 0 : 1;
     //===========================Fixed variable location=======================
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
@@ -285,6 +253,10 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 		CV[nt-1].E[j][i]   =   CV[nt].E[j][i];  
 		CV[nt-1].P[j][i]   =   CV[nt].P[j][i];
 	    }
+    
+    toc = clock();
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time_sum += cpu_time[nt];
   }
 
   printf("\nTime is up at time step %d.\n", k);

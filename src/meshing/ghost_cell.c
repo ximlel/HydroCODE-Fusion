@@ -1,3 +1,8 @@
+/**
+ * @file  ghost_cell.c
+ * @brief This is a set of functions which manipulate the ghost cell and the data on it.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,16 +12,29 @@
 #include "../include/var_struc.h"
 
 
+/**
+ * @brief Copy the grid variable data on the corresponding cell to the i-th ghost cell.
+ */
 #define CV_COPY(var)  cv->var[i] = cv->var[pc[i]]
+/**
+ * @brief Copy the fluid variable data on the corresponding cell to the i-th ghost cell.
+ */
 #define FV_COPY(var)  FV->var[i] = FV->var[pc[i]]
 
 
+/**
+ * @brief Copy the grid and fluid variable data in struct 'cv' and 'FV' on the corresponding cell to the i-th ghost cell.
+ * @param[in] cv: Structure of grid variable data in computational grid cells.
+ * @param[in] mv: Structure of meshing variable data.
+ * @param[in] FV: Structure of fluid variable data array pointer.
+ * @param[in] t:  Current computational time.
+ */
 void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const double t)
 {
 	const int order = (int)config[9];
 	const int num_cell = (int)config[3];
 	const int num_cell_ghost = mv->num_ghost + num_cell;
-	const int *pc = mv->peri_cell;
+	const int *pc = mv->period_cell;
 	
 	for(int i = num_cell; i < num_cell_ghost; i++)
 		{
@@ -61,11 +79,14 @@ void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_v
 }
 
 
-
-void period_cell_modi(struct mesh_var * mv)
+/**
+ * @brief Recount 'mv->cell_pt' according to the grid cell on the periodic boundary 'mv->period_cell'.
+ * @param[in] mv: Structure of meshing variable data.
+ */
+void period_cell_modify(struct mesh_var * mv)
 {
 	const int num_cell = mv->num_ghost + (int)config[3];
-	int *pc = mv->peri_cell;
+	int *pc = mv->period_cell;
 	
 	int *per_num = (int*)ALLOC(num_cell*sizeof(int));
 	int per_n = 0;

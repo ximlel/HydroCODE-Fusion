@@ -112,8 +112,8 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
+      h_S_max = INFINITY; // h/S_max = INFINITY
 
       find_bound = bound_cond_slope_limiter(true, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, true, time_c, X[nt-1]);
       if(!find_bound)
@@ -289,10 +289,6 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 
 //============================Time update=======================
 
-    toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    cpu_time_sum += cpu_time[nt];
-
     time_c += tau;
     if(isfinite(t_all))
         DispPro(time_c*100.0/t_all, k);
@@ -309,6 +305,10 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 	    E[nt-1][j]   =   E[nt][j];  
 	    P[nt-1][j]   =   P[nt][j];
 	}
+
+    toc = clock();
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time_sum += cpu_time[nt];
   }
 
   printf("\nTime is up at time step %d.\n", k);

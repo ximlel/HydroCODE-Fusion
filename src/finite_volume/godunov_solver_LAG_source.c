@@ -77,8 +77,8 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 //-----------------------THE MAIN LOOP--------------------------------
   for(k = 1; k <= N; ++k)
   {
-      h_S_max = INFINITY; // h/S_max = INFINITY
       tic = clock();
+      h_S_max = INFINITY; // h/S_max = INFINITY
 
       find_bound = bound_cond_slope_limiter(true, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, false, time_c, X[nt-1]);
       if(!find_bound)
@@ -190,10 +190,6 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 
 //============================Time update=======================
 
-    toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
-    cpu_time_sum += cpu_time[nt];
-
     time_c += tau;
     if(isfinite(t_all))
         DispPro(time_c*100.0/t_all, k);
@@ -212,6 +208,10 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 	    E[nt-1][j]   =   E[nt][j];  
 	    P[nt-1][j]   =   P[nt][j];
 	}
+
+    toc = clock();
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time_sum += cpu_time[nt];
   }
 
   printf("\nTime is up at time step %d.\n", k);
