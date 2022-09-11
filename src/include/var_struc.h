@@ -156,4 +156,17 @@ typedef struct mesh_var {
 	void (*bc)(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, double t);
 } Mesh_Variable;
 
+
+//! SPHERically symmetric MESHing VARiables.
+typedef struct spher_mesh_var {
+    double * Rb;
+    double * Lb;
+    double * RR;
+    double * DdrL;
+	double * DdrR;
+	double * Ddr;
+	double * dRc;
+    double * vol;
+} Spherical_Mesh_Variable;
+
 #endif
