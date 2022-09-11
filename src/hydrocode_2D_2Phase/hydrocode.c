@@ -151,8 +151,7 @@ int main(int argc, char *argv[])
      * The following m variables are the initial value.
      */
   struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot);
-
-  struct mesh_var mv = mesh_init(argv[1], argv[6]);
+  struct mesh_var mv = mesh_init(argv[1], argv[5]);
 
   if ((_Bool)config[32])
       {
@@ -178,12 +177,11 @@ int main(int argc, char *argv[])
 
   // Write the final data down.
 #ifndef NOTECPLOT
-  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], config[1]);
+  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], time_plot[N-1]);
 #endif
 #ifndef NOVTKPLOT
-  file_write_3D_VTK(FV0, mv, argv[2], config[1]);
+  file_write_3D_VTK(FV0, mv, argv[2], time_plot[N-1]);
 #endif
-
 
 return_NULL:
   mesh_mem_free(&mv);

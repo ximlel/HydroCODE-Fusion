@@ -1,15 +1,28 @@
-column=640;
-line=1281;
-A=round((line-1)/64);  %amplitude (number of grid)
+function value_start(A)
+if nargin < 1
+    A = 8  %amplitude (number of grid)
+elseif strcmpi(A,{'INPUT'})
+    A = input('Please input the A number: (Default 50 25 20 10 5 2 0) ')
+else
+    A
+    if isstring(A)
+        error("Not a string 'INPUT' was entered to represent the input!");
+    elseif A ~= fix(A) || A <= 0
+        error("Not a positive integer was entered to represent variable 'A'!")
+    end
+end
+
+column=200;
+line=400;
 K=1;  %wavenumber
 
 gamma = 1.35;
 Ma=1.5;
-L_x=0.5/(column-1);
-L_y=1.0/(line-1);
+L_x=0.5/column;
+L_y=1.0/line;
 
-shock=round((line-1)*0.1);
-center=round((line-1)*0.5);  %center of the interface seperated two fluid.
+shock=round(line*0.1);
+center=round(line*0.5)+A;  %center of the interface seperated two fluid.
 
 u=0.0;
 rho_uH=1;
@@ -48,7 +61,7 @@ end
 
 fid = fopen('PHI.dat','wt');
 for j=1:line
-fprintf(fid,'%14.12f\t',CC(j,:));
+fprintf(fid,'%14.12g\t',CC(j,:));
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -56,11 +69,11 @@ fclose(fid);
 
 fid = fopen('RHO.dat','wt');
 for j=1:shock
-fprintf(fid,'%14.12f\t',rho_sH*ones(column,1));
+fprintf(fid,'%14.12g\t',rho_sH*ones(column,1));
 fprintf(fid,'\n');
 end
 for j=(shock+1):line
-fprintf(fid,'%14.12f\t',CC(j,:)*rho_uH+(1-CC(j,:))*rho_L);
+fprintf(fid,'%14.12g\t',CC(j,:)*rho_uH+(1-CC(j,:))*rho_L);
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -68,7 +81,7 @@ fclose(fid);
 
 fid = fopen('U.dat','wt');
 for j=1:line
-fprintf(fid,'%14.12f\t',u*ones(column,1));
+fprintf(fid,'%14.12g\t',u*ones(column,1));
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -76,11 +89,11 @@ fclose(fid);
 
 fid = fopen('V.dat','wt');
 for j=1:shock
-fprintf(fid,'%14.12f\t',v_sH*ones(column,1));
+fprintf(fid,'%14.12g\t',v_sH*ones(column,1));
 fprintf(fid,'\n');
 end
 for j=(shock+1):line
-fprintf(fid,'%14.12f\t',v_uH*ones(column,1));
+fprintf(fid,'%14.12g\t',v_uH*ones(column,1));
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -88,11 +101,11 @@ fclose(fid);
 
 fid = fopen('P.dat','wt');
 for j=1:shock
-fprintf(fid,'%14.12f\t',p_sH*ones(column,1));
+fprintf(fid,'%14.12g\t',p_sH*ones(column,1));
 fprintf(fid,'\n');
 end
 for j=(shock+1):line
-fprintf(fid,'%14.12f\t',p_uH*ones(column,1));
+fprintf(fid,'%14.12g\t',p_uH*ones(column,1));
 fprintf(fid,'\n');
 end
 fclose(fid);

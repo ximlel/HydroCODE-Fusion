@@ -107,6 +107,9 @@ callgrind.png
 *.mat
 *.dat
 
+# data initialize
+data_initialize.m
+
 # Octave Workspace
 octave-workspace
 

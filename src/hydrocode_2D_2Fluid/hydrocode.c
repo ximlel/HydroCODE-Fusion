@@ -114,33 +114,6 @@
 double config[N_CONF]; //!< Initial configuration data array.
 
 /**
- * @brief N memory allocations to the initial fluid variable 'v' in the structure cell_var_stru.
- */
-#define CV_INIT_MEM(v, N)						\
-    do {								\
-    for(k = 0; k < N; ++k)						\
-	{								\
-	    CV[k].v = (double **)malloc(n_x * sizeof(double *));	\
-	    if(CV[k].v == NULL)						\
-		{							\
-		    printf("NOT enough memory! CV[%d].%s\n", k, #v);	\
-		    retval = 5;						\
-		    goto return_NULL;					\
-		}							\
-	    for(j = 0; j < n_x; ++j)					\
-		{							\
-		    CV[k].v[j] = (double *)malloc(n_y * sizeof(double)); \
-		    if(CV[k].v[j] == NULL)				\
-			{						\
-			    printf("NOT enough memory! CV[%d].%s[%d]\n", k, #v, j); \
-			    retval = 5;					\
-			    goto return_NULL;				\
-			}						\
-		}							\
-	}								\
-    } while (0)
-
-/**
  * @brief This is the main function which constructs the
  *        main structure of the Eulerian hydrocode.
  * @param[in] argc: ARGument Counter.
@@ -149,7 +122,7 @@ double config[N_CONF]; //!< Initial configuration data array.
  *            - argv[2]: Folder name of numerical results (output path).
  *            - argv[3]: Dimensionality (= 2).
  *            - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
- *            - argv[5]: Eulerian coordinate framework (= EUL).
+ *            - argv[5]: Mesh name.
  *            - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
  * @return Program exit status code.
  */
@@ -178,7 +151,7 @@ int main(int argc, char *argv[])
      * The following m variables are the initial value.
      */
   struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot);
-  struct mesh_var mv = mesh_init(argv[1], argv[6]);
+  struct mesh_var mv = mesh_init(argv[1], argv[5]);
 
   if ((_Bool)config[32])
       {
@@ -190,17 +163,8 @@ int main(int argc, char *argv[])
 #endif
       }
 
-  if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
-      {
-	  config[8] = (double)0;
-	  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], N, time_plot);
-      }
-  else
-      {
-	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);
-	  retval = 4;
-	  goto return_NULL;
-      }
+  config[8] = (double)0;  // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
+  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], N, time_plot);
 
   // Write the final data down.
 #ifndef NOTECPLOT
@@ -210,7 +174,6 @@ int main(int argc, char *argv[])
   file_write_3D_VTK(FV0, mv, argv[2], time_plot[N-1]);
 #endif
 
-return_NULL:
   mesh_mem_free(&mv);
 
   free(FV0.RHO);

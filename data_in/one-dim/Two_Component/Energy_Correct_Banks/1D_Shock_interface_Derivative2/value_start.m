@@ -28,7 +28,7 @@ for i=(interface+1):column
 end
 fid = fopen('RHO.dat','wt');
 for j=1:line
-fprintf(fid,'%12.10f\t',rho);
+fprintf(fid,'%12.10g\t',rho);
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -45,7 +45,7 @@ for i=(interface+1):column
 end
 fid = fopen('U.dat','wt');
 for j=1:line
-fprintf(fid,'%12.10f\t',u);
+fprintf(fid,'%12.10g\t',u);
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -53,7 +53,7 @@ fclose(fid);
 v=zeros(column,1);
 fid = fopen('V.dat','wt');
 for j=1:line
-fprintf(fid,'%12.10f\t',v);
+fprintf(fid,'%12.10g\t',v);
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -70,7 +70,7 @@ for i=(interface+1):column
 end
 fid = fopen('P.dat','wt');
 for j=1:line
-fprintf(fid,'%12.10f\t',p);
+fprintf(fid,'%12.10g\t',p);
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -87,12 +87,12 @@ for i=(interface+1):column
 end
 fid = fopen('PHI.dat','wt');
 for j=1:line
-fprintf(fid,'%12.10f\t',phi);
+fprintf(fid,'%12.10g\t',phi);
 fprintf(fid,'\n');
 end
 fid = fopen('Z_a.dat','wt');
 for j=1:line
-fprintf(fid,'%12.10f\t',phi);
+fprintf(fid,'%12.10g\t',phi);
 fprintf(fid,'\n');
 end
 fclose(fid);

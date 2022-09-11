@@ -13,24 +13,24 @@ CPath=$(pwd)
 MRun=`ls -l`
 #alias MRun='~/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop'
 alias MRun='octave'
-EXEcute=./hydrocode.out
+EXE=./hydrocode.out  #EXEcutable program
 
 ## RP2D_Positive
 :<<!
  cd ../../data_in/two-dim/RP2D_Positive/Config3
  echo "value_start" | MRun
  cd $CPath
- $EXEcute 
+ $EXE 
 !
 
 
 ### gprof
-# gprof -b -A -p -q hydrocode.out gmon.out > pg
-# gprof -b ./hydrocode.out gmon.out | gprof2dot | dot -Tpng -o pg.png
+# gprof -b -A -p -q $EXE gmon.out > pg
+# gprof -b $EXE gmon.out | gprof2dot | dot -Tpng -o pg.png
 
 ### Valgrind
 # valgrind --tool=callgrind --callgrind-out-file=callgrind.out \
-$EXEcute 
+$EXE 
 # gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
 
 ### gcov 

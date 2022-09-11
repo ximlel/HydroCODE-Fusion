@@ -94,25 +94,9 @@ struct mesh_var mesh_init(const char *example, const char *mesh_name)
 			}
 		}
 
-	if (strcmp(mesh_name,"Sod") == 0)
-	    Sod_mesh(&mv);
-	else if (strcmp(mesh_name,"Shear") == 0)
-	    Shear_mesh(&mv);
-	else if (strcmp(mesh_name,"Shock_Bubble") == 0)
-	    Shock_Bubble_mesh(&mv);
-	else if (strcmp(mesh_name,"free") == 0)
-	    free_mesh(&mv);
-	else if (strcmp(mesh_name,"Shell") == 0)
-	    Shell_mesh(&mv);
-	else if (strcmp(mesh_name,"RMI") == 0)
-	    RMI_mesh(&mv);
-	else if (strcmp(mesh_name,"RMI_S") == 0)
-	    RMI_S_mesh(&mv);
-	else if (strcmp(mesh_name,"R2D") == 0)
-	    R2D_mesh(&mv);
-	else if (strcmp(mesh_name,"Vortex") == 0)
-	    Vortex_mesh(&mv);
-	else if (strcmp(mesh_name,"cylinder") == 0)
+	if (!quad_mesh(&mv, mesh_name))
+	    ;
+	else if (strcmp(mesh_name,"cylinder") == 0 || strcmp(mesh_name,"Cylinder") == 0)
 	    cylinder_mesh(&mv);
 	else if (strcmp(mesh_name,"odd_even") == 0)
 	    odd_even_mesh(&mv);
@@ -122,10 +106,8 @@ struct mesh_var mesh_init(const char *example, const char *mesh_name)
 	    odd_even_inflow_mesh(&mv);
 	else if (strcmp(mesh_name,"rand_disturb_inflow") == 0)
 	    rand_disturb_inflow_mesh(&mv);
-	else if (strcmp(mesh_name,"oblique_periodic") == 0)
-	    oblique_periodic_mesh(&mv);
 	else if (strcmp(mesh_name,"Saltzman") == 0)
-	    Saltzman_mesh_Lag(&mv);
+	    Saltzman_Lag_mesh(&mv);
 	else
 	    {
 		fprintf(stderr, "No mesh setting!\n");

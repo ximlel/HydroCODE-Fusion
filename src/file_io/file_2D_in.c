@@ -127,24 +127,35 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
     _Bool r = true; // r: Whether to read data file successfully.
 
      // Open the initial data files and initializes the reading of data.
-    STR_FLU_INI(RHO, 1);
-    STR_FLU_INI(U, 1);
-    STR_FLU_INI(V, 1);
-    STR_FLU_INI(P, 1);
+    STR_FLU_INI(RHO,1);
+    STR_FLU_INI(U,  1);
+    STR_FLU_INI(V,  1);
+    STR_FLU_INI(P,  1);
 #ifdef MULTIFLUID_BASICS
-    STR_FLU_INI(Z_a, 1);
 #ifdef MULTIPHASE_BASICS
-    STR_FLU_INI(RHO_b, 1);
-    STR_FLU_INI(U_b, 1);
-    STR_FLU_INI(V_b, 1);
-    STR_FLU_INI(P_b, 1);
+    STR_FLU_INI(Z_a,  1);
+    STR_FLU_INI(RHO_b,1);
+    STR_FLU_INI(U_b,  1);
+    STR_FLU_INI(V_b,  1);
+    STR_FLU_INI(P_b,  1);
 #else
-    STR_FLU_INI(PHI, 1);
-    STR_FLU_INI(gamma, 0);
+    STR_FLU_INI(PHI,  1);
+    STR_FLU_INI(Z_a,  0);
     if(!r)
-	for(int i = 0; i < (int)config[3]; i++)
-	    FV0.gamma[i] = 1.0 + 1.0 / (FV0.Z_a[i]/(config[6]-1.0) + (1.0-FV0.Z_a[i])/(config[106]-1.0));
-    r = true;
+	{
+	    for(int i = 0; i < (int)config[3]; i++)
+		FV0.Z_a[i] = FV0.PHI[i];
+	    printf("Initial volume fraction 'Z_a' is initialized by mass fraction 'PHI'.\n");
+	    r = true;
+	}
+    STR_FLU_INI(gamma,0);
+    if(!r)
+	{
+	    for(int i = 0; i < (int)config[3]; i++)
+		FV0.gamma[i] = 1.0 + 1.0 / (FV0.Z_a[i]/(config[6]-1.0) + (1.0-FV0.Z_a[i])/(config[106]-1.0));
+	    printf("Initial specific heat rate 'gamma' is initialized by volume fraction 'Z_a'.\n");
+	    r = true;
+	}
 #endif
 #endif
 

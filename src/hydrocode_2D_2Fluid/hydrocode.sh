@@ -13,24 +13,46 @@ CPath=$(pwd)
 MRun=`ls -l`
 #alias MRun='~/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop'
 alias MRun='octave'
-EXEcute=./hydrocode.out
+EXE=./hydrocode.out  #EXEcutable program
+TC=Two_Component
 
-## RP2D_Positive
+
+## RMI_Latini
 :<<!
- cd ../../data_in/two-dim/RP2D_Positive/Config3
- echo "value_start" | MRun
- cd $CPath
- $EXEcute 
+$EXE $TC/RMI_Latini/RMI_one	$TC/RMI_Latini/RMI_one	2 1_Riemann_exact RMI_vertical
+$EXE $TC/RMI_Latini/RMI_one	$TC/RMI_Latini/RMI_one	2 2_GRP		  RMI_vertical
+$EXE $TC/RMI_Latini/RMI_one_half/	$TC/RMI_Latini/RMI_one_half/	2 2_GRP		  free
+!
+## A3_shell
+:<<!
+$EXE $TC/A3_shell/A3_shell_quarter	$TC/A3_shell/A3_shell_quarter	2 1_Riemann_exact Shell
+$EXE $TC/A3_shell/A3_shell_quarter	$TC/A3_shell/A3_shell_quarter	2 2_GRP Shell
+$EXE $TC/A3_shell/A3_shell_whole	$TC/A3_shell/A3_shell_whole	2 1_Riemann_exact free
+$EXE $TC/A3_shell/A3_shell_whole	$TC/A3_shell/A3_shell_whole	2 2_GRP free
+!
+## Energy_Correct_Banks
+:<<!
+$EXE $TC/Energy_Correct_Banks/2D_Shock_interface_1wave/line_1281	$TC/Energy_Correct_Banks/2D_Shock_interface_1wave/line_1281	2 1_Riemann_exact RMI_vertical
+$EXE $TC/Energy_Correct_Banks/2D_Shock_interface_1wave/line_400/	$TC/Energy_Correct_Banks/2D_Shock_interface_1wave/line_400/	2 1_Riemann_exact RMI_vertical
+$EXE $TC/Energy_Correct_Banks/Bubble_He	$TC/Energy_Correct_Banks/Bubble_He	2 1_Riemann_exact Sod
+$EXE $TC/Energy_Correct_Banks/Bubble_He	$TC/Energy_Correct_Banks/Bubble_He	2 2_GRP Sod
+!
+## Shock_Bubble_Quirk
+:<<!
+$EXE $TC/Shock_Bubble_Quirk/Bubble_He $TC/Shock_Bubble_Quirk/Bubble_He	2 1_Riemann_exact Sod
+$EXE $TC/Shock_Bubble_Quirk/Bubble_He $TC/Shock_Bubble_Quirk/Bubble_He	2 2_GRP Sod
+$EXE $TC/Shock_Bubble_Quirk/Bubble_R22	$TC/Shock_Bubble_Quirk/Bubble_R22	2 1_Riemann_exact Sod
+$EXE $TC/Shock_Bubble_Quirk/Bubble_R22	$TC/Shock_Bubble_Quirk/Bubble_R22	2 2_GRP Sod
 !
 
 
 ### gprof
-# gprof -b -A -p -q hydrocode.out gmon.out > pg
-# gprof -b ./hydrocode.out gmon.out | gprof2dot | dot -Tpng -o pg.png
+# gprof -b -A -p -q $EXE gmon.out > pg
+# gprof -b $EXE gmon.out | gprof2dot | dot -Tpng -o pg.png
 
 ### Valgrind
 # valgrind --tool=callgrind --callgrind-out-file=callgrind.out \
-$EXEcute 
+$EXE 
 # gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
 
 ### gcov 

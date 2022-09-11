@@ -13,7 +13,7 @@
 #endif
 
 
-static int quad_mesh(struct mesh_var * mv, int n_x_add, int n_y_add)
+static int quad_mesh_init(struct mesh_var * mv, int n_x_add, int n_y_add)
 {
 	if(isinf(config[13]) || isinf(config[14]))
 		{
@@ -257,80 +257,65 @@ static int quad_border_cond
 	exit(5);	
 }
 
-
-void Sod_mesh(struct mesh_var * mv)
+int quad_mesh(struct mesh_var * mv, const char * mesh_name)
 {
 	const int n_x_a = 0, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -2, -4, -2, -4);
-}
+    const int bound_x = (int)(config[17]);// the boundary condition in x-direction
+    const int bound_y = (int)(config[18]);// the boundary condition in y-direction
+	int C = 0; // Read the boundary condition from the configuration data
+	if (strcmp(mesh_name,"CONFIG") == 0 || strcmp(mesh_name,"Config") == 0)
+		C = 1;
 
-/*
-void Shock_Bubble_mesh(struct mesh_var * mv)
-{
-	const int n_x_a = 0, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -4, -4, -4, -4);
-}
-*/
+	if (strcmp(mesh_name,"Sod") == 0 || (C && bound_x == -4 && bound_y == -2))
+	    {
+		quad_mesh_init(mv, n_x_a, n_y_a);
+		quad_border_cond(mv, n_x_a, n_y_a, -2, -4, -2, -4);
+	    }
+	else if (strcmp(mesh_name,"Shear") == 0 || strcmp(mesh_name,"shear") == 0 || (C && bound_x == -14 && bound_y == -4))
+	    {
+		quad_mesh_init(mv, n_x_a, n_y_a);
+		quad_border_cond(mv, n_x_a, n_y_a, -1, -4, -4, -4);
+	    }
+	else if (strcmp(mesh_name,"free") == 0 || strcmp(mesh_name,"Free") == 0 || (C && bound_x == -4 && bound_y == -4))
+	    { // Shock_Bubble, RMI_S
+		quad_mesh_init(mv, n_x_a, n_y_a);
+		quad_border_cond(mv, n_x_a, n_y_a, -4, -4, -4, -4);
+	    }
+	else if (strcmp(mesh_name,"Shell") == 0 || strcmp(mesh_name,"shell") == 0 || (C && bound_x == -24 && bound_y == -24))
+	    {
+		quad_mesh_init(mv, n_x_a, n_y_a);
+		quad_border_cond(mv, n_x_a, n_y_a, -2, -4, -4, -2);
+	    }
+	else if (strcmp(mesh_name,"RMI_vertical") == 0 || (C && bound_x == -7 && bound_y == -4))
+	    {
+		quad_mesh_init(mv, n_x_a+2, n_y_a);
+		quad_border_cond(mv, n_x_a+2, n_y_a, -4, -7, -4, -7);
+	    }
+	else if (strcmp(mesh_name,"RP2D") == 0)
+	    {
+		quad_mesh_init(mv, n_x_a+2, n_y_a+2);
+		quad_border_cond(mv, n_x_a+2, n_y_a+2, -77, -77, -77, -77);
+	    }
+	else if (strcmp(mesh_name,"Vortex") == 0 || strcmp(mesh_name,"vortex") == 0 || (C && bound_x == -7 && bound_y == -7))
+	    {
+		quad_mesh_init(mv, n_x_a+2, n_y_a+2);
+		quad_border_cond(mv, n_x_a+2, n_y_a+2, -7, -7, -7, -7);
+	    }
+	else if (strcmp(mesh_name,"oblique_periodic") == 0 || (C && bound_x == -3 && bound_y == -70))
+	    {
+		quad_mesh_init(mv, n_x_a, n_y_a+2);
+		quad_border_cond(mv, n_x_a, n_y_a+2, -70, -3, -70, -3);
+	    }
+	    else
+		return 1;
 
-void Shear_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 0, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -1, -4, -4, -4);
+return 0;
 }
-
-/*
-void free_mesh(struct mesh_var * mv)
-{		
-	const int n_x_a = 0, n_y_a = 0;	
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -3, -3, -3, -3);
-}
-*/
-
-// void RMI_S_mesh(struct mesh_var * mv)
-void free_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 0, n_y_a = 0;		
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -4, -4, -4, -4);
-}
-
-void RMI_vertical_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 2, n_y_a = 0;		
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -4, -7, -4, -7);
-}
-
-void R2D_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 2, n_y_a = 2;		
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -77, -77, -77, -77);
-}
-
-void Vortex_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 2, n_y_a = 2;		
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -7, -7, -7, -7);
-}
-
-void Shell_mesh(struct mesh_var * mv)
-{	
-	const int n_x_a = 0, n_y_a = 0;		
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -2, -4, -4, -2);
-}
-
 
 void cylinder_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 2, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
+	quad_mesh_init(mv, n_x_a, n_y_a);
 	
 	const int n_x = (int)config[13] + n_x_a, n_y = (int)config[14] + n_y_a;
 	const double R = config[11]*n_y/M_PI*9.0/8.0;	
@@ -345,7 +330,7 @@ void cylinder_mesh(struct mesh_var * mv)
 void odd_even_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 0, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
+	quad_mesh_init(mv, n_x_a, n_y_a);
 	
 	const int n_x = (int)config[13] + n_x_a, n_y = (int)config[14] + n_y_a;
 	for(int k = 0; k < (n_y+1); k++)
@@ -357,7 +342,7 @@ void odd_even_mesh(struct mesh_var * mv)
 void odd_even_periodic_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 2, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
+	quad_mesh_init(mv, n_x_a, n_y_a);
 	
 	const int n_x = (int)config[13] + n_x_a, n_y = (int)config[14] + n_y_a;
 	for(int k = 0; k < (n_y+1); k++)
@@ -369,7 +354,7 @@ void odd_even_periodic_mesh(struct mesh_var * mv)
 void odd_even_inflow_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 0, n_y_a = 2;
-	quad_mesh(mv, n_x_a, n_y_a);
+	quad_mesh_init(mv, n_x_a, n_y_a);
 	
 	const int n_x = (int)config[13] + n_x_a, n_y = (int)config[14] + n_y_a;
 	for(int k = 0; k < (n_y+1); k++)
@@ -382,7 +367,7 @@ void rand_disturb_inflow_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 0, n_y_a = 2;
 
-	quad_mesh(mv, n_x_a, n_y_a);
+	quad_mesh_init(mv, n_x_a, n_y_a);
 
 	const int n_x = (int)config[13] + n_x_a, n_y = (int)config[14] + n_y_a;
 	srand((unsigned) time(NULL)); //seed--time.
@@ -398,12 +383,6 @@ void rand_disturb_inflow_mesh(struct mesh_var * mv)
 	quad_border_cond(mv, n_x_a, n_y_a, -7, -3, -7, -1);
 }
 
-void oblique_periodic_mesh(struct mesh_var * mv)
-{
-	const int n_x_a = 0, n_y_a = 2;
-	quad_mesh(mv, n_x_a, n_y_a);
-	quad_border_cond(mv, n_x_a, n_y_a, -70, -3, -70, -3);
-}
 
 static int quad_border_normal_velocity
 (struct mesh_var * mv, int n_x_add, int n_y_add,
@@ -445,10 +424,10 @@ static int quad_border_normal_velocity
 	exit(5);	
 }
 
-void Saltzman_mesh_Lag(struct mesh_var * mv)
+void Saltzman_Lag_mesh(struct mesh_var * mv)
 {
 	const int n_x_a = 0, n_y_a = 0;
-	quad_mesh(mv, n_x_a, n_y_a);
+	quad_mesh_init(mv, n_x_a, n_y_a);
 
 	for(int k = 0; k < mv->num_pt; k++)		
 		mv->X[k] += (0.1 - mv->Y[k])*sin(M_PI * mv->X[k]);
