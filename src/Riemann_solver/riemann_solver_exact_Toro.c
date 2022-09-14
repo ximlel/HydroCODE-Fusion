@@ -108,7 +108,7 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
     else
 	CRW[1]=true;
   
-    U_int = 0.5*(U_l+U_r)+ 0.5 *(f_R-f_L);
+    U_int = 0.5*(U_l+U_r) + 0.5 *(f_R-f_L);
 
     *P_star = P_int;
     *U_star = U_int;

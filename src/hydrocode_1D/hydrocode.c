@@ -54,20 +54,19 @@
  *          - Run program:
  *            - Linux/Unix: Run 'hydrocode.sh' command on the terminal. \n
  *                          The details are as follows: \n
- *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result dimension order[_scheme]
+ *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result order[_scheme]
  *                               coordinate config[n]=(double)C' command on the terminal. \n
- *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 1 2[_GRP] LAG 5=100' (second-order Lagrangian GRP scheme).
- *                          - dim: Dimension of test example (= 1).
+ *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 2[_GRP] LAG 5=100' (second-order Lagrangian GRP scheme).
  *                          - order: Order of numerical scheme (= 1 or 2).
  *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
  *                          - coordinate: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
  *            - Windows: Run 'hydrocode.bat' command on the terminal. \n
  *                       The details are as follows: \n
- *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result 1 order[_scheme] 
+ *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result order[_scheme] 
  *                            coordinate n=C' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result 1 order[_scheme] coordinate n=C
+ *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result order[_scheme] coordinate n=C
  *             <tr><th> Working Directory <td> hydrocode_1D
  *             </table>
  *                       [Run] Project -> Properties -> Configuration Properties -> Linker -> System \n
@@ -128,10 +127,9 @@ double config[N_CONF]; //!< Initial configuration data array.
  * @param[in] argv: ARGument Values.
  *          - argv[1]: Folder name of test example (input path).
  *          - argv[2]: Folder name of numerical results (output path).
- *          - argv[3]: Dimensionality (= 1).
- *          - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
- *          - argv[5]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
- *          - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
+ *          - argv[3]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
+ *          - argv[4]: Lagrangian/Eulerian coordinate framework (= LAG or EUL).
+ *          - argv[5,6,…]: Configuration supplement config[n]=(double)C (= n=C).
  * @return Program exit status code.
  */
 int main(int argc, char *argv[])
@@ -142,12 +140,10 @@ int main(int argc, char *argv[])
       config[k] = INFINITY;
 
   char * scheme = NULL; // Riemann_exact(Godunov), GRP
-  arg_preprocess(5, argc, argv, scheme);
-  if ((int)config[0] != 1)
-	{
-	    printf("No appropriate dimension was entered!\n");
-	    return 4;
-	}
+  arg_preprocess(4, argc, argv, scheme);
+
+  // Set dimension.
+  config[0] = (double)1; // Dimensionality = 1
 
   // The number of times steps of the fluid data stored for plotting.
   int N; // (int)(config[5]) + 1;
@@ -223,7 +219,7 @@ int main(int argc, char *argv[])
   for(j = 0; j < m; ++j)
       CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(gamma - 1.0)/CV.RHO[0][j]; 
 
-  if (strcmp(argv[5],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
+  if (strcmp(argv[4],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {
 	  config[8] = (double)1;
 	  switch(order)
@@ -240,7 +236,7 @@ int main(int argc, char *argv[])
 		  goto return_NULL;
  	      }
       }
-  else if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
+  else if (strcmp(argv[4],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
 	  for (k = 1; k < N; ++k)
@@ -262,7 +258,7 @@ int main(int argc, char *argv[])
       }
   else
       {
-	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);
+	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[4]);
 	  retval = 4;
 	  goto return_NULL;
       }

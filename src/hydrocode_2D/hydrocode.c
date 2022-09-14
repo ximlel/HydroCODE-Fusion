@@ -54,20 +54,19 @@
  *          - Run program:
  *            - Linux/Unix: Run 'hydrocode.sh' command on the terminal. \n
  *                          The details are as follows: \n
- *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result dimension order[_scheme]
+ *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result order[_scheme]
  *                               coordinate config[n]=(double)C' command on the terminal. \n
- *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 1 2[_GRP] EUL 5=100' (second-order Eulerian GRP scheme).
- *                          - dim: Dimension of test example (= 2).
+ *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 2[_GRP] EUL 5=100' (second-order Eulerian GRP scheme).
  *                          - order: Order of numerical scheme (= 1 or 2).
  *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
  *                          - coordinate: Eulerian coordinate framework (= EUL).
  *            - Windows: Run 'hydrocode.bat' command on the terminal. \n
  *                       The details are as follows: \n
- *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result 2 order[_scheme] 
+ *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result order[_scheme] 
  *                            coordinate n=C' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result 2 order[_scheme] coordinate n=C
+ *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result order[_scheme] coordinate n=C
  *             <tr><th> Working Directory <td> hydrocode_2D
  *             </table>
  *                       [Run] Project -> Properties -> Configuration Properties -> Linker -> System \n
@@ -146,10 +145,9 @@ double config[N_CONF]; //!< Initial configuration data array.
  * @param[in] argv: ARGument Values.
  *            - argv[1]: Folder name of test example (input path).
  *            - argv[2]: Folder name of numerical results (output path).
- *            - argv[3]: Dimensionality (= 2).
- *            - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
- *            - argv[5]: Eulerian coordinate framework (= EUL).
- *            - argv[6,7,…]: Configuration supplement config[n]=(double)C (= n=C).
+ *            - argv[3]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
+ *            - argv[4]: Eulerian coordinate framework (= EUL).
+ *            - argv[5,6,…]: Configuration supplement config[n]=(double)C (= n=C).
  * @return Program exit status code.
  */
 int main(int argc, char *argv[])
@@ -159,12 +157,10 @@ int main(int argc, char *argv[])
   for(k = 1; k < N_CONF; k++)
       config[k] = INFINITY;
   char * scheme = NULL; // Riemann_exact(Godunov), GRP
-  arg_preprocess(5, argc, argv, scheme);
-  if ((int)config[0] != 2)
-	{
-	    printf("No appropriate dimension was entered!\n");
-	    return 4;
-	}
+  arg_preprocess(4, argc, argv, scheme);
+
+  // Set dimension.
+  config[0] = (double)2; // Dimensionality = 2
 
   // The number of times steps of the fluid data stored for plotting.
   int N; // (int)(config[5]) + 1;
@@ -247,7 +243,7 @@ int main(int argc, char *argv[])
 	      CV[0].E[j][i]  += 0.5*CV[0].V[j][i]*CV[0].V[j][i];
 	  }
 
-  if (strcmp(argv[5],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
+  if (strcmp(argv[4],"EUL") == 0) // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
       {
 	  config[8] = (double)0;
 	  switch(order)
@@ -271,7 +267,7 @@ int main(int argc, char *argv[])
       }
   else
       {
-	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[5]);
+	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[4]);
 	  retval = 4;
 	  goto return_NULL;
       }

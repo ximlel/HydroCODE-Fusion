@@ -34,6 +34,13 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 				 const double c_l, const double c_r, _Bool * CRW,
 				 const double eps, const double tol, const int N);
 
+/**
+ * @brief Which solver is chosen as the exact Riemann solver for single-component flow.
+ */
+#ifndef Riemann_solver_exact_single
+#define Riemann_solver_exact_single Riemann_solver_exact_Ben
+#endif
+
 
 // 1-D GRP solver (Lagrangian, two-component flow)
 void  linear_GRP_solver_LAG(double *D, double *U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double  atc);
@@ -46,11 +53,13 @@ void linear_GRP_solver_Edir_Q1D(double *wave_speed, double *D, double *U, double
 void linear_GRP_solver_Edir_G2D(double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double  eps, const double  atc);
 
 
-/**
- * @brief Which solver is chosen as the exact Riemann solver for single-component flow.
- */
-#ifndef Riemann_solver_exact_single
-#define Riemann_solver_exact_single Riemann_solver_exact_Ben
-#endif
+void Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL, const double GammaR,
+			   const double UL, const double UR, const double PL, const double PR,
+			   const double CL, const double CR, _Bool * CRW,
+			   const double eps, const double TOLPRE, const int NRITER);
+void AcousticSLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
+			 double r, double M, const double eps);
+void GRPsolverSLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
+		   double r, double M, const double eps, const double  atc);
 
 #endif

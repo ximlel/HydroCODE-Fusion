@@ -20,8 +20,7 @@
  * @param[in] argv:       ARGument Values.
  * @param[in] scheme:     Scheme name.
  *          - argv[1]: Folder name of test example (input path).
- *          - argv[3]: Dimensionality (= 1).
- *          - argv[4]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
+ *          - argv[3]: Order of numerical scheme[_scheme name] (= 1[_Riemann_exact] or 2[_GRP]).
  *          - argv[argc_least+1,argc_least+2,…]: Configuration supplement config[n]=(double)C (= n=C).
  */
 void arg_preprocess(const int argc_least, const int argc, char *argv[], char * scheme)
@@ -52,20 +51,15 @@ void arg_preprocess(const int argc_least, const int argc, char *argv[], char * s
     printf("Test Beginning: \x1b[43;37mARGuments Counter = %d\x1b[0m\n", argc);
 #endif
 
-    // Set dimension.
-    int dim;
-    dim = atoi(argv[3]);
-    config[0] = (double)dim;
-
     // Set order and scheme.
     int order; // 1, 2
 #ifdef _WIN32
-    printf("Order[_Scheme]: %s\n",argv[4]);
+    printf("Order[_Scheme]: %s\n",argv[3]);
 #elif __linux__
-    printf("Order[_Scheme]: \x1b[41;37m%s\x1b[0m\n",argv[4]);
+    printf("Order[_Scheme]: \x1b[41;37m%s\x1b[0m\n",argv[3]);
 #endif
     errno = 0;
-    order = strtoul(argv[4], &scheme, 10);
+    order = strtoul(argv[3], &scheme, 10);
     if (*scheme == '_')
 	scheme++;
     else if (*scheme != '\0' || errno == ERANGE)

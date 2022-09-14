@@ -12,7 +12,7 @@ It is made by Doxygen and LaTeX,
 
 Run the following command on the terminal.
 
-```
+```shell
 cd src/*
 doxygen Doxyfile
 cd doc/*/latex
@@ -21,7 +21,7 @@ cd doc/*/Specification
 xelatex Specification.tex
 ```
 
-Open 'doc/*/html/index.html' in a browser to view the specific instructions of this program.
+Open `doc/*/html/index.html` in a browser to view the specific instructions of this program.
 
 Compilers/Interpreters
 ---------
@@ -35,15 +35,15 @@ Licensing
 ---------
 GNU Lesser General Public License v3.0 or later.
 
-Please see the file called LICENSE.
+Please see the file called `LICENSE`.
 
 Contacts
 --------
-If you want more available support for this program, please send an email to  [xinlei@cugb.edu.cn](mailto:xinlei@cugb.edu.cn).
+If you want more available support for this program, please send an email to [xinlei@cugb.edu.cn](mailto:xinlei@cugb.edu.cn).
 
 Copyright
 --------
-> Part of this code is modified from the provision of Zhifang Du.
-> The source code in the book "C Interfaces and Implementations" by David Hanson is used.
+> Part of this code is modified from the provision of Zhifang Du, Rui Chen & Jian Cheng @ IAPCM.
+> The source code in the book "C Interfaces and Implementations" designed by David Hanson is used.
 
-Copyright © 2022 ximlel.
+Copyright © 2022 Xin Lei.

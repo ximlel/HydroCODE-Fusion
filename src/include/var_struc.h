@@ -48,7 +48,7 @@ typedef struct flu_var {
 typedef struct cell_var_stru {
 	double **    E;                      //!< specific total energy.
 	double **  RHO, **  U, **  V, **  P; //!< density, velocity components in direction x and y, pressure.
-	double * d_rho, * d_u,        * d_p; //!< spatial derivatives in one dimension.
+	double * d_rho, * d_u, * d_v, * d_p; //!< spatial derivatives in one dimension.
 	double **s_rho, **s_u, **s_v, **s_p; //!< spatial derivatives in coordinate x (slopes).
 	double **t_rho, **t_u, **t_v, **t_p; //!< spatial derivatives in coordinate y (slopes).
 	double **rhoIx, **uIx, **vIx, **pIx; //!< interfacial variable values in coordinate x at t_{n+1}.
@@ -165,6 +165,8 @@ typedef struct spher_mesh_var {
     double * DdrL;
 	double * DdrR;
 	double * Ddr;
+	double * Rbh;
+	double * Lbh;
 	double * dRc;
     double * vol;
 } Spherical_Mesh_Variable;
