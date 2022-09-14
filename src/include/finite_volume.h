@@ -28,4 +28,6 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 // 2-D Godunov/GRP scheme (Eulerian, Baer-Nunziato two-phase flow, structured grid)
 void finite_volume_scheme_GRP2D(struct flu_var * FV, const struct mesh_var * mv, const char * phase, const char * problem);
 
+void grp_solver_spher_LAG_source(struct flu_var *FV, struct spher_mesh_var *smv, const int M, double * cpu_time, const int N_plot , double time_plot[]);
+
 #endif

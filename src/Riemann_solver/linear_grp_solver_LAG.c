@@ -149,6 +149,6 @@ void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var *ifv_L, 
   U[3] = rho_star_R;
   D[1] = (d_L*b_R-d_R*b_L)/(a_L*b_R-a_R*b_L);
   D[2] = (d_L*a_R-d_R*a_L)/(b_L*a_R-b_R*a_L);
-  D[0] = 1.0/c_star_L/c_star_L*D[2];
-  D[3] = 1.0/c_star_R/c_star_R*D[2];
+  D[0] = D[2]/c_star_L/c_star_L;
+  D[3] = D[2]/c_star_R/c_star_R;
 }

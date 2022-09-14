@@ -27,12 +27,14 @@ struct mesh_var mesh_init(const char *example, const char *mesh_name);
 void mesh_mem_free(struct mesh_var * mv);
 
 
-// spher_mesh_int_free.c
-struct spher_mesh_var spher_mesh_init(void);
-
-
 // ghost_cell.c
 void period_cell_modify(struct mesh_var * mv);
 void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_var * FV, const double t);
+
+
+// spher_mesh.c
+struct spher_mesh_var spher_mesh_init(const char *example);
+void spher_mesh_update  (struct spher_mesh_var *smv);
+void spher_mesh_mem_free(struct spher_mesh_var *smv);
 
 #endif
