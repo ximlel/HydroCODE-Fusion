@@ -39,7 +39,7 @@ for i=(Ncell2+1):Ncell3
     p(i)  =PR0;
     phi(i)=0.0;
 end
-for i=(Ncell3+1):Domlen
+for i=(Ncell3+1):Ncell
     rho(i)=DL1;
     u(i)  =UL1;
     p(i)  =PL1;
@@ -48,28 +48,28 @@ end
 
 fid = fopen('RHO.dat','wt');
 for j=1:Tcell
-fprintf(fid,'%12.10g\t',rho);
+fprintf(fid,'%12.10g\t',rho(2:Ncell));
 fprintf(fid,'\n');
 end
 fclose(fid);
 
 fid = fopen('U.dat','wt');
 for j=1:Tcell
-fprintf(fid,'%12.10g\t',u);
+fprintf(fid,'%12.10g\t',u(2:Ncell));
 fprintf(fid,'\n');
 end
 fclose(fid);
 
 fid = fopen('P.dat','wt');
 for j=1:Tcell
-fprintf(fid,'%12.10g\t',p);
+fprintf(fid,'%12.10g\t',p(2:Ncell));
 fprintf(fid,'\n');
 end
 fclose(fid);
 
 fid = fopen('PHI.dat','wt');
 for j=1:Tcell
-fprintf(fid,'%12.10g\t',phi);
+fprintf(fid,'%12.10g\t',phi(2:Ncell));
 fprintf(fid,'\n');
 end
 fclose(fid);
@@ -96,12 +96,15 @@ Epsilon=1.0;      % r_0=Epsilon*dr
 fid = fopen('config.dat','wt');
 fprintf(fid,'1\t%g\n',Timeout);
 fprintf(fid,'2\t2\n');
+fprintf(fid,'3\t%i\n',Ncell-1);
 fprintf(fid,'4\t%g\n',eps);
 fprintf(fid,'5\t%i\n',step);
 fprintf(fid,'6\t%g\n',GAMMAL);
 fprintf(fid,'7\t%g\n',CFL);
 fprintf(fid,'10\t%g\n',Domlen/Ncell);
-fprintf(fid,'13\t%i\n',Ncell);
+fprintf(fid,'11\t%g\n',0.5*pi/Tcell);
+fprintf(fid,'13\t%i\n',Ncell-1);
 fprintf(fid,'14\t%i\n',Tcell);
+fprintf(fid,'20\t%i\n',Tcell);
 fprintf(fid,'106\t%g\n',GAMMAR);
 fclose(fid);

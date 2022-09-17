@@ -2,7 +2,7 @@ CC = g++
 #C compiler
 CFLAGS = -std=c++20 -Wall -pedantic -Og -g -pg -fprofile-arcs -ftest-coverage
 #C compiler options
-CFLAGD = -DMULTIFLUID_BASICS -D_Bool=bool
+CFLAGD = -DSPHERICAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources

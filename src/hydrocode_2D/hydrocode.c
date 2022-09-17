@@ -251,13 +251,11 @@ int main(int argc, char *argv[])
 	      case 1:
 		  // Godunov_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  config[41] = 0.0; // alpha = 0.0
-		  GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time, time_plot);
-		  break;
 	      case 2:
 		  if (dim_split)
-		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, cpu_time, time_plot);
+		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, cpu_time, N, time_plot);
 		  else
-		      GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time, time_plot);
+		      GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time, N, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);

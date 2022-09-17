@@ -43,4 +43,8 @@ void config_write(const char * add_out, const double * cpu_time, const char * na
 // terminal_io.c
 void arg_preprocess(const int argc_least, const int argc, char *argv[], char * scheme);
 
+
+// file_spher_out.c
+void file_spher_write_TEC(const struct flu_var FV, const struct spher_mesh_var smv, const char * problem, const double time);
+
 #endif

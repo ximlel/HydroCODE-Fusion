@@ -9,11 +9,7 @@
 #include "../include/file_io.h"
 #include "../include/meshing.h"
 #include "../include/riemann_solver.h"
-#include "../include_cpp/inter_process.hpp"
 
-#define LIMITER_CONF 2  /* LIMITER<0, add VIP limiter; LIMITER>0, only minmod limiter;
-			   abs(LIMITER)=1, original minmod limiter; abs(LIMITER)=2, VIP-like minmod limiter */
-#define pi (acos(-1.0))
 
 #define FV_RESET_MEM(VV, sfv)					\
     do {							\
@@ -31,13 +27,13 @@
 //#define M (2.) // M=1 planar; M=2 cylindrical; M=3 spherical
 void grp_solver_spher_LAG_source(struct flu_var *FV, struct spher_mesh_var *smv, const int M, double * cpu_time, const int N_plot , double time_plot[])
 {
+	struct cell_var_stru CV;
     int i, k=0;
     
     clock_t tic, toc;
     double cpu_time_sum = 0.0;
-	
-    //parameters
 
+    //parameters
     double const Timeout = config[1];       // Output time
     double const eps     = config[4];
     int    const N  = (int)config[5];       // the maximum number of time steps
@@ -45,16 +41,12 @@ void grp_solver_spher_LAG_source(struct flu_var *FV, struct spher_mesh_var *smv,
     double const GAMMAR  = config[106];
     double const CFL     = config[7];       // CFL condition
     double const dr      = config[10];      //initial d_raidus
-	int    const Ncell   = (int)config[13]; // Number of computing cells in r direction
-	int    const Tcell   = (int)config[14]; // Number of computing cells in \theta direction
+    double const dtheta  = config[11];      //initial d_angle
+    int    const Ncell   = (int)config[3];  // Number of computing cells in r direction
+    int    const Tcell   = (int)config[14]; // Number of computing cells in \theta direction
     double       dt      = config[16];      // the length of the time step
     double const Alpha   = config[41];      // GRP limiter parameter
     int    const Md      = Ncell+2;         // max vector dimension
-    int    const Mt      = Tcell+2;         // max theta dimension
-
-    double dtheta;//initial d_angle
-    dtheta = 0.5*pi/Tcell;
-    config[11] = dtheta;
 
     double wave_speed[2], dire[4], mid[4];
 
@@ -65,11 +57,14 @@ void grp_solver_spher_LAG_source(struct flu_var *FV, struct spher_mesh_var *smv,
 
     double *DD, *UU, *PP, *GammaGamma; // D:Density;U,V:Velocity;P:Pressure
     FV_RESET_MEM(DD,FV->RHO);
-    DD[0]=DD[1];
+    DD[0]     = DD[1];
+    CV.RHO[0] = DD;
     FV_RESET_MEM(UU,FV->U);
-    UU[0]=0.0;
+    UU[0]   = 0.0;
+    CV.U[0] = UU;
     FV_RESET_MEM(PP,FV->P);
-    PP[0]=PP[1];
+    PP[0]   = PP[1];
+    CV.P[0] = PP;
     FV_RESET_MEM(GammaGamma,FV->gamma);
     GammaGamma[0]=GammaGamma[1];
 
@@ -77,7 +72,7 @@ void grp_solver_spher_LAG_source(struct flu_var *FV, struct spher_mesh_var *smv,
     double *DmU = (double*)CALLOC(Md, sizeof(double));
     double *TmV = (double*)CALLOC(Md, sizeof(double));
     double *DmP = (double*)CALLOC(Md, sizeof(double));
-	struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
+    struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
     CV.d_rho = DmD;
     CV.d_u   = DmU;
     CV.d_v   = TmV;

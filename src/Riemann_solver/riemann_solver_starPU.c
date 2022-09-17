@@ -74,7 +74,7 @@ void Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL
 {
 	double DL=GammaL*PL/CL/CL;
 	double DR=GammaR*PR/CR/CR;
-	double P, U;
+	double P=0.5*(PL+PR), U=0.5*(UL+UR);
 	double change,FL,FR,FLD,FRD,POLD,PSTART,UDIFF;
 	PSTART = GuessP(DL,DR,UL,UR,PL,PR,CL,CR,GammaL,GammaR,eps);
 	POLD=PSTART;

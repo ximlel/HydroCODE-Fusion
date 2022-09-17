@@ -73,7 +73,11 @@ void file_1D_write(const int m, const int N, const struct cell_var_stru CV,
     PRINT_NC(U,   CV.U[k][j]);
     PRINT_NC(P,   CV.P[k][j]);
     PRINT_NC(E,   CV.E[k][j]);
+#ifdef SPHERICAL_BASICS
+    PRINT_NC(R,   X[k][j]);
+#else
     PRINT_NC(X, 0.5 * (X[k][j] + X[k][j+1]));
+#endif
 
     strcpy(file_data, add_out);
     strcat(file_data, "/time_plot.dat");

@@ -25,7 +25,7 @@
  * @param[out] time_plot: Array of the plotting time recording.
  * @todo All of the functionality of the ALE code has not yet been implemented.
  */
-void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, double time_plot[])
+void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, const int N_plot, double time_plot[])
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -81,6 +81,9 @@ void Godunov_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, doub
   for(k = 1; k <= N; ++k)
   {
       tic = clock();
+      if (time_c > time_plot[nt] && nt < (N_plot-1))
+	  nt++;
+
       h_S_max = INFINITY; // h/S_max = INFINITY
 
       find_bound = bound_cond_slope_limiter(true, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, false, time_c, X[nt-1]);
@@ -225,8 +228,17 @@ return_NULL:
   config[5] = (double)k;
   if(fabs(time_plot[1]) < eps)
       {
-	  time_plot[0] = time_c - tau;
 	  time_plot[1] = time_c;
+	  if(isfinite(time_c))
+	      {
+		  time_plot[N_plot-2] = time_c - tau;
+		  time_plot[N_plot-1] = time_c;
+	      }
+	  else
+	      {
+		  time_plot[N_plot-2] = N*tau - tau;
+		  time_plot[N_plot-1] = N*tau;
+	      }
       }
 
   free(F_rho);

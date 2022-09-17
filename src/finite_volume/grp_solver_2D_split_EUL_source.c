@@ -60,7 +60,7 @@
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */
-void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, double time_plot[])
+void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, const int N_plot, double time_plot[])
 {
     /* 
      * i is a frequently used index for y-spatial variables.
@@ -127,6 +127,9 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   for(k = 1; k <= N; DS ? k : ++k)
   {
     tic = clock();
+    if (time_c > time_plot[nt] && nt < (N_plot-1))
+	nt++;
+
     /* evaluate f and a at some grid points for the iteration
      * and evaluate the character speed to decide the length
      * of the time step by (tau * speed_max)/h = CFL
@@ -267,8 +270,17 @@ return_NULL:
   config[5] = (double)k;
   if (fabs(time_plot[1]) < eps)
       {
-	  time_plot[0] = time_c - tau;
 	  time_plot[1] = time_c;
+	  if(isfinite(time_c))
+	      {
+		  time_plot[N_plot-2] = time_c - tau;
+		  time_plot[N_plot-1] = time_c;
+	      }
+	  else
+	      {
+		  time_plot[N_plot-2] = N*tau - tau;
+		  time_plot[N_plot-1] = N*tau;
+	      }
       }
   for(j = 0; j < m+1; ++j)
   {

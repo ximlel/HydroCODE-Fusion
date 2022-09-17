@@ -23,7 +23,7 @@
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */
-void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, double time_plot[])
+void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, const int N_plot, double time_plot[])
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -110,6 +110,9 @@ void GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_ti
   for(k = 1; k <= N; ++k)
   {
       tic = clock();
+      if (time_c > time_plot[nt] && nt < (N_plot-1))
+	  nt++;
+
       h_S_max = INFINITY; // h/S_max = INFINITY
 
       find_bound = bound_cond_slope_limiter(false, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, true, time_c);
@@ -310,8 +313,17 @@ return_NULL:
   config[5] = (double)k;
   if(fabs(time_plot[1]) < eps)
       {
-	  time_plot[0] = time_c - tau;
 	  time_plot[1] = time_c;
+	  if(isfinite(time_c))
+	      {
+		  time_plot[N_plot-2] = time_c - tau;
+		  time_plot[N_plot-1] = time_c;
+	      }
+	  else
+	      {
+		  time_plot[N_plot-2] = N*tau - tau;
+		  time_plot[N_plot-1] = N*tau;
+	      }
       }
 
   free(s_u);

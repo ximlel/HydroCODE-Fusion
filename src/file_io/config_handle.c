@@ -119,6 +119,8 @@ static void config_check(void)
     config[2]   = isfinite(config[2])   ? config[2]   : (double)1;	
     // Coordinate framework (EUL/LAG/ALE)
     config[8]   = isfinite(config[8])   ? config[8]   : (double)0;
+    // r_0
+    config[20]  = isfinite(config[20])  ? config[20]  : config[10];
     // Reconstruction approach (interfacial value / lsq)
     config[30]  = isfinite(config[30])  ? config[30]  : (double)0;
     // Reconstruction variable (prim_var/cons_var)
@@ -131,6 +133,8 @@ static void config_check(void)
     config[40]  = isfinite(config[40])  ? config[40]  : (double)0;
     // Parameter α in minmod limiter
     config[41]  = isfinite(config[41])  ? config[41]  : 1.9;
+    // Slope limiter for minmod VIP
+    config[42]  = isfinite(config[42])  ? config[42]  : (double)1;
     // Runge-Kutta time discretization
     config[53]  = isfinite(config[53])  ? config[53]  : (double)false;
     // Conservative variable (U_gamma) ργ

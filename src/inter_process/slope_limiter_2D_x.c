@@ -34,7 +34,6 @@ void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool
 {
     va_list ap;
     va_start(ap, HL);
-    int j;
     double const alpha = config[41]; // the paramater in slope limiters.
     double s_L, s_R; // spatial derivatives in coordinate x (slopes) 
     double h = HL, HR, * X;
@@ -44,7 +43,7 @@ void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool
 	    X  = va_arg(ap, double *);
 	}
 	
-    for(j = 0; j < m; ++j) // Reconstruct slopes
+    for(int j = 0; j < m; ++j) // Reconstruct slopes
 	{ /*
 	   *  j-1          j          j+1
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1

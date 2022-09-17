@@ -5,15 +5,14 @@
 #include "../include_cii/mem.h"
 #include "../include/var_struc.h"
 
-#define Epsilon (dr) // r_0=Epsilon
-
 
 struct spher_mesh_var spher_mesh_init(const char *example)
 {
-    double const dr     = config[10];      // initial d_raidus
-    double const dtheta = config[11];      // initial d_angle
-    int    const Ncell  = (int)config[13]; // Number of computing cells in r direction
-    int    const Md     = Ncell+2;         // max vector dimension
+    double const dr     = config[10];     // initial d_raidus
+    double const dtheta = config[11];     // initial d_angle
+    double const r_0    = config[20];
+    int    const Ncell  = (int)config[3]; // Number of computing cells in r direction
+    int    const Md     = Ncell+2;        // max vector dimension
 
     struct spher_mesh_var smv;
     smv.Rb   = (double*)ALLOC(Md*sizeof(double)); //radius and length of outer cell boundary
@@ -27,14 +26,14 @@ struct spher_mesh_var spher_mesh_init(const char *example)
 
 	for(int i=1;i<Md;i++)//center cell is cell 0
 		{
-			smv.Rb[i]=(Epsilon+(i-1)*dr)*cos(0.5*dtheta);//outer cell boundary
-			smv.Lb[i]=(Epsilon+(i-1)*dr)*sin(0.5*dtheta)*2.0;
+			smv.Rb[i]=(r_0+(i-1)*dr)*cos(0.5*dtheta);//outer cell boundary
+			smv.Lb[i]=(r_0+(i-1)*dr)*sin(0.5*dtheta)*2.0;
 			//centroid of triangular and trapezoid
-			smv.RR[i]=(Epsilon+i*dr-(3*Epsilon/dr+3*i-2)/(6*Epsilon/dr+6*i-3)*dr)*cos(0.5*dtheta);
+			smv.RR[i]=(r_0+i*dr-(3*r_0/dr+3*i-2)/(6*r_0/dr+6*i-3)*dr)*cos(0.5*dtheta);
 		}
 	smv.Rb[0]=0.;
 	smv.Lb[0]=0.;
-	smv.RR[0]=(2.0/3.0*Epsilon)*cos(0.5*dtheta);
+	smv.RR[0]=(2.0/3.0*r_0)*cos(0.5*dtheta);
 
 	printf("Mesh of %s has been constructed!\n", example);
 	return smv;
@@ -43,7 +42,7 @@ struct spher_mesh_var spher_mesh_init(const char *example)
 
 void spher_mesh_update(struct spher_mesh_var *smv)
 {
-    int const Ncell  = (int)config[13]; // Number of computing cells in r direction
+    int const Ncell = (int)config[3]; // Number of computing cells in r direction
 
     double *Rb   = smv->Rb;  //radius and length of outer cell boundary
     double *Lb   = smv->Lb;
