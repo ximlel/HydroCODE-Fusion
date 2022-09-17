@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "../include/var_struc.h"
+#include "../include/inter_process.h"
 #include "../include/riemann_solver.h"
 
 
@@ -79,6 +80,8 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 	double gamma_mid = ifv->gamma;
 	ifv->lambda_u = 0.0;  ifv->lambda_v = 0.0;
 
+	int retval;
+
 	if (dim == 2)
 		{
 			double u, u_R;
@@ -94,10 +97,8 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 
 	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, ifv, ifv_R, eps, INFINITY);
 
-	if(mid[3] < eps || mid[0] < eps)
-	    return 1;
-	if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
-	    return 2;
+	if((retval = star_dire_check(mid, dire, 2)))
+	    return retval;
 
 	double rho_mid = mid[0], p_mid = mid[3], u_mid = mid[1], v_mid = mid[2];
 #ifdef MULTIFLUID_BASICS
@@ -139,7 +140,7 @@ int Riemann_exact_flux(struct i_f_var * ifv, struct i_f_var * ifv_R)
 	ifv->V_qt_star  = p_mid*n_y;
 	ifv->P_star     = p_mid/rho_mid*ifv->F_rho;
 #endif
-	return 0;
+	return retval;
 }
 
 
@@ -161,6 +162,8 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	double gamma_mid = ifv->gamma;
 	ifv->lambda_u = 0.0;  ifv->lambda_v = 0.0;
 
+	int retval;
+
 	double u, u_R, d_u, d_u_R, t_u, t_u_R;
 	u          =  ifv->U    *n_x + ifv->V    *n_y;
 	u_R        =  ifv_R->U  *n_x + ifv_R->V  *n_y;
@@ -180,7 +183,7 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	ifv_R->d_u =  d_u_R;
 	ifv->t_u   =  t_u;
 	ifv_R->t_u =  t_u_R;
-	
+
 	double wave_speed[2], dire[6], mid[6], star[6];
 
 	// linear_GRP_solver_Edir_G2D(wave_speed, dire, mid, star, ifv, ifv_R, eps, eps);
@@ -188,12 +191,8 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, ifv, ifv_R, eps, eps);
 	// linear_GRP_solver_Edir_Q1D(wave_speed, dire, mid, star, ifv, ifv_R, eps, INFINITY);
 
-	if(mid[3] < eps || mid[0] < eps)
-	    return 1;
-	if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
-	    return 2;
-	if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0])|| !isfinite(dire[3]))
-	    return 3;
+	if((retval = star_dire_check(mid, dire, 2)))
+	    return retval;
 
 	double rho_mid, p_mid, u_mid, v_mid;
 	rho_mid =  mid[0] + 0.5*tau*dire[0];
@@ -233,5 +232,5 @@ int GRP_2D_flux(struct i_f_var * ifv, struct i_f_var * ifv_R, const double tau)
 	ifv->V_qt_star  = p_mid*n_y;
 	ifv->P_star     = p_mid/rho_mid*ifv->F_rho;
 #endif
-	return 0;
+	return retval;
 }

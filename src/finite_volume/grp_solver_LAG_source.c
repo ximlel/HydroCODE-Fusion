@@ -177,50 +177,46 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 
 	      if(j) //calculate the material derivatives
 		  {
-		      ifv_L.t_u   =   s_u[j-1]/ifv_L.RHO;
-		      ifv_L.t_p   =   s_p[j-1]/ifv_L.RHO;
-		      ifv_L.t_rho = s_rho[j-1]/ifv_L.RHO;
+		      ifv_L.d_u   =   s_u[j-1];
+		      ifv_L.d_p   =   s_p[j-1];
+		      ifv_L.d_rho = s_rho[j-1];
 		  }
 	      else
 		  {
-		      ifv_L.t_rho = bfv_L.SRHO/ifv_L.RHO;
-		      ifv_L.t_u   = bfv_L.SU  /ifv_L.RHO;
-		      ifv_L.t_p   = bfv_L.SP  /ifv_L.RHO;
+		      ifv_L.d_rho = bfv_L.SRHO;
+		      ifv_L.d_u   = bfv_L.SU;
+		      ifv_L.d_p   = bfv_L.SP;
 		  }
+	      ifv_L.t_u   =   ifv_L.d_u/ifv_L.RHO;
+	      ifv_L.t_p   =   ifv_L.d_p/ifv_L.RHO;
+	      ifv_L.t_rho = ifv_L.d_rho/ifv_L.RHO;
 	      if(j < m)
 		  {
-		      ifv_R.t_u   =   s_u[j]/ifv_R.RHO;
-		      ifv_R.t_p   =   s_p[j]/ifv_R.RHO;
-		      ifv_R.t_rho = s_rho[j]/ifv_R.RHO;
+		      ifv_R.d_u   =   s_u[j];
+		      ifv_R.d_p   =   s_p[j];
+		      ifv_R.d_rho = s_rho[j];
 		  }
 	      else
 		  {
-		      ifv_R.t_rho = bfv_R.SRHO/ifv_R.RHO;
-		      ifv_R.t_u   = bfv_R.SU  /ifv_R.RHO;
-		      ifv_R.t_p   = bfv_R.SP  /ifv_R.RHO;
+		      ifv_R.d_rho = bfv_R.SRHO;
+		      ifv_R.d_u   = bfv_R.SU;
+		      ifv_R.d_p   = bfv_R.SP;
 		  }
-	      if(!isfinite(ifv_L.t_p)|| !isfinite(ifv_R.t_p)|| !isfinite(ifv_L.t_u)|| !isfinite(ifv_R.t_u)|| !isfinite(ifv_L.t_rho)|| !isfinite(ifv_R.t_rho))
+	      ifv_R.t_u   =   ifv_R.d_u/ifv_R.RHO;
+	      ifv_R.t_p   =   ifv_R.d_p/ifv_R.RHO;
+	      ifv_R.t_rho = ifv_R.d_rho/ifv_R.RHO;
+	      if(ifvar_check(&ifv_L, &ifv_R, 1))
 		  {
-		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - Slope\n", k, j); 
+		      printf(" on [%d, %d] (t_n, x).\n", k, j);
 		      goto return_NULL;
 		  }
 
 //========================Solve GRP========================
 	      linear_GRP_solver_LAG(dire, mid, &ifv_L, &ifv_R, eps, eps);
 
-	      if(mid[2] < eps || mid[0] < eps || mid[3] < eps)
+	      if(star_dire_check(mid, dire, 1))
 		  {
-		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
-		      time_c = t_all;
-		  }
-	      if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
-		  {
-		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
-		      time_c = t_all;
-		  }
-	      if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0])|| !isfinite(dire[3]))
-		  {
-		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - DIRE\n", k, j); 
+		      printf(" on [%d, %d] (t_n, x).\n", k, j);
 		      time_c = t_all;
 		  }
 

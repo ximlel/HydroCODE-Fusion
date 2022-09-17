@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "../include/var_struc.h"
+#include "../include/inter_process.h"
 #include "../include/flux_calc.h"
 
 
@@ -30,7 +31,6 @@
 int flux_generator_y(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
 		      struct b_f_var * bfv_D, struct b_f_var * bfv_U, const _Bool Transversal)
 {
-  double const eps = config[4];  // the largest value could be seen as zero
   double const h_y = config[11]; // the length of the initial y spatial grids
   struct i_f_var ifv_D = {.n_x = 1.0, .n_y = 0.0, .gamma = config[6]};
   struct i_f_var ifv_U = ifv_D;
@@ -84,16 +84,6 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
           ifv_U.V     = bfv_U[j].V   - 0.5*h_y*bfv_U[j].TV;
           ifv_U.P     = bfv_U[j].P   - 0.5*h_y*bfv_U[j].TP;
       }
-      if(ifv_D.P < eps || ifv_U.P < eps || ifv_D.RHO < eps || ifv_U.RHO < eps)
-	  {
-	      printf("<0.0 error on [%d, %d, %d] (nt, x, y) - Reconstruction_y\n", nt, j, i);
-	      return 1;
-	  }
-      if(!isfinite(ifv_D.d_p)|| !isfinite(ifv_U.d_p)|| !isfinite(ifv_D.d_u)|| !isfinite(ifv_U.d_u)|| !isfinite(ifv_D.d_v)|| !isfinite(ifv_U.d_v)|| !isfinite(ifv_D.d_rho)|| !isfinite(ifv_U.d_rho))
-	  {
-	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - d_Slope_y\n", nt, j, i); 
-	      return 1;
-	  }
 
 //===========================
       if (Transversal)
@@ -126,11 +116,6 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
 		      ifv_U.t_v   = -bfv_U[j].SV;
 		      ifv_U.t_p   = -bfv_U[j].SP;
 		  }
-	      if(!isfinite(ifv_D.t_p)|| !isfinite(ifv_U.t_p)|| !isfinite(ifv_D.t_u)|| !isfinite(ifv_U.t_u)|| !isfinite(ifv_D.t_v)|| !isfinite(ifv_U.t_v)|| !isfinite(ifv_D.t_rho)|| !isfinite(ifv_U.t_rho))
-		  {
-		      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - t_Slope_y\n", nt, j, i); 
-		      return 1;
-		  }
 	  }
       else
 	  {
@@ -143,6 +128,12 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
 	      ifv_U.t_v   = -0.0;
 	      ifv_U.t_p   = -0.0;
 	  }
+      if(ifvar_check(&ifv_D, &ifv_U, 2))
+	  {
+	      printf(" on [%d, %d, %d] (nt, x, y).\n", nt, j, i);
+	      return 1;
+	  }
+
 //===========================
 
       data_err = GRP_2D_flux(&ifv_D, &ifv_U, tau);

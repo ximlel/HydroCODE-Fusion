@@ -9,6 +9,11 @@
 
 #include "../include/var_struc.h"
 
+// fluid_var_check.c
+int ifvar_check(struct i_f_var *ifv_L, struct i_f_var *ifv_R, const int dim);
+int star_dire_check(double *mid, double *dire, const int dim);
+
+
 // minmod slope limiter
 void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, double s[],
 		    const double U[], const double UL, const double UR, const double HL, ...);

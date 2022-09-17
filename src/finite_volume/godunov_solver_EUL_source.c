@@ -126,14 +126,9 @@ void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cp
 //========================Solve Riemann Problem========================
 	      linear_GRP_solver_Edir(dire, mid, &ifv_L, &ifv_R, eps, INFINITY);
 
-	      if(mid[2] < eps || mid[0] < eps)
+	      if(star_dire_check(mid, dire, 1))
 		  {
-		      printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, j);
-		      time_c = t_all;
-		  }
-	      if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0]))
-		  {
-		      printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, j); 
+		      printf(" on [%d, %d] (t_n, x).\n", k, j);
 		      time_c = t_all;
 		  }
 
