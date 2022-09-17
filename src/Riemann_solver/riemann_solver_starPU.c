@@ -72,6 +72,9 @@ void Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL
 	    const double eps, const double TOLPRE, const int NRITER)
 // compute the solution for pressure and velocity in the star region
 {
+	if((2.0*CL/(GammaL-1.0)+2.0*CR/(GammaR-1.0)) <= (UR-UL))
+		printf("Error: Vacuum is generated in Riemann solver!\n");
+
 	double DL=GammaL*PL/CL/CL;
 	double DR=GammaR*PR/CR/CR;
 	double P=0.5*(PL+PR), U=0.5*(UL+UR);

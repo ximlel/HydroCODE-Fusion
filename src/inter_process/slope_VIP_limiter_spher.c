@@ -8,7 +8,7 @@
 
 
 void VIP_limiter_spher(const int Ncell, const _Bool find_bound, double DmU[], double TmV[],
-		       const double UU[], const double UL, const double UR, struct spher_mesh_var *smv)
+		       const double UU[], struct spher_mesh_var *smv)
 {
     double const dtheta = config[11]; //initial d_angle
     double const Alpha  = config[41]; // the paramater in slope limiters.

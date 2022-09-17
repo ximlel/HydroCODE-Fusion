@@ -36,10 +36,9 @@ typedef struct flu_var {
 	double * RHO,   * U,   * V,   * P;
 #ifdef MULTIFLUID_BASICS
 	double * Z_a;
+	double * PHI, * gamma;
 #ifdef MULTIPHASE_BASICS
 	double * RHO_b, * U_b, * V_b, * P_b;
-#else
-	double * PHI, * gamma;
 #endif
 #endif
 } Fluid_Variable;
@@ -55,6 +54,9 @@ typedef struct cell_var_stru {
 	double **rhoIy, **uIy, **vIy, **pIy; //!< interfacial variable values in coordinate y at t_{n+1}.
 	double **F_rho, **F_e, **F_u, **F_v; //!< numerical fluxes at (x_{j-1/2}, t_{n}).
 	double **G_rho, **G_e, **G_u, **G_v; //!< numerical fluxes at (y_{j-1/2}, t_{n}).
+#ifdef MULTIFLUID_BASICS
+	double ** gamma;
+#endif
 } Cell_Variable_Structured;
 
 //! pointer structure of VARiables on unstructured computational grid CELLs.

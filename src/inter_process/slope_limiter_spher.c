@@ -25,6 +25,11 @@ void minmod_limiter_spher(const int Ncell, const _Bool find_bound, double s[],
 		    s_L = (U[j]   - U[j-1]) / 2.0 / smv->DdrR[j];
 		    s_R = (U[j+1] - U[j])   / 2.0 / smv->DdrL[j];
 		}
+	    else
+		{
+		    printf("LIMITER_VIP Parameter Error!\n");
+		    exit(2);
+		}
 	    if (find_bound)
 		s[j] = minmod3(Alpha*s_L, Alpha*s_R, s[j]);
 	    else

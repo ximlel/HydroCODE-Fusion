@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
   for(j = 0; j <= m; ++j)
       X[0][j] = h * j;
   for(j = 0; j < m; ++j)
-      CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(gamma - 1.0)/CV.RHO[0][j]; 
+      CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(gamma - 1.0)/CV.RHO[0][j];
 
   if (strcmp(argv[4],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {

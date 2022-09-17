@@ -19,10 +19,13 @@ HEAD = finite_volume flux_calc inter_process Riemann_solver file_io tools
 SOURCE = hydrocode
 #Name of the main source 
 
-all: modules
+all: modules exe
+.PHONYP:all
+
+exe:
 	@echo "**********Generate executable file***********"
 	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
-.PHONYP:all
+.PHONYP:exe
 
 modules:
 #Enter each subdirectory

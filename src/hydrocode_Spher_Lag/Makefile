@@ -6,7 +6,7 @@ CFLAGD = -DSPHERICAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I$(SRC)/include -I$(SRC)/include_cpp
+INCLUDE = -I $(SRC)/include
 #Inclued folder
 LIBS = -lm -lgcov
 #Library files
@@ -14,15 +14,18 @@ LIBS = -lm -lgcov
 RM = rm -vf
 #Delete command
 
-HEAD = inter_process_spher inter_process_cpp meshing file_io
+HEAD = finite_volume inter_process inter_process_cpp Riemann_solver meshing file_io tools src_cii
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 
 
-all: modules
+all: modules exe
+.PHONYP:all
+
+exe:
 	@echo "**********Generate executable file***********"
 	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
-.PHONYP:all
+.PHONYP:exe
 
 modules:
 #Enter each subdirectory

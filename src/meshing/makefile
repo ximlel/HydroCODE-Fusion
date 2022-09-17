@@ -7,7 +7,7 @@ CFLAGD  =
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I$(SRC)/include -I$(SRC)/include
+INCLUDE = -I$(SRC)/include -I$(SRC)/include_cii
 #Inclued folder
 
 AR = ar
