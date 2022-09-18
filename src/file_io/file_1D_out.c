@@ -12,6 +12,13 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
+#ifdef DOXYGEN_PREDEFINED
+/**
+ * @def SPHERICAL_BASICS
+ * @brief 
+ */
+#endif
+
 
 /**
  * @brief Print out fluid variable 'v' with array data element 'v_print'.

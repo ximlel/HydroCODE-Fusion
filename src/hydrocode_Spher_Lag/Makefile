@@ -25,12 +25,14 @@ HEAD = finite_volume inter_process inter_process_cpp riemann_solver meshing file
 SOURCE = hydrocode
 #Name of the main source 
 
-SRC_LIST = sys_pro.c \
-	config_handle.c file_1D_out.c terminal_io.c file_1D_in.c io_control.c \
+SRC_LIST = except.c mem.c \
 	sys_pro.c \
-	linear_grp_solver_LAG.c linear_grp_solver_Edir.c riemann_solver_exact_Ben.c riemann_solver_exact_Toro.c \
-	bound_cond_slope_limiter.c fluid_var_check.c slope_limiter.c \
-	grp_solver_EUL_source.c grp_solver_LAG_source.c godunov_solver_EUL_source.c godunov_solver_LAG_source.c
+	config_handle.c file_spher_out.c file_1D_out.c file_1D_in.c io_control.c terminal_io.c \
+	spher_mesh.c \
+	linear_grp_solver_spher_LAG.c riemann_solver_starPU.c \
+	VIPLimiter.cpp \
+	fluid_var_check.c slope_limiter_spher.c slope_VIP_limiter_spher.c \
+	grp_solver_spher_LAG_source.c
 
 all: modules libscopy $(SOURCE).out
 .PHONYP:all

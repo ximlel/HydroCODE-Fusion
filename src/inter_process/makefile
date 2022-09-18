@@ -23,6 +23,10 @@ DIR_NAME = $(shell basename `pwd`)
 SRC_LIST = $(shell ls *.c)
 FILES_C  = $(filter -out $(SRC_LIST), $(shell ls *.c))
 #All .c files
+FILES_O  = $(addsuffix .o,$(basename $(FILES_C)))
+#All .o files
+FILES_SLO = $(addsuffix .slo,$(basename $(FILES_C)))
+#All .slo files
 
 define compile_c_file #Compile all .c files
 @echo "$(CC) $(CFLAGS) $(CFLAGD)-c {"
@@ -46,11 +50,6 @@ all: lib$(DIR_NAME).a
 *.o *.slo: *.c $(addsuffix /*, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 	@echo "******************Compiling******************"
 	$(call compile_c_file)
-
-FILES_O = $(shell find ./ -name "*.o" -print)
-#All .o files
-FILES_SLO = $(shell find ./ -name "*.slo" -print)
-#All .slo files
 
 lib$(DIR_NAME).a lib$(DIR_NAME).so: *.o
 	@echo "******Producing static and dynamic libs******"

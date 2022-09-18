@@ -20,17 +20,20 @@ CP = cp -vu
 #Copy command
 
 #Head folder
-HEAD = finite_volume flux_calc inter_process_unstruct riemann_solver meshing file_io tools src_cii
+HEAD = finite_volume flux_calc inter_process_unstruct inter_process riemann_solver meshing file_io tools src_cii
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 
 
-SRC_LIST = sys_pro.c \
-	config_handle.c file_1D_out.c terminal_io.c file_1D_in.c io_control.c \
-	sys_pro.c \
-	linear_grp_solver_LAG.c linear_grp_solver_Edir.c riemann_solver_exact_Ben.c riemann_solver_exact_Toro.c \
-	bound_cond_slope_limiter.c fluid_var_check.c slope_limiter.c \
-	grp_solver_EUL_source.c grp_solver_LAG_source.c godunov_solver_EUL_source.c godunov_solver_LAG_source.c
+SRC_LIST = except.c mem.c \
+	sys_pro.c mat_algo.c \
+	config_handle.c file_2D_unstruct_out.c file_2D_in.c io_control.c terminal_io.c \
+	ghost_cell.c  mesh_init_free.c  msh_load.c  quad_mesh.c \
+	hll_2D_solver.c roe_2D_solver.c roe_solver.c roe_HLL_solver.c linear_grp_solver_Edir_G2D.c linear_grp_solver_Edir_Q1D.c riemann_solver_exact_Ben.c riemann_solver_exact_Toro.c \
+	fluid_var_check.c \
+	assist_func.c cons_qty_calc.c copy_func.c cell_init_free.c cons_qty_update_P_ave.c slope_limiter_unstruct.c \
+	flux_solver.c \
+	finite_volume_scheme_unstruct.c
 
 all: modules libscopy $(SOURCE).out
 .PHONYP:all

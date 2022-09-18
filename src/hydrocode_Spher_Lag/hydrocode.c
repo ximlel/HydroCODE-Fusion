@@ -137,6 +137,11 @@ int main(int argc, char *argv[])
   }
   for(j = 1; j <= Ncell; ++j)
       CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(CV.gamma[0][j] - 1.0)/CV.RHO[0][j];
+  for(k = 1; k < N; ++k)
+      {
+	  free(CV.gamma[k]);
+	  CV.gamma[k] = CV.gamma[0];
+      }
 
   if (strcmp(argv[4],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
       {
@@ -181,7 +186,6 @@ return_NULL:
     free(CV.RHO[k]);
     free(CV.U[k]);
     free(CV.P[k]);
-    free(CV.gamma[k]);
     free(R[k]);
     CV.E[k]     = NULL;
     CV.RHO[k]   = NULL;
