@@ -878,7 +878,7 @@ INPUT                  = ../include \
                          ../tools \
                          ../file_io \
                          ../meshing \
-                         ../Riemann_solver \
+                         ../riemann_solver \
                          ../inter_process_unstruct \
                          ../flux_calc \
                          ../finite_volume \

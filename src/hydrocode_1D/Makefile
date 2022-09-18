@@ -1,21 +1,18 @@
 CC = gcc
 #C compiler
-CFLAGS  = -std=c99 -Wall -pedantic -Og -g -pg
+CFLAGS   = -std=c99 -Wall -pedantic -Og -g -pg
 #CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
-CFLAGD = #-D_Bool=bool
+CFLAGD = 
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I$(SRC)/include
+INCLUDE_FOLDER = include
+INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
 LIBS  = -lm -lgcov -Llib/
-#Library files
 LIBS += $(addprefix -l, $(HEAD))
-#Library files addition for *.a
-# LIBS += $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD)))
-# LIBS += $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD_SO)))
-#Library files addition for *.so
+#Library files
 
 RM = rm -vf
 #Delete command
@@ -23,20 +20,22 @@ CP = cp -vu
 #Copy command
 
 #Head folder
-HEAD = finite_volume inter_process Riemann_solver file_io tools
-#Head folder addition for *.so
-# HEAD_SO = inter_process_unstruct inter_process_cpp flux_calc meshing src_cii
+HEAD = finite_volume inter_process riemann_solver file_io tools
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 
 
-SRC_LIST = config_handle.c file_1D_out.c file_2D_out.c file_spher_out.c terminal_io.c file_1D_in.c \
-	file_2D_in.c file_2D_unstruct_out.c io_control.c 
+SRC_LIST = sys_pro.c \
+	config_handle.c file_1D_out.c terminal_io.c file_1D_in.c io_control.c \
+	sys_pro.c \
+	linear_grp_solver_LAG.c linear_grp_solver_Edir.c riemann_solver_exact_Ben.c riemann_solver_exact_Toro.c \
+	bound_cond_slope_limiter.c fluid_var_check.c slope_limiter.c \
+	grp_solver_EUL_source.c grp_solver_LAG_source.c godunov_solver_EUL_source.c godunov_solver_LAG_source.c
 
-all: modules libscopy exe
+all: modules libscopy $(SOURCE).out
 .PHONYP:all
 
-exe:
+$(SOURCE).out exe: $(SOURCE).c lib/*.a $(addsuffix /*, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 	@echo "**********Generate executable file***********"
 	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
 .PHONYP:exe
@@ -45,15 +44,12 @@ modules:
 #Enter each subdirectory
 #Call the Makefile in the subdirectory
 	@for n in $(HEAD); do \
-	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
-	done;
-	@for n in $(HEAD_SO); do \
-	( $(MAKE) --directory=$(SRC)/$$n )  \
+	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' SRC_LIST='$(SRC_LIST)' --directory=$(SRC)/$$n )  \
 	done;
 .PHONYP:modules
 
-libscopy:
-	-mkdir -v lib
+lib/*.a lib/*.so libscopy:
+	@-mkdir -v lib
 	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) lib/
 	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
 .PHONY: libscopy
@@ -71,22 +67,21 @@ html:
 	genhtml -o gcovdir $(SOURCE).info
 .PHONYP:html
 
-clean: clean_tmp
-#Clean in the subdirectory
+clean_all: clean
+#Clean in the directory
 	@$(RM) $(SOURCE).out $(SOURCE).exe
-	@$(RM) -R lib
-	@$(RM) -R gcovdir
+	@$(RM) -R lib gcovdir
 	@$(RM) pg.png callgrind.png
-.PHONYP:clean
+.PHONYP:clean_all
 
-clean_tmp:
+clean:
 #Clean in the subdirectory
 	@for n in $(HEAD) $(HEAD_SO); do \
 	( $(MAKE) --directory=$(SRC)/$$n clean ) \
 	done;
 	@$(RM) *.gcov *.gcda *.gcno
 	@$(RM) $(SOURCE).info gmon.out pg callgrind.out
-.PHONYP:clean_tmp
+.PHONYP:clean
 
 #Linux terminal color test
 all_color: regular bold underline background

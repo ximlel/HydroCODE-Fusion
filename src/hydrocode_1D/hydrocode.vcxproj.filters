@@ -77,7 +77,7 @@
     <ClInclude Include="..\include\finite_volume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Riemann_solver.h">
+    <ClInclude Include="..\include\riemann_solver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\tools.h">

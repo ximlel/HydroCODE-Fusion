@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ulimit -c unlimited
+export LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH
 
 ### Compile the program
 # make clean

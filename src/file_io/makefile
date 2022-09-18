@@ -7,7 +7,8 @@ CFLAGD  =
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I$(SRC)/include
+INCLUDE_FOLDER = include
+INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
 
 AR = ar
@@ -19,15 +20,18 @@ RM = rm -vf
 
 DIR_NAME = $(shell basename `pwd`)
 #Current folder
-FILES_C = $(shell ls *.c)
+SRC_LIST = $(shell ls *.c)
+FILES_C  = $(filter -out $(SRC_LIST), $(shell ls *.c))
 #All .c files
 
 define compile_c_file #Compile all .c files
+@echo "$(CC) $(CFLAGS) $(CFLAGD)-c {"
 @for file in $(FILES_C); do \
-( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && \
+( echo "  $$file"  && \
 	$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)  && \
-	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$file.slo $(INCLUDE) ) \
+	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$(basename $$file .c).slo $(INCLUDE) ) \
 done;
+@echo " } $(INCLUDE)"
 endef
 
 define rm_o_file #Delete all .o .slo files
@@ -39,7 +43,7 @@ endef
 all: lib$(DIR_NAME).a
 .PHONYP:all
 
-*.o *.slo: *.c $(SRC)/include/*.h
+*.o *.slo: *.c $(addsuffix /*, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 	@echo "******************Compiling******************"
 	$(call compile_c_file)
 

@@ -8,7 +8,7 @@
 #include "../include/var_struc.h"
 #include "../include/tools.h"
 #include "../include/finite_volume.h"
-#include "../include/Riemann_solver.h"
+#include "../include/riemann_solver.h"
 #include "../include/file_io.h"
 
 #define pi (4.*atan(1.0))

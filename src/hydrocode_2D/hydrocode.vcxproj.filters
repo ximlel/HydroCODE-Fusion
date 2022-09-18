@@ -72,13 +72,13 @@
     <ClCompile Include="..\file_io\file_2D_out.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Riemann_solver\roe_2D_solver.c">
+    <ClCompile Include="..\riemann_solver\roe_2D_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Riemann_solver\roe_solver.c">
+    <ClCompile Include="..\riemann_solver\roe_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Riemann_solver\hll_2D_solver.c">
+    <ClCompile Include="..\riemann_solver\hll_2D_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,7 +95,7 @@
     <ClInclude Include="..\include\inter_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Riemann_solver.h">
+    <ClInclude Include="..\include\riemann_solver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\tools.h">
