@@ -1,6 +1,7 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -Wall -pedantic -Og -g -pg -fprofile-arcs -ftest-coverage
+CFLAGS  = -std=c99 -Wall -pedantic -Og -g -pg
+#CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
 CFLAGD = #-D_Bool=bool
 #Macro definition
@@ -8,28 +9,36 @@ SRC = ..
 #Directory of sources
 INCLUDE = -I$(SRC)/include
 #Inclued folder
-LIBS = -lm -lgcov
+LIBS  = -lm -lgcov -Llib/
 #Library files
-# LIBS += $(SRC)/inter_process_cpp/*.so
+LIBS += $(addprefix -l, $(HEAD))
+#Library files addition for *.a
+# LIBS += $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD)))
+# LIBS += $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD_SO)))
 #Library files addition for *.so
 
 RM = rm -vf
 #Delete command
+CP = cp -vu
+#Copy command
 
-#Head folder for *.a
+#Head folder
 HEAD = finite_volume inter_process Riemann_solver file_io tools
-#Head folder for *.so
-# HEAD = finite_volume inter_process inter_process_unstruct flux_calc Riemann_solver meshing file_io tools src_cii
+#Head folder addition for *.so
+# HEAD_SO = inter_process_unstruct inter_process_cpp flux_calc meshing src_cii
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 
 
-all: modules exe
+SRC_LIST = config_handle.c file_1D_out.c file_2D_out.c file_spher_out.c terminal_io.c file_1D_in.c \
+	file_2D_in.c file_2D_unstruct_out.c io_control.c 
+
+all: modules libscopy exe
 .PHONYP:all
 
 exe:
 	@echo "**********Generate executable file***********"
-	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
+	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
 .PHONYP:exe
 
 modules:
@@ -38,7 +47,16 @@ modules:
 	@for n in $(HEAD); do \
 	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
 	done;
+	@for n in $(HEAD_SO); do \
+	( $(MAKE) --directory=$(SRC)/$$n )  \
+	done;
 .PHONYP:modules
+
+libscopy:
+	-mkdir -v lib
+	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) lib/
+	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
+.PHONY: libscopy
 
 get: 
 #Generate GCOV code coverage report
@@ -53,17 +71,22 @@ html:
 	genhtml -o gcovdir $(SOURCE).info
 .PHONYP:html
 
-clean:
+clean: clean_tmp
 #Clean in the subdirectory
 	@$(RM) $(SOURCE).out $(SOURCE).exe
-	@for n in $(HEAD); do \
+	@$(RM) -R lib
+	@$(RM) -R gcovdir
+	@$(RM) pg.png callgrind.png
+.PHONYP:clean
+
+clean_tmp:
+#Clean in the subdirectory
+	@for n in $(HEAD) $(HEAD_SO); do \
 	( $(MAKE) --directory=$(SRC)/$$n clean ) \
 	done;
 	@$(RM) *.gcov *.gcda *.gcno
-	@$(RM) -R gcovdir
 	@$(RM) $(SOURCE).info gmon.out pg callgrind.out
-	@$(RM) pg.png callgrind.png
-.PHONYP:clean
+.PHONYP:clean_tmp
 
 #Linux terminal color test
 all_color: regular bold underline background

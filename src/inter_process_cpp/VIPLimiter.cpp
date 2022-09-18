@@ -44,6 +44,9 @@ static bool insideQuadCH(std::vector<std::vector<double> >& CH, bool flag, doubl
 /// @param[in,out] Vp: vector for the velocity of a given location in the target cell where VIP limiter needs to be applied
 /// @return the limiting coefficient lambda ( in [0, 1] ) for gradient vector
 ///////////////////////////////////////////////////
+#ifdef __cplusplus
+extern "C" {
+#endif
 double useVIPLimiter(int neigh_cell_num, double Vave[][2], double* V0, double* Vp)
 {
 	double const Alpha = config[41];
@@ -262,6 +265,9 @@ double useVIPLimiter(int neigh_cell_num, double Vave[][2], double* V0, double* V
 
 	return lambda;
 }
+#ifdef __cplusplus
+}
+#endif
 
 ///////////////////////////////////////////////////
 //some subroutines called by useViPLimiter...

@@ -116,13 +116,13 @@
     <ClCompile Include="..\inter_process\bound_cond_slope_limiter_y.c" />
     <ClCompile Include="..\inter_process\slope_limiter.c" />
     <ClCompile Include="..\inter_process\slope_limiter_2D_x.c" />
-    <ClCompile Include="..\Riemann_solver\hll_2D_solver.c" />
+    <ClCompile Include="..\riemann_solver\hll_2D_solver.c" />
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_G2D.c" />
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_Q1D.c" />
     <ClCompile Include="..\riemann_solver\riemann_solver_exact_Ben.c" />
     <ClCompile Include="..\riemann_solver\riemann_solver_exact_Toro.c" />
-    <ClCompile Include="..\Riemann_solver\roe_2D_solver.c" />
-    <ClCompile Include="..\Riemann_solver\roe_solver.c" />
+    <ClCompile Include="..\riemann_solver\roe_2D_solver.c" />
+    <ClCompile Include="..\riemann_solver\roe_solver.c" />
     <ClCompile Include="..\tools\sys_pro.c" />
     <ClCompile Include="hydrocode.c" />
   </ItemGroup>

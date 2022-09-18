@@ -6,7 +6,7 @@ This is a implementation of fully explict forward Euler scheme for single/multi-
 
 How to use it?
 -----------
-Programer's Guide can be found in folder 'doc'.
+*Programer's Guide* can be found in folder `doc`.
 
 It is made by Doxygen and LaTeX,
 
@@ -33,7 +33,7 @@ make, gprof, gcov, lcov, Valgrind, Cppcheck, gprof2dot.
 
 Licensing
 ---------
-GNU Lesser General Public License v3.0 or later.
+*GNU Lesser General Public License v3.0* or later.
 
 Please see the file called `LICENSE`.
 
@@ -44,6 +44,6 @@ If you want more available support for this program, please send an email to [xi
 Copyright
 --------
 > Part of this code is modified from the provision of Zhifang Du, Rui Chen & Jian Cheng @ IAPCM.
-> The source code in the book "C Interfaces and Implementations" designed by David Hanson is used.
+> Some source codes in the book *C Interfaces and Implementations* designed by David Hanson and 《常用算法程序及》 designed by 徐士良 are used.
 
 Copyright © 2022 Xin Lei.

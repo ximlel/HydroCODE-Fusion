@@ -8,13 +8,21 @@ SRC = ..
 #Directory of sources
 INCLUDE = -I$(SRC)/include
 #Inclued folder
-LIBS = -lm -lgcov
+LIBS  = -lm -lgcov
 #Library files
+LIBS += $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD)))
+#Library files addition for *.a
+# LIBS += $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD)))
+# LIBS += $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD_SO)))
+#Library files addition for *.so
 
 RM = rm -vf
 #Delete command
 
+#Head folder
 HEAD = finite_volume flux_calc inter_process_BN Riemann_solver_BN file_io tools
+#Head folder addition for *.so
+# HEAD_SO = inter_process_cpp
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 
@@ -24,7 +32,7 @@ all: modules exe
 
 exe:
 	@echo "**********Generate executable file***********"
-	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(addsuffix /*.a,$(addprefix $(SRC)/,$(HEAD))) $(INCLUDE) $(LIBS)
+	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
 .PHONYP:exe
 
 modules:
@@ -32,6 +40,9 @@ modules:
 #Call the Makefile in the subdirectory
 	@for n in $(HEAD); do \
 	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
+	done;
+	@for n in $(HEAD_SO); do \
+	( $(MAKE) --directory=$(SRC)/$$n )  \
 	done;
 .PHONYP:modules
 
@@ -51,7 +62,7 @@ html:
 clean:
 #Clean in the subdirectory
 	@$(RM) $(SOURCE).out $(SOURCE).exe
-	@for n in $(HEAD); do \
+	@for n in $(HEAD) $(HEAD_SO); do \
 	( $(MAKE) --directory=$(SRC)/$$n clean ) \
 	done;
 	@$(RM) *.gcov *.gcda *.gcno

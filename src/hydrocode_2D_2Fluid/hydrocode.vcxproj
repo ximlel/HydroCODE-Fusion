@@ -114,7 +114,7 @@
     <ClCompile Include="..\meshing\mesh_init.c" />
     <ClCompile Include="..\meshing\msh_load.c" />
     <ClCompile Include="..\meshing\quad_mesh.c" />
-    <ClCompile Include="..\Riemann_solver\hll_2D_solver.c" />
+    <ClCompile Include="..\riemann_solver\hll_2D_solver.c" />
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_G2D.c" />
     <ClCompile Include="..\riemann_solver\linear_grp_solver_Edir_Q1D.c" />
     <ClCompile Include="..\riemann_solver\riemann_solver_exact_Ben.c" />

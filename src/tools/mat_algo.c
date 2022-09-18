@@ -1,6 +1,6 @@
 /**
- * @file  math_algo.c
- * @brief There are some mathematical algorithms.
+ * @file  mat_algo.c
+ * @brief There are some matrix algorithms.
  */
 
 #include <stdio.h>

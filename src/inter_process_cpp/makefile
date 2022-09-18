@@ -9,8 +9,6 @@ SRC = ..
 #Directory of sources
 INCLUDE = -I$(SRC)/include -I$(SRC)/include_cpp
 #Inclued folder
-LIBS = -lgcov
-#Library files
 
 AR = ar
 #Archive : creat static libs
@@ -27,8 +25,8 @@ FILES_C = $(shell ls *.cpp)
 define compile_c_file #Compile all .cpp files
 @for file in $(FILES_C); do \
 ( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && \
-$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)  && \
-$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$file.slo $(INCLUDE) $(LIBS) ) \
+	$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)  && \
+	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$file.slo $(INCLUDE) ) \
 done;
 endef
 
