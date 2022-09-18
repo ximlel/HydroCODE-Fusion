@@ -6,15 +6,20 @@ CFLAGD = #-D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I $(SRC)/include
+INCLUDE = -I$(SRC)/include
 #Inclued folder
 LIBS = -lm -lgcov
 #Library files
+# LIBS += $(SRC)/inter_process_cpp/*.so
+#Library files addition for *.so
 
 RM = rm -vf
 #Delete command
 
+#Head folder for *.a
 HEAD = finite_volume inter_process Riemann_solver file_io tools
+#Head folder for *.so
+# HEAD = finite_volume inter_process inter_process_unstruct flux_calc Riemann_solver meshing file_io tools src_cii
 #Name of header files or subdirectories
 SOURCE = hydrocode
 #Name of the main source 

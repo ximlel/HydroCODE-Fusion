@@ -6,7 +6,7 @@ CFLAGD = -DMULTIFLUID_BASICS -DNOVTKPLOT #-D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I $(SRC)/include
+INCLUDE = -I$(SRC)/include
 #Inclued folder
 LIBS = -lm -lgcov
 #Library files

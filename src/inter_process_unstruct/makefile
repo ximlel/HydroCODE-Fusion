@@ -7,8 +7,10 @@ CFLAGD  =
 #Macro definition
 SRC = ..
 #Directory of sources
-INCLUDE = -I $(SRC)/include
+INCLUDE = -I$(SRC)/include
 #Inclued folder
+LIBS = -lgcov
+#Library files
 
 AR = ar
 #Archive : creat static libs
@@ -24,12 +26,17 @@ FILES_C = $(shell ls *.c)
 
 define compile_c_file #Compile all .c files
 @for file in $(FILES_C); do \
-( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && $(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE) ) \
+( echo "$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)" && \
+$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)  && \
+$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$file.slo $(INCLUDE) $(LIBS) ) \
 done;
 endef
 
-define rm_o_file #Delete all .o files
+define rm_o_file #Delete all .o .slo files
 @for file in $(FILES_O); do \
+( $(RM) $$file ) \
+done;
+@for file in $(FILES_SLO); do \
 ( $(RM) $$file ) \
 done;
 endef
@@ -44,15 +51,18 @@ compile:
 
 FILES_O = $(shell find ./ -name "*.o" -print)
 #All .o files
+FILES_SLO = $(shell find ./ -name "*.slo" -print)
+#All .slo files
 
 archive:
 	@echo "************Producing static libs************"
-	@$(AR) $(ARFLAGS) $(DIR_NAME).a $(FILES_O)
+	@$(AR) $(ARFLAGS) lib$(DIR_NAME).a  $(FILES_O)
+	@$(CC) -shared -o lib$(DIR_NAME).so $(FILES_SLO)
 ./PHONYP:archive
 
 clean:
 	@echo "******************Cleaning*******************"
 	$(call rm_o_file)
-	@$(RM) $(DIR_NAME).a
+	@$(RM) lib$(DIR_NAME).a lib$(DIR_NAME).so
 	@$(RM) *.gcov *.gcda *.gcno
 .PHONYP:clean
