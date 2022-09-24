@@ -6,7 +6,7 @@
 #include "../include/var_struc.h"
 
 
-struct spher_mesh_var spher_mesh_init(const char *example)
+struct radial_mesh_var radial_mesh_init(const char *example)
 {
     double const dr     = config[10];     // initial d_raidus
     double const dtheta = config[11];     // initial d_angle
@@ -14,7 +14,7 @@ struct spher_mesh_var spher_mesh_init(const char *example)
     int    const Ncell  = (int)config[3]; // Number of computing cells in r direction
     int    const Md     = Ncell+2;        // max vector dimension
 
-    struct spher_mesh_var smv;
+    struct radial_mesh_var smv;
     smv.Rb   = (double*)ALLOC(Md*sizeof(double)); //radius and length of outer cell boundary
     smv.Lb   = (double*)ALLOC(Md*sizeof(double));
     smv.RR   = (double*)ALLOC(Md*sizeof(double)); //centroidal radius and variable in cells
@@ -40,7 +40,7 @@ struct spher_mesh_var spher_mesh_init(const char *example)
 }
 
 
-void spher_mesh_update(struct spher_mesh_var *smv)
+void radial_mesh_update(struct radial_mesh_var *smv)
 {
     int const Ncell = (int)config[3]; // Number of computing cells in r direction
 
@@ -72,7 +72,7 @@ void spher_mesh_update(struct spher_mesh_var *smv)
 }
 
 
-void spher_mesh_mem_free(struct spher_mesh_var *smv)
+void radial_mesh_mem_free(struct radial_mesh_var *smv)
 {
     FREE(smv->Rb);
     FREE(smv->Lb);

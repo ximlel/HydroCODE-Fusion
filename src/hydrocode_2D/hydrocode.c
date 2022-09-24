@@ -103,6 +103,11 @@
  */
 #define NODATPLOT
 /**
+ * @def HDF5PLOT
+ * @brief Switch whether to plot with HDF5 data.
+ */
+#define HDF5PLOT
+/**
  * @def NOTECPLOT
  * @brief Switch whether to plot without Tecplot data.
  */
@@ -273,6 +278,9 @@ int main(int argc, char *argv[])
   // Write the final data down.
 #ifndef NODATPLOT
   file_2D_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+#endif
+#ifdef HDF5PLOT
+  file_2D_write_HDF5(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
 #endif
 #ifndef NOTECPLOT
   file_2D_write_POINT_TEC(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);

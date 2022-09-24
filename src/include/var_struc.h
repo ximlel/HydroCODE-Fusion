@@ -160,7 +160,7 @@ typedef struct mesh_var {
 
 
 //! SPHERically symmetric MESHing VARiables.
-typedef struct spher_mesh_var {
+typedef struct radial_mesh_var {
     double * Rb;
     double * Lb;
     double * RR;

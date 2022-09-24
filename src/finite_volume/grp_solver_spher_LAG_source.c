@@ -15,7 +15,8 @@
 
 // M=2,
 // M=1 planar; M=2 cylindrical ; M=3 spherical
-void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct spher_mesh_var * smv, const int M, const char * problem, double * cpu_time, const int N_plot , double time_plot[])
+void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
+				 const int M, const char * problem, double * cpu_time, const int N_plot , double time_plot[])
 {
     int i, k=0;
     
@@ -102,7 +103,9 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 	    tic = clock();
 	    if (time_c > time_plot[nt] && nt < (N_plot-1))
 		{
-			file_spher_write_TEC(*FV, *smv, problem, time_plot[nt]);
+#ifndef NOTECPLOT
+			file_radial_write_TEC(*FV, *smv, problem, time_plot[nt]);
+#endif
 			nt++;
 		}
 
@@ -120,9 +123,9 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 	    PP[Ncell+1] = PP[Ncell];
 	    EE[Ncell+1] = EE[Ncell];
 
-	    VIP_limiter_spher(Ncell, (_Bool)(k-1), DmU, TmV, UU, smv);
-	    minmod_limiter_spher(Ncell, (_Bool)(k-1), DmD, DD, smv);
-	    minmod_limiter_spher(Ncell, (_Bool)(k-1), DmP, PP, smv);
+	    VIP_limiter_radial(Ncell, (_Bool)(k-1), DmU, TmV, UU, smv);
+	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmD, DD, smv);
+	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmP, PP, smv);
 /*
 	    TmV[Ncell+1]=TmV[Ncell];
 	    DmU[Ncell+1]=DmU[Ncell];
@@ -242,7 +245,7 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 		    DRmin[i+1] +=     dt*DR_t[i+1];
 		}
 
-	    spher_mesh_update(smv);
+	    radial_mesh_update(smv);
 
 	    for(i=1;i<=Ncell;i++)//m=2
 		{

@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
 	  exit(4);
       }
 
-  struct spher_mesh_var smv = spher_mesh_init(argv[1]);
-  spher_mesh_update(&smv);
+  struct radial_mesh_var smv = radial_mesh_init(argv[1]);
+  radial_mesh_update(&smv);
 
   struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
   double ** R = NULL;
@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
       retval = 5;
       goto return_NULL;
     }
-    memmove(R[k], smv.RR, Md * sizeof(double));
   }
+  memmove(R[0], smv.RR, Md * sizeof(double));
 
   CV_INIT_FV_RESET_MEM(U, N);
   CV_INIT_FV_RESET_MEM(P, N);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
       }
   for(k = 0; k < N; ++k)
   {
-    CV.E[k] = (double *)malloc((Ncell+1) * sizeof(double));
+    CV.E[k] = (double *)malloc(Md * sizeof(double));
     if(CV.E[k] == NULL)
     {
       printf("NOT enough memory! E[%d]\n", k);
@@ -143,34 +143,30 @@ int main(int argc, char *argv[])
 	  CV.gamma[k] = CV.gamma[0];
       }
 
-  if (strcmp(argv[4],"LAG") == 0) // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
+  // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
+  config[8] = (double)1;
+  switch(order)
       {
-	  config[8] = (double)1;
-	  switch(order)
-	      {
-	      case 1:
-		  config[41] = 0.0; // alpha = 0.0
-	      case 2:
-		  grp_solver_spher_LAG_source(&FV0, &CV, &smv, M, argv[2], cpu_time, N, time_plot);
-		  break;
-	      default:
-		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
-		  retval = 4;
-		  goto return_NULL;
-	      }
-      }
-  else
-      {
-	  printf("NOT appropriate coordinate framework! The framework is %s.\n", argv[4]);
+      case 1:
+	  config[41] = 0.0; // alpha = 0.0
+      case 2:
+	  grp_solver_spher_LAG_source(&FV0, &CV, &smv, R, M, argv[2], cpu_time, N, time_plot);
+	  break;
+      default:
+	  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
 	  retval = 4;
 	  goto return_NULL;
       }
 
-  file_spher_write_TEC(FV0, smv, argv[2], time_plot[N-1]);
+#ifndef NODATPLOT
   file_1D_write(Ncell, N, CV, R, cpu_time, argv[2], time_plot);
+#endif
+#ifndef NOTECPLOT
+  file_radial_write_TEC(FV0, smv, argv[2], time_plot[N-1]);
+#endif
 
 return_NULL:
-  spher_mesh_mem_free(&smv);
+  radial_mesh_mem_free(&smv);
 
   free(FV0.RHO);
   free(FV0.U);

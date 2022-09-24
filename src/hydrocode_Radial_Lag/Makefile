@@ -10,7 +10,7 @@ SRC = ..
 INCLUDE_FOLDER = include
 INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
-LIBS  = -lm -lgcov -Llib/
+LIBS  = -lm -lgcov -lhdf5 -Llib/
 LIBS += $(addprefix -l, $(HEAD))
 #Library files
 
@@ -27,11 +27,11 @@ SOURCE = hydrocode
 
 SRC_LIST = except.c mem.c \
 	sys_pro.c \
-	config_handle.c file_spher_out.c file_1D_out.c file_1D_in.c io_control.c terminal_io.c \
-	spher_mesh.c \
-	linear_grp_solver_spher_LAG.c riemann_solver_starPU.c \
+	config_handle.c file_out_hdf5.c file_radial_out.c file_1D_out.c file_1D_in.c io_control.c terminal_io.c \
+	radial_mesh.c \
+	linear_grp_solver_radial_LAG.c riemann_solver_starPU.c \
 	VIPLimiter.cpp \
-	fluid_var_check.c slope_limiter_spher.c slope_VIP_limiter_spher.c \
+	fluid_var_check.c slope_limiter_radial.c slope_VIP_limiter_radial.c \
 	grp_solver_spher_LAG_source.c
 
 all: modules libscopy $(SOURCE).out

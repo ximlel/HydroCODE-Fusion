@@ -3,14 +3,14 @@ CC = gcc
 CFLAGS   = -std=c99 -Wall -pedantic -Og -g -pg
 #CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
-CFLAGD = -DNODATPLOT
+CFLAGD = -DNODATPLOT -DHDF5PLOT
 #Macro definition
 SRC = ..
 #Directory of sources
 INCLUDE_FOLDER = include
 INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
-LIBS  = -lm -lgcov -Llib/
+LIBS  = -lm -lgcov -lhdf5 -Llib/
 LIBS += $(addprefix -l, $(HEAD))
 #Library files
 
@@ -26,7 +26,7 @@ SOURCE = hydrocode
 #Name of the main source 
 
 SRC_LIST = sys_pro.c \
-	config_handle.c file_2D_out.c file_2D_in.c io_control.c terminal_io.c \
+	config_handle.c file_out_hdf5.c file_2D_out.c file_2D_in.c io_control.c terminal_io.c \
 	hll_2D_solver.c roe_2D_solver.c roe_solver.c roe_HLL_solver.c linear_grp_solver_Edir_G2D.c linear_grp_solver_Edir_Q1D.c riemann_solver_exact_Ben.c riemann_solver_exact_Toro.c \
 	bound_cond_slope_limiter_x.c bound_cond_slope_limiter_y.c fluid_var_check.c slope_limiter.c slope_limiter_2D_x.c \
 	flux_generator_x.c flux_generator_y.c flux_solver.c \

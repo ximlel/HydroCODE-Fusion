@@ -21,8 +21,8 @@
  * @param[in] N_plot:     Number of time steps for plotting.
  * @param[in] time_plot:  Array of the plotting time recording.
  */
-void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * mv, const char * scheme, const char * problem,
-				   const int N_plot, double time_plot[])
+void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * mv, const char * scheme,
+				   const char * problem, const int N_plot, double time_plot[])
 {
 	int const num_cell = (int)config[3];  // Total grid cell number
 	int const N        = (int)config[5];  // the maximum number of time steps

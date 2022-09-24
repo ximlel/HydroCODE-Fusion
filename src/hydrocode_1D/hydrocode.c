@@ -92,6 +92,18 @@
 #include "../include/file_io.h"
 #include "../include/finite_volume.h"
 
+#ifdef DOXYGEN_PREDEFINED
+/**
+ * @def NODATPLOT
+ * @brief Switch whether to plot without Matrix data.
+ */
+#define NODATPLOT
+/**
+ * @def HDF5PLOT
+ * @brief Switch whether to plot with HDF5 data.
+ */
+#define HDF5PLOT
+#endif
 
 double config[N_CONF]; //!< Initial configuration data array.
 
@@ -264,7 +276,12 @@ int main(int argc, char *argv[])
       }
 
   // Write the final data down.
+#ifndef NODATPLOT
   file_1D_write(m, N, CV, X, cpu_time, argv[2], time_plot);
+#endif
+#ifdef HDF5PLOT
+  file_1D_write_HDF5(m, N, CV, X, cpu_time, argv[2], time_plot);
+#endif
 
  return_NULL:
   free(FV0.RHO);

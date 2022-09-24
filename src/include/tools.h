@@ -9,24 +9,7 @@
 
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
-// sys_pro.c
-void DispPro(const double pro, const int step);
-
-int CreateDir(const char* pPath);
-
-void init_mem (double * p[], const int n, int ** cell_pt);
-void init_mem_int(int * p[], const int n, int ** cell_pt);
-
-
-// math_algo.c
-void mat_mul(const double A[], const double B[], double C[], const int m, const int p, const int n);
-void mat_add(const double A[], const double B[], double C[], const int m,              const int n);
-void mat_sub(const double A[], const double B[], double C[], const int m,              const int n);
-
-int rinv(double a[], const int n);
-
-
-// minmod function
+/* minmod function */
 #ifdef _WIN32
 inline double minmod2(const double s_L, const double s_R);
 inline double minmod3(const double s_L, const double s_R, const double s_m);
@@ -34,6 +17,26 @@ inline double minmod3(const double s_L, const double s_R, const double s_m);
 inline double minmod2(const double s_L, const double s_R)                   __attribute__((always_inline));
 inline double minmod3(const double s_L, const double s_R, const double s_m) __attribute__((always_inline));
 #endif
+
+//////////////////////////
+// sys_pro.c
+//////////////////////////
+void DispPro(const double pro, const int step);
+
+int CreateDir(const char* pPath);
+
+void init_mem (double * p[], const int n, int ** cell_pt);
+void init_mem_int(int * p[], const int n, int ** cell_pt);
+
+//////////////////////////
+// mat_algo.c
+//////////////////////////
+void mat_mul(const double A[], const double B[], double C[], const int m, const int p, const int n);
+void mat_add(const double A[], const double B[], double C[], const int m,              const int n);
+void mat_sub(const double A[], const double B[], double C[], const int m,              const int n);
+
+int rinv(double a[], const int n);
+
 
 /**
  * @brief Minmod limiter function of two variables.

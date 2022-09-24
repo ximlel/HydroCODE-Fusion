@@ -27,6 +27,10 @@ Compilers/Interpreters
 ---------
 gcc -std=c99, g++ -std=c++20, Visual Studio 2022, MATLAB/Octave, Python3
 
+Program Library
+---------
+HDF5, GNU Scientific Library (GSL), LAPACKE, CBLAS
+
 Debugging tools
 ---------
 make, gprof, gcov, lcov, Valgrind, Cppcheck, gprof2dot.

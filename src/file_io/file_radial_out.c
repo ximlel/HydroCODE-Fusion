@@ -7,7 +7,7 @@
 #include "../include/file_io.h"
 
 
-void file_spher_write_TEC(const struct flu_var FV, const struct spher_mesh_var smv, const char * problem, const double time)
+void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var smv, const char * problem, const double time)
 {
     double const eps    =      config[4];
     int    const Ncell  = (int)config[3];  // Number of computing cells in r direction

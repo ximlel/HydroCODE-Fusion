@@ -66,7 +66,7 @@ static void PreFun(double *F, double *FD, const double P, const double DK, const
 }
 
 // NRITER=100
-void Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL, const double GammaR,
+double Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL, const double GammaR,
 	    const double UL, const double UR, const double PL, const double PR,
 	    const double CL, const double CR, _Bool * CRW,
 	    const double eps, const double TOLPRE, const int NRITER)
@@ -109,4 +109,6 @@ void Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL
 
 	* U_star = U;
 	* P_star = P;
+
+	return change;
 } 

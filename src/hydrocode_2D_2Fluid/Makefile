@@ -10,7 +10,7 @@ SRC = ..
 INCLUDE_FOLDER = include
 INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
-LIBS  = -lm -lgcov -Llib/
+LIBS  = -lm -lgcov -lhdf5 -Llib/
 LIBS += $(addprefix -l, $(HEAD))
 #Library files
 

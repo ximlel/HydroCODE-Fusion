@@ -6,7 +6,7 @@
 
 
 void minmod_limiter_spher(const int Ncell, const _Bool find_bound, double s[],
-			  const double U[], struct spher_mesh_var *smv)
+			  const double U[], struct radial_mesh_var *smv)
 {
     double const Alpha       =      config[41]; // the paramater in slope limiters.
     int    const LIMITER_VIP = (int)config[42];
