@@ -98,6 +98,6 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
     STR_FLU_INI(U);
     STR_FLU_INI(P);
 
-    printf("%s data initialized, grid cell number = %d.\n", name, num_cell);
+    printf("'%s' data initialized, grid cell number = %d.\n", add_in, num_cell);
     return FV0;
 }

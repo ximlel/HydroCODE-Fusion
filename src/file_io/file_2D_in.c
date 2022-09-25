@@ -159,7 +159,7 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
 #endif
 #endif
 
-    printf("%s data initialized, line = %d, column = %d.\n", name, (int)config[14], (int)config[13]);
+    printf("'%s' data initialized, line = %d, column = %d.\n", add_in, (int)config[14], (int)config[13]);
     return FV0;
 }
 

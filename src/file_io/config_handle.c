@@ -258,7 +258,7 @@ void config_write(const char * add_out, const double * cpu_time, const char * na
 
 //======================Write Log File============================
   strcpy(file_data, add_out);
-  strcat(file_data, "/log");
+  strcat(file_data, "log");
   strcat(file_data, ".dat");
   if((fp_write = fopen(file_data, "w")) == NULL)
   {

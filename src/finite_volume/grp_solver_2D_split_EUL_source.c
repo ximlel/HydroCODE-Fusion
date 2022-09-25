@@ -268,9 +268,8 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
   
 return_NULL:
   config[5] = (double)k;
-  if (fabs(time_plot[1]) < eps)
+  if(fabs(time_plot[1]) < eps || isinf(time_plot[1]))
       {
-	  time_plot[1] = time_c;
 	  if(isfinite(time_c))
 	      {
 		  time_plot[N_plot-2] = time_c - tau;
@@ -282,6 +281,7 @@ return_NULL:
 		  time_plot[N_plot-1] = N*tau;
 	      }
       }
+
   for(j = 0; j < m+1; ++j)
   {
     free(CV->F_rho[j]); free(CV->F_u[j]); free(CV->F_v[j]); free(CV->F_e[j]);

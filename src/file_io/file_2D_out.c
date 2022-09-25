@@ -19,7 +19,6 @@
 #define PRINT_NC(v, v_print)						\
     do {								\
     strcpy(file_data, add_out);						\
-    strcat(file_data, "/");						\
     strcat(file_data, #v);						\
     strcat(file_data, ".dat");						\
     if((fp_write = fopen(file_data, "w")) == NULL)			\
@@ -60,7 +59,7 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
     // Get the address of the output data folder of the test example.
     example_io(problem, add_out, 0);
     
-    char file_data[FILENAME_MAX+40] = "";
+    char file_data[FILENAME_MAX+40];
     FILE * fp_write;
 
 //===================Write Solution File=========================
@@ -75,7 +74,7 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
     PRINT_NC(Y, 0.25*(Y[j][i] + Y[j][i+1] + Y[j+1][i] + Y[j+1][i+1]));
     
     strcpy(file_data, add_out);
-    strcat(file_data, "/time_plot.dat");
+    strcat(file_data, "time_plot.dat");
     if((fp_write = fopen(file_data, "w")) == NULL)
 	{
 	    printf("Cannot open solution output file: time_plot!\n");
@@ -108,13 +107,13 @@ void file_2D_write_POINT_TEC(const int n_x, const int n_y, const int N, const st
     // Get the address of the output data folder of the test example.
     example_io(problem, add_out, 0);
     
-    char file_data[FILENAME_MAX+40] = "";
+    char file_data[FILENAME_MAX+40];
     FILE * fp;
     int k, i, j;
 
     //===================Write solution File=========================
     strcpy(file_data, add_out);
-    strcat(file_data, "/FLU_VAR.tec");	
+    strcat(file_data, "FLU_VAR.tec");	
     if ((fp = fopen(file_data, "w")) == NULL)
 	{
 	    fprintf(stderr, "Cannot open solution output TECPLOT file of '%s'!\n", problem);

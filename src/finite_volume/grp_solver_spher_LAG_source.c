@@ -296,11 +296,19 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 
  return_NULL:
     config[5] = (double)k;
-    if(fabs(time_plot[1]) < eps)
-	{
-	    time_plot[0] = time_c - dt;
-	    time_plot[1] = time_c;
-	}
+  if(fabs(time_plot[1]) < eps || isinf(time_plot[1]))
+      {
+	  if(isfinite(time_c))
+	      {
+		  time_plot[N_plot-2] = time_c - dt;
+		  time_plot[N_plot-1] = time_c;
+	      }
+	  else
+	      {
+		  time_plot[N_plot-2] = N*dt - dt;
+		  time_plot[N_plot-1] = N*dt;
+	      }
+      }
 
     DD = NULL;
     UU = NULL;

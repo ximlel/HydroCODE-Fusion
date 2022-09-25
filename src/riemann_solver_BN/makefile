@@ -33,7 +33,7 @@ define compile_c_file #Compile all .c files
 @for file in $(FILES_C); do \
 ( echo "  $$file"  && \
 	$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE)  && \
-	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$(basename $$file .c).slo $(INCLUDE) ) \
+	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$(basename $$file .c).slo $(INCLUDE) 2> /dev/null ) \
 done;
 @echo " } $(INCLUDE)"
 endef

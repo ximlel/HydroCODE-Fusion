@@ -14,7 +14,7 @@
 // flux_generator_x.c
 /////////////////////////
 int flux_generator_x(const int m, const int n, const int nt, const double tau, struct cell_var_stru * CV,
-		      struct b_f_var * bfv_L, struct b_f_var * bfv_R, const _Bool Transversal);0
+		      struct b_f_var * bfv_L, struct b_f_var * bfv_R, const _Bool Transversal);
 /////////////////////////
 // flux_generator_y.c
 /////////////////////////

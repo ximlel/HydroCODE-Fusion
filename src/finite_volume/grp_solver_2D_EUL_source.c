@@ -241,9 +241,8 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   
 return_NULL:
   config[5] = (double)k;
-  if (fabs(time_plot[1]) < eps)
+  if(fabs(time_plot[1]) < eps || isinf(time_plot[1]))
       {
-	  time_plot[1] = time_c;
 	  if(isfinite(time_c))
 	      {
 		  time_plot[N_plot-2] = time_c - tau;

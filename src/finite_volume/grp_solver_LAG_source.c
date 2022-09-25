@@ -319,9 +319,8 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 
 return_NULL:
   config[5] = (double)k;
-  if(fabs(time_plot[1]) < eps)
+  if(fabs(time_plot[1]) < eps || isinf(time_plot[1]))
       {
-	  time_plot[1] = time_c;
 	  if(isfinite(time_c))
 	      {
 		  time_plot[N_plot-2] = time_c - tau;

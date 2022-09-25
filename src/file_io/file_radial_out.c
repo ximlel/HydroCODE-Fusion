@@ -21,7 +21,7 @@ void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var
     char str_tmp[40];
 
     //===================Write solution File=========================
-    sprintf(str_tmp, "/FLU_VAR_%.8g.tec", time + eps);
+    sprintf(str_tmp, "FLU_VAR_%.8g.tec", time + eps);
     strcat(file_data, str_tmp);
     if ((out = fopen(file_data, "w")) == NULL)
 	{

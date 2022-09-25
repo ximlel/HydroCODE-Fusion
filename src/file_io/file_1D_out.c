@@ -26,7 +26,6 @@
 #define PRINT_NC(v, v_print)						\
     do {								\
 	strcpy(file_data, add_out);					\
-	strcat(file_data, "/");						\
 	strcat(file_data, #v);						\
 	strcat(file_data, ".dat");					\
 	if((fp_write = fopen(file_data, "w")) == NULL)			\
@@ -70,7 +69,7 @@ void file_1D_write(const int m, const int N, const struct cell_var_stru CV,
     // Get the address of the output data folder of the test example.
     example_io(problem, add_out, 0);
     
-    char file_data[FILENAME_MAX+40] = "";
+    char file_data[FILENAME_MAX+40];
     FILE * fp_write;
 
 //===================Write Output Data File=========================
@@ -87,7 +86,8 @@ void file_1D_write(const int m, const int N, const struct cell_var_stru CV,
 #endif
 
     strcpy(file_data, add_out);
-    strcat(file_data, "/time_plot.dat");
+    strcat(file_data, "time_plot.dat");
+    printf("%s\n",file_data);
     if((fp_write = fopen(file_data, "w")) == NULL)
 	{
 	    printf("Cannot open solution output file: time_plot!\n");

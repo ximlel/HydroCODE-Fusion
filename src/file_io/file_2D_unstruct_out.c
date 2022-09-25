@@ -57,7 +57,7 @@ void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, 
     char str_tmp[40];
 
 	//===================Write solution File=========================
-	sprintf(str_tmp, "/FLU_VAR_%.8g.tec", time + eps);
+	sprintf(str_tmp, "FLU_VAR_%.8g.tec", time + eps);
 	strcat(file_data, str_tmp);
 	if ((fp = fopen(file_data, "w")) == NULL)
 		{
@@ -177,7 +177,7 @@ void file_write_3D_VTK(const struct flu_var FV, const struct mesh_var mv, const 
 	int k;
 
 	//===================Write solution File=========================
-	sprintf(str_tmp, "/FLU_VAR_%.8g.vtk", time + eps);
+	sprintf(str_tmp, "FLU_VAR_%.8g.vtk", time + eps);
 	strcat(file_data, str_tmp);
 	if ((fp = fopen(file_data, "w")) == NULL)
 		{

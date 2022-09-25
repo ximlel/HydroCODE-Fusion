@@ -120,6 +120,10 @@ octave-workspace
 # VTK data (data_out)
 *.vtk
 
+# HDF5 data (data_out)
+*.h5
+*.hdf5
+
 # ============================Doxygen=========================
 
 latex/
