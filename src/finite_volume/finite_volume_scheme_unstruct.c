@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
@@ -22,7 +23,7 @@
  * @param[in] time_plot:  Array of the plotting time recording.
  */
 void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * mv, const char * scheme,
-				   const char * problem, const int N_plot, double time_plot[])
+				   const char * problem, int * N_plot, double time_plot[])
 {
 	int const num_cell = (int)config[3];  // Total grid cell number
 	int const N        = (int)config[5];  // the maximum number of time steps
@@ -53,11 +54,12 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 
 	struct i_f_var ifv, ifv_R;
 	double time_c = 0.0;
-	int i, ivi, RK = 0, N_count = 1;
+	_Bool stop_t = false;
+	int i, ivi, RK = 0, N_count = 0;
 	for(i = 1; i <= N; ++i)
 		{
 			start_clock = clock();
-			if (time_c >= time_plot[N_count] && N_count < N_plot)
+			if (time_c >= time_plot[N_count] && N_count < (*N_plot-1))
 				{
 					file_write_2D_BLOCK_TEC(*FV, *mv, problem, time_plot[N_count]);
 					N_count++;
@@ -83,7 +85,7 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 				if(tau < eps)
 				    {
 					printf("\nThe length of the time step is so small on [%d, %g, %g] (t_n, time_c, tau)\n", i, time_c, tau);
-					time_c = t_all;
+					stop_t = true;
 				    }
 				else if((time_c + tau) > (t_all - eps))
 				    {
@@ -93,7 +95,6 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 				else if(!isfinite(tau))
 				    {
 					printf("NAN or INFinite error on [%d, %g, %g] (t_n, time_c, tau) - CFL\n", i, time_c, tau); 
-					tau = t_all - time_c;
 					goto return_NULL;
 				    }
 			    }
@@ -105,7 +106,7 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 							ivi = interface_var_init(&cv, mv, &ifv, &ifv_R, k, j, i, 0.0);
 							// ivi = interface_var_init(&cv, mv, &ifv, &ifv_R, k, j, i, 1.0/sqrt(3));
 							if(ivi == 0)
-								time_c = t_all;
+								stop_t = true;
 							else if (ivi == 1)
 								{
 									if (order == 1)
@@ -139,7 +140,7 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 							ivi = interface_var_init(&cv, mv, &ifv, &ifv_R, k, j, i, 0.0);
 							//ivi = interface_var_init(&cv, mv, &ifv, &ifv_R, k, j, i, -1.0/sqrt(3));
 							if(ivi == 0)
-								time_c = t_all;
+								stop_t = true;
 							else if (order == 2 && ivi == 1)
 								{
 									if(strcmp(scheme,"GRP") == 0)					
@@ -161,7 +162,7 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 
 			// cons_qty_update(&cv, mv, *FV, tau);
 			if (cons_qty_update_corr_ave_P(&cv, mv, FV, tau, RK) == 0)
-			    time_c = t_all;
+			    stop_t = true;
 
 			if((_Bool)config[53])
 			    RK = RK ? 0 : 1;
@@ -171,7 +172,7 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 			    DispPro(time_c*100.0/t_all, i);
 			else
 			    DispPro(i*100.0/N, i);
-			if(time_c > (t_all - eps) || isinf(time_c))
+			if(stop_t || time_c > (t_all - eps) || !isfinite(time_c))
 			    break;
 
 			cpu_time += (clock() - start_clock) / (double)CLOCKS_PER_SEC;
@@ -181,10 +182,13 @@ void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * 
 
 return_NULL:
 	config[5] = (double)i;
-	if(isfinite(time_c))
-	    time_plot[N_plot-1] = time_c;
-	else
-	    time_plot[N_plot-1] = N*tau;
+  *N_plot = N_count+1;
+  if(isfinite(time_c))
+      time_plot[N_count] = time_c;
+  else if(isfinite(t_all))
+      time_plot[N_count] = t_all;
+  else if(isfinite(tau))
+      time_plot[N_count] = i*tau;
 
 	fluid_var_update(FV, &cv);
 	cell_mem_init_free(&cv, mv, FV, 0);

@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
       case 1:
 	  config[41] = 0.0; // alpha = 0.0
       case 2:
-	  grp_solver_spher_LAG_source(&FV0, &CV, &smv, R, M, argv[2], cpu_time, N, time_plot);
+	  grp_solver_spher_LAG_source(&FV0, &CV, &smv, R, M, argv[2], cpu_time, &N, time_plot);
 	  break;
       default:
 	  printf("NOT appropriate order of the scheme! The order is %d.\n", order);

@@ -299,32 +299,32 @@ void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
 	    r = false;
 	}
     else
-	*N_plot = flu_var_count(fp, add) + 1;
+	*N_plot = flu_var_count(fp, add) + 2;
     if (*N_plot < 2)
 	{
 	    printf("Error in counting time data file for plotting!\n");
 	    fclose(fp);
 	    exit(2);
 	}
-    *time_plot = (double*)calloc(*N_plot, sizeof(double));
+    *time_plot = (double*)malloc((*N_plot)*sizeof(double));
     if(*time_plot == NULL)
 	{
 	    printf("NOT enough memory! time_plot[]\n");
 	    exit(5);
 	}
+    (*time_plot)[0] = 0.0;
+    (*time_plot)[*N_plot - 1] = config[1];
     if(r)
 	{
-	    if(flu_var_read(fp, *time_plot + 1, *N_plot - 1))
+	    if(flu_var_read(fp, *time_plot + 1, *N_plot - 2))
 		{
 		    fclose(fp);
 		    exit(2);
 		}
-	    printf("Load time data file for plotting! Plot time step is %d.\n", *N_plot - 1);
-	    qsort(*time_plot, *N_plot, sizeof(double), compare_double);
+	    printf("Load time data file for plotting! Plot time step is %d.\n", *N_plot - 2);
+	    qsort(*time_plot, *N_plot-1, sizeof(double), compare_double);
 	    fclose(fp);
 	}
-    else
-	(*time_plot)[1] = config[1];
 }
 
 

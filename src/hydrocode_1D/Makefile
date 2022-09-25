@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS   = -std=c99 -Wall -pedantic -Og -g -pg
 #CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
-CFLAGD = -DNODATPLOT -DHDF5PLOT
+CFLAGD = -DHDF5PLOT #-DNODATPLOT
 #Macro definition
 SRC = ..
 #Directory of sources

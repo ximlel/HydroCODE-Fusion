@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
       }
 
   config[8] = (double)0;  // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
-  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], N, time_plot);
+  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], &N, time_plot);
 
   // Write the final data down.
 #ifndef NOTECPLOT

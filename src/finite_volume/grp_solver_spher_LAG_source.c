@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "../include_cii/mem.h"
 #include "../include/var_struc.h"
@@ -16,7 +17,7 @@
 // M=2,
 // M=1 planar; M=2 cylindrical ; M=3 spherical
 void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
-				 const int M, const char * problem, double * cpu_time, const int N_plot , double time_plot[])
+				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[])
 {
     int i, k=0;
     
@@ -41,7 +42,8 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 
     double Smax_dr;
     double time_c=0.0;
-    int nt = 1;
+    _Bool stop_t = false;
+    int nt = 0;
 
     struct i_f_var ifv_L = {0}, ifv_R = {0};
 
@@ -101,12 +103,19 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
     for(k=1; k<=N; k++)
 	{
 	    tic = clock();
-	    if (time_c > time_plot[nt] && nt < (N_plot-1))
+	    if (time_c >= time_plot[nt] && nt < (*N_plot-1))
 		{
 #ifndef NOTECPLOT
-			file_radial_write_TEC(*FV, *smv, problem, time_plot[nt]);
+		    file_radial_write_TEC(*FV, *smv, problem, time_plot[nt]);
 #endif
-			nt++;
+		    for(i = 0; i < Md; ++i)
+			{
+			    CV->RHO[nt+1][i] = CV->RHO[nt][i];
+			    CV->U[nt+1][i]   =   CV->U[nt][i];
+			    CV->E[nt+1][i]   =   CV->E[nt][i];  
+			    CV->P[nt+1][i]   =   CV->P[nt][i];
+			}
+		    nt++;
 		}
 
 	    Smax_dr=0.0;
@@ -168,17 +177,17 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 		    if(mid[2] < eps || mid[0] < eps || mid[3] < eps)
 			{
 			    printf("<0.0 error on [%d, %d] (t_n, x) - STAR\n", k, i);
-			    time_c = Timeout;
+			    stop_t = true;
 			}
 		    if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
 			{
 			    printf("NAN or INFinite error on [%d, %d] (t_n, x) - STAR\n", k, i); 
-			    time_c = Timeout;
+			    stop_t = true;
 			}
 		    if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0])|| !isfinite(dire[3]))
 			{
 			    printf("NAN or INFinite error on [%d, %d] (t_n, x) - DIRE\n", k, i); 
-			    time_c = Timeout;
+			    stop_t = true;
 			}
 
 		    Smax_dr=Smax_dr>fabs(wave_speed[0])/Ddr[i] ? Smax_dr:fabs(wave_speed[0])/Ddr[i];
@@ -194,9 +203,22 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 		    DR_t[i+1]  = dire[3];
 		}
 
-	    dt=CFL/Smax_dr;
-	    if(time_c<Timeout&&(time_c+dt)>Timeout)
-		dt=Timeout-time_c;//compute for time step
+	    if(isfinite(Timeout) || !isfinite(config[16]) || config[16] <= 0.0) //compute for time step
+		{
+		    dt=CFL/Smax_dr;
+		    if(dt < eps)
+			{
+			    printf("\nThe length of the time step is so small on [%d, %g, %g] (t_n, time_c, tau)\n", k, time_c, dt);
+			    stop_t = true;
+			}
+		    else if((time_c + dt) > (Timeout - eps))
+			dt=Timeout-time_c;
+		    else if(!isfinite(dt))
+			{
+			    printf("NAN or INFinite error on [%d, %g, %g] (t_n, time_c, tau) - CFL\n", k, time_c, dt); 
+			    goto return_NULL;
+			}
+		}
 
 	    for(i=1;i<=Ncell;i++)
 		{
@@ -256,12 +278,12 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 		    if(isnan(PP[i])||isnan(UU[i])||isnan(DD[i]))
 			{
 			    printf("variable is nan,error!\n");
-			    time_c = Timeout;
+			    stop_t = true;
 			}
 		    else if (PP[i]<0 || UU[i])
 			{
 			    printf("p<0,error!\n");
-			    time_c = Timeout;
+			    stop_t = true;
 			}
 		    DmD[i]=(DD[i]-DD[i-1])/dRc[i];
 		    DmU[i]=(UU[i]-UU[i-1])/dRc[i];
@@ -275,16 +297,8 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 		DispPro(time_c*100.0/Timeout, k);
 	    else
 		DispPro(k*100.0/N, k);
-	    if(time_c > (Timeout - eps) || isinf(time_c))
+	    if(stop_t || time_c > (Timeout - eps) || !isfinite(time_c))
 		break;
-
-	    for(i = 0; i < Md; ++i)
-		{
-		    CV->RHO[nt-1][i] = CV->RHO[nt][i];
-		    CV->U[nt-1][i]   =   CV->U[nt][i];
-		    CV->E[nt-1][i]   =   CV->E[nt][i];  
-		    CV->P[nt-1][i]   =   CV->P[nt][i];
-		}
 
 	    toc = clock();
 	    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
@@ -296,19 +310,13 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 
  return_NULL:
     config[5] = (double)k;
-  if(fabs(time_plot[1]) < eps || isinf(time_plot[1]))
-      {
-	  if(isfinite(time_c))
-	      {
-		  time_plot[N_plot-2] = time_c - dt;
-		  time_plot[N_plot-1] = time_c;
-	      }
-	  else
-	      {
-		  time_plot[N_plot-2] = N*dt - dt;
-		  time_plot[N_plot-1] = N*dt;
-	      }
-      }
+    *N_plot = nt+1;
+    if(isfinite(time_c))
+	time_plot[nt] = time_c;
+    else if(isfinite(Timeout))
+	time_plot[nt] = Timeout;
+    else if(isfinite(dt))
+	time_plot[nt] = k*dt;
 
     DD = NULL;
     UU = NULL;

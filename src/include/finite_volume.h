@@ -13,44 +13,44 @@
 //////////////////////////////////////
 // godunov_solver_LAG_source.c
 //////////////////////////////////////
-void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, const int N_plot, double time_plot[]);
+void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, int * N_plot, double time_plot[]);
 //////////////////////////////////////
 // grp_solver_LAG_source.c
 //////////////////////////////////////
-void     GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, const int N_plot, double time_plot[]);
+void     GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, int * N_plot, double time_plot[]);
 
 /* 1-D Godunov/GRP scheme (Eulerian, single-component flow) */
 //////////////////////////////////////
 // godunov_solver_EUL_source.c
 //////////////////////////////////////
-void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, const int N_plot, double time_plot[]);
+void Godunov_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, int * N_plot, double time_plot[]);
 //////////////////////////////////////
 // grp_solver_EUL_source.c
 //////////////////////////////////////
-void     GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, const int N_plot, double time_plot[]);
+void     GRP_solver_EUL_source(const int m, struct cell_var_stru CV, double * cpu_time, int * N_plot, double time_plot[]);
 
 /* 2-D Godunov/GRP scheme (Eulerian, single-component flow, structured grid) */
 //////////////////////////////////////
 // grp_solver_2D_EUL_source.c
 //////////////////////////////////////
-void GRP_solver_2D_EUL_source      (const int m, const int n, struct cell_var_stru * CV, double * cpu_time, const int N_plot, double time_plot[]);
+void GRP_solver_2D_EUL_source      (const int m, const int n, struct cell_var_stru * CV, double * cpu_time, int * N_plot, double time_plot[]);
 //////////////////////////////////////
 // grp_solver_2D_split_EUL_source.c
 //////////////////////////////////////
-void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, const int N_plot, double time_plot[]);
+void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, int * N_plot, double time_plot[]);
 
 //////////////////////////////////////
 // grp_solver_spher_LAG_source.c
 //////////////////////////////////////
 void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
-				 const int M, const char * problem, double * cpu_time, const int N_plot , double time_plot[]);
+				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[]);
 
 /* 2-D Godunov/GRP scheme (Eulerian, two-component flow, unstructured grid) */
 //////////////////////////////////////
 // finite_volume_scheme_unstruct.c
 //////////////////////////////////////
 void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * mv, const char * scheme, 
-				   const char * problem, const int N_plot , const double time_plot[]);
+				   const char * problem, int * N_plot, const double time_plot[]);
 
 /* 2-D Godunov/GRP scheme (Eulerian, Baer-Nunziato two-phase flow, structured grid) */
 void finite_volume_scheme_GRP2D(struct flu_var * FV, const struct mesh_var * mv, const char * phase, const char * problem);

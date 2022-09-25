@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "hdf5.h"
 
@@ -42,6 +43,13 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
     char file_data[FILENAME_MAX+40];
     strcpy(file_data, add_out);
     strcat(file_data, "FLU_VAR.h5");
+    
+    double *XX = (double*)malloc(m * sizeof(double));
+    if(XX == NULL)
+	{
+	    printf("NOT enough memory! plot X\n");
+	    exit(5);
+	}
 
     hid_t file_id, group_id, attr_id, dataspace_id, dataspaceA_id, dataset_id;
     herr_t status;
@@ -77,10 +85,10 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
 	    // group2_id = H5Gcreate(group_id, "/MyGroup1/MyGroup2",  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	    // group2_id = H5Gcreate(group_id, "./MyGroup2",  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        /* Create an attribute. */
-        attr_id = H5Acreate(group_id, "time_plot", H5T_NATIVE_FLOAT, dataspaceA_id, H5P_DEFAULT, H5P_DEFAULT);
-        status  = H5Aread (attr_id, H5T_NATIVE_DOUBLE, time_plot+k);
-        status  = H5Aclose(attr_id);
+	    /* Create an attribute. */
+	    attr_id = H5Acreate(group_id, "time_plot", H5T_NATIVE_FLOAT, dataspaceA_id, H5P_DEFAULT, H5P_DEFAULT);
+	    status  = H5Awrite(attr_id, H5T_NATIVE_DOUBLE, time_plot+k);
+	    status  = H5Aclose(attr_id);
 
 	    PRINT_NC(RHO, CV.RHO[k]);
 	    PRINT_NC(U,   CV.U[k]);
@@ -90,8 +98,8 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
 	    PRINT_NC(R, X[k]);
 #else
 	    for(int j = 0; j < m; ++j)
-		X[k][j] = 0.5 * (X[k][j] + X[k][j+1]);
-	    PRINT_NC(X, X[k]);
+		XX[j] = 0.5 * (X[k][j] + X[k][j+1]);
+	    PRINT_NC(X, XX);
 #endif
 
 	    status = H5Gclose(group_id);
@@ -100,6 +108,11 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
     status = H5Sclose(dataspaceA_id);
     status = H5Sclose(dataspace_id);
     status = H5Fclose(file_id);
+    
+    free(XX);
+    XX = NULL;
+    if(status)
+        return;
     /*
      * file_id = H5Fopen(const char *filename, 
      *                   unsigned read-write_flag,
@@ -127,6 +140,25 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
     strcpy(file_data, add_out);
     strcat(file_data, "FLU_VAR.h5");
 
+    double ** XX, ** YY;
+    XX = (double **)malloc(n_x * sizeof(double *));
+    YY = (double **)malloc(n_x * sizeof(double *));
+    if(XX == NULL || YY == NULL)
+	{
+	    printf("NOT enough memory! plot X or Y\n");
+	    exit(5);
+	}
+    for(int j = 0; j < n_x; ++j)
+	{
+	    XX[j] = (double *)malloc(n_y * sizeof(double));
+	    YY[j] = (double *)malloc(n_y * sizeof(double));
+	    if(XX[j] == NULL || YY[j] == NULL)
+		{
+		    printf("NOT enough memory! plot X[%d] or Y[%d]\n", j, j);
+		    exit(5);
+		}
+	}
+
     hid_t file_id, group_id, attr_id, dataspace_id, dataspaceA_id, dataset_id;
     herr_t status;
     const unsigned rank = 2;
@@ -142,9 +174,9 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
 	    sprintf(group_name, "/T%d", k);
 	    group_id = H5Gcreate(file_id, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        attr_id = H5Acreate(group_id, "time_plot", H5T_NATIVE_FLOAT, dataspaceA_id, H5P_DEFAULT, H5P_DEFAULT);
-        status  = H5Aread (attr_id, H5T_NATIVE_DOUBLE, time_plot+k);
-        status  = H5Aclose(attr_id);
+	    attr_id = H5Acreate(group_id, "time_plot", H5T_NATIVE_FLOAT, dataspaceA_id, H5P_DEFAULT, H5P_DEFAULT);
+	    status  = H5Aread (attr_id, H5T_NATIVE_DOUBLE, time_plot+k);
+	    status  = H5Aclose(attr_id);
 
 	    PRINT_NC(RHO, CV[k].RHO);
 	    PRINT_NC(U,   CV[k].U);
@@ -166,4 +198,18 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
     status = H5Sclose(dataspaceA_id);
     status = H5Sclose(dataspace_id);
     status = H5Fclose(file_id);
+
+    for(int j = 0; j < n_x; ++j)
+	{
+	    free(XX[j]);
+	    free(YY[j]);
+	    XX[j] = NULL;
+	    YY[j] = NULL;
+	}
+    free(XX);
+    free(YY);
+    XX = NULL;
+    YY = NULL;
+    if(status)
+	return;
 }

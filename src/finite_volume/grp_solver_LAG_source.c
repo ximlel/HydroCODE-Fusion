@@ -24,7 +24,7 @@
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */
-void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, const int N_plot, double time_plot[])
+void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, int * N_plot, double time_plot[])
 {
     /* 
      * j is a frequently used index for spatial variables.
@@ -60,7 +60,8 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
   double h_S_max; // h/S_max, S_max is the maximum wave speed
   double time_c = 0.0; // the current time
   double C_m = 1.01; // a multiplicative coefficient allows the time step to increase.
-  int nt = 1; // the number of times storing plotting data
+  _Bool stop_t = false;
+  int nt = 0; // the number of times storing plotting data
 
   struct b_f_var bfv_L = {.H = h, .SRHO = 0.0, .SP = 0.0, .SU = 0.0}, bfv_R = bfv_L; // Left/Right boundary condition
   struct i_f_var ifv_L = {.gamma = gamma}, ifv_R = ifv_L;
@@ -117,12 +118,23 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
   for(k = 1; k <= N; ++k)
   {
       tic = clock();
-      if (time_c > time_plot[nt] && nt < (N_plot-1))
-	  nt++;
+      if (time_c >= time_plot[nt] && nt < (*N_plot-1))
+	  {
+	      for(j = 0; j < m; ++j)
+		  {
+		      RHO[nt+1][j] = RHO[nt][j];
+		      U[nt+1][j]   =   U[nt][j];
+		      E[nt+1][j]   =   E[nt][j];  
+		      P[nt+1][j]   =   P[nt][j];
+		      X[nt+1][j]   =   X[nt][j];
+		  }
+	      X[nt+1][m] = X[nt][m];
+	      nt++;
+	  }
 
       h_S_max = INFINITY; // h/S_max = INFINITY
 
-      find_bound = bound_cond_slope_limiter(true, m, nt-1, &CV, &bfv_L, &bfv_R, find_bound, true, time_c, X[nt-1]);
+      find_bound = bound_cond_slope_limiter(true, m, nt, &CV, &bfv_L, &bfv_R, find_bound, true, time_c, X[nt]);
       if(!find_bound)
 	  goto return_NULL;
 
@@ -134,10 +146,10 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	     */
 	      if(j) // Initialize the initial values.
 		  {
-		      h_L       =   X[nt-1][j] - X[nt-1][j-1];
-		      ifv_L.RHO = RHO[nt-1][j-1] + 0.5*h_L*s_rho[j-1];
-		      ifv_L.U   =   U[nt-1][j-1] + 0.5*h_L*s_u[j-1];
-		      ifv_L.P   =   P[nt-1][j-1] + 0.5*h_L*s_p[j-1];
+		      h_L       =   X[nt][j] - X[nt][j-1];
+		      ifv_L.RHO = RHO[nt][j-1] + 0.5*h_L*s_rho[j-1];
+		      ifv_L.U   =   U[nt][j-1] + 0.5*h_L*s_u[j-1];
+		      ifv_L.P   =   P[nt][j-1] + 0.5*h_L*s_p[j-1];
 		  }
 	      else
 		  {
@@ -148,10 +160,10 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 		  }
 	      if(j < m)
 		  {
-		      h_R       =   X[nt-1][j+1] - X[nt-1][j];
-		      ifv_R.RHO = RHO[nt-1][j] - 0.5*h_R*s_rho[j];
-		      ifv_R.U   =   U[nt-1][j] - 0.5*h_R*s_u[j];
-		      ifv_R.P   =   P[nt-1][j] - 0.5*h_R*s_p[j];
+		      h_R       =   X[nt][j+1] - X[nt][j];
+		      ifv_R.RHO = RHO[nt][j] - 0.5*h_R*s_rho[j];
+		      ifv_R.U   =   U[nt][j] - 0.5*h_R*s_u[j];
+		      ifv_R.P   =   P[nt][j] - 0.5*h_R*s_p[j];
 		  }
 	      else
 		  {
@@ -217,7 +229,7 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	      if(star_dire_check(mid, dire, 1))
 		  {
 		      printf(" on [%d, %d] (t_n, x).\n", k, j);
-		      time_c = t_all;
+		      stop_t = true;
 		  }
 
 	      RHO_next_L[j] = mid[0];
@@ -238,14 +250,13 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	    if(tau < eps)
 		{
 		    printf("\nThe length of the time step is so small on [%d, %g, %g] (t_n, time_c, tau)\n", k, time_c, tau);
-		    time_c = t_all;
+		    stop_t = true;
 		}
 	    else if((time_c + tau) > (t_all - eps))
 		tau = t_all - time_c;
 	    else if(!isfinite(tau))
 		{
 		    printf("NAN or INFinite error on [%d, %g, %g] (t_n, time_c, tau) - CFL\n", k, time_c, tau); 
-		    tau = t_all - time_c;
 		    goto return_NULL;
 		}
 	}
@@ -260,7 +271,7 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	    U_next[j]     += tau * U_t[j];
 	    P_next[j]     += tau * P_t[j];
 
-	    X[nt][j] = X[nt-1][j] + tau * U_F[j]; // motion along the contact discontinuity
+	    X[nt][j] += tau * U_F[j]; // motion along the contact discontinuity
 	}
 
 //======================THE CORE ITERATION=========================(On Lagrangian Coordinate)
@@ -270,14 +281,14 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 	   * j-1/2  j-1  j+1/2   j   j+3/2  j+1
 	   *   o-----X-----o-----X-----o-----X--...
 	   */
-	    RHO[nt][j] = 1.0 / (1.0/RHO[nt-1][j] + tau/MASS[j]*(U_F[j+1] - U_F[j]));
-	    U[nt][j]   = U[nt-1][j] - tau/MASS[j]*(P_F[j+1] - P_F[j]);
-	    E[nt][j]   = E[nt-1][j] - tau/MASS[j]*(P_F[j+1]*U_F[j+1] - P_F[j]*U_F[j]);
+	    RHO[nt][j] = 1.0 / (1.0/RHO[nt][j] + tau/MASS[j]*(U_F[j+1] - U_F[j]));
+	    U[nt][j]   = U[nt][j] - tau/MASS[j]*(P_F[j+1] - P_F[j]);
+	    E[nt][j]   = E[nt][j] - tau/MASS[j]*(P_F[j+1]*U_F[j+1] - P_F[j]*U_F[j]);
 	    P[nt][j]   = (E[nt][j] - 0.5 * U[nt][j]*U[nt][j]) * (gamma - 1.0) * RHO[nt][j];
 	    if(P[nt][j] < eps || RHO[nt][j] < eps)
 		{
 		    printf("<0.0 error on [%d, %d] (t_n, x) - Update\n", k, j);
-		    time_c = t_all;
+		    stop_t = true;
 		}
 	    
 //============================compute the slopes============================
@@ -293,20 +304,10 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
         DispPro(time_c*100.0/t_all, k);
     else
         DispPro(k*100.0/N, k);
-    if(time_c > (t_all - eps) || isinf(time_c))
-	
+    if(stop_t || time_c > (t_all - eps) || !isfinite(time_c))
 	break;
 
-//===========================Fixed variable location=======================	
-    for(j = 0; j <= m; ++j)
-	X[nt-1][j] = X[nt][j];
-    for(j = 0; j < m; ++j)
-	{
-	    RHO[nt-1][j] = RHO[nt][j];
-	    U[nt-1][j]   =   U[nt][j];
-	    E[nt-1][j]   =   E[nt][j];  
-	    P[nt-1][j]   =   P[nt][j];
-	}
+//===========================Fixed variable location=======================
 
     toc = clock();
     cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
@@ -319,19 +320,13 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 
 return_NULL:
   config[5] = (double)k;
-  if(fabs(time_plot[1]) < eps || isinf(time_plot[1]))
-      {
-	  if(isfinite(time_c))
-	      {
-		  time_plot[N_plot-2] = time_c - tau;
-		  time_plot[N_plot-1] = time_c;
-	      }
-	  else
-	      {
-		  time_plot[N_plot-2] = N*tau - tau;
-		  time_plot[N_plot-1] = N*tau;
-	      }
-      }
+  *N_plot = nt+1;
+  if(isfinite(time_c))
+      time_plot[nt] = time_c;
+  else if(isfinite(t_all))
+      time_plot[nt] = t_all;
+  else if(isfinite(tau))
+      time_plot[nt] = k*tau;
 
   free(s_u);
   free(s_p);

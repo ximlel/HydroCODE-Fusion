@@ -237,10 +237,10 @@ int main(int argc, char *argv[])
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_LAG_source(m, CV, X, cpu_time, N, time_plot);
+		  Godunov_solver_LAG_source(m, CV, X, cpu_time, &N, time_plot);
 		  break;
 	      case 2:
-		  GRP_solver_LAG_source(m, CV, X, cpu_time, N, time_plot);
+		  GRP_solver_LAG_source(m, CV, X, cpu_time, &N, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -257,10 +257,10 @@ int main(int argc, char *argv[])
 	  switch(order)
 	      {
 	      case 1:
-		  Godunov_solver_EUL_source(m, CV, cpu_time, N, time_plot);
+		  Godunov_solver_EUL_source(m, CV, cpu_time, &N, time_plot);
 		  break;
 	      case 2:
-		  GRP_solver_EUL_source(m, CV, cpu_time, N, time_plot);
+		  GRP_solver_EUL_source(m, CV, cpu_time, &N, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
