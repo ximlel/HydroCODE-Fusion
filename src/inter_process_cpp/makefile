@@ -21,7 +21,7 @@ RM = rm -vf
 DIR_NAME = $(shell basename `pwd`)
 #Current folder
 SRC_LIST = $(shell ls *.cpp)
-FILES_C  = $(filter -out $(SRC_LIST), $(shell ls *.cpp))
+FILES_C  = $(filter $(SRC_LIST), $(shell ls *.cpp))
 #All .cpp files
 FILES_O  = $(addsuffix .o,$(basename $(FILES_C)))
 #All .o files

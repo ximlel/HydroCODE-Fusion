@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS   = -std=c99 -Wall -pedantic -Og -g -pg
 #CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
-CFLAGD = -DNODATPLOT -DHDF5PLOT
+CFLAGD = -DNODATPLOT
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -49,7 +49,7 @@ modules:
 .PHONYP:modules
 
 lib/*.a lib/*.so libscopy:
-	@-mkdir -v lib
+	@mkdir -pv lib
 	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) lib/
 	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
 .PHONY: libscopy

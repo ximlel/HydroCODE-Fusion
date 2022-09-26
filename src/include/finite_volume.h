@@ -40,9 +40,9 @@ void GRP_solver_2D_EUL_source      (const int m, const int n, struct cell_var_st
 void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, int * N_plot, double time_plot[]);
 
 //////////////////////////////////////
-// grp_solver_spher_LAG_source.c
+// grp_solver_radial_LAG_source.c
 //////////////////////////////////////
-void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
+void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
 				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[]);
 
 /* 2-D Godunov/GRP scheme (Eulerian, two-component flow, unstructured grid) */

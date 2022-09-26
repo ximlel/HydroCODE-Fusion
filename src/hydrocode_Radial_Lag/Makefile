@@ -3,7 +3,7 @@ CC = g++
 CFLAGS   = -std=c++20 -Wall -pedantic -Og -g -pg
 #CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
-CFLAGD = -DSPHERICAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool
+CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources
@@ -32,7 +32,7 @@ SRC_LIST = except.c mem.c \
 	linear_grp_solver_radial_LAG.c riemann_solver_starPU.c \
 	VIPLimiter.cpp \
 	fluid_var_check.c slope_limiter_radial.c slope_VIP_limiter_radial.c \
-	grp_solver_spher_LAG_source.c
+	grp_solver_radial_LAG_source.c
 
 all: modules libscopy $(SOURCE).out
 .PHONYP:all
@@ -51,7 +51,7 @@ modules:
 .PHONYP:modules
 
 lib/*.a lib/*.so libscopy:
-	@-mkdir -v lib
+	@mkdir -pv lib
 	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) lib/
 	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
 .PHONY: libscopy

@@ -159,7 +159,7 @@ typedef struct mesh_var {
 } Mesh_Variable;
 
 
-//! SPHERically symmetric MESHing VARiables.
+//! RADIALly symmetric MESHing VARiables.
 typedef struct radial_mesh_var {
     double * Rb;
     double * Lb;
@@ -171,6 +171,6 @@ typedef struct radial_mesh_var {
 	double * Lbh;
 	double * dRc;
     double * vol;
-} Spherical_Mesh_Variable;
+} Radial_Mesh_Variable;
 
 #endif

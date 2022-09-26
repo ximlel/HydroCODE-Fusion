@@ -6,12 +6,9 @@ u_p   = h5read('FLU_VAR.h5',[TN{2},'/U']);
 e_p   = h5read('FLU_VAR.h5',[TN{2},'/E'])-0.5*u_p.^2;
 x_p   = h5read('FLU_VAR.h5',[TN{2},'/X']);
 time_plot = h5readatt('FLU_VAR.h5',TN{2},'time_plot');
-rho_p=RHO(N_STEP,:);
-u_p  =U(N_STEP,:);
-x_p  =X(N_STEP,:);
 figure(1)
 hold on
-plot(x_p,rho_p,'r.');
+plot(x_p,rho_p,'rx');
 ylim([0,1]);
 xlabel('x');
 ylabel('\rho');
@@ -21,3 +18,9 @@ plot(x_p,u_p,'r.');
 ylim([0,1]);
 xlabel('x');
 ylabel('u');
+figure(4)
+hold on
+plot(x_p,e_p,'r.');
+ylim([1.7,3.3]);
+xlabel('x');
+ylabel('e');

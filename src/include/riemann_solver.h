@@ -72,9 +72,9 @@ void linear_GRP_solver_Edir_G2D(double *wave_speed, double *D, double *U, double
 //////////////////////////////////////
 // linear_grp_solver_radial_LAG.c
 //////////////////////////////////////
-void AcousticSLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
+void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
 			 double r, double M, const double eps);
-void GRPsolverSLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
+void GRPsolverRLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
 		   double r, double M, const double eps, const double  atc);
 
 

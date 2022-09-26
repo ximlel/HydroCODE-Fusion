@@ -11,12 +11,6 @@ make
 ### Run the program
 EXE=./hydrocode.out  #EXEcutable program
 
- $EXE GRP_Book/6_2_1   GRP_Book/6_2_1   2_GRP EUL 1=-1.0
- $EXE GRP_Book/6_2_3   GRP_Book/6_2_3   2_GRP EUL 1=-1.0
- $EXE GRP_Book/6_1_EUL GRP_direct/9_1_a 1     EUL 1=15
- $EXE GRP_Book/6_1_EUL GRP_direct/9_1_a 2_GRP EUL 1=15
- $EXE GRP_direct/9_1_e GRP_direct/9_1_e 2_GRP EUL
-
 ## GRP_Book
 :<<!
  $EXE GRP_Book/6_1_LAG GRP_Book/6_1_LAG 1     LAG 1=-1.0

@@ -5,7 +5,7 @@
 #include "../include/tools.h"
 
 
-void minmod_limiter_spher(const int Ncell, const _Bool find_bound, double s[],
+void minmod_limiter_radial(const int Ncell, const _Bool find_bound, double s[],
 			  const double U[], struct radial_mesh_var *smv)
 {
     double const Alpha       =      config[41]; // the paramater in slope limiters.

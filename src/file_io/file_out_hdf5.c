@@ -54,7 +54,7 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
     hid_t file_id, group_id, attr_id, dataspace_id, dataspaceA_id, dataset_id;
     herr_t status;
     const unsigned rank = 1;
-    const hsize_t dims[1] = {m}, dimsA[1] = {1};
+    const hsize_t dims[1] = {(hsize_t)m}, dimsA[1] = {1};
     /*
      * file_id = H5Fcreate(const char *filename,
      *                     unsigned overlay_flag,
@@ -94,7 +94,7 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
 	    PRINT_NC(U,   CV.U[k]);
 	    PRINT_NC(P,   CV.P[k]);
 	    PRINT_NC(E,   CV.E[k]);
-#ifdef SPHERICAL_BASICS
+#ifdef RADIAL_BASICS
 	    PRINT_NC(R, X[k]);
 #else
 	    for(int j = 0; j < m; ++j)
@@ -162,7 +162,7 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
     hid_t file_id, group_id, attr_id, dataspace_id, dataspaceA_id, dataset_id;
     herr_t status;
     const unsigned rank = 2;
-    const hsize_t dims[2] = {n_y, n_x}, dimsA[1] = {1};
+    const hsize_t dims[2] = {(hsize_t)n_y, (hsize_t)n_x}, dimsA[1] = {1};
 
     file_id = H5Fcreate(file_data, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     dataspace_id  = H5Screate_simple(rank, dims,  NULL);
@@ -175,22 +175,22 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
 	    group_id = H5Gcreate(file_id, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
 	    attr_id = H5Acreate(group_id, "time_plot", H5T_NATIVE_FLOAT, dataspaceA_id, H5P_DEFAULT, H5P_DEFAULT);
-	    status  = H5Aread (attr_id, H5T_NATIVE_DOUBLE, time_plot+k);
+	    status  = H5Awrite(attr_id, H5T_NATIVE_DOUBLE, time_plot+k);
 	    status  = H5Aclose(attr_id);
 
 	    PRINT_NC(RHO, CV[k].RHO);
 	    PRINT_NC(U,   CV[k].U);
-	    PRINT_NC(U,   CV[k].V);
+	    PRINT_NC(V,   CV[k].V);
 	    PRINT_NC(P,   CV[k].P);
 	    PRINT_NC(E,   CV[k].E);
 	    for(int i = 0; i < n_y; ++i)
 		for(int j = 0; j < n_x; ++j)
 		    {			    
-			X[j][i] = 0.25*(X[j][i] + X[j][i+1] + X[j+1][i] + X[j+1][i+1]);
-			Y[j][i] = 0.25*(Y[j][i] + Y[j][i+1] + Y[j+1][i] + Y[j+1][i+1]);
+			XX[j][i] = 0.25*(X[j][i] + X[j][i+1] + X[j+1][i] + X[j+1][i+1]);
+			YY[j][i] = 0.25*(Y[j][i] + Y[j][i+1] + Y[j+1][i] + Y[j+1][i+1]);
 		    }
-	    PRINT_NC(X, X);
-	    PRINT_NC(Y, Y);
+	    PRINT_NC(X, XX);
+	    PRINT_NC(Y, YY);
 
 	    status = H5Gclose(group_id);
 	}

@@ -11,7 +11,7 @@ for i in `find ./${path} -name '*' ! -name '.?*' -type d`
 do
     for j in `find . -name "*.tec" -type f`
     do
-	echo "preplot $j" && preplot $j
-	rm $j
+	preplot $j
+	rm -v $j
     done
 done

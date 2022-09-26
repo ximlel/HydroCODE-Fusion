@@ -49,7 +49,7 @@ modules:
 .PHONYP:modules
 
 lib/*.a lib/*.so libscopy:
-	@-mkdir -v lib
+	@mkdir -pv lib
 	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) lib/
 	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
 .PHONY: libscopy

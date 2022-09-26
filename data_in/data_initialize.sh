@@ -12,10 +12,11 @@ echo "The first script parameter is the folder path: ./"$1
 for i in `find ./${path} -name '*' ! -name '.?*' -type d`
 do
     if [ -f "$i/value_start.m" ]; then
-	echo "run $i/value_start.m;" >> data_initialize.m 
+	echo "disp(\"run $i/value_start.m\")" >> data_initialize.m
+	echo "run $i/value_start.m;" >> data_initialize.m
     fi
     if [ -f "$i/octave-workspace" ]; then
-	echo "rm $i/octave-workspace" && rm $i/octave-workspace
+	rm -v $i/octave-workspace
     fi
 done
 

@@ -6,7 +6,7 @@
 
 
 //GRP solver for tangential case. Lagrangian version(moving mesh) for cylindrical case.
-void AcousticSLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
+void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
 			 double r, double M, const double eps)
 {
 	double GammaL = ifv_L->gamma, GammaR = ifv_R->gamma;
@@ -43,7 +43,7 @@ void AcousticSLagTangent(double *dire, double *U_star, const struct i_f_var * if
 
 
 // Lagrangian version(moving mesh) cylindrical case.
-void GRPsolverSLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
+void GRPsolverRLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
 		   double r, double M, const double eps, const double  atc)
 {
 	const double GammaL = ifv_L->gamma, GammaR = ifv_R->gamma;

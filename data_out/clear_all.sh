@@ -8,10 +8,10 @@ echo "The second script parameter must be: ACK"
 for i in `find ./${path} -name '*' ! -name '.?*' -type d`
 do
     if [[ "${ACK}" == "ACK" ]]; then
-        rm $i/*.dat
-        rm $i/*.h5
-        rm $i/*.tec
-        rm $i/*.plt
-        rm $i/*.vtk
+        rm -vf $i/*.dat
+        rm -vf $i/*.h5
+        rm -vf $i/*.tec
+        rm -vf $i/*.plt
+        rm -vf $i/*.vtk
     fi
 done

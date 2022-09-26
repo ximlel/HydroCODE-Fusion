@@ -14,9 +14,8 @@
 #include "../include/inter_process.h"
 
 
-// M=2,
-// M=1 planar; M=2 cylindrical ; M=3 spherical
-void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
+// M=1 planar; M=2 cylindrical √; M=3 spherical
+void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
 				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[])
 {
     int i, k=0;
@@ -172,7 +171,7 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 			    goto return_NULL;
 			}
 
-		    GRPsolverSLag(wave_speed, dire, mid, &ifv_L, &ifv_R, Rb[i+1], M, eps, eps);
+		    GRPsolverRLag(wave_speed, dire, mid, &ifv_L, &ifv_R, Rb[i+1], M, eps, eps);
 
 		    if(mid[2] < eps || mid[0] < eps || mid[3] < eps)
 			{
@@ -233,7 +232,7 @@ void grp_solver_spher_LAG_source(struct flu_var * FV, struct cell_var_stru * CV,
 		    ifv_L.d_p   = DmP[i]*cos(0.5*dtheta);
 		    ifv_L.d_u   = DmU[i]+TmV[i];
 
-		    AcousticSLagTangent(dire, mid, &ifv_L, &ifv_R, 0.5*(Rb[i]+Rb[i+1])/cos(0.5*dtheta), M, eps);
+		    AcousticRLagTangent(dire, mid, &ifv_L, &ifv_R, 0.5*(Rb[i]+Rb[i+1])/cos(0.5*dtheta), M, eps);
 		    F_u2[i]  = mid[2]+dt*dire[2];
 		    VLmin[i] = (ifv_L.U*cos(0.5*dtheta)+ifv_L.V*sin(0.5*dtheta)+dt*dire[1])*sin(0.5*dtheta);
 		}

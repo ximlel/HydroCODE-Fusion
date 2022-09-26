@@ -39,25 +39,7 @@ int ifvar_check(struct i_f_var *ifv_L, struct i_f_var *ifv_R, const int dim)
 int star_dire_check(double *mid, double *dire, const int dim)
 {
     double const eps = config[4];
-    if(dim == 1)
-	{
-	    if(mid[3] < eps || mid[0] < eps)
-		{
-		    printf("<0.0 error - STAR");
-		    return 1;
-		}
-	    if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
-		{
-		    printf("NAN or INFinite error - STAR"); 
-		    return 2;
-		}
-	    if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0])|| !isfinite(dire[3]))
-		{
-		    printf("NAN or INFinite error - DIRE"); 
-		    return 3;
-		}
-	}
-    else if (dim == 2)
+    if (dim == 1)
 	{
 	    if(mid[2] < eps || mid[0] < eps)
 		{
@@ -75,5 +57,24 @@ int star_dire_check(double *mid, double *dire, const int dim)
 		    return 3;
 		}
 	}
+    else if(dim == 2)
+	{
+	    if(mid[3] < eps || mid[0] < eps)
+		{
+		    printf("<0.0 error - STAR");
+		    return 1;
+		}
+	    if(!isfinite(mid[1])|| !isfinite(mid[2])|| !isfinite(mid[0])|| !isfinite(mid[3]))
+		{
+		    printf("NAN or INFinite error - STAR"); 
+		    return 2;
+		}
+	    if(!isfinite(dire[1])|| !isfinite(dire[2])|| !isfinite(dire[0])|| !isfinite(dire[3]))
+		{
+		    printf("NAN or INFinite error - DIRE"); 
+		    return 3;
+		}
+	}
+
     return 0;
 }
