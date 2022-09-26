@@ -6,16 +6,20 @@
 #ifndef VARSTRUC_H
 #define VARSTRUC_H
 
-#ifdef DOXYGEN_PREDEFINED
+#ifdef  MULTIFLUID_BASICS
 /**
  * @def MULTIFLUID_BASICS
  * @brief Switch whether to compute multi-fluids.
  */
+#undef  MULTIFLUID_BASICS
 #define MULTIFLUID_BASICS
+#endif
+#ifdef  LAGRANGIAN_MAIRE
 /**
  * @def LAGRANGIAN_MAIRE
  * @brief Switch whether to use Maire's cell-centered schemes for Lagrangian hydrodynamics.
  */
+#undef  LAGRANGIAN_MAIRE
 #define LAGRANGIAN_MAIRE
 #endif
 
