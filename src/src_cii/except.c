@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "except.h"
+#include "../include_cii/except.h"
 #define T Except_T
 #ifdef WIN32
 __declspec(thread)

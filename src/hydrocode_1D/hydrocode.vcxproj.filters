@@ -18,12 +18,6 @@
     <ClCompile Include="..\file_io\io_control.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\file_io\_1D_file_in.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\file_io\_1D_file_out.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\finite_volume\Godunov_solver_EUL_source.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,6 +61,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\inter_process\bound_cond_slope_limiter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_1D_in.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_1D_out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process\fluid_var_check.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\terminal_io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

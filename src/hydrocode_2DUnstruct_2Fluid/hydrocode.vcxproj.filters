@@ -33,9 +33,6 @@
     <ClCompile Include="..\inter_process_unstruct\assist_func.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\inter_process_unstruct\cell_init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\inter_process_unstruct\cons_qty_calc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,15 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\inter_process_unstruct\copy_func.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\inter_process_unstruct\slope_limiter.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\meshing\ghost_value.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\meshing\mesh_init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\meshing\msh_load.c">
@@ -81,9 +69,6 @@
     <ClCompile Include="..\riemann_solver\roe_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\math_algo.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\tools\sys_pro.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,6 +79,33 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\riemann_solver\hll_2D_solver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process\fluid_var_check.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process_unstruct\cell_init_free.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process_unstruct\slope_limiter_unstruct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\mat_algo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\meshing\ghost_cell.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\meshing\mesh_init_free.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_cii\except.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_cii\mem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\terminal_io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -123,6 +135,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\var_struc_BN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include_cii\mem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include_cii\except.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

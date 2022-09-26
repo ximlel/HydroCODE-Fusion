@@ -27,22 +27,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -102,16 +102,18 @@
     <ClCompile Include="..\file_io\file_2D_in.c" />
     <ClCompile Include="..\file_io\file_2D_unstruct_out.c" />
     <ClCompile Include="..\file_io\io_control.c" />
+    <ClCompile Include="..\file_io\terminal_io.c" />
     <ClCompile Include="..\finite_volume\finite_volume_scheme_unstruct.c" />
     <ClCompile Include="..\flux_calc\flux_solver.c" />
+    <ClCompile Include="..\inter_process\fluid_var_check.c" />
     <ClCompile Include="..\inter_process_unstruct\assist_func.c" />
-    <ClCompile Include="..\inter_process_unstruct\cell_init.c" />
+    <ClCompile Include="..\inter_process_unstruct\cell_init_free.c" />
     <ClCompile Include="..\inter_process_unstruct\cons_qty_calc.c" />
     <ClCompile Include="..\inter_process_unstruct\cons_qty_update_P_ave.c" />
     <ClCompile Include="..\inter_process_unstruct\copy_func.c" />
-    <ClCompile Include="..\inter_process_unstruct\slope_limiter.c" />
-    <ClCompile Include="..\meshing\ghost_value.c" />
-    <ClCompile Include="..\meshing\mesh_init.c" />
+    <ClCompile Include="..\inter_process_unstruct\slope_limiter_unstruct.c" />
+    <ClCompile Include="..\meshing\ghost_cell.c" />
+    <ClCompile Include="..\meshing\mesh_init_free.c" />
     <ClCompile Include="..\meshing\msh_load.c" />
     <ClCompile Include="..\meshing\quad_mesh.c" />
     <ClCompile Include="..\riemann_solver\hll_2D_solver.c" />
@@ -122,7 +124,9 @@
     <ClCompile Include="..\riemann_solver\roe_2D_solver.c" />
     <ClCompile Include="..\riemann_solver\roe_HLL_solver.c" />
     <ClCompile Include="..\riemann_solver\roe_solver.c" />
-    <ClCompile Include="..\tools\math_algo.c" />
+    <ClCompile Include="..\src_cii\except.c" />
+    <ClCompile Include="..\src_cii\mem.c" />
+    <ClCompile Include="..\tools\mat_algo.c" />
     <ClCompile Include="..\tools\sys_pro.c" />
     <ClCompile Include="hydrocode.c" />
   </ItemGroup>
@@ -136,6 +140,8 @@
     <ClInclude Include="..\include\tools.h" />
     <ClInclude Include="..\include\var_struc.h" />
     <ClInclude Include="..\include\var_struc_BN.h" />
+    <ClInclude Include="..\include_cii\except.h" />
+    <ClInclude Include="..\include_cii\mem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

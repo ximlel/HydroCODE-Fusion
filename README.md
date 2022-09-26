@@ -2,10 +2,12 @@
 
 What is it?
 -----------
+
 This is a implementation of fully explict forward Euler scheme for single/multi-fluid Euler equations of motion on Lagrangian/Eulerian coordinate.
 
 How to use it?
 -----------
+
 *Programer's Guide* can be found in folder `doc`.
 
 It is made by Doxygen and LaTeX,
@@ -25,28 +27,34 @@ Open `doc/*/html/index.html` in a browser to view the specific instructions of t
 
 Compilers/Interpreters
 ---------
+
 gcc -std=c99, g++ -std=c++20, Visual Studio 2022, MATLAB/Octave, Python3
 
 Program Library
 ---------
-HDF5, GNU Scientific Library (GSL), LAPACKE, CBLAS
+
+HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(gsl-msvc-x86)*, LAPACKE/CBLAS
 
 Debugging tools
 ---------
+
 make, gprof, gcov, lcov, Valgrind, Cppcheck, gprof2dot.
 
 Licensing
 ---------
+
 *GNU Lesser General Public License v3.0* or later.
 
 Please see the file called `LICENSE`.
 
 Contacts
 --------
+
 If you want more available support for this program, please send an email to [xinlei@cugb.edu.cn](mailto:xinlei@cugb.edu.cn).
 
 Copyright
 --------
+
 > Part of this code is modified from the provision of Zhifang Du, Rui Chen & Jian Cheng @ IAPCM.
 > Some source codes in the book *C Interfaces and Implementations* designed by David Hanson and 《常用算法程序及》 designed by 徐士良 are used.
 

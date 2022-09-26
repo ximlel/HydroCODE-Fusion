@@ -15,90 +15,78 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\file_io\io_control.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\finite_volume\GRP_solver_2D_EUL_source.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flux_calc\flux_generator_x.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flux_calc\flux_generator_y.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flux_calc\flux_solver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="hydrocode.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\inter_process\bound_cond_slope_limiter_x.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\inter_process\bound_cond_slope_limiter_y.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\inter_process\slope_limiter.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\inter_process\slope_limiter_2D_x.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir_G2D.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\linear_GRP_solver_Edir_Q1D.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Ben.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\Riemann_solver_exact_Toro.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tools\sys_pro.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\file_io\config_handle.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\finite_volume\GRP_solver_2D_split_EUL_source.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\file_io\file_2D_in.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\file_io\file_2D_out.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\roe_2D_solver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\roe_solver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\riemann_solver\hll_2D_solver.c">
+    <ClCompile Include="..\finite_volume\grp_solver_radial_LAG_source.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\inter_process\fluid_var_check.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\inter_process\slope_limiter_radial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process\slope_VIP_limiter_radial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\sys_pro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_cii\except.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src_cii\mem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\config_handle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_1D_in.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_1D_out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_radial_out.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\io_control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\file_io\terminal_io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\meshing\radial_mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\riemann_solver\linear_grp_solver_radial_LAG.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\riemann_solver\riemann_solver_starPU.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inter_process_cpp\VIPLimiter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\file_io\file_out_hdf5.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include_cpp\inter_process.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\file_io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\finite_volume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\flux_calc.h">
+    <ClInclude Include="..\include\inter_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\inter_process.h">
+    <ClInclude Include="..\include\meshing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\riemann_solver.h">
@@ -110,5 +98,14 @@
     <ClInclude Include="..\include\var_struc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include_cii\except.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include_cii\mem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

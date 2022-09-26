@@ -27,22 +27,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,12 +101,16 @@
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>NODATPLOT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\file_io\config_handle.c" />
     <ClCompile Include="..\file_io\io_control.c" />
     <ClCompile Include="..\file_io\file_2D_in.c" />
     <ClCompile Include="..\file_io\file_2D_out.c" />
+    <ClCompile Include="..\file_io\terminal_io.c" />
     <ClCompile Include="..\finite_volume\grp_solver_2D_EUL_source.c" />
     <ClCompile Include="..\finite_volume\grp_solver_2D_split_EUL_source.c" />
     <ClCompile Include="..\flux_calc\flux_generator_x.c" />
@@ -114,6 +118,7 @@
     <ClCompile Include="..\flux_calc\flux_solver.c" />
     <ClCompile Include="..\inter_process\bound_cond_slope_limiter_x.c" />
     <ClCompile Include="..\inter_process\bound_cond_slope_limiter_y.c" />
+    <ClCompile Include="..\inter_process\fluid_var_check.c" />
     <ClCompile Include="..\inter_process\slope_limiter.c" />
     <ClCompile Include="..\inter_process\slope_limiter_2D_x.c" />
     <ClCompile Include="..\riemann_solver\hll_2D_solver.c" />
