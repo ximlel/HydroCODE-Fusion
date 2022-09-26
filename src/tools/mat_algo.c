@@ -46,6 +46,7 @@ void mat_mul(const double A[], const double B[], double C[], const int m, const 
  * @return Matrix is invertible or not.
  *    @retval 0: No inverse matrix
  *    @retval 1: Invertible matrix
+ * @attention This function is only valid for the matrix with consecutive array.
  */
 int rinv(double a[], const int n)
 {
