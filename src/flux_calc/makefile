@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS += -std=c99 -Wall
+CFLAGS += -std=c99 -fopenmp -Wall
 #C compiler options
 CFLAGS += -DMULTIFLUID_BASICS
 CFLAGD  = 

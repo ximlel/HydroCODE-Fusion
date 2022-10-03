@@ -17,20 +17,20 @@ Run the following command on the terminal.
 ```shell
 cd src/*
 doxygen Doxyfile
-cd doc/*/latex
+cd doc/hydrocode_*/latex
 make
-cd doc/*/Specification
+cd doc/hydrocode_*/Specification
 xelatex Specification.tex
 ```
 
-Open `doc/*/html/index.html` in a browser to view the specific instructions of this program.
+Open `doc/hydrocode_*/html/index.html` in a browser to view the specific instructions of this program.
 
 Compilers/Interpreters
 ---------
 
 gcc -std=c99, g++ -std=c++20, Visual Studio 2022(.sln .vcxproj), MATLAB/Octave(.m), Python3(.py), Maple(.mw).
 
-Program Library
+Program library
 ---------
 
 OpenMP, HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(NuGet: gsl-msvc-x86)*, LAPACKE/OpenBLAS.
@@ -42,7 +42,26 @@ make/Automake, gprof, gcov(.gcov .gcda .gcno), lcov, Valgrind, Cppcheck, gprof2d
 
 Processing tools
 ---------
+
 Tecplot(.tec .plt .mcr), ParaView(.vtk), Gmesh(.msh).
+
+Debug, Run and Release
+-----------
+
+```shell
+cd src/hydrocode_*
+./hydrocode.sh
+make release
+```
+
+Dependency test
+-----------
+
+```shell
+cd doc/detector/
+autoconf
+./configure
+```
 
 Licensing
 ---------

@@ -15,6 +15,7 @@ AC_CHECK_PROGS([LCOV],       [lcov])
 AC_CHECK_PROGS([VALGRIND],   [valgrind])
 AC_CHECK_PROGS([CPPCHECK],   [cppcheck])
 AC_CHECK_PROGS([GPROF2DOT],  [gprof2dot])
+AC_CHECK_PROGS([PARAVIEW],   [paraview])
 AC_CHECK_PROGS([GMESH],      [gmsh])
 
 # Checks for libraries.
@@ -23,7 +24,7 @@ AC_CHECK_LIB([gcov],      [__gcov_dump])
 AC_CHECK_LIB([pthread],   [sem_init])
 AC_CHECK_LIB([m],         [exp])
 AC_CHECK_LIB([lapack],    [dgelsy_])
-AC_CHECK_LIB([gslcblas],  main)
+AC_CHECK_LIB([gslcblas],  [main])
 AC_CHECK_LIB([gsl],       [gsl_expm1])
 
 AC_OUTPUT
