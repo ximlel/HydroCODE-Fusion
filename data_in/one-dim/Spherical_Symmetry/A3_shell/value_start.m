@@ -47,31 +47,23 @@ for i=(Ncell3+1):Ncell
 end
 
 fid = fopen('RHO.dat','wt');
-for j=1:Tcell
 fprintf(fid,'%12.10g\t',rho(2:Ncell));
 fprintf(fid,'\n');
-end
 fclose(fid);
 
 fid = fopen('U.dat','wt');
-for j=1:Tcell
 fprintf(fid,'%12.10g\t',u(2:Ncell));
 fprintf(fid,'\n');
-end
 fclose(fid);
 
 fid = fopen('P.dat','wt');
-for j=1:Tcell
 fprintf(fid,'%12.10g\t',p(2:Ncell));
 fprintf(fid,'\n');
-end
 fclose(fid);
 
 fid = fopen('PHI.dat','wt');
-for j=1:Tcell
 fprintf(fid,'%12.10g\t',phi(2:Ncell));
 fprintf(fid,'\n');
-end
 fclose(fid);
 
 

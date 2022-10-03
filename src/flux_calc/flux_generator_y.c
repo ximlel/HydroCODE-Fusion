@@ -34,9 +34,10 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
   double const h_y = config[11]; // the length of the initial y spatial grids
   struct i_f_var ifv_D = {.n_x = 1.0, .n_y = 0.0, .gamma = config[6]};
   struct i_f_var ifv_U = ifv_D;
-  int i, j, data_err;
+  int i, j, data_err, data_err_retval = 0;
 
 //===========================
+#pragma omp parallel for firstprivate(ifv_U, ifv_D)
   for(j = 0; j < m; ++j)
     for(i = 0; i <= n; ++i)
     {
@@ -131,7 +132,7 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
       if(ifvar_check(&ifv_D, &ifv_U, 2))
 	  {
 	      printf(" on [%d, %d, %d] (nt, x, y).\n", nt, j, i);
-	      return 1;
+	      data_err_retval = 1;
 	  }
 
 //===========================
@@ -141,13 +142,13 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
 	  {
 	  case 1:
 	      printf("<0.0 error on [%d, %d, %d] (nt, x, y) - STAR_y\n", nt, j, i);
-	      return 2;
+	      data_err_retval = 2;
 	  case 2:
 	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - STAR_y\n", nt, j, i); 
-	      return 2;
+	      data_err_retval = 2;
 	  case 3:
 	      printf("NAN or INFinite error on [%d, %d, %d] (nt, x, y) - DIRE_y\n", nt, j, i); 
-	      return 2;
+	      data_err_retval = 2;
 	  }
 
       CV->G_rho[j][i] = ifv_D.F_rho;
@@ -160,5 +161,5 @@ int flux_generator_y(const int m, const int n, const int nt, const double tau, s
       CV->vIy[j][i]   = ifv_D.V_int;
       CV->pIy[j][i]   = ifv_D.P_int;
     }
-  return 0;
+  return data_err_retval;
 }

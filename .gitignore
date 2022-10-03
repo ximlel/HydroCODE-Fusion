@@ -74,10 +74,20 @@ dkms.conf
 *.a
 *.lib
 
+# ========================Test and Run=====================
+
+# Autoconf
+configure
+config.status
+doc/detector/autom4te.cache/*
+
 # Executables
 *.exe
 *.out
 *.app
+
+# Release
+bin/
 
 # gprof
 pg

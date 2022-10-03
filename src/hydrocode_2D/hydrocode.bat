@@ -8,6 +8,7 @@
 set CPath=%~dp0
 set MRun=D:/Softwares/MATLAB6p5/bin/win32/matlab.exe -nojvm -nodisplay -nosplash -nodesktop -r
 set EXE=.\hydrocode.exe
+set OMP_NUM_THREADS=4
 
 ::: GRP_Book
 goto !
@@ -19,9 +20,9 @@ goto !
 
 ::: 2D Riemnnn problem
 goto !
- cd ../../data_in/two-dim/RP2D/RP2D_3_Quad
- %MRun% "value_start('INPUT'); quit;"
- cd %CPath%
+   cd ../../data_in/two-dim/RP2D/RP2D_3_Quad
+   %MRun% "value_start('INPUT'); quit;"
+   cd %CPath%
  %EXE% RP2D_Positive/Config3  RP2D_Positive/Config3  2_GRP EUL
  %EXE% RP2D_Positive/Config7  RP2D_Positive/Config7  2_GRP EUL
  %EXE% RP2D_Positive/Config12 RP2D_Positive/Config12 2_GRP EUL

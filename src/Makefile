@@ -1,6 +1,6 @@
 CC = g++
 #C compiler
-CFLAGS   = -std=c++20 -Wall -pedantic -Og -g -pg
+CFLAGS   = -std=c++20 -fopenmp -Wall -pedantic -Og -g -pg
 #C compiler options
 CFLAGD = -D_Bool=bool
 #Macro definition

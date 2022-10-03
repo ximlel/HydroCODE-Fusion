@@ -28,17 +28,21 @@ Open `doc/*/html/index.html` in a browser to view the specific instructions of t
 Compilers/Interpreters
 ---------
 
-gcc -std=c99, g++ -std=c++20, Visual Studio 2022, MATLAB/Octave, Python3
+gcc -std=c99, g++ -std=c++20, Visual Studio 2022(.sln .vcxproj), MATLAB/Octave(.m), Python3(.py), Maple(.mw).
 
 Program Library
 ---------
 
-HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(gsl-msvc-x86)*, LAPACKE/CBLAS
+OpenMP, HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(NuGet: gsl-msvc-x86)*, LAPACKE/OpenBLAS.
 
 Debugging tools
 ---------
 
-make, gprof, gcov, lcov, Valgrind, Cppcheck, gprof2dot.
+make/Automake, gprof, gcov(.gcov .gcda .gcno), lcov, Valgrind, Cppcheck, gprof2dot.
+
+Processing tools
+---------
+Tecplot(.tec .plt .mcr), ParaView(.vtk), Gmesh(.msh).
 
 Licensing
 ---------

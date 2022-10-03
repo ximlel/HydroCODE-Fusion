@@ -294,7 +294,7 @@ void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
 	}
     if((fp = fopen(add, "r")) == NULL)
 	{
-	    printf("No time data file for plotting! Only the final result will be plotted.\n");
+	    printf("No time data file for plotting! Only the initial data and final result will be plotted.\n");
 	    *N_plot = 2;
 	    r = false;
 	}

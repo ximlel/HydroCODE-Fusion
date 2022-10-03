@@ -12,6 +12,6 @@ do
     for j in `find . -name "*.tec" -type f`
     do
 	preplot $j
-	rm -v $j
+	rm -vf $j
     done
 done
