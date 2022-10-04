@@ -1,7 +1,6 @@
 CC = gcc
 #C compiler
 CFLAGS   = -std=c99 -Wall -pedantic -Og -g -pg
-#CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
 CFLAGD = -DHDF5PLOT -DNODATPLOT
 #Macro definition

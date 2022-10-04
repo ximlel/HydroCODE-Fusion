@@ -1,9 +1,8 @@
 CC = gcc
 #C compiler
-CFLAGS   = -std=c99 -fopenmp -Wall -pedantic -Og -g -pg
-#CFLAGS += -fprofile-arcs -ftest-coverage
+CFLAGS = -std=c99 -fopenmp -Wall -pedantic -Og -g -pg
 #C compiler options
-CFLAGD = -DHDF5PLOT -DNODATPLOT
+CFLAGD = -DNODATPLOT #-DHDF5PLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder

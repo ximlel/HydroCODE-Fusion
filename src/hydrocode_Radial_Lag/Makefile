@@ -1,7 +1,6 @@
 CC = g++
 #C compiler
 CFLAGS   = -std=c++20 -Wall -pedantic -Og -g -pg
-#CFLAGS += -fprofile-arcs -ftest-coverage
 #C compiler options
 CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool
 #Macro definition
