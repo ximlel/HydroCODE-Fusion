@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH
-export OMP_STACKSIZE=8192
+#export OMP_STACKSIZE=8192
 
 ### Test the program
 EXE=./hydrocode.out  #EXEcutable program

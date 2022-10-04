@@ -2,7 +2,7 @@
 
 shopt -s expand_aliases
 export LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH
-export OMP_STACKSIZE=8192
+#export OMP_STACKSIZE=8192
 #export OMP_NUM_THREADS=4
 
 ### Run the program

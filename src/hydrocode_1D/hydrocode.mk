@@ -20,6 +20,12 @@ $(SOURCE).out exe: $(SOURCE).c lib/*.a $(addsuffix /*, $(addprefix $(SRC)/,$(INC
 	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
 .PHONYP:exe
 
+static:
+	@$(RM) $(SOURCE).out lib/*.a
+	@echo "**********Generate executable file***********"
+	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
+.PHONYP:static
+
 modules:
 #Enter each subdirectory
 #Call the Makefile in the subdirectory
@@ -54,7 +60,7 @@ release:
 
 clean_all: clean
 #Clean in the directory
-	@$(RM) $(SOURCE).out $(SOURCE).exe
+	@$(RM) $(SOURCE).out
 	@$(RM) -R lib gcovdir
 	@$(RM) pg.png callgrind.png
 .PHONYP:clean_all
@@ -67,4 +73,6 @@ clean:
 	@$(RM) lib/*.a
 	@$(RM) *.gcov *.gcda *.gcno
 	@$(RM) $(SOURCE).info gmon.out pg callgrind.out
+	@$(RM) $(SOURCE).exe
+	@$(RM) -R .vs x64 x86 Debug Release
 .PHONYP:clean

@@ -38,7 +38,7 @@ OpenMP, HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(NuGet
 Debugging tools
 ---------
 
-make/Automake, gprof, gcov(.gcov .gcda .gcno), lcov, Valgrind, Cppcheck, gprof2dot.
+Autoconf, make, gprof, GCOV(.gcov .gcda .gcno), LCOV, Valgrind, Cppcheck, gprof2dot.
 
 Processing tools
 ---------

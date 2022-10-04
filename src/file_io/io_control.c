@@ -43,6 +43,7 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 	const int el    = (int)config[8];
 	const int order = (int)config[9];
 
+	static int output_const = 0;
 	char str_tmp[11], str_order[11];
 	switch (dim)
 	    {
@@ -94,12 +95,15 @@ void example_io(const char *example, char *add_mkdir, const int i_or_o)
 #endif
 			exit(1);
 		    }
-		else
+		else if(output_const == 0)
+		    {
 #ifdef _WIN32
-		    printf("Output directory '%s' has been constructed.\n", add_mkdir);				
+			printf("Output directory '%s' has been constructed.\n", add_mkdir);				
 #elif __linux__
-		    printf("\x1b[47;34mOutput directory '%s' has been constructed.\x1b[0m\n", add_mkdir);				
+			printf("\x1b[47;34mOutput directory '%s' has been constructed.\x1b[0m\n", add_mkdir);
 #endif
+			output_const = 1;
+		    }
 	    }
 	else if (ACCESS(add_mkdir,4) == -1)
 	    {

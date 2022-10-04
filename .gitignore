@@ -79,7 +79,7 @@ dkms.conf
 # Autoconf
 configure
 config.status
-doc/detector/autom4te.cache/*
+**/autom4te.cache/**
 
 # Executables
 *.exe
