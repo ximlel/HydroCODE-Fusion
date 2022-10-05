@@ -1,15 +1,15 @@
 ifdef STATIC
-CFLAGS  += --coverage
+CFLAGS  += --coverage -pg
 LDFLAGS += -Lliba
 else
 LDFLAGS += -Llib
 endif
-#C flags for gcov/lcov
+#C flags for gcov/lcov/gprof
 SRC = ..
 #Directory of source file
 BIN = ../../bin
 #Directory of binary files
-INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
+INCLUDE = $(addprefix -I, $(addprefix $(SRC)/, $(INCLUDE_FOLDER)))
 #Inclued folder
 LDFLAGS += $(addprefix -l, $(HEAD))
 #Library files
@@ -29,7 +29,7 @@ ifdef RELEASE
 endif
 .PHONYP:all
 
-$(SOURCE).out exe: $(SOURCE).c lib/*.so $(addsuffix /*, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
+$(SOURCE).out exe: $(SOURCE).c lib/*.so $(addsuffix /*, $(addprefix $(SRC)/, $(INCLUDE_FOLDER)))
 	@echo "**********Generate executable file***********"
 ifdef RELEASE
 	$(CC) $(CFLAGR) $(CFLAGD) -c $(SOURCE).c $(INCLUDE)
@@ -56,8 +56,8 @@ endif
 
 lib/*.so liba/*.a libscopy:
 	@mkdir -pv lib liba
-	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) liba/
-	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
+	@$(CP) $(addsuffix /*.a,  $(addprefix $(SRC)/, $(HEAD))) liba/
+	@$(CP) $(addsuffix /*.so, $(addprefix $(SRC)/, $(HEAD))) lib/
 .PHONY: libscopy
 
 get: 
@@ -91,6 +91,6 @@ clean:
 	@$(RM) $(SOURCE).o
 	@$(RM) -R liba
 	@$(RM) *.gcov *.gcda *.gcno
-	@$(RM) $(SOURCE).info gmon.out pg callgrind.out
+	@$(RM) $(SOURCE).info gmon.out pg callgrind.out* massif.out*
 	@$(RM) perf.*
 .PHONYP:clean

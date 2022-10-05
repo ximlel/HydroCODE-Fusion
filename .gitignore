@@ -9,12 +9,6 @@
 *.gch
 *.pch
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.so
@@ -105,8 +99,9 @@ pg.png
 gcovdir/
 
 # Valgrind
-callgrind.out
+callgrind.out*
 callgrind.png
+massif.out*
 
 # =====================MATLAB/Octave project=================
 

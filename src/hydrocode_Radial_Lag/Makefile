@@ -1,6 +1,6 @@
 CC = g++
 #C compiler
-CFLAGS = -std=c++20 -Wall -pedantic -Og -g -pg
+CFLAGS = -std=c++20 -Wall -pedantic -Og -g
 CFLAGS = -std=c++20 -O2
 #C compiler options
 CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool

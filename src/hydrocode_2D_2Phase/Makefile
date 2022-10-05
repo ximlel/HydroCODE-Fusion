@@ -1,7 +1,7 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -fopenmp -Wall -pedantic -Og -g -pg
-CFLAGR = -std=c99 -fopenmp -O2
+CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp
+CFLAGR = -std=c99 -O2 -fopenmp
 #C compiler options
 CFLAGD = -DMULTIFLUID_BASICS -DMULTIPHASE_BASICS -DNODATPLOT
 #Macro definition

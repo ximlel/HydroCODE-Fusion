@@ -33,12 +33,12 @@ gcc -std=c99, g++ -std=c++20, Visual Studio 2022(.sln .vcxproj), MATLAB/Octave(.
 Program library
 ---------
 
-OpenMP, HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(NuGet: gsl-msvc-x86)*, LAPACKE/OpenBLAS.
+OpenMP, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet: gsl-msvc-x86]*, LAPACKE/OpenBLAS.
 
 Debugging tools
 ---------
 
-Autoconf, make, gprof, gprof2dot, Valgrind, Cppcheck, GCOV(.gcov .gcda .gcno), LCOV, perf, FlameGraph.
+Autoconf, make(.mk), gprof, gprof2dot *[need pkg: Graphviz]*, Valgrind *[opt pkg: KCacheGrind, Massif-Visualizer]*, Cppcheck, GCOV(.gcov .gcda .gcno), LCOV, perf, FlameGraph.
 
 Processing tools
 ---------

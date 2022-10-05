@@ -17,6 +17,8 @@ TEST="$EXE GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   1     EUL 33=
 ### Valgrind
 # valgrind --tool=callgrind --callgrind-out-file=callgrind.out $TEST
 # gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
+valgrind -v --tool=massif --time-unit=B --detailed-freq=1 --keep-debuginfo=yes -s --trace-children=yes --track-fds=yes --massif-out-file=massif.out $TEST
+
 
 # $TEST
 

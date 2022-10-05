@@ -19,6 +19,7 @@ AC_CHECK_PROGS([PERF],       [perf])
 AC_CHECK_PROGS([VALGRIND],   [valgrind])
 AC_CHECK_PROGS([CPPCHECK],   [cppcheck])
 AC_CHECK_PROGS([PARAVIEW],   [paraview])
+AC_CHECK_PROGS([GRAPHVIZ],   [dot])
 AC_CHECK_PROGS([GMESH],      [gmsh])
 
 # Checks for libraries.
