@@ -191,6 +191,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	stop_t = true;
 
 //===============THE CORE ITERATION=================
+#pragma omp parallel for private(mom_x, mom_y, ene) collapse(2) schedule(dynamic)
     for(i = 0; i < n; ++i)
       for(j = 0; j < m; ++j)
       { /*
