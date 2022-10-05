@@ -17,5 +17,5 @@ sh shell/hydrocode_test.sh
 sh shell/hydrocode_run.sh
 
 ### Release the program dynamically
-make clean
+# make clean
 # make RELEASE=1
