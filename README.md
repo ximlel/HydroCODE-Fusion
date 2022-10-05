@@ -15,7 +15,7 @@ It is made by Doxygen and LaTeX,
 Run the following command on the terminal.
 
 ```shell
-cd src/*
+cd src/hydrocode_*
 doxygen Doxyfile
 cd doc/hydrocode_*/latex
 make
@@ -38,7 +38,7 @@ OpenMP, HDF5 *(NuGet: hdf5-v120-complete)*, GNU Scientific Library (GSL) *(NuGet
 Debugging tools
 ---------
 
-Autoconf, make, gprof, GCOV(.gcov .gcda .gcno), LCOV, Valgrind, Cppcheck, gprof2dot.
+Autoconf, make, gprof, gprof2dot, Valgrind, Cppcheck, GCOV(.gcov .gcda .gcno), LCOV, perf, FlameGraph.
 
 Processing tools
 ---------
@@ -51,14 +51,13 @@ Debug, Run and Release
 ```shell
 cd src/hydrocode_*
 ./hydrocode.sh
-make release
 ```
 
 Dependency test
 -----------
 
 ```shell
-cd doc/detector/
+cd src/MAKE/Autoconf
 autoconf
 ./configure
 ```

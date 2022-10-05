@@ -1,12 +1,13 @@
 CC = gcc
 #C compiler
-CFLAGS   = -std=c99 -fopenmp -Wall -pedantic -Og -g -pg
+CFLAGS = -std=c99 -fopenmp -Wall -pedantic -Og -g -pg
+CFLAGR = -std=c99 -fopenmp -O2
 #C compiler options
 CFLAGD = -DMULTIFLUID_BASICS -DNOVTKPLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder
-LIBS  = -lm -lgcov -lhdf5 -Llib/
+LDFLAGS = -lm -lhdf5
 #Library files
 
 #Head folder
@@ -26,4 +27,4 @@ SRC_LIST = except.c mem.c \
 	finite_volume_scheme_unstruct.c
 #List of source files
 
-include ../hydrocode_1D/hydrocode.mk
+include ../MAKE/hydrocode.mk

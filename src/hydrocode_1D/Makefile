@@ -1,12 +1,13 @@
 CC = gcc
 #C compiler
-CFLAGS   = -std=c99 -Wall -pedantic -Og -g -pg
+CFLAGS = -std=c99 -Wall -pedantic -Og -g -pg
+CFLAGR = -std=c99 -O2
 #C compiler options
 CFLAGD = -DHDF5PLOT -DNODATPLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder
-LIBS  = -lm -lgcov -lhdf5 -Llib/
+LDFLAGS = -lm -lhdf5
 #Library files
 
 #Head folder
@@ -22,4 +23,4 @@ SRC_LIST = sys_pro.c \
 	grp_solver_EUL_source.c grp_solver_LAG_source.c godunov_solver_EUL_source.c godunov_solver_LAG_source.c
 #List of source files
 
-include hydrocode.mk
+include ../MAKE/hydrocode.mk

@@ -89,6 +89,10 @@ config.status
 # Release
 bin/
 
+# perf
+perf.*
+perf_flame.svg
+
 # gprof
 pg
 pg.png

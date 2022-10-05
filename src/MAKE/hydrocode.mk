@@ -1,4 +1,9 @@
-CFLAGCOV = -fprofile-arcs -ftest-coverage
+ifdef STATIC
+CFLAGS  += --coverage
+LDFLAGS += -Lliba
+else
+LDFLAGS += -Llib
+endif
 #C flags for gcov/lcov
 SRC = ..
 #Directory of source file
@@ -6,7 +11,7 @@ BIN = ../../bin
 #Directory of binary files
 INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
-LIBS += $(addprefix -l, $(HEAD))
+LDFLAGS += $(addprefix -l, $(HEAD))
 #Library files
 DIR_NAME = $(shell basename `pwd`)
 
@@ -17,30 +22,41 @@ CP = cp -vur
 
 
 all: modules libscopy $(SOURCE).out
+ifdef RELEASE
+	@mkdir -pv $(BIN)/$(DIR_NAME)
+	@$(CP) lib $(BIN)/$(DIR_NAME)
+	@$(CP) $(SOURCE).out shell/*_run.sh $(BIN)/$(DIR_NAME)
+endif
 .PHONYP:all
 
 $(SOURCE).out exe: $(SOURCE).c lib/*.so $(addsuffix /*, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 	@echo "**********Generate executable file***********"
-	$(CC) $(CFLAGS) $(CFLAGD) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
+ifdef RELEASE
+	$(CC) $(CFLAGR) $(CFLAGD) -c $(SOURCE).c $(INCLUDE)
+	$(CC) $(CFLAGR) -o $(SOURCE).out $(SOURCE).o $(LDFLAGS)
+else
+	$(CC) $(CFLAGS) $(CFLAGD) -c $(SOURCE).c $(INCLUDE)
+	$(CC) $(CFLAGS) -o $(SOURCE).out $(SOURCE).o $(LDFLAGS)
+endif
 .PHONYP:exe
-
-static: all
-	@$(RM) lib/*.so
-	@echo "**********Generate executable file***********"
-	$(CC) $(CFLAGS) $(CFLAGD) $(CFLAGCOV) -o $(SOURCE).out $(SOURCE).c $(INCLUDE) $(LIBS)
-.PHONYP:static
 
 modules:
 #Enter each subdirectory
 #Call the Makefile in the subdirectory
+ifdef RELEASE
 	@for n in $(HEAD); do \
-	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' SRC_LIST='$(SRC_LIST)' --directory=$(SRC)/$$n )  \
+	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGR) $(CFLAGD)' SRC_LIST='$(SRC_LIST)' --directory=$(SRC)/$$n ) \
+	done
+else
+	@for n in $(HEAD); do \
+	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGCOV) $(CFLAGD)' SRC_LIST='$(SRC_LIST)' --directory=$(SRC)/$$n ) \
 	done;
+endif
 .PHONYP:modules
 
-lib/*.so lib/*.a libscopy:
-	@mkdir -pv lib
-	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) lib/
+lib/*.so liba/*.a libscopy:
+	@mkdir -pv lib liba
+	@$(CP) $(addsuffix /*.a, $(addprefix $(SRC)/,$(HEAD))) liba/
 	@$(CP) $(addsuffix /*.so,$(addprefix $(SRC)/,$(HEAD))) lib/
 .PHONY: libscopy
 
@@ -49,7 +65,7 @@ get:
 	gcov $(SOURCE).c
 .PHONY: get
 
-html: get
+html:
 #Generate graphical GCOV code coverage report
 	#Create test coverage data file
 	lcov -c -d $(SRC) -o $(SOURCE).info
@@ -57,16 +73,14 @@ html: get
 	genhtml -o gcovdir $(SOURCE).info
 .PHONYP:html
 
-release: 
-	@mkdir -pv $(BIN)/$(DIR_NAME)
-	@$(CP) $(SOURCE).out shell/*_run.sh lib $(BIN)/$(DIR_NAME)
-	@$(RM) $(BIN)/$(DIR_NAME)/lib/*.a
-
 clean_all: clean
 #Clean in the directory
 	@$(RM) $(SOURCE).out
 	@$(RM) -R lib gcovdir
 	@$(RM) pg.png callgrind.png
+	@$(RM) perf_flame.svg
+	@$(RM) $(SOURCE).exe
+	@$(RM) -R .vs x64 x86 Debug Release
 .PHONYP:clean_all
 
 clean:
@@ -74,9 +88,9 @@ clean:
 	@for n in $(HEAD) $(HEAD_SO); do \
 	( $(MAKE) --directory=$(SRC)/$$n clean ) \
 	done;
-	@$(RM) lib/*.a
+	@$(RM) $(SOURCE).o
+	@$(RM) -R liba
 	@$(RM) *.gcov *.gcda *.gcno
 	@$(RM) $(SOURCE).info gmon.out pg callgrind.out
-	@$(RM) $(SOURCE).exe
-	@$(RM) -R .vs x64 x86 Debug Release
+	@$(RM) perf.*
 .PHONYP:clean

@@ -4,14 +4,14 @@ CFLAGS   = -std=c++20 -fopenmp -Wall -pedantic -Og -g -pg
 #C compiler options
 CFLAGD = -D_Bool=bool
 #Macro definition
-SRC = .
+SRC = ..
 #Directory of sources
 RM = rm -vf
 #Delete command
 
-FOLDER = $(filter-out $(shell ls -d include_*/), $(shell ls -d */))
+FOLDER = $(filter-out $(shell ls -d $(SRC)/include_*/) $(SRC)/MAKE/, $(shell ls -d $(SRC)/*/))
 #Directory of source codes
-FOLDER_hydro = $(shell ls -d hydrocode_*/)
+FOLDER_hydro = $(shell ls -d $(SRC)/hydrocode_*/)
 #Directory of hydrocodes
 
 clean:
@@ -31,13 +31,13 @@ clean_all: clean
 
 modules:
 	@for n in $(filter-out $(FOLDER_hydro), $(FOLDER)) ; do \
-	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$(SRC)/$$n )  \
+	( $(MAKE) CC=$(CC) CFLAGS='$(CFLAGS) $(CFLAGD)' --directory=$$n )  \
 	done;
 .PHONYP:modules
 
 all:
 	@for n in $(FOLDER_hydro); do \
-	( $(MAKE) --directory=$(SRC)/$$n clean && \
-	$(MAKE) --directory=$(SRC)/$$n )  \
+	( $(MAKE) --directory=$$n clean && \
+	$(MAKE) --directory=$$n )  \
 	done;
 .PHONYP:all

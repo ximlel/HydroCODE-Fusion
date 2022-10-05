@@ -1,12 +1,13 @@
 CC = g++
 #C compiler
-CFLAGS   = -std=c++20 -Wall -pedantic -Og -g -pg
+CFLAGS = -std=c++20 -Wall -pedantic -Og -g -pg
+CFLAGS = -std=c++20 -O2
 #C compiler options
 CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -D_Bool=bool
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder
-LIBS  = -lm -lgcov -lhdf5 -Llib/
+LDFLAGS = -lm -lhdf5
 #Library files
 
 #Head folder
@@ -25,4 +26,4 @@ SRC_LIST = except.c mem.c \
 	grp_solver_radial_LAG_source.c
 #List of source files
 
-include ../hydrocode_1D/hydrocode.mk
+include ../MAKE/hydrocode.mk

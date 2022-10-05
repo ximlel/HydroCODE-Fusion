@@ -10,4 +10,4 @@ INCLUDE_FOLDER = include
 C_SUF = .c
 #Source code file suffix
 
-include module.mk
+include ../MAKE/module.mk

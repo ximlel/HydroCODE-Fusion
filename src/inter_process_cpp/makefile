@@ -10,4 +10,4 @@ INCLUDE_FOLDER = include_cpp
 C_SUF = .cpp
 #Source code file suffix
 
-include ../tools/module.mk
+include ../MAKE/module.mk

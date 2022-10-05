@@ -2,12 +2,20 @@
 
 ulimit -c unlimited
 
-### Compile the program
+### Compile the program statically
 # make clean
-make
+make STATIC=1
 
 ### Test the program
 sh shell/hydrocode_test.sh
 
+### Compile the program dynamically
+# make clean
+# make
+
 ### Run the program
 sh shell/hydrocode_run.sh
+
+### Release the program dynamically
+make clean
+# make RELEASE=1

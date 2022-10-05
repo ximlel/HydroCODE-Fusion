@@ -1,12 +1,13 @@
 CC = gcc
 #C compiler
 CFLAGS = -std=c99 -fopenmp -Wall -pedantic -Og -g -pg
+CFLAGR = -std=c99 -fopenmp -O2
 #C compiler options
 CFLAGD = -DNODATPLOT #-DHDF5PLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder
-LIBS  = -lm -lgcov -lhdf5 -Llib/
+LDFLAGS = -lm -lhdf5
 #Library files
 
 #Head folder
@@ -20,7 +21,7 @@ SRC_LIST = sys_pro.c \
 	hll_2D_solver.c roe_2D_solver.c roe_solver.c roe_HLL_solver.c linear_grp_solver_Edir_G2D.c linear_grp_solver_Edir_Q1D.c riemann_solver_exact_Ben.c riemann_solver_exact_Toro.c \
 	bound_cond_slope_limiter_x.c bound_cond_slope_limiter_y.c fluid_var_check.c slope_limiter.c slope_limiter_2D_x.c \
 	flux_generator_x.c flux_generator_y.c flux_solver.c \
-	grp_solver_2D_EUL_source.c grp_solver_2D_split_EUL_source.c \
+	grp_solver_2D_EUL_source.c grp_solver_2D_split_EUL_source.c
 #List of source files
 
-include ../hydrocode_1D/hydrocode.mk
+include ../MAKE/hydrocode.mk
