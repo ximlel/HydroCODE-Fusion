@@ -92,6 +92,6 @@ clean:
 	@$(RM) -R liba
 	@$(RM) *.gcov *.gcda *.gcno
 	@$(RM) $(SOURCE).info gmon.out pg 
-	@$(RM) callgrind.out* massif.out* memchk.log
+	@$(RM) callgrind.out* cachegrind.out* massif.out* memchk.log
 	@$(RM) perf.*
 .PHONYP:clean
