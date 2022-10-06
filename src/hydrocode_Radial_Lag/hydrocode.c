@@ -32,7 +32,7 @@ double config[N_CONF]; //!< Initial configuration data array.
 	    }								\
 	memmove(CV.v[0]+1, FV0.v, Ncell * sizeof(double));		\
 	free(FV0.v);							\
-	FV0.v = CV.v[0];						\
+	FV0.v = NULL;							\
     } while(0)
 
 /**
@@ -118,6 +118,11 @@ int main(int argc, char *argv[])
   CV_INIT_FV_RESET_MEM(P, N);
   CV_INIT_FV_RESET_MEM(RHO, N);
   CV_INIT_FV_RESET_MEM(gamma, N);
+  for(k = 1; k < N; ++k)
+      {
+	  free(CV.gamma[k]);
+	  CV.gamma[k] = CV.gamma[0];
+      }
   CV.E = (double **)malloc(N * sizeof(double *));
   if(CV.E == NULL)
       {
@@ -137,11 +142,6 @@ int main(int argc, char *argv[])
   }
   for(j = 1; j <= Ncell; ++j)
       CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(CV.gamma[0][j] - 1.0)/CV.RHO[0][j];
-  for(k = 1; k < N; ++k)
-      {
-	  free(CV.gamma[k]);
-	  CV.gamma[k] = CV.gamma[0];
-      }
 
   // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
   config[8] = (double)1;
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
       case 1:
 	  config[41] = 0.0; // alpha = 0.0
       case 2:
-	  grp_solver_radial_LAG_source(&FV0, &CV, &smv, R, M, argv[2], cpu_time, &N, time_plot);
+	  grp_solver_radial_LAG_source(&CV, &smv, R, M, argv[2], cpu_time, &N, time_plot);
 	  break;
       default:
 	  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -162,21 +162,20 @@ int main(int argc, char *argv[])
   file_1D_write(Ncell, N, CV, R, cpu_time, argv[2], time_plot);
 #endif
 #ifndef NOTECPLOT
+  FV0.RHO = CV.RHO[N-1];
+  FV0.U   = CV.U[N-1];
+  FV0.P   = CV.P[N-1];
   file_radial_write_TEC(FV0, smv, argv[2], time_plot[N-1]);
 #endif
 
 return_NULL:
   radial_mesh_mem_free(&smv);
 
-  free(FV0.RHO);
-  free(FV0.U);
-  free(FV0.P);
-  free(FV0.gamma);
   FV0.RHO   = NULL;
   FV0.U     = NULL;
   FV0.P     = NULL;
   FV0.gamma = NULL;
-  for(k = 1; k < N; ++k)
+  for(k = 0; k < N; ++k)
   {
     free(CV.E[k]);
     free(CV.RHO[k]);
@@ -190,12 +189,6 @@ return_NULL:
     CV.gamma[k] = NULL;
     R[k] = NULL;
   }
-  free(CV.E[0]);
-  CV.E[0]     = NULL;
-  CV.RHO[0]   = NULL;
-  CV.U[0]     = NULL;
-  CV.P[0]     = NULL;
-  CV.gamma[0] = NULL;
   free(CV.E);
   free(CV.RHO);
   free(CV.U);

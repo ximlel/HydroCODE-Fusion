@@ -1,7 +1,9 @@
 #!/bin/bash
 
 export LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH
+### OpenMP
 #export OMP_STACKSIZE=8192
+#export OMP_NUM_THREADS=1
 
 ### Test the program
 EXE=./hydrocode.out  #EXEcutable program
@@ -15,7 +17,7 @@ TEST="$EXE"
 
 ### Valgrind
 # valgrind --tool=callgrind --callgrind-out-file=callgrind.out $TEST
-# gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
+# gprof2dot -f callgrind -s callgrind.out | dot -Tpng -o callgrind.png
 
 # $TEST
 

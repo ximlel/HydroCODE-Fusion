@@ -14,7 +14,7 @@ TEST="$EXE GRP_Book/6_1_LAG GRP_Book/6_1_LAG 1 LAG 1=-1.0"
 
 ### Valgrind
 # valgrind --tool=callgrind --callgrind-out-file=callgrind.out $TEST
-# gprof2dot -f callgrind -s callgrind.out | dot  -Tpng -o callgrind.png
+# gprof2dot -f callgrind -s callgrind.out | dot -Tpng -o callgrind.png
 
 # $TEST
 

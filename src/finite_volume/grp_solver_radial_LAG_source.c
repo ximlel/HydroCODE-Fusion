@@ -15,7 +15,7 @@
 
 
 // M=1 planar; M=2 cylindrical √; M=3 spherical
-void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
+void grp_solver_radial_LAG_source(struct cell_var_stru * CV, struct radial_mesh_var * smv, double * R[],
 				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[])
 {
     int i, k=0;
@@ -45,6 +45,7 @@ void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV
     int nt = 0;
 
     struct i_f_var ifv_L = {0}, ifv_R = {0};
+    struct flu_var FV;
 
     //initial value
     double *DD = CV->RHO[0]; // D:Density;U,V:Velocity;P:Pressure
@@ -55,7 +56,7 @@ void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV
     double *GammaGamma = CV->gamma[0]; // Ratio of special heats
 #else
     double *GammaGamma = (double*)ALLOC(Md*sizeof(double)); // Ratio of special heats
-    for(i=0; i<Md; i++)//center cell is cell 0
+    for(i=0; i<Md; i++) //center cell is cell 0
 	GammaGamma[i] = config[6];
 #endif
 
@@ -105,7 +106,11 @@ void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV
 	    if (time_c >= time_plot[nt] && nt < (*N_plot-1))
 		{
 #ifndef NOTECPLOT
-		    file_radial_write_TEC(*FV, *smv, problem, time_plot[nt]);
+		    FV.RHO   = CV->RHO[nt];
+		    FV.U     = CV->U[nt];
+		    FV.P     = CV->P[nt];
+		    FV.gamma = CV->gamma[0];
+		    file_radial_write_TEC(FV, *smv, problem, time_plot[nt]);
 #endif
 		    for(i = 0; i < Md; ++i)
 			{
@@ -114,6 +119,10 @@ void grp_solver_radial_LAG_source(struct flu_var * FV, struct cell_var_stru * CV
 			    CV->E[nt+1][i]   =   CV->E[nt][i];  
 			    CV->P[nt+1][i]   =   CV->P[nt][i];
 			}
+			DD = CV->RHO[nt+1];
+			UU = CV->U[nt+1];
+			PP = CV->P[nt+1];
+			EE = CV->E[nt+1];
 		    nt++;
 		}
 

@@ -14,7 +14,7 @@ LDFLAGS = -lm -lhdf5
 HEAD = finite_volume flux_calc inter_process riemann_solver file_io tools
 #Name of header files or subdirectories
 SOURCE = hydrocode
-#Name of the main source 
+#Name of the main source
 
 SRC_LIST = sys_pro.c \
 	config_handle.c file_out_hdf5.c file_2D_out.c file_2D_in.c io_control.c terminal_io.c \

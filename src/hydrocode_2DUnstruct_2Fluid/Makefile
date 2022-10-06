@@ -14,7 +14,7 @@ LDFLAGS = -lm -lhdf5
 HEAD = finite_volume flux_calc inter_process_unstruct inter_process riemann_solver meshing file_io tools src_cii
 #Name of header files or subdirectories
 SOURCE = hydrocode
-#Name of the main source 
+#Name of the main source
 
 SRC_LIST = except.c mem.c \
 	sys_pro.c mat_algo.c \

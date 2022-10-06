@@ -1,4 +1,17 @@
-Ncell=3000;  % Number of computing cells in r direction
+function value_start(Ncell)
+if nargin < 1
+    Ncell = 3000   % Number of computing cells in r direction
+elseif strcmpi(Ncell,{'INPUT'})
+    Ncell = input('Please input the Ncell number: (Default 3000 6000) ')
+else
+    Ncell
+    if isstring(Ncell)
+        error("Not a string 'INPUT' was entered to represent the input!");
+    elseif Ncell ~= fix(Ncell) || Ncell <= 0
+        error("Not a positive integer was entered to represent variable 'Ncell'!")
+    end
+end
+
 Diaph1=10.0;
 Diaph2=10.2;
 Diaph3=10.25;
@@ -67,7 +80,7 @@ fprintf(fid,'\n');
 fclose(fid);
 
 
-Timeout=0.23;     % Output time
+Timeout=0.23;%0.8 % Output time
 D_PLOT_T=0.001;   % Output time interval
 time_plot=0:D_PLOT_T:Timeout;
 fid = fopen('time_plot.dat','wt');
@@ -100,3 +113,4 @@ fprintf(fid,'14\t%i\n',Tcell);
 fprintf(fid,'20\t%i\n',Tcell);
 fprintf(fid,'106\t%g\n',GAMMAR);
 fclose(fid);
+end
