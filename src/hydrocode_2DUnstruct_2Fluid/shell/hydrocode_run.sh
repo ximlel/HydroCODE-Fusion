@@ -1,14 +1,13 @@
 #!/bin/bash
 
-shopt -s expand_aliases
 export LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH
 #export OMP_STACKSIZE=8192
 #export OMP_NUM_THREADS=4
 
 ### Run the program
 CPath=$(pwd)
-#alias MRun='~/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop'
-alias MRun='octave'
+#MRun="$HOME/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop"
+#MRun="octave"
 EXE=./hydrocode.out  #EXEcutable program
 TC=Two_Component
 DI=../../data_in/two-dim/$TC

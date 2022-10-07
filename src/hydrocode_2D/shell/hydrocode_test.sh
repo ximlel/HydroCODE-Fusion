@@ -26,7 +26,7 @@ TEST="$EXE GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   1     EUL 33=
 # valgrind -v --tool=massif --time-unit=B --detailed-freq=1 --keep-debuginfo=yes -s --trace-children=yes --track-fds=yes --massif-out-file=massif.out $TEST
 # valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --track-origins=yes --log-file=memchk.log $TEST
 
-# $TEST
+ $TEST
 
 ### gprof
 # gprof -b -A -p -q $EXE gmon.out > pg

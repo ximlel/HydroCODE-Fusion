@@ -89,7 +89,7 @@ _Bool bound_cond_slope_limiter_y(const int m, const int n, const int nt, struct 
 		    minmod_limiter(false, n, find_bound_y, CV->t_v[j],   CV[nt].V[j],   bfv_D[j].V,   bfv_U[j].V,   h_y);
 		    minmod_limiter(false, n, find_bound_y, CV->t_p[j],   CV[nt].P[j],   bfv_D[j].P,   bfv_U[j].P,   h_y);
 		    minmod_limiter(false, n, find_bound_y, CV->t_rho[j], CV[nt].RHO[j], bfv_D[j].RHO, bfv_U[j].RHO, h_y);
-		}
+		} // End of parallel region
 
 	    for(j = 0; j < m; ++j)
 		switch(bound_y)

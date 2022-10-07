@@ -89,7 +89,7 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 		    minmod_limiter_2D_x(false, m, i, find_bound_x, CV->s_v,   CV[nt].V,   bfv_L[i].V,   bfv_R[i].V,   h_x);
 		    minmod_limiter_2D_x(false, m, i, find_bound_x, CV->s_p,   CV[nt].P,   bfv_L[i].P,   bfv_R[i].P,   h_x);
 		    minmod_limiter_2D_x(false, m, i, find_bound_x, CV->s_rho, CV[nt].RHO, bfv_L[i].RHO, bfv_R[i].RHO, h_x);
-		}
+		} // End of parallel region
 
 	    for(i = 0; i < n; ++i)
 		switch(bound_x)

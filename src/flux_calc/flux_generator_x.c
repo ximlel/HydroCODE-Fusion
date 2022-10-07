@@ -5,9 +5,6 @@
  */
 #include <stdio.h>
 #include <math.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 #include "../include/var_struc.h"
 #include "../include/inter_process.h"
@@ -163,6 +160,6 @@ int flux_generator_x(const int m, const int n, const int nt, const double tau, s
       CV->uIx[j][i]   = ifv_L.U_int;
       CV->vIx[j][i]   = ifv_L.V_int;
       CV->pIx[j][i]   = ifv_L.P_int;
-    }
+    } // End of parallel region
   return data_err_retval;
 }

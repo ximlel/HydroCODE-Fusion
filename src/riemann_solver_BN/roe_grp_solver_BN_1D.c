@@ -273,7 +273,7 @@ if (U_all[1]/U_all[0]>1.1)
    Dt_U_all[2] = -D_U_S[2]*u_g_S-U[2]*d_u_g_S-U[0]*d_p_g_S+(P_INT-p_g_S)*D_U_S[0];
    Dt_U_all[3] = -D_U_S[2]*v_g_S-U[2]*d_v_g_S;
    Dt_U_all[4] = -D_U_S[3]*u_g_S-U[3]*d_u_g_S-U[0]*(u_g_S*d_p_g_S+d_u_g_S*p_g_S)+(P_INT*U_INT-p_g_S*u_g_S)*D_U_S[0];
-   Dt_U_all[5] = -D_U_S[5];;
+   Dt_U_all[5] = -D_U_S[5];
    Dt_U_all[6] = -D_U_S[5]*u_l_S-U[5]*d_u_l_S-(1.0-U[0])*d_p_l_S-(P_INT-p_l_S)*D_U_S[0];
    Dt_U_all[7] = -D_U_S[5]*v_l_S-U[5]*d_v_l_S;
    Dt_U_all[8] = -D_U_S[6]*u_l_S-U[6]*d_u_l_S+(1.0-U[0])*(u_l_S*d_p_l_S+d_u_l_S*p_l_S)-(P_INT*U_INT-p_l_S*u_l_S)*D_U_S[0];

@@ -12,7 +12,7 @@ else
     else
         line
     end
-    if isstring(column)
+    if ischar(column)
         error("Not a string 'INPUT' was entered to represent the input!");
     elseif column ~= fix(column) || column <= 0
         error("Not a positive integer was entered to represent variable 'column'!")

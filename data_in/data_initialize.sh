@@ -1,9 +1,7 @@
 #!/bin/bash
 
-shopt -s expand_aliases
-
-alias MRun='~/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop'
-#alias MRun='octave'
+MRun="$HOME/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop"
+#MRun="octave"
 
 rm -vf data_initialize.m
 path=$1
@@ -20,5 +18,5 @@ do
     fi
 done
 
-echo "data_initialize" | MRun
+echo "data_initialize" | $MRun
 rm -vf data_initialize.m

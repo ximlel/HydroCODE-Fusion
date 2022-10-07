@@ -5,7 +5,7 @@ elseif strcmpi(column,{'INPUT'})
     column = input('Please input the column number: (Default 20 40 80 160 320 640 1280) ')
 else
     column
-    if isstring(column)
+    if ischar(column)
         error("Not a string 'INPUT' was entered to represent the input!");
     elseif column ~= fix(column) || column <= 0
         error("Not a positive integer was entered to represent variable 'column'!")
@@ -23,7 +23,7 @@ rho=zeros(column,1);
 f=@(x) 1+0.2*sin(pi*x);
 
 for i=1:column
-    rho(i)=quad(f,(i-1)*d_x,i*d_x,1e-18,0)/d_x;
+    rho(i)=quad(f,(i-1)*d_x,i*d_x,1e-18)/d_x;
 end
 fid = fopen('RHO.dat','wt');
 for j=1:line

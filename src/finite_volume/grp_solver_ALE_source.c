@@ -241,7 +241,7 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
     
     for(j = 0; j <= m; ++j)
 	{
-	    RHO_next[j] += 0.5 * tau * RHO_t[j];;
+	    RHO_next[j] += 0.5 * tau * RHO_t[j];
 	    U_next[j]   += 0.5 * tau * U_t[j];
 	    P_next[j]   += 0.5 * tau * P_t[j];
 
@@ -250,7 +250,7 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 	    F_e[j] = (gamma/(gamma-1.0))*P_next[j] + 0.5*F_rho[j]*U_next[j];
 	    F_e[j] = F_e[j]*U_next[j];
 
-	    RHO_next[j] += 0.5 * tau * RHO_t[j];;
+	    RHO_next[j] += 0.5 * tau * RHO_t[j];
 	    U_next[j]   += 0.5 * tau * U_t[j];
 	    P_next[j]   += 0.5 * tau * P_t[j];
 
@@ -296,7 +296,7 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 //===========================Fixed variable location=======================
 
     toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
     cpu_time_sum += cpu_time[nt];
   }
 

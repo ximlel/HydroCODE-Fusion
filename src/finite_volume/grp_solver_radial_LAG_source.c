@@ -309,7 +309,7 @@ void grp_solver_radial_LAG_source(struct cell_var_stru * CV, struct radial_mesh_
 		break;
 
 	    toc = clock();
-	    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+	    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
 	    cpu_time_sum += cpu_time[nt];
 	}
 

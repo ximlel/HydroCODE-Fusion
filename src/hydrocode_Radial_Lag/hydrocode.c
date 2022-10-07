@@ -63,20 +63,19 @@ int main(int argc, char *argv[])
   config[0] = (double)1; // Dimension of input data = 1
 
   // The number of times steps of the fluid data stored for plotting.
-  int N; // (int)(config[5]) + 1;
+  int N;
   double *time_plot;
   /* 
    * We read the initial data files.
    * The function initialize return a point pointing to the position
-   * of a block of memory consisting (m+1) variables of type double.
-   * The value of first array element of these variables is m.
-   * The following m variables are the initial value.
+   * of a block of memory consisting Ncell variables of type double.
+   * The Ncell variables are the initial value.
    */
   struct flu_var FV0 = initialize_1D(argv[1], &N, &time_plot); // Structure of initial data array pointer.
-  const int Ncell = (int)config[3];
+  const int Ncell = (int)config[3]; // Number of computing cells in r direction
   const int Md    = Ncell+2;        // max vector dimension
   const int order = (int)config[9];
-  int M = atoi(argv[4]); // m=1 planar; m=2 cylindrical; m=3 spherical
+  int M = atoi(argv[4]); // M=1 planar; M=2 cylindrical; M=3 spherical
   if(M != 1 && M != 2 && M != 3)
       {
 	  printf("Wrong spatial dimension number!\n");
@@ -117,12 +116,14 @@ int main(int argc, char *argv[])
   CV_INIT_FV_RESET_MEM(U, N);
   CV_INIT_FV_RESET_MEM(P, N);
   CV_INIT_FV_RESET_MEM(RHO, N);
+#ifdef MULTIFLUID_BASICS
   CV_INIT_FV_RESET_MEM(gamma, N);
   for(k = 1; k < N; ++k)
       {
 	  free(CV.gamma[k]);
 	  CV.gamma[k] = CV.gamma[0];
       }
+#endif
   CV.E = (double **)malloc(N * sizeof(double *));
   if(CV.E == NULL)
       {
@@ -140,8 +141,14 @@ int main(int argc, char *argv[])
       goto return_NULL;
     }
   }
+  double gamma = config[6];
   for(j = 1; j <= Ncell; ++j)
-      CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(CV.gamma[0][j] - 1.0)/CV.RHO[0][j];
+      {
+#ifdef MULTIFLUID_BASICS
+	  gamma = CV.gamma[0][j];
+#endif
+	  CV.E[0][j] = 0.5*CV.U[0][j]*CV.U[0][j] + CV.P[0][j]/(gamma-1.0)/CV.RHO[0][j];
+      }
 
   // Use GRP/Godunov scheme to solve it on Lagrangian coordinate.
   config[8] = (double)1;
@@ -174,7 +181,6 @@ return_NULL:
   FV0.RHO   = NULL;
   FV0.U     = NULL;
   FV0.P     = NULL;
-  FV0.gamma = NULL;
   for(k = 0; k < N; ++k)
   {
     free(CV.E[k]);
@@ -186,19 +192,24 @@ return_NULL:
     CV.RHO[k]   = NULL;
     CV.U[k]     = NULL;
     CV.P[k]     = NULL;
-    CV.gamma[k] = NULL;
     R[k] = NULL;
   }
   free(CV.E);
   free(CV.RHO);
   free(CV.U);
   free(CV.P);
-  free(CV.gamma);
   CV.E     = NULL;
   CV.RHO   = NULL;
   CV.U     = NULL;
   CV.P     = NULL;
+#ifdef MULTIFLUID_BASICS
+  FV0.gamma = NULL;
+  free(CV.gamma[0]);
+  for(k = 0; k < N; ++k)
+      CV.gamma[k] = NULL;
+  free(CV.gamma);
   CV.gamma = NULL;
+#endif
   free(R);
   R = NULL;
   free(cpu_time);

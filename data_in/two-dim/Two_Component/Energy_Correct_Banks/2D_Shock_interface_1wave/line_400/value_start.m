@@ -5,7 +5,7 @@ elseif strcmpi(A,{'INPUT'})
     A = input('Please input the A number: (Default 50 25 20 10 5 2 0) ')
 else
     A
-    if isstring(A)
+    if ischar(A)
         error("Not a string 'INPUT' was entered to represent the input!");
     elseif A ~= fix(A) || A <= 0
         error("Not a positive integer was entered to represent variable 'A'!")

@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include "../include/var_struc.h"
 #include "../include/riemann_solver.h"
@@ -69,7 +72,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
      */
   int i, j, k = 0;
 
-  clock_t tic, toc;
+  double tic, toc;
   double cpu_time_sum = 0.0;
 
   double const t_all     = config[1];      // the total time
@@ -127,7 +130,11 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 //------------THE MAIN LOOP-------------
   for(k = 1; k <= N; DS ? k : ++k)
   {
-    tic = clock();
+#ifdef _OPENMP
+    tic = omp_get_wtime();
+#else
+    tic = (double)clock() / (double)CLOCKS_PER_SEC;
+#endif
     if (time_c >= time_plot[nt] && nt < (*N_plot-1))
 	{
 	    for(j = 0; j < m; ++j)
@@ -213,7 +220,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	  CV->s_u[j][i]   = (  CV->uIx[j+1][i] -   CV->uIx[j][i])/h_x;
 	  CV->s_v[j][i]   = (  CV->vIx[j+1][i] -   CV->vIx[j][i])/h_x;
 	  CV->s_p[j][i]   = (  CV->pIx[j+1][i] -   CV->pIx[j][i])/h_x;
-      }
+      } // End of parallel region
 
     if(stop_t)
 	break;
@@ -257,7 +264,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	  CV->t_u[j][i]   = (  CV->uIy[j][i+1] -   CV->uIy[j][i])/h_y;
 	  CV->t_v[j][i]   = (  CV->vIy[j][i+1] -   CV->vIy[j][i])/h_y;
 	  CV->t_p[j][i]   = (  CV->pIy[j][i+1] -   CV->pIy[j][i])/h_y;
-      }
+      } // End of parallel region
 //==================================================
     
     time_c += tau;
@@ -272,8 +279,12 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
     DS = DS ? 0 : 1;
     //===========================Fixed variable location=======================
     
-    toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;;
+#ifdef _OPENMP
+    toc = omp_get_wtime();
+#else
+    toc = (double)clock() / (double)CLOCKS_PER_SEC;
+#endif
+    cpu_time[nt] = toc - tic;
     cpu_time_sum += cpu_time[nt];
   }
 
