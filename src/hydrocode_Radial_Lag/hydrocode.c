@@ -20,7 +20,7 @@ double config[N_CONF]; //!< Initial configuration data array.
 		retval = 5;						\
 		goto return_NULL;					\
 	    }								\
-	for(k = 1; k < N; ++k)						\
+	for(k = 0; k < N; ++k)						\
 	    {								\
 		CV.v[k] = (double *)malloc(Md * sizeof(double));	\
 		if(CV.v[k] == NULL)					\
@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
   const int Ncell = (int)config[3]; // Number of computing cells in r direction
   const int Md    = Ncell+2;        // max vector dimension
   const int order = (int)config[9];
+  double gamma = config[6];
   int M = atoi(argv[4]); // M=1 planar; M=2 cylindrical; M=3 spherical
   if(M != 1 && M != 2 && M != 3)
       {
@@ -141,7 +142,6 @@ int main(int argc, char *argv[])
       goto return_NULL;
     }
   }
-  double gamma = config[6];
   for(j = 1; j <= Ncell; ++j)
       {
 #ifdef MULTIFLUID_BASICS
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
       case 1:
 	  config[41] = 0.0; // alpha = 0.0
       case 2:
-	  grp_solver_radial_LAG_source(&CV, &smv, R, M, argv[2], cpu_time, &N, time_plot);
+	  grp_solver_radial_LAG_source(CV, &smv, R, M, argv[2], cpu_time, &N, time_plot);
 	  break;
       default:
 	  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -192,7 +192,7 @@ return_NULL:
     CV.RHO[k]   = NULL;
     CV.U[k]     = NULL;
     CV.P[k]     = NULL;
-    R[k] = NULL;
+    R[k]        = NULL;
   }
   free(CV.E);
   free(CV.RHO);

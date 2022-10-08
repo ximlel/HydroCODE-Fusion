@@ -169,11 +169,9 @@ typedef struct radial_mesh_var {
     double * Lb;
     double * RR;
     double * DdrL;
-	double * DdrR;
-	double * Ddr;
-	double * Rbh;
-	double * Lbh;
-	double * dRc;
+    double * DdrR;
+    double * Ddr;
+    double * dRc;
     double * vol;
 } Radial_Mesh_Variable;
 

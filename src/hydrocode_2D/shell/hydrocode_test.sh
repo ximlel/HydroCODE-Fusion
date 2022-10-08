@@ -11,7 +11,7 @@ export G_DEBUG=gc-friendly
 
 ### Test the program
 EXE=./hydrocode.out  #EXEcutable program
-TEST="$EXE GRP_Book/6_1_Sod_10_lines   GRP_Book/6_1_Sod_10_lines   1     EUL 33=1"
+TEST="$EXE RP2D_Positive/Config7  RP2D_Positive/Config7  2_GRP EUL"
 
 ### Perf
 # perf record -e cpu-clock -g -F 999 $TEST

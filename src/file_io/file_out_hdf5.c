@@ -7,11 +7,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hdf5.h"
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
+#ifdef HDF5PLOT
+#include "hdf5.h"
 
 /* Create the data itself in the dataset.
  * dataset_id = H5Dcreate(loc_id (location id), const char *name (dataset name),
@@ -219,3 +220,4 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
     if(status)
 	return;
 }
+#endif

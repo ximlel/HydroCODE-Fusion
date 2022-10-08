@@ -25,6 +25,11 @@ xelatex Specification.tex
 
 Open `doc/hydrocode_*/html/index.html` in a browser to view the specific instructions of this program.
 
+Processing tools
+---------
+
+Tecplot(.tec .plt .mcr), ParaView(.vtk), Gmesh(.msh).
+
 Compilers/Interpreters
 ---------
 
@@ -38,12 +43,7 @@ OpenMP, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet
 Debugging tools
 ---------
 
-Autoconf, make(.mk), gprof, gprof2dot *[need pkg: Graphviz]*, Valgrind *[opt pkg: KCacheGrind, Massif-Visualizer]*, Cppcheck, GCOV(.gcov .gcda .gcno), LCOV, perf, FlameGraph.
-
-Processing tools
----------
-
-Tecplot(.tec .plt .mcr), ParaView(.vtk), Gmesh(.msh).
+Autoconf, Make(.mk), gprof & gprof2dot *[rely pkg: Graphviz]*, Valgrind *[opt pkg: KCacheGrind, Massif-Visualizer]*, Cppcheck, GCOV(.gcov .gcda .gcno) & LCOV, perf & FlameGraph.
 
 Debug, Run and Release
 -----------

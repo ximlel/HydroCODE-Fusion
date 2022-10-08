@@ -82,7 +82,7 @@ _Bool bound_cond_slope_limiter_y(const int m, const int n, const int nt, struct 
 	    }
     if (Slope)
 	{
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for schedule(dynamic, 8)
 	    for(j = 0; j < m; ++j)
 		{
 		    minmod_limiter(false, n, find_bound_y, CV->t_u[j],   CV[nt].U[j],   bfv_D[j].U,   bfv_U[j].U,   h_y);
