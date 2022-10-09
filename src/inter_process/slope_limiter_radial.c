@@ -5,7 +5,7 @@
 #include "../include/tools.h"
 
 
-void minmod_limiter_radial(const int Ncell, const _Bool find_bound, double s[],
+void minmod_limiter_radial(const int Ncell, const _Bool i_f_var_get, double s[],
 			  const double U[], struct radial_mesh_var *smv)
 {
     double const Alpha       =      config[41]; // the paramater in slope limiters.
@@ -27,10 +27,10 @@ void minmod_limiter_radial(const int Ncell, const _Bool find_bound, double s[],
 		}
 	    else
 		{
-		    printf("LIMITER_VIP Parameter Error!\n");
+		    fprintf(stderr, "ERROE! No suitable LIMITER_VIP Parameter.\n");
 		    exit(2);
 		}
-	    if (find_bound)
+	    if (i_f_var_get)
 		s[j] = minmod3(Alpha*s_L, Alpha*s_R, s[j]);
 	    else
 		s[j] = minmod2(s_L, s_R);

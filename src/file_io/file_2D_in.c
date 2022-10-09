@@ -126,11 +126,11 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
     FILE * fp;      // The pointer to the above data files.
     _Bool r = true; // r: Whether to read data file successfully.
 
-     // Open the initial data files and initializes the reading of data.
-    STR_FLU_INI(RHO,1);
-    STR_FLU_INI(U,  1);
-    STR_FLU_INI(V,  1);
-    STR_FLU_INI(P,  1);
+    // Open the initial data files and initializes the reading of data.
+    STR_FLU_INI(RHO,  1);
+    STR_FLU_INI(U,    1);
+    STR_FLU_INI(V,    1);
+    STR_FLU_INI(P,    1);
 #ifdef MULTIFLUID_BASICS
 #ifdef MULTIPHASE_BASICS
     STR_FLU_INI(Z_a,  1);
@@ -162,5 +162,3 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
     printf("'%s' data initialized, line = %d, column = %d.\n", add_in, (int)config[14], (int)config[13]);
     return FV0;
 }
-
-

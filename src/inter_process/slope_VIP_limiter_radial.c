@@ -7,7 +7,7 @@
 #include "../include_cpp/inter_process.hpp"
 
 
-void VIP_limiter_radial(const int Ncell, const _Bool find_bound, double DmU[], double TmV[],
+void VIP_limiter_radial(const int Ncell, const _Bool i_f_var_get, double DmU[], double TmV[],
 		       const double UU[], struct radial_mesh_var *smv)
 {
     double const dtheta = config[11]; //initial d_angle
@@ -95,4 +95,5 @@ void VIP_limiter_radial(const int Ncell, const _Bool find_bound, double DmU[], d
 	    TmV[0]=minmod2(sV,TmV[1]);
 	}
     DmU[Ncell+1]=minmod2(DmU[Ncell],DmU[Ncell+1]); 
+    TmV[Ncell+1]=TmV[Ncell];
 }

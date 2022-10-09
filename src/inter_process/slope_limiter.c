@@ -15,7 +15,7 @@
  *                  - true: There are moving spatial grid point coordinates *X.
  *                  - false: There is fixed spatial grid length.
  * @param[in] m:         Number of the x-grids: n_x.
- * @param[in] find_bound: Whether the boundary conditions have been found.
+ * @param[in] i_f_var_get: Whether the cell interfacial variables have been obtained.
  *                        - true: interfacial variables at t_{n+1} are available, 
  *                                and then trivariate minmod3() function is used.
  *                        - false: bivariate minmod2() function is used.
@@ -28,7 +28,7 @@
  *            - \b double \c HR: Spatial grid length at right boundary.
  *            - \b double \c *X: Array of moving spatial grid point coordinates.
  */
-void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, double s[],
+void minmod_limiter(const _Bool NO_h, const int m, const _Bool i_f_var_get, double s[],
 		    const double U[], const double UL, const double UR, const double HL, ...)
 {
     va_list ap;
@@ -72,7 +72,7 @@ void minmod_limiter(const _Bool NO_h, const int m, const _Bool find_bound, doubl
 			h = 0.5 * (X[j+1] - X[j] + HR);
 		    s_R = (UR - U[j]) / h;
 		}
-	    if (find_bound)
+	    if (i_f_var_get)
 		s[j] = minmod3(alpha*s_L, alpha*s_R, s[j]);
 	    else
 		s[j] = minmod2(s_L, s_R);

@@ -44,7 +44,6 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
     _Bool stop_t = false;
     int nt = 0;
 
-    struct b_f_var bfv_L = {.SRHO = 0.0, .SP = 0.0, .SU = 0.0}, bfv_R = bfv_L; // Left/Right boundary condition
     struct i_f_var ifv_L = {0}, ifv_R = {0};
     struct flu_var FV;
 
@@ -92,16 +91,16 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
     double *Ddr  = smv->Ddr;
     double *dRc  = smv->dRc; //(derivative)centers distance
     double *vol  = smv->vol;
-
     double *Rbh  = (double*)ALLOC(Md*sizeof(double)); //h: half time step
     double *Lbh  = (double*)ALLOC(Md*sizeof(double));
+
     //flux, conservative variable and wave speed
     double *F_e  = (double*)ALLOC(Md*sizeof(double));
     double *F_u  = (double*)ALLOC(Md*sizeof(double));
     double *F_u2 = (double*)ALLOC(Md*sizeof(double));
     double *mass = (double*)ALLOC(Md*sizeof(double));
     for(i = 1; i <= Ncell; i++)//center cell is cell 0
-	mass[i] = DD[i]*vol[i];
+	mass[i] = DD[i] * vol[i];
 
     for(k = 1; k <= N; k++)
 	{
@@ -136,17 +135,18 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmD,      DD, smv);
 	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmP,      PP, smv);
 
-	    UU[Ncell+1] = UU[Ncell];
-	    DD[Ncell+1] = DD[Ncell];
-	    PP[Ncell+1] = PP[Ncell];
-	    EE[Ncell+1] = EE[Ncell];
-	    DmU[0]=0.0;
-	    DmD[0]=0.0;
-	    DmP[0]=0.0;
-	    TmV[Ncell+1]=TmV[Ncell];
-	    DmU[Ncell+1]=0.0;
-	    DmD[Ncell+1]=0.0;
-	    DmP[Ncell+1]=0.0;
+	    UU[Ncell+1]  = UU[Ncell];
+	    DD[Ncell+1]  = DD[Ncell];
+	    PP[Ncell+1]  = PP[Ncell];
+	    EE[Ncell+1]  = EE[Ncell];
+	    // TmV[0]       = 0.0;
+	    DmU[0]       = 0.0;
+	    DmD[0]       = 0.0;
+	    DmP[0]       = 0.0;
+	    // TmV[Ncell+1] = TmV[Ncell];
+	    DmU[Ncell+1] = 0.0;
+	    DmD[Ncell+1] = 0.0;
+	    DmP[Ncell+1] = 0.0;
 
 	    for(i = 0; i <= Ncell; i++)
 		{
@@ -179,7 +179,7 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 
 		    if(star_dire_check(mid, dire, 1))
 			{
-			    printf(" on [%d, %d] (t_n, x).\n", k, j);
+			    printf(" on [%d, %d] (t_n, x).\n", k, i);
 			    stop_t = true;
 			}
 
@@ -254,10 +254,10 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 		      Sh[i]=Rbh[i+1]*Lbh[i+1]-Rbh[i]*Lbh[i]-sin(dtheta)*Rbh_side[i]*Lbh_side[i];
 		    */
 
-		    Umin[i+1]  += 0.5 * dt *  U_t[i+1];
-		    Pmin[i+1]  += 0.5 * dt *  P_t[i+1];
-		    DLmin[i+1] +=       dt * DL_t[i+1];
-		    DRmin[i+1] +=       dt * DR_t[i+1];
+		    Umin[i+1]  += dt *  U_t[i+1] * 0.5;
+		    Pmin[i+1]  += dt *  P_t[i+1] * 0.5;
+		    DLmin[i+1] += dt * DL_t[i+1];
+		    DRmin[i+1] += dt * DR_t[i+1];
 		}
 
 	    radial_mesh_update(smv);
@@ -280,14 +280,19 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 			    stop_t = true;
 			}
 		}
-	    /*
+
 	    for(i = 1; i <= Ncell; i++)
 		{
-		    DmD[i]=(DD[i]-DD[i-1])/dRc[i];
-		    DmU[i]=(UU[i]-UU[i-1])/dRc[i];
-		    DmP[i]=(PP[i]-PP[i-1])/dRc[i];
+		    DmU[i]=(Umin[i+1] -Umin[i]) /Ddr[i];
+		    DmP[i]=(Pmin[i+1] -Pmin[i]) /Ddr[i];
+		    DmD[i]=(DLmin[i+1]-DRmin[i])/Ddr[i];
 		}
-	    */
+	    DmU[0]      =(Umin[1]-UU[0]) /dRc[0];
+	    DmP[0]      =(Pmin[1]-PP[0]) /dRc[0];
+	    DmD[0]      =(DLmin[1]-DD[0])/dRc[0];
+	    DmU[Ncell+1]=(Umin[Ncell+1] -UU[Ncell])/dRc[Ncell];
+	    DmP[Ncell+1]=(Pmin[Ncell+1] -PP[Ncell])/dRc[Ncell];
+	    DmD[Ncell+1]=(DLmin[Ncell+1]-DD[Ncell])/dRc[Ncell];
 
 	    time_c=time_c+dt;
 	    if(isfinite(Timeout))
@@ -298,8 +303,8 @@ void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 		break;
 
 	    toc = clock();
-	    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
-	    cpu_time_sum += cpu_time[nt];
+	    cpu_time_sum += ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
+	    cpu_time[nt]  = cpu_time_sum;
 	}
 
     printf("\nTime is up at time step %d.\n", k);

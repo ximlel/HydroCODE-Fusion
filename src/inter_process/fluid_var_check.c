@@ -40,12 +40,13 @@ int star_dire_check(double *mid, double *dire, const int dim)
 {
     double const eps = config[4];
     int    const el  = (int)config[8];
+    double * star = NULL;
     if (dim == 1)
 	{
 	    switch(el)
 		{
 		case 1:
-			double * star = mid;
+			star = mid;
 		    if(star[2] < eps || star[0] < eps || star[3] < eps)
 			{
 			    printf("<0.0 error - STAR");

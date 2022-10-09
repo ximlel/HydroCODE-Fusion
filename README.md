@@ -43,7 +43,7 @@ OpenMP, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet
 Debugging tools
 ---------
 
-Autoconf, Make(.mk), gprof & gprof2dot *[rely pkg: Graphviz]*, Valgrind *[opt pkg: KCacheGrind, Massif-Visualizer]*, Cppcheck, GCOV(.gcov .gcda .gcno) & LCOV, perf & FlameGraph.
+Autoconf, Make(.mk), gdb, gprof & gprof2dot *[rely pkg: Graphviz]*, Valgrind *[opt pkg: KCacheGrind, Massif-Visualizer]*, Cppcheck, GCOV(.gcov .gcda .gcno) & LCOV, perf & FlameGraph.
 
 Debug, Run and Release
 -----------

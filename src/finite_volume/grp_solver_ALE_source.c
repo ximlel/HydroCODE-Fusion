@@ -296,8 +296,8 @@ void GRP_solver_ALE_source_Undone(const int m, struct cell_var_stru CV, double *
 //===========================Fixed variable location=======================
 
     toc = clock();
-    cpu_time[nt] = ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
-    cpu_time_sum += cpu_time[nt];
+    cpu_time_sum += ((double)toc - (double)tic) / (double)CLOCKS_PER_SEC;
+    cpu_time[nt]  = cpu_time_sum;
   }
 
   printf("\nTime is up at time step %d.\n", k);

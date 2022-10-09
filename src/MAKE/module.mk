@@ -24,8 +24,9 @@ define compile_c_file #Compile all .c/.cpp files
 @echo "$(CC) $(CFLAGS) $(CFLAGD)-c {"
 @for file in $(FILES_C); do \
 ( echo "  $$file"  && \
-	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$(basename $$file $(C_SUF)).slo $(INCLUDE) 2> /dev/null && \
-	$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE) ) \
+	$(CC) $(CFLAGS) $(CFLAGD) -c $$file $(INCLUDE) && \
+	$(CC) -fPIC $(CFLAGS) $(CFLAGD) -c $$file -o $$(basename $$file $(C_SUF)).slo $(INCLUDE) 2> /dev/null \
+) \
 done;
 @echo " } $(INCLUDE)"
 endef

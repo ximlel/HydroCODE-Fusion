@@ -166,7 +166,10 @@ int main(int argc, char *argv[])
       }
 
 #ifndef NODATPLOT
-  file_1D_write(Ncell, N, CV, R, cpu_time, argv[2], time_plot);
+  file_1D_write(Ncell+1, N, CV, R, cpu_time, argv[2], time_plot);
+#endif
+#ifdef HDF5PLOT
+  file_1D_write_HDF5(Ncell+1, N, CV, R, cpu_time, argv[2], time_plot);
 #endif
 #ifndef NOTECPLOT
   FV0.RHO = CV.RHO[N-1];

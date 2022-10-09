@@ -248,8 +248,8 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 #else
     toc = (double)clock() / (double)CLOCKS_PER_SEC;
 #endif
-    cpu_time[nt] = toc - tic;
-    cpu_time_sum += cpu_time[nt];
+    cpu_time_sum += toc - tic;
+    cpu_time[nt]  = cpu_time_sum;
   }
 
   printf("\nTime is up at time step %d.\n", k);
