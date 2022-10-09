@@ -82,8 +82,11 @@ _Bool bound_cond_slope_limiter_x(const int m, const int n, const int nt, struct 
 	    }
     if (Slope)
 	{
-#pragma acc parallel loop
+#ifdef _OPENMP
 #pragma omp parallel for  schedule(dynamic, 8)
+#elif defined _OPENACC
+#pragma acc parallel loop
+#endif
 	    for(i = 0; i < n; ++i)
 		{
 		    minmod_limiter_2D_x(false, m, i, find_bound_x, CV->s_u,   CV[nt].U,   bfv_L[i].U,   bfv_R[i].U,   h_x);

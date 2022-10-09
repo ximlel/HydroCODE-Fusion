@@ -8,11 +8,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
-#ifdef _OPENMP
-#include <omp.h>
-#elif defined _OPENACC
+#ifdef _OPENACC
 #include <omp.h>
 #include <openacc.h>
+#elif defined _OPENMP
+#include <omp.h>
 #endif
 
 #include "../include/var_struc.h"
@@ -72,7 +72,8 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   printf("@@ Number of threads for OpenMP: %d\n", omp_get_max_threads());
 #endif
 #ifdef _OPENACC
-  printf("@@ Number of devices for OpenACC: %d\n", acc_get_num_devices(acc_device_not_host));
+  printf("@@ Number of CPU devices for OpenACC: %d\n", acc_get_num_devices(acc_device_host));
+  printf("@@ Number of GPU devices for OpenACC: %d\n", acc_get_num_devices(acc_device_not_host));
 #endif
     /* 
      * i is a frequently used index for y-spatial variables.
@@ -209,8 +210,11 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	stop_t = true;
 
 //===============THE CORE ITERATION=================
+#ifdef _OPENMP
+#pragma omp parallel for  private(mom_x, mom_y, ene) collapse(2) schedule(dynamic, 8)
+#elif defined _OPENACC
 #pragma acc parallel loop private(mom_x, mom_y, ene) collapse(2)
-#pragma omp parallel for private(mom_x, mom_y, ene) collapse(2) schedule(dynamic, 8)
+#endif
     for(i = 0; i < n; ++i)
       for(j = 0; j < m; ++j)
       { /*
