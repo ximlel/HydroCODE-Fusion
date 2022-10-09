@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
   CV_INIT_FV_RESET_MEM(RHO, N);
 #ifdef MULTIFLUID_BASICS
   CV_INIT_FV_RESET_MEM(gamma, N);
+  FV0.gamma = CV.gamma[0];
   for(k = 1; k < N; ++k)
       {
 	  free(CV.gamma[k]);

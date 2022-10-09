@@ -38,7 +38,7 @@ gcc -std=c99, g++ -std=c++20, Visual Studio 2022(.sln .vcxproj), MATLAB/Octave(.
 Program library
 ---------
 
-OpenMP, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet: gsl-msvc-x86]*, LAPACKE/OpenBLAS.
+OpenMP, OpenACC, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet: gsl-msvc-x86]*, LAPACKE/OpenBLAS.
 
 Debugging tools
 ---------

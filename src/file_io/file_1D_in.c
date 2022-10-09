@@ -61,6 +61,15 @@
 		    }							\
 		fclose(fp);						\
 	    }								\
+	else								\
+	    {								\
+		FV0.sfv = (double*)malloc(num_cell * sizeof(double));	\
+		if(FV0.sfv == NULL)					\
+		    {							\
+			printf("NOT enough memory! %s\n", #sfv);	\
+			exit(5);					\
+		    }							\
+	    }								\
     } while(0)
 
 /** 

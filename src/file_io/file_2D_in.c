@@ -60,7 +60,7 @@ static double * flu_var_init(const char * add, FILE *fp)
 	    fclose(fp);
 	    exit(2);
 	}
-	return sfv;
+    return sfv;
 }
 
 
@@ -87,6 +87,15 @@ static double * flu_var_init(const char * add, FILE *fp)
 	{								\
 	    FV0.sfv = flu_var_init(add, fp);				\
 	    fclose(fp);							\
+	}								\
+    else								\
+	{								\
+	    FV0.sfv = (double*)malloc((int)config[3] * sizeof(double)); \
+	    if(FV0.sfv == NULL)						\
+		{							\
+		    printf("NOT enough memory! %s\n", #sfv);		\
+		    exit(5);						\
+		}							\
 	}								\
     } while(0)
 

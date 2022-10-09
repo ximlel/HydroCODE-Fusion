@@ -4,6 +4,7 @@ AC_INIT([hydrocode], [0.4], [xinlei@cugb.edu.cn])
 AC_PROG_CC
 AC_PROG_CXX
 AC_OPENMP
+#AC_OPENACC
 AC_CHECK_PROGS([MAKE],       [$MAKE make])
 AC_CHECK_PROGS([DOXYGEN],    [doxygen doxywizard])
 AC_CHECK_PROGS([LATEX],      [pdflatex])
