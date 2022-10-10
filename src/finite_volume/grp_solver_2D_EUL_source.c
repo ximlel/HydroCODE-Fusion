@@ -211,7 +211,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 
 //===============THE CORE ITERATION=================
 #ifdef _OPENMP
-#pragma omp parallel for  private(mom_x, mom_y, ene) collapse(2) schedule(dynamic, 8)
+#pragma omp parallel for  private(mom_x, mom_y, ene) collapse(2)
 #elif defined _OPENACC
 #pragma acc parallel loop private(mom_x, mom_y, ene) collapse(2) worker
 #endif

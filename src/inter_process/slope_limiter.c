@@ -28,7 +28,6 @@
  *            - \b double \c HR: Spatial grid length at right boundary.
  *            - \b double \c *X: Array of moving spatial grid point coordinates.
  */
-//#pragma acc routine seq
 void minmod_limiter(const _Bool NO_h, const int m, const _Bool i_f_var_get, double s[],
 		    const double U[], const double UL, const double UR, const double HL, ...)
 {
@@ -42,7 +41,7 @@ void minmod_limiter(const _Bool NO_h, const int m, const _Bool i_f_var_get, doub
 	    HR = va_arg(ap, double);
 	    X  = va_arg(ap, double *);
 	}
-
+#pragma acc parallel loop worker
     for(int j = 0; j < m; ++j) // Reconstruct slopes
 	{ /*
 	   *  j-1          j          j+1
