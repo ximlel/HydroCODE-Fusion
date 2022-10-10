@@ -1,7 +1,9 @@
 CC = gcc
+#CC = /opt/nvidia/hpc_sdk/Linux_x86_64/22.7/compilers/bin/pgcc
 #C compiler
 CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp -fopenacc
 CFLAGR = -std=c99 -O2 -fopenmp
+#CFLAGR = -std=c99 -O2 -acc -ta=multicore -Minfo=accel
 #C compiler options
 CFLAGD = -DNODATPLOT -DHDF5PLOT
 #Macro definition

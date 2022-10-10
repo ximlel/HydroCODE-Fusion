@@ -38,9 +38,9 @@ int flux_generator_x(const int m, const int n, const int nt, const double tau, s
 
 //===========================
 #ifdef _OPENMP
-#pragma omp parallel for  firstprivate(ifv_L, ifv_R) collapse(2) schedule(dynamic, 8)
+#pragma omp parallel for firstprivate(ifv_L, ifv_R) collapse(2) schedule(dynamic, 8)
 #elif defined _OPENACC
-#pragma acc parallel loop firstprivate(ifv_L, ifv_R) collapse(2)
+#pragma acc kernels loop private(ifv_L, ifv_R) collapse(2)
 #endif
   for(i = 0; i < n; ++i)
     for(j = 0; j <= m; ++j)
