@@ -1,6 +1,6 @@
 CC = gcc
 #C compiler
-CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp -fopenacc
+CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp #-fopenacc
 CFLAGR = -std=c99 -O2 -fopenmp
 #C compiler options
 CFLAGD = -DMULTIFLUID_BASICS -DMULTIPHASE_BASICS -DNODATPLOT

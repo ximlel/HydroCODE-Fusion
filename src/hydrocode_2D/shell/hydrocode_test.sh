@@ -8,6 +8,9 @@ export G_DEBUG=gc-friendly
 ### OpenMP
 #export OMP_STACKSIZE=8192
 #export OMP_NUM_THREADS=1
+### OpenACC
+#export ACC_NOTIFY=1
+#export PGI_ACC_TIME=1
 
 ### Test the program
 EXE=./hydrocode.out  #EXEcutable program

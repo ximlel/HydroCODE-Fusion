@@ -213,7 +213,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 #ifdef _OPENMP
 #pragma omp parallel for  private(mom_x, mom_y, ene) collapse(2) schedule(dynamic, 8)
 #elif defined _OPENACC
-#pragma acc parallel loop private(mom_x, mom_y, ene) collapse(2)
+#pragma acc parallel loop private(mom_x, mom_y, ene) collapse(2) worker
 #endif
     for(i = 0; i < n; ++i)
       for(j = 0; j < m; ++j)
@@ -226,7 +226,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - nu*(CV->F_v[j+1][i]  -CV->F_v[j][i])   - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
 	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - nu*(CV->F_e[j+1][i]  -CV->F_e[j][i])   - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
 	  CV[nt].RHO[j][i]   =   CV[nt].RHO[j][i] - nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]) - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
-	  
+
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
 	  CV[nt].E[j][i] = ene   / CV[nt].RHO[j][i];

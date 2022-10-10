@@ -69,7 +69,7 @@ void radial_mesh_update(struct radial_mesh_var *smv)
 		}
 	dRc[Ncell+1]  = RR[Ncell+1]-RR[Ncell]; // boundary condition
 	DdrR[Ncell+1] = RR[Ncell+1]-Rb[Ncell+1];
-	// Ddr[Ncell+1] =Ddr[Ncell];
+	Ddr[Ncell+1]  = Ddr[Ncell];
 }
 
 

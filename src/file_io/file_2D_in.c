@@ -154,7 +154,7 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
 	{
 	    for(int i = 0; i < (int)config[3]; i++)
 		FV0.Z_a[i] = FV0.PHI[i];
-	    printf("Initial volume fraction 'Z_a' is initialized by mass fraction 'PHI'.\n");
+	    printf("\t Initial volume fraction 'Z_a' is initialized by mass fraction 'PHI'.\n");
 	    r = true;
 	}
     STR_FLU_INI(gamma,0);
@@ -162,7 +162,7 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
 	{
 	    for(int i = 0; i < (int)config[3]; i++)
 		FV0.gamma[i] = 1.0 + 1.0 / (FV0.Z_a[i]/(config[6]-1.0) + (1.0-FV0.Z_a[i])/(config[106]-1.0));
-	    printf("Initial specific heat rate 'gamma' is initialized by volume fraction 'Z_a'.\n");
+	    printf("\t Initial specific heat rate 'gamma' is initialized by volume fraction 'Z_a'.\n");
 	    r = true;
 	}
 #endif

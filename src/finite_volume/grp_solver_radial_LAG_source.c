@@ -15,7 +15,7 @@
 
 
 // M=1 planar; M=2 cylindrical √; M=3 spherical
-void grp_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[],
+void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[],
 				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[])
 {
     int i, k=0;

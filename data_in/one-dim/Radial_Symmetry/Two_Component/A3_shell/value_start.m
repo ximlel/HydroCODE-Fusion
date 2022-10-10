@@ -24,7 +24,8 @@ DL0=0.00129
 DR0=19.237
 DL1=0.000129
 UL0=0.0
-UR0=-200.0
+%UR0=-200.0
+UR0=-10
 UL1=0.0
 PL0=1.01325
 PR0=1.01325
@@ -79,8 +80,8 @@ fprintf(fid,'%12.10g\t',phi(2:Ncell));
 fprintf(fid,'\n');
 fclose(fid);
 
-
-Timeout=0.23;%0.8 % Output time
+%Timeout=0.23;     % Output time
+Timeout=0.8;
 D_PLOT_T=0.001;   % Output time interval
 time_plot=0:D_PLOT_T:Timeout;
 fid = fopen('time_plot.dat','wt');
@@ -110,6 +111,7 @@ fprintf(fid,'10\t%g\n',Domlen/Ncell);
 fprintf(fid,'11\t%g\n',0.5*pi/Tcell);
 fprintf(fid,'13\t%i\n',Ncell-1);
 fprintf(fid,'14\t%i\n',Tcell);
+fprintf(fid,'17\t-24\n');
 fprintf(fid,'20\t%i\n',Tcell);
 fprintf(fid,'106\t%g\n',GAMMAR);
 fclose(fid);

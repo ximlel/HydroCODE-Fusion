@@ -17,7 +17,7 @@ TEST="$EXE $RSTC/A3_shell $RSTC/A3_shell 2_GRP 2"
 # valgrind --tool=callgrind --callgrind-out-file=callgrind.out $TEST
 # gprof2dot -f callgrind -s callgrind.out | dot -Tpng -o callgrind.png
 
-# $TEST
+ $TEST
 
 ### gprof
 # gprof -b -A -p -q $EXE gmon.out > pg

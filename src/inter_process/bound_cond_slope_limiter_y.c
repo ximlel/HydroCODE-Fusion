@@ -85,7 +85,7 @@ _Bool bound_cond_slope_limiter_y(const int m, const int n, const int nt, struct 
 #ifdef _OPENMP
 #pragma omp parallel for  schedule(dynamic, 8)
 #elif defined _OPENACC
-#pragma acc parallel loop
+#pragma acc parallel loop worker
 #endif
 	    for(j = 0; j < m; ++j)
 		{

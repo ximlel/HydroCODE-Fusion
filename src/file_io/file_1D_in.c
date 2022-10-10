@@ -105,7 +105,7 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
 
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
     FILE * fp;      // The pointer to the above data files.
-    int num_cell;   // The number of the numbers in the above data files.
+    int num_cell = (int)config[3]; // The number of the numbers in the above data files.
     _Bool r = true; // r: Whether to read data file successfully.
 
     // Open the initial data files and initializes the reading of data.
@@ -126,7 +126,7 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
 	{
 	    for(int i = 0; i < num_cell; i++)
 		FV0.Z_a[i] = FV0.PHI[i];
-	    printf("Initial volume fraction 'Z_a' is initialized by mass fraction 'PHI'.\n");
+	    printf("\t Initial volume fraction 'Z_a' is initialized by mass fraction 'PHI'.\n");
 	    r = true;
 	}
     STR_FLU_INI(gamma,0);
@@ -134,7 +134,7 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
 	{
 	    for(int i = 0; i < num_cell; i++)
 		FV0.gamma[i] = 1.0 + 1.0 / (FV0.Z_a[i]/(config[6]-1.0) + (1.0-FV0.Z_a[i])/(config[106]-1.0));
-	    printf("Initial specific heat rate 'gamma' is initialized by volume fraction 'Z_a'.\n");
+	    printf("\t Initial specific heat rate 'gamma' is initialized by volume fraction 'Z_a'.\n");
 	    r = true;
 	}
 #endif
