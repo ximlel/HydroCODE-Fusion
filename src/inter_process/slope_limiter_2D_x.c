@@ -42,7 +42,9 @@ void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool
 	    HR = va_arg(ap, double);
 	    X  = va_arg(ap, double *);
 	}
+#ifdef _OPENACC
 #pragma acc parallel loop private(s_L, s_R, h)
+#endif
     for(int j = 0; j < m; ++j) // Reconstruct slopes
 	{ /*
 	   *  j-1          j          j+1
