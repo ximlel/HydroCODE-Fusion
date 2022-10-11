@@ -3,6 +3,10 @@ CC = g++
 CFLAGS = -std=c++20 -Wall -pedantic -Og -g
 CFLAGR = -std=c++20 -O2
 #C compiler options
+#CC = /opt/intel/oneapi/compiler/latest/linux/bin/icpx
+#CC = /opt/intel/oneapi/compiler/latest/linux/bin/intel64/icpc
+#CFLAGR = -std=c++17 -O2 -shared-intel -fp-model=precise
+#Intel C++ compiler options
 CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -DHDF5PLOT -DNODATPLOT -DNOTECPLOT -D_Bool=bool
 #Macro definition
 INCLUDE_FOLDER = include

@@ -1,12 +1,15 @@
 CC = gcc
-#CC = /opt/nvidia/hpc_sdk/Linux_x86_64/2022/compilers/bin/pgcc
-#CC = /opt/intel/oneapi/compiler/latest/linux/bin/intel64/icc
 #C compiler
 CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp #-fopenacc
 CFLAGR = -std=c99 -O2 -fopenmp
-#CFLAGR = -std=c99 -O2 -acc -mp -ta=multicore -Minfo=accel
-#CFLAGR = -std=c99 -O2 -qopenmp
 #C compiler options
+#CC = /opt/nvidia/hpc_sdk/Linux_x86_64/2022/compilers/bin/nvcc
+#CFLAGR = -std=c99 -O2 -acc -mp -ta=multicore -Minfo=accel
+#NVIDIA HPC C compiler options
+#CC = /opt/intel/oneapi/compiler/latest/linux/bin/icx
+#CC = /opt/intel/oneapi/compiler/latest/linux/bin/intel64/icc
+#CFLAGR = -std=c99 -O2 -qopenmp -shared-intel
+#Intel C compiler options
 CFLAGD = -DNODATPLOT -DHDF5PLOT
 #Macro definition
 INCLUDE_FOLDER = include

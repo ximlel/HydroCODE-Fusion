@@ -33,12 +33,12 @@ Tecplot(.tec .plt .mcr), ParaView(.vtk), Gmesh(.msh).
 Compilers/Interpreters
 ---------
 
-gcc/clang/mpicc -std=c99, g++/clang++/mpicxx -std=c++20, Visual Studio 2022(.sln .vcxproj), MATLAB/Octave(.m), Python3(.py), Maple(.mw).
+gcc/clang/icc -std=c99, g++/clang++ -std=c++20/icpc -std=c++17, Visual Studio 2022(.sln .vcxproj), MATLAB/Octave(.m), Python3(.py), Maple(.mw).
 
 Program library
 ---------
 
-OpenMP, OpenACC *[rely pkg: NVIDIA HPC SDK (pgcc/nvcc)]*, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet: gsl-msvc-x86]*, LAPACKE/OpenBLAS.
+OpenMP, OpenACC *[rely pkg: NVIDIA HPC SDK (pgcc/nvcc, pgc++/nvc++)]*, HDF5 *[NuGet: hdf5-v120-complete]*, GNU Scientific Library (GSL) *[NuGet: gsl-msvc-x86]*, LAPACKE/OpenBLAS.
 
 Debugging tools
 ---------

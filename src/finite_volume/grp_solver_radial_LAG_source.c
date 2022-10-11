@@ -112,7 +112,9 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 		    FV.RHO   = CV.RHO[nt];
 		    FV.U     = CV.U[nt];
 		    FV.P     = CV.P[nt];
+#ifdef MULTIFLUID_BASICS
 		    FV.gamma = CV.gamma[0];
+#endif
 		    file_radial_write_TEC(FV, *smv, problem, time_plot[nt]);
 #endif
 		    for(i = 0; i < Md; ++i)
