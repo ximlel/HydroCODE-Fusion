@@ -37,22 +37,28 @@
 void DispPro(const double pro, const int step)
 {
         int j;
-        for (j = 0; j < 77; j++)
-                putchar('\b'); // Clears the current line to display the latest progress bar status.
-        for (j = 0; j < lround(pro/2); j++)
+	static double pro_print = 0.0;
+	const double dpro_print = 1.0;
+	if (pro >= pro_print)
+	    {
+		for (j = 0; j < 77; j++)
+		    putchar('\b'); // Clears the current line to display the latest progress bar status.
+		for (j = 0; j < lround(pro/2); j++)
 #ifdef _WIN32
-                putchar('+');  // Print the part of the progress bar that has been completed, denoted by '+'.
+		    putchar('+');  // Print the part of the progress bar that has been completed, denoted by '+'.
 #elif __linux__
                 printf("\x1b[45m \x1b[0m");
 #endif
-        for (j = 1; j <= 50-lround(pro/2); j++)
+		for (j = 1; j <= 50-lround(pro/2); j++)
 #ifdef _WIN32
-                putchar('-');  // Print how much is left on the progress bar.
+		    putchar('-');  // Print how much is left on the progress bar.
 #elif __linux__
                 printf("\x1b[47m \x1b[0m");
 #endif
-        fprintf(stdout, "  %6.2f%%   STEP=%-8d", pro, step);  
-        fflush(stdout);
+		fprintf(stdout, "  %6.2f%%   STEP=%-8d", pro, step);  
+		fflush(stdout);
+		pro_print += dpro_print;
+	    }
 }
 
 /**

@@ -45,7 +45,6 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
     int nt = 0;
 
     struct i_f_var ifv_L = {0}, ifv_R = {0};
-    struct flu_var FV;
 
     // initial value
     double *DD = CV.RHO[0]; // D:Density;U,V:Velocity;P:Pressure
@@ -99,7 +98,7 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
     double *F_u  = (double*)ALLOC(Md*sizeof(double));
     double *F_u2 = (double*)ALLOC(Md*sizeof(double));
     double *mass = (double*)ALLOC(Md*sizeof(double));
-    for(i = 1; i <= Ncell; i++)//center cell is cell 0
+    for(i = 0; i <= Ncell; i++) //center cell is cell 0
 	mass[i] = DD[i] * vol[i];
 
     for(k = 1; k <= N; k++)
@@ -109,6 +108,7 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 	    if (time_c >= time_plot[nt] && nt < (*N_plot-1))
 		{
 #ifndef NOTECPLOT
+		    struct flu_var FV;
 		    FV.RHO   = CV.RHO[nt];
 		    FV.U     = CV.U[nt];
 		    FV.P     = CV.P[nt];
@@ -164,11 +164,6 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 		    ifv_R.P     = PP[i+1] - DdrR[i+1]*ifv_R.d_p;
 		    ifv_L.U     = UU[i]   + DdrL[i]  *ifv_L.d_u;
 		    ifv_R.U     = UU[i+1] - DdrR[i+1]*ifv_R.d_u;
-		    if(ifv_L.P < eps || ifv_R.P < eps || ifv_L.RHO < eps || ifv_R.RHO < eps)
-			{
-			    printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, i);
-			    goto return_NULL;
-			}
 		    if(ifvar_check(&ifv_L, &ifv_R, 1))
 			{
 			    printf(" on [%d, %d] (t_n, x).\n", k, i);

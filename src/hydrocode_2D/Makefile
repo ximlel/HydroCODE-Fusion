@@ -1,9 +1,11 @@
 CC = gcc
 #CC = /opt/nvidia/hpc_sdk/Linux_x86_64/22.7/compilers/bin/pgcc
+#CC = /opt/intel/oneapi/mpi/2021.6.0/bin/mpicc
 #C compiler
 CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp #-fopenacc
 CFLAGR = -std=c99 -O2 -fopenmp
 #CFLAGR = -std=c99 -O2 -acc -mp -ta=multicore -Minfo=accel
+#CFLAGR = -std=c99 -O2 -openmp
 #C compiler options
 CFLAGD = -DNODATPLOT -DHDF5PLOT
 #Macro definition

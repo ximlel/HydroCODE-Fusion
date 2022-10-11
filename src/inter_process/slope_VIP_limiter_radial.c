@@ -71,8 +71,8 @@ void VIP_limiter_radial(const int Ncell, const _Bool i_f_var_get, double DmU[], 
 	}
     //sV=0.0;
     //sV=VLmin[1]/(0.5*Rb[1]*tan(0.5*dtheta));
-    sV=UU[0]/Rb[1];
     sU=DmU[0];
+    sV=UU[0]/Rb[1];
     Vave[0][0] = UU[1];
     Vave[0][1] = 0.0;
     Vave[1][0] = UU[0]*cos(dtheta);

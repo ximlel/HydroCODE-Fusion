@@ -172,11 +172,6 @@ void GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], d
 		      ifv_R.U   = bfv_R.U   + 0.5*h_R*bfv_R.SU;
 		      ifv_R.P   = bfv_R.P   + 0.5*h_R*bfv_R.SP;
 		  }
-	      if(ifv_L.P < eps || ifv_R.P < eps || ifv_L.RHO < eps || ifv_R.RHO < eps)
-		  {
-		      printf("<0.0 error on [%d, %d] (t_n, x) - Reconstruction\n", k, j);
-		      goto return_NULL;
-		  }
 
 	      c_L = sqrt(gamma * ifv_L.P / ifv_L.RHO);
 	      c_R = sqrt(gamma * ifv_R.P / ifv_R.RHO);
