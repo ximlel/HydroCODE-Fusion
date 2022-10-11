@@ -36,9 +36,9 @@
  */
 void DispPro(const double pro, const int step)
 {
-        int j;
+	int j;
 	static double pro_print = 0.0;
-	const double dpro_print = 1.0;
+	const double dpro_print = 0.1;
 	if (pro >= pro_print)
 	    {
 		for (j = 0; j < 77; j++)

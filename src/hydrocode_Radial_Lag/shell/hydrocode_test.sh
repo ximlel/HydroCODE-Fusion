@@ -5,7 +5,8 @@ export LD_LIBRARY_PATH=lib:$LD_LIBRARY_PATH
 ### Test the program
 EXE=./hydrocode.out  #EXEcutable program
 RSTC=Radial_Symmetry/Two_Component
-TEST="$EXE $RSTC/A3_shell $RSTC/A3_shell 2_GRP 2"
+#TEST="$EXE $RSTC/A3_shell $RSTC/A3_shell 2_GRP 2 42=2"
+TEST="$EXE $RSTC/A3_shell $RSTC/A3_shell 2_GRP 2 42=-2"
 
 ### Perf
 # perf record -e cpu-clock -g -F 999 $TEST

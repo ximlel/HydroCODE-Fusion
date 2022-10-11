@@ -15,5 +15,5 @@ DITC=../../data_in/one-dim/$RSTC
    cd $DITC/A3_shell
    echo "value_start" | $MRun
    cd $CPath
- $EXE $RSTC/A3_shell $RSTC/A3_shell 2_GRP 2
+ $EXE $RSTC/A3_shell $RSTC/A3_shell 2_GRP 2 42=-2
 !

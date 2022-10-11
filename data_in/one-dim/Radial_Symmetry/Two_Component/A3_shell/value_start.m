@@ -91,7 +91,7 @@ fclose(fid);
 
 
 eps=1e-9;
-step=25000;
+step=250000;
 GAMMAL=1.4;       % Ratio of special heats
 GAMMAR=3.0;
 CFL=0.45;         % CFL condition
