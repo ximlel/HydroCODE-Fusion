@@ -152,7 +152,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
     if (time_c >= time_plot[nt_plot] && nt_plot < (*N_plot-1))
 	{
 #ifndef NOTECPLOT
-	    file_2D_write_POINT_TEC(m, n, 1, CV + nt_plot, X, Y, cpu_time, problem, time_plot + nt_plot);
+	    file_2D_write_POINT_TEC(m, n, 1, CV + nt, X, Y, cpu_time, problem, time_plot + nt_plot);
 #endif
 	    nt_plot++;
 	    if (nt < (N_T-1))
@@ -176,6 +176,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
      */
     if(DS) {
     h_S_max = INFINITY; // h/S_max = INFINITY
+
     for(j = 0; j < m; ++j)
 	for(i = 0; i < n; ++i)
 	    {
@@ -230,7 +231,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - half_nu*(CV->F_u[j+1][i]  -CV->F_u[j][i]);
 	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - half_nu*(CV->F_v[j+1][i]  -CV->F_v[j][i]);
 	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - half_nu*(CV->F_e[j+1][i]  -CV->F_e[j][i]);
-	  CV[nt].RHO[j][i]   =   CV[nt].RHO[j][i] - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
+	  CV[nt].RHO[j][i] +=                     - half_nu*(CV->F_rho[j+1][i]-CV->F_rho[j][i]);
 
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
@@ -278,7 +279,7 @@ void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_st
 	  mom_x = CV[nt].RHO[j][i]*CV[nt].U[j][i] - mu*(CV->G_u[j][i+1]  -CV->G_u[j][i]);
 	  mom_y = CV[nt].RHO[j][i]*CV[nt].V[j][i] - mu*(CV->G_v[j][i+1]  -CV->G_v[j][i]);
 	  ene   = CV[nt].RHO[j][i]*CV[nt].E[j][i] - mu*(CV->G_e[j][i+1]  -CV->G_e[j][i]);
-	  CV[nt].RHO[j][i]   =   CV[nt].RHO[j][i] - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
+	  CV[nt].RHO[j][i] +=                     - mu*(CV->G_rho[j][i+1]-CV->G_rho[j][i]);
 
 	  CV[nt].U[j][i] = mom_x / CV[nt].RHO[j][i];
 	  CV[nt].V[j][i] = mom_y / CV[nt].RHO[j][i];
