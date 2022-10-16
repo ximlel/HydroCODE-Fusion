@@ -1,3 +1,8 @@
+/**
+ * @file  grp_solver_radial_LAG_source.c
+ * @brief This is a Lagrangian GRP scheme to solve radial/cylindrical symmetric compressible fluid flows.
+ */
+
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -14,7 +19,16 @@
 #include "../include/inter_process.h"
 
 
-// M=1 planar; M=2 cylindrical √; M=3 spherical
+/**
+ * @brief A Lagrangian GRP scheme to solve radial/cylindrical symmetric compressible fluid flows.
+ * @param[in] M: Spatial dimension number for radially symmetric flow.
+ *             - M=1: planar flow.
+ *             - M=2: cylindrical flow. (√)
+ *             - M=3: spherical flow.
+ * @sa    Theory is found in Reference [1]. \n
+ *        [1] R. Chen, J. Li & B. Tian, Application of the GRP Scheme for Cylindrical Compressible Fluid Flows,
+ *            COMMUNICATIONS IN COMPUTATIONAL PHYSICS, 24.5: 1523-1555, 2018.
+ */
 void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[], const int M,
 				  const char * problem, double * cpu_time, int N_T, int * N_plot , double time_plot[])
 {
@@ -115,7 +129,7 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 #ifdef MULTIFLUID_BASICS
 		    FV.gamma = CV.gamma[0];
 #endif
-		    file_radial_write_TEC(FV, *smv, problem, time_plot[nt_plot]);
+		    file_radial_write_TEC(FV, RR, problem, time_plot[nt_plot]);
 #endif
 		    nt_plot++;
 		    if (nt < (N_T-1))

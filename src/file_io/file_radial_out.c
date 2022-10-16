@@ -7,7 +7,7 @@
 #include "../include/file_io.h"
 
 
-void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var smv, const char * problem, const double time)
+void file_radial_write_TEC(const struct flu_var FV, const double * R, const char * problem, const double time)
 {
     double const eps    =      config[4];
     int    const Ncell  = (int)config[3];  // Number of computing cells in r direction
@@ -41,17 +41,17 @@ void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var
     fprintf(out, "\n");
 
     fprintf(out, "ZONE I=%d, J=%d, F=POINT, SOLUTIONTIME=%.8g\n", Tcell+1, Ncell+1, time);
-    for(j=0; j<=Ncell; j++)
-	for(i=0; i<=Tcell; i++)
+    for(i=0; i<=Ncell; i++)
+	for(j=0; j<=Tcell; j++)
 	    {
-		fprintf(out,"%.10g",smv.RR[i]*cos(j*dtheta));
-		fprintf(out,"%.10g",smv.RR[i]*sin(j*dtheta));
-		fprintf(out,"%.10g",FV.RHO[i]);
-		fprintf(out,"%.10g",FV.U[i]);
-		fprintf(out,"%.10g",FV.P[i]);
+		fprintf(out,"%.10g\t",R[i]*cos(j*dtheta));
+		fprintf(out,"%.10g\t",R[i]*sin(j*dtheta));
+		fprintf(out,"%.10g\t",FV.RHO[i]);
+		fprintf(out,"%.10g\t",FV.U[i]);
+		fprintf(out,"%.10g\t",FV.P[i]);
 #ifdef  MULTIFLUID_BASICS
 #ifndef MULTIPHASE_BASICS
-		fprintf(out,"%.10g",FV.gamma[i]);
+		fprintf(out,"%.10g\t",FV.gamma[i]);
 #endif
 #endif
 		fprintf(out,"\n");

@@ -64,7 +64,7 @@ void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct 
 //////////////////////////
 // file_radial_out.c
 //////////////////////////
-void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var smv, const char * problem, const double time);
+void file_radial_write_TEC(const struct flu_var FV, const double * R, const char * problem, const double time);
 
 //////////////////////////
 // file_2D_unstruct_out.c

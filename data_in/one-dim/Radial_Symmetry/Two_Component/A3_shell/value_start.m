@@ -82,8 +82,9 @@ fclose(fid);
 
 %Timeout=0.23;     % Output time
 Timeout=0.8;
-D_PLOT_T=0.001;   % Output time interval
-time_plot=0:D_PLOT_T:Timeout;
+%D_PLOT_T=0.001;   % Output time interval
+D_PLOT_T=0.01;
+time_plot=D_PLOT_T:D_PLOT_T:Timeout;
 fid = fopen('time_plot.dat','wt');
 fprintf(fid,'%12.10g\t',time_plot);
 fprintf(fid,'\n');
@@ -112,7 +113,7 @@ fprintf(fid,'11\t%g\n',0.5*pi/Tcell);
 fprintf(fid,'13\t%i\n',Ncell-1);
 fprintf(fid,'14\t%i\n',Tcell);
 fprintf(fid,'17\t-24\n');
-fprintf(fid,'20\t%i\n',Tcell);
+fprintf(fid,'20\t%i\n',Domlen/Ncell);
 fprintf(fid,'106\t%g\n',GAMMAR);
 fclose(fid);
 end

@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
   FV0.RHO = CV.RHO[N_plot-1];
   FV0.U   = CV.U[N_plot-1];
   FV0.P   = CV.P[N_plot-1];
-  file_radial_write_TEC(FV0, smv, argv[2], time_plot[N_plot-1]);
+  file_radial_write_TEC(FV0, smv.RR, argv[2], time_plot[N_plot-1]);
 #endif
 
 return_NULL:
