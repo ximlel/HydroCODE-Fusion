@@ -1,6 +1,6 @@
 /**
  * @file file_out_hdf5.c
- * @brief 
+ * @brief This is a set of functions which control the readout of 1-D and 2-D data in HDF5 file format.
  * @attention  Library Dependency: HDF5®
  */
 
@@ -10,9 +10,9 @@
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
-
 #ifdef HDF5PLOT
 #include "hdf5.h"
+
 
 /* Create the data itself in the dataset.
  * dataset_id = H5Dcreate(loc_id (location id), const char *name (dataset name),
@@ -30,6 +30,7 @@
  *                                conversion property of this I/O operation,
  *                                const void * buf (the location of data in memory) );
  */
+
 /**
  * @brief Print out fluid variable 'v' with data array 'v_array'.
  */
@@ -40,6 +41,16 @@
 	status = H5Dclose(dataset_id);					\
     } while (0)
 
+/**
+ * @brief This function write the 1-D solution into HDF5 output '.h5' files.
+ * @param[in] m:   The number of spatial points in the output data.
+ * @param[in] N:   The number of time steps in the output data.
+ * @param[in] CV:  Structure of grid variable data in computational grid cells.
+ * @param[in] X[]: Array of the coordinate data.
+ * @param[in] cpu_time:  Array of the CPU time recording.
+ * @param[in] problem:   Name of the numerical results for the test problem.
+ * @param[in] time_plot: Array of the plotting time recording.
+ */
 void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV, 
 			double * X[], const double * cpu_time, const char * problem, double time_plot[])
 {
@@ -136,6 +147,18 @@ void file_1D_write_HDF5(const int m, const int N, const struct cell_var_stru CV,
 }
 
 
+/**
+ * @brief This function write the 2-D solution into HDF5 output '.h5' files.
+ * @param[in] n_x: The number of x-spatial points in the output data.
+ * @param[in] n_y: The number of y-spatial points in the output data.
+ * @param[in] N:   The number of time steps in the output data.
+ * @param[in] CV:  Structure of variable data in computational grid cells.
+ * @param[in] X:   Array of the x-coordinate data.
+ * @param[in] Y:   Array of the y-coordinate data.
+ * @param[in] cpu_time:  Array of the CPU time recording.
+ * @param[in] problem:   Name of the numerical results for the test problem.
+ * @param[in] time_plot: Array of the plotting time recording.
+ */
 void file_2D_write_HDF5(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
 			double ** X, double ** Y, const double * cpu_time, const char * problem, double time_plot[])
 {

@@ -12,11 +12,14 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
-#define N_MAX_1D 1000
 
+//! The maximum number of 1-D data dimension storing fluid variables in memory.
+#define N_MAX_1D 1000
 
 /**
  * @brief Count out and read in 1-D data of the initial fluid variable 'sfv'.
+ *        If the initial data file does not exist, 'err_exit=1' means the program exits,
+ *        while 'err_exit=0' means the program continues.
  */
 #define STR_FLU_INI(sfv, err_exit)					\
     do {								\
@@ -81,6 +84,7 @@
   *             position of a block of memory consisting m variables* of type double.
   *             These m variables are the initial value and the value of m is stored in config[3].
   * @param[in]  name:      Name of the test example.
+  * @param[in]  N:         Pointer to the number of 1-D data dimension storing fluid variables in memory.
   * @param[out] N_plot:    Pointer to the number of time steps for plotting.
   * @param[out] time_plot: Pointer to the array of the plotting time recording.
   * @return  \b FV0:  Structure of initial fluid variable data array pointer.

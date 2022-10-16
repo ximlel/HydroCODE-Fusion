@@ -69,6 +69,13 @@ Licensing
 
 Please see the file called `LICENSE`.
 
+Clone/Download HTTPS
+--------
+
+<https://gitee.com/ximlel/HydroCODE.git>
+<https://github.com/ximlel/HydroCODE.git>
+<https://osredm.com/p16943850/HydroCODE.git>
+
 Contacts
 --------
 

@@ -32,19 +32,19 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = hydrocode_2D_2Phase
+PROJECT_NAME           = hydrocode_Radial_Lag
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 0.5
+PROJECT_NUMBER         = 0.3
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "This is a implementation of fully explict forward Euler scheme for 2-D Baer-Nunziato two-phase flow model on Eulerian coordinate"
+PROJECT_BRIEF          = "This is an implementation of fully explict forward Euler scheme for multi-D radially symmetric compressible flows on Lagrangian coordinate"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -58,7 +58,7 @@ PROJECT_LOGO           = ../../doc/Logo.jpg
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = ../../doc/hydrocode_2D_2Phase
+OUTPUT_DIRECTORY       = ../../doc/hydrocode_Radial_Lag
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -875,10 +875,13 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ../include \
+                         ../src_cii \
                          ../tools \
                          ../file_io \
-                         ../riemann_solver_BN \
-                         ../inter_process_BN \
+                         ../meshing \
+                         ../riemann_solver \
+                         ../inter_process_cpp \
+                         ../inter_process \
                          ../flux_calc \
                          ../finite_volume \
                          ./
@@ -2266,8 +2269,7 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGEN_PREDEFINED \
                          HDF5PLOT \
-                         MULTIFLUID_BASICS \
-                         MULTIPHASE_BASICS
+                         MULTIFLUID_BASICS
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

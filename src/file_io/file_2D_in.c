@@ -12,8 +12,9 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
-#define N_MAX_2D 5
 
+//! The maximum number of 2-D data dimension storing fluid variables in memory.
+#define N_MAX_2D 5
 
 /**
  * @brief  This function count out and read in 2-D data file with (line*column) data and initialize pointer to these data.
@@ -22,7 +23,7 @@
  *          the value (column) number is stored in config[14];
  * @param[in]  add: Adress of the initial data file.
  * @param[in]  fp:  Pointer to the input data file.
- * @return  Pointer to the position of a block of memory consisting (line*column) variables* of type double.
+ * @return  Pointer to the position of a block of memory consisting (line*column) variables of type double.
  */
 static double * flu_var_init(const char * add, FILE *fp)
 {
@@ -68,6 +69,8 @@ static double * flu_var_init(const char * add, FILE *fp)
 
 /**
  * @brief Count out and read in 2-D data of the initial fluid variable 'sfv' using function 'flu_var_init()'.
+ *        If the initial data file does not exist, 'err_exit=1' means the program exits,
+ *        while 'err_exit=0' means the program continues.
  */
 #define STR_FLU_INI(sfv, err_exit)					\
     do {								\
@@ -107,6 +110,7 @@ static double * flu_var_init(const char * add, FILE *fp)
   *             position of a block of memory consisting (line*column) variables* of type double.
   *             These (line*column) variables are the initial value.
   * @param[in]  name:      Name of the test example.
+  * @param[in]  N:         Pointer to the number of 2-D data dimension storing fluid variables in memory.
   * @param[out] N_plot:    Pointer to the number of time steps for plotting.
   * @param[out] time_plot: Pointer to the array of the plotting time recording.
   * @return  \b FV0:  Structure of initial fluid variable data array pointer.

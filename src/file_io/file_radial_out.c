@@ -1,3 +1,8 @@
+/**
+ * @file  file_radial_out.c
+ * @brief This is a set of functions which control the readout of radially symmetric multi-dimensional data.
+ */
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -7,6 +12,13 @@
 #include "../include/file_io.h"
 
 
+/**
+ * @brief This function write the radially symmetric 2-D solution into Tecplot output '.tec' files.
+ * @param[in] FV: Structure of fluid variable data array in computational grid.
+ * @param[in] R:  Array of the r-coordinate data.
+ * @param[in] problem: Name of the numerical results for the test problem.
+ * @param[in] time: The plotting time.
+ */
 void file_radial_write_TEC(const struct flu_var FV, const double * R, const char * problem, const double time)
 {
     double const eps    =      config[4];

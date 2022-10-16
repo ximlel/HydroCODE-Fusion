@@ -34,11 +34,11 @@
     } while (0)
 
 /**
- * @brief This function write the 2-D solution into Tecplot output files with block data.
+ * @brief This function write the 2-D solution into Tecplot output '.tec' files with unstructured block data.
  * @param[in] FV: Structure of fluid variable data array in computational grid.
  * @param[in] mv: Structure of meshing variable data.
- * @param[in] problem:   Name of the numerical results for the test problem.
- * @param[in] time_plot: Array of the plotting time recording.
+ * @param[in] problem: Name of the numerical results for the test problem.
+ * @param[in] time: The plotting time.
  */
 void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, const char * problem, const double time)
 {
@@ -158,11 +158,11 @@ void file_write_2D_BLOCK_TEC(const struct flu_var FV, const struct mesh_var mv, 
     } while (0)
 
 /**
- * @brief This function write the 2-D solution into VTK 3D output files with brick data.
+ * @brief This function write the 2-D solution into VTK 3D output '.vtk' files with unstructured brick data.
  * @param[in] FV: Structure of fluid variable data array in computational grid.
  * @param[in] mv: Structure of meshing variable data.
- * @param[in] problem:   Name of the numerical results for the test problem.
- * @param[in] time_plot: Array of the plotting time recording.
+ * @param[in] problem: Name of the numerical results for the test problem.
+ * @param[in] time: The plotting time.
  */
 void file_write_3D_VTK(const struct flu_var FV, const struct mesh_var mv, const char * problem, const double time)
 {

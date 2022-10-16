@@ -20,7 +20,7 @@
 
 
 /**
- * @brief A Lagrangian GRP scheme to solve radial/cylindrical symmetric compressible fluid flows.
+ * @brief A Lagrangian GRP scheme to solve radially/cylindrically symmetric compressible flows.
  * @param[in] M: Spatial dimension number for radially symmetric flow.
  *             - M=1: planar flow.
  *             - M=2: cylindrical flow. (√)

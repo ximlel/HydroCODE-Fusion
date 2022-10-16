@@ -280,6 +280,7 @@ static int compare_double(const void *a,const void *b)
  * @brief This function reads the time data file for plotting 'time_plot.dat' and 
  *        initialize tha array 'time_plot[]'.
  * @param[in]  add_in:    Adress of the initial data folder of the test example.
+ * @param[in]  N_max:     The maximum number of data dimension storing fluid variables in memory.
  * @param[out] N_plot:    Pointer to the number of time steps for plotting.
  * @param[out] time_plot: Pointer to the array of the plotting time recording.
  */

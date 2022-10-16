@@ -6,7 +6,7 @@
 /** 
  * @mainpage Multi-D Godunov/GRP scheme for radially symmetric Lagrangian hydrodynamics with VIP limiter
  * @brief This is an implementation of fully explict forward Euler scheme
- *        for multi-dimensional radially symmetric compressible fluid flows
+ *        for multi-dimensional radially symmetric compressible flows
  *        of motion on Lagrangian coordinate.
  * @version 0.3
  *
@@ -96,6 +96,24 @@
 #include "../include/finite_volume.h"
 #include "../include/meshing.h"
 
+
+#ifdef DOXYGEN_PREDEFINED
+/**
+ * @def NODATPLOT
+ * @brief Switch whether to plot without Matrix data.
+ */
+#define NODATPLOT
+/**
+ * @def HDF5PLOT
+ * @brief Switch whether to plot with HDF5 data.
+ */
+#define HDF5PLOT
+/**
+ * @def NOTECPLOT
+ * @brief Switch whether to plot without Tecplot data.
+ */
+#define NOTECPLOT
+#endif
 
 double config[N_CONF]; //!< Initial configuration data array.
 
