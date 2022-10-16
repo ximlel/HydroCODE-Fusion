@@ -56,7 +56,7 @@ end
 end
 for j=1:column
 for i=(shock+1):(round(0.37/d_y)+1)
-    CC(i,j) = index((j-0.5)*d_x,(i-0.5)*d_y);
+    CC(i,j) = index_calc((j-0.5)*d_x,(i-0.5)*d_y);
 end
 end
 for j=1:column

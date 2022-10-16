@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
   config[0] = (double)2; // Dimensionality = 2
 
   // The number of times steps of the fluid data stored for plotting.
-  int N; // (int)(config[5]) + 1;
+  int N, N_plot; // (int)(config[5]) + 1;
   double * time_plot;
     /* 
      * We read the initial data files.
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-  struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot);
+  struct flu_var FV0 = initialize_2D(argv[1], &N, &N_plot, &time_plot);
   struct mesh_var mv = mesh_init(argv[1], argv[4]);
 
   if ((_Bool)config[32])
@@ -160,14 +160,14 @@ int main(int argc, char *argv[])
       }
 
   config[8] = (double)0;  // Use GRP/Godunov scheme to solve it on Eulerian coordinate.
-  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], &N, time_plot);
+  finite_volume_scheme_unstruct(&FV0, &mv, scheme, argv[2], &N_plot, time_plot);
 
   // Write the final data down.
 #ifndef NOTECPLOT
-  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], time_plot[N-1]);
+  file_write_2D_BLOCK_TEC(FV0, mv, argv[2], time_plot[N_plot-1]);
 #endif
 #ifndef NOVTKPLOT
-  file_write_3D_VTK(FV0, mv, argv[2], time_plot[N-1]);
+  file_write_3D_VTK(FV0, mv, argv[2], time_plot[N_plot-1]);
 #endif
 
   mesh_mem_free(&mv);

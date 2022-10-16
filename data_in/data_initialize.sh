@@ -1,7 +1,7 @@
 #!/bin/bash
 
-MRun="$HOME/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop"
-#MRun="octave"
+#MRun="$HOME/Softwares/MATLAB/R2018a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop"
+MRun="octave"
 
 rm -vf data_initialize.m
 path=$1

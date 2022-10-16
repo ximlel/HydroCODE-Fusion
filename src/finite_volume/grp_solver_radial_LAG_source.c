@@ -15,11 +15,11 @@
 
 
 // M=1 planar; M=2 cylindrical √; M=3 spherical
-void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[],
-				 const int M, const char * problem, double * cpu_time, int * N_plot , double time_plot[])
+void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[], const int M,
+				  const char * problem, double * cpu_time, int N_T, int * N_plot , double time_plot[])
 {
     int i, k=0;
-    
+
     clock_t tic, toc;
     double cpu_time_sum = 0.0;
 
@@ -42,7 +42,7 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
     double Smax_dr;
     double time_c = 0.0;
     _Bool stop_t = false;
-    int nt = 0;
+    int nt = 0, nt_plot = 0;
 
     struct i_f_var ifv_L = {0}, ifv_R = {0};
 
@@ -105,7 +105,7 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 	{
 	    tic = clock();
 
-	    if (time_c >= time_plot[nt] && nt < (*N_plot-1))
+	    if (time_c >= time_plot[nt_plot] && nt_plot < (*N_plot-1))
 		{
 #ifndef NOTECPLOT
 		    struct flu_var FV;
@@ -115,20 +115,24 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 #ifdef MULTIFLUID_BASICS
 		    FV.gamma = CV.gamma[0];
 #endif
-		    file_radial_write_TEC(FV, *smv, problem, time_plot[nt]);
+		    file_radial_write_TEC(FV, *smv, problem, time_plot[nt_plot]);
 #endif
-		    for(i = 0; i < Md; ++i)
+		    nt_plot++;
+		    if (nt < (N_T-1))
 			{
-			    CV.RHO[nt+1][i] = CV.RHO[nt][i];
-			    CV.U[nt+1][i]   =   CV.U[nt][i];
-			    CV.E[nt+1][i]   =   CV.E[nt][i];  
-			    CV.P[nt+1][i]   =   CV.P[nt][i];
+			    for(i = 0; i < Md; ++i)
+				{
+				    CV.RHO[nt+1][i] = CV.RHO[nt][i];
+				    CV.U[nt+1][i]   =   CV.U[nt][i];
+				    CV.E[nt+1][i]   =   CV.E[nt][i];  
+				    CV.P[nt+1][i]   =   CV.P[nt][i];
+				}
+			    DD = CV.RHO[nt+1];
+			    UU = CV.U[nt+1];
+			    PP = CV.P[nt+1];
+			    EE = CV.E[nt+1];
+			    nt++;
 			}
-		    DD = CV.RHO[nt+1];
-		    UU = CV.U[nt+1];
-		    PP = CV.P[nt+1];
-		    EE = CV.E[nt+1];
-		    nt++;
 		}
 
 	    Smax_dr = 0.0; // S_max/dr = 0.0

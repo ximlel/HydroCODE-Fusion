@@ -103,6 +103,7 @@ void file_2D_write(const int n_x, const int n_y, const int N, const struct cell_
 void file_2D_write_POINT_TEC(const int n_x, const int n_y, const int N, const struct cell_var_stru CV[],
 			double ** X, double ** Y, const double * cpu_time, const char * problem, const double time_plot[])
 {
+    double const eps = config[4];
     char add_out[FILENAME_MAX+40];
     // Get the address of the output data folder of the test example.
     example_io(problem, add_out, 0);
@@ -110,10 +111,12 @@ void file_2D_write_POINT_TEC(const int n_x, const int n_y, const int N, const st
     char file_data[FILENAME_MAX+40];
     FILE * fp;
     int k, i, j;
+    char str_tmp[40];
 
     //===================Write solution File=========================
     strcpy(file_data, add_out);
-    strcat(file_data, "FLU_VAR.tec");	
+    sprintf(str_tmp, "FLU_VAR_%.8g.tec", time_plot[N-1] + eps);
+    strcat(file_data, str_tmp);
     if ((fp = fopen(file_data, "w")) == NULL)
 	{
 	    fprintf(stderr, "Cannot open solution output TECPLOT file of '%s'!\n", problem);
@@ -145,6 +148,4 @@ void file_2D_write_POINT_TEC(const int n_x, const int n_y, const int N, const st
 	    fprintf(fp, "\n");
 	}
     fclose(fp);
-    
-    config_write(add_out, cpu_time, problem);
 }

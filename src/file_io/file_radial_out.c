@@ -18,6 +18,7 @@ void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var
     example_io(problem, file_data, 0);
 
     FILE * out;
+    int i, j;
     char str_tmp[40];
 
     //===================Write solution File=========================
@@ -30,10 +31,18 @@ void file_radial_write_TEC(const struct flu_var FV, const struct radial_mesh_var
 	}
 
     fprintf(out, "TITLE = \"Planar Plot of Radially Symmetric Data\"\n");
-    fprintf(out, "VARIABLES = X, Y, D, U, P, Gamma\n");
-    fprintf(out, "ZONE I=%d, J=%d, F=POINT, SOLUTIONTIME=%.8g\n",Tcell+1,Ncell+1,time);
-    for(int j=0; j<=Ncell; j++)
-	for(int i=0; i<=Tcell; i++)
+    fprintf(out, "VARIABLES = \"X\", \"Y\"");
+    fprintf(out, ", \"RHO\", \"U\", \"P\"");
+#ifdef  MULTIFLUID_BASICS
+#ifndef MULTIPHASE_BASICS
+    fprintf(out, ", \"gamma\"");
+#endif
+#endif
+    fprintf(out, "\n");
+
+    fprintf(out, "ZONE I=%d, J=%d, F=POINT, SOLUTIONTIME=%.8g\n", Tcell+1, Ncell+1, time);
+    for(j=0; j<=Ncell; j++)
+	for(i=0; i<=Tcell; i++)
 	    {
 		fprintf(out,"%.10g",smv.RR[i]*cos(j*dtheta));
 		fprintf(out,"%.10g",smv.RR[i]*sin(j*dtheta));

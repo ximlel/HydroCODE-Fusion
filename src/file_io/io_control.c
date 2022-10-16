@@ -283,7 +283,7 @@ static int compare_double(const void *a,const void *b)
  * @param[out] N_plot:    Pointer to the number of time steps for plotting.
  * @param[out] time_plot: Pointer to the array of the plotting time recording.
  */
-void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
+int time_plot_read(const char * add_in, const int N_max, int * N_plot, double * time_plot[])
 {
     _Bool r = true; // r: Whether to read data file successfully.
     FILE * fp;
@@ -329,6 +329,5 @@ void time_plot_read(const char * add_in, int * N_plot, double * time_plot[])
 	    qsort(*time_plot, *N_plot-1, sizeof(double), compare_double);
 	    fclose(fp);
 	}
+    return N_max<(*N_plot) ? N_max : (*N_plot);
 }
-
-

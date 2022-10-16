@@ -79,6 +79,6 @@ void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool
 		s[j][i] = minmod3(alpha*s_L, alpha*s_R, s[j][i]);
 	    else
 		s[j][i] = minmod2(s_L, s_R);
-	}
+	} // End of parallel region
     va_end(ap);
 }

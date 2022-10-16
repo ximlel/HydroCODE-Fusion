@@ -7,7 +7,7 @@ CFLAGR = -std=c++20 -O2
 #CC = /opt/intel/oneapi/compiler/latest/linux/bin/intel64/icpc
 #CFLAGR = -std=c++17 -O2 -shared-intel -fp-model=precise
 #Intel C++ compiler options
-CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -DHDF5PLOT -DNODATPLOT -DNOTECPLOT -D_Bool=bool
+CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -DHDF5PLOT -D_Bool=bool #-DNODATPLOT -DNOTECPLOT 
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder

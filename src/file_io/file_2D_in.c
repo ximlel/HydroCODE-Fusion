@@ -12,6 +12,8 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
+#define N_MAX_2D 5
+
 
 /**
  * @brief  This function count out and read in 2-D data file with (line*column) data and initialize pointer to these data.
@@ -110,7 +112,7 @@ static double * flu_var_init(const char * add, FILE *fp)
   * @return  \b FV0:  Structure of initial fluid variable data array pointer.
   * @note This function contains the function procedures 'time_plot_read()' and 'configurate()'.
   */
-struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot[])
+struct flu_var initialize_2D(const char * name, int * N, int * N_plot, double * time_plot[])
 {
     struct flu_var FV0 = {NULL};
 
@@ -129,7 +131,7 @@ struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot
     printf("  bondary_x\t= %d\n", (int)config[17]);
     printf("  bondary_y\t= %d\n", (int)config[18]);
 
-    time_plot_read(add_in, N_plot, time_plot);
+    (*N) = time_plot_read(add_in, N_MAX_2D, N_plot, time_plot);
 
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
     FILE * fp;      // The pointer to the above data files.

@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
   config[0] = (double)1; // Dimension of input data = 1
 
   // The number of times steps of the fluid data stored for plotting.
-  int N;
+  int N, N_plot;
   double *time_plot;
   /* 
    * We read the initial data files.
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
    * of a block of memory consisting Ncell variables of type double.
    * The Ncell variables are the initial value.
    */
-  struct flu_var FV0 = initialize_1D(argv[1], &N, &time_plot); // Structure of initial data array pointer.
+  struct flu_var FV0 = initialize_1D(argv[1], &N, &N_plot, &time_plot); // Structure of initial data array pointer.
   const int Ncell = (int)config[3]; // Number of computing cells in r direction
   const int Md    = Ncell+2;        // max vector dimension
   const int order = (int)config[9];
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
       case 1:
 	  config[41] = 0.0; // alpha = 0.0
       case 2:
-	  GRP_solver_radial_LAG_source(CV, &smv, R, M, argv[2], cpu_time, &N, time_plot);
+	  GRP_solver_radial_LAG_source(CV, &smv, R, M, argv[2], cpu_time, N, &N_plot, time_plot);
 	  break;
       default:
 	  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -167,16 +167,16 @@ int main(int argc, char *argv[])
       }
 
 #ifndef NODATPLOT
-  file_1D_write(Ncell+1, N, CV, R, cpu_time, argv[2], time_plot);
+  file_1D_write(Ncell+1, N_plot, CV, R, cpu_time, argv[2], time_plot);
 #endif
 #ifdef HDF5PLOT
-  file_1D_write_HDF5(Ncell+1, N, CV, R, cpu_time, argv[2], time_plot);
+  file_1D_write_HDF5(Ncell+1, N_plot, CV, R, cpu_time, argv[2], time_plot);
 #endif
 #ifndef NOTECPLOT
-  FV0.RHO = CV.RHO[N-1];
-  FV0.U   = CV.U[N-1];
-  FV0.P   = CV.P[N-1];
-  file_radial_write_TEC(FV0, smv, argv[2], time_plot[N-1]);
+  FV0.RHO = CV.RHO[N_plot-1];
+  FV0.U   = CV.U[N_plot-1];
+  FV0.P   = CV.P[N_plot-1];
+  file_radial_write_TEC(FV0, smv, argv[2], time_plot[N_plot-1]);
 #endif
 
 return_NULL:

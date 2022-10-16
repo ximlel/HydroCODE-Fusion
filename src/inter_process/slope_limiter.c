@@ -78,6 +78,6 @@ void minmod_limiter(const _Bool NO_h, const int m, const _Bool i_f_var_get, doub
 		s[j] = minmod3(alpha*s_L, alpha*s_R, s[j]);
 	    else
 		s[j] = minmod2(s_L, s_R);
-	}
+	} // End of parallel region
     va_end(ap);
 }

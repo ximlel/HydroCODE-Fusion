@@ -20,6 +20,7 @@
 #include "../include/flux_calc.h"
 #include "../include/inter_process.h"
 #include "../include/tools.h"
+#include "../include/file_io.h"
 
 
 /**
@@ -66,7 +67,8 @@
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[out] time_plot: Array of the plotting time recording.
  */
-void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * CV, double * cpu_time, int * N_plot, double time_plot[])
+void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * CV, double ** X, double **Y, 
+			      double * cpu_time, const char * problem, int N_T, int * N_plot, double time_plot[])
 {
 #ifdef _OPENMP
   printf("@@ Number of threads for OpenMP: %d\n", omp_get_max_threads());
@@ -104,7 +106,7 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
   double h_S_max, sigma; // h/S_max, S_max is the maximum character speed, sigma is the character speed
   double time_c = 0.0; // the current time
   _Bool stop_t = false;
-  int nt = 0; // the number of times storing plotting data
+  int nt = 0, nt_plot = 0; // the number of times storing plotting data
   
   // Left/Right/Upper/Downside boundary condition
   struct b_f_var * bfv_L = NULL, * bfv_R = NULL, * bfv_U = NULL, * bfv_D = NULL;
@@ -145,17 +147,25 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 #else
     tic = (double)clock() / (double)CLOCKS_PER_SEC;
 #endif
-    if (time_c >= time_plot[nt] && nt < (*N_plot-1))
+    if (time_c >= time_plot[nt_plot] && nt_plot < (*N_plot-1))
 	{
-	    for(j = 0; j < m; ++j)
-		for(i = 0; i < n; ++i)
-		    {
-			CV[nt+1].RHO[j][i] = CV[nt].RHO[j][i];
-			CV[nt+1].U[j][i]   =   CV[nt].U[j][i];
-			CV[nt+1].V[j][i]   =   CV[nt].V[j][i];
-			CV[nt+1].E[j][i]   =   CV[nt].E[j][i];  
-			CV[nt+1].P[j][i]   =   CV[nt].P[j][i];
-		    }
+#ifndef NOTECPLOT
+	    file_2D_write_POINT_TEC(m, n, 1, CV + nt_plot, X, Y, cpu_time, problem, time_plot + nt_plot);
+#endif
+	    nt_plot++;
+	    if (nt < (N_T-1))
+		{
+		    for(j = 0; j < m; ++j)
+			for(i = 0; i < n; ++i)
+			    {
+				CV[nt+1].RHO[j][i] = CV[nt].RHO[j][i];
+				CV[nt+1].U[j][i]   =   CV[nt].U[j][i];
+				CV[nt+1].V[j][i]   =   CV[nt].V[j][i];
+				CV[nt+1].E[j][i]   =   CV[nt].E[j][i];  
+				CV[nt+1].P[j][i]   =   CV[nt].P[j][i];
+			    }
+		    nt++;
+		}
 	}
 
     /* evaluate f and a at some grid points for the iteration

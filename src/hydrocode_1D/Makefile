@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -std=c99 -Wall -pedantic -Og -g
 CFLAGR = -std=c99 -O2
 #C compiler options
-CFLAGD = -DHDF5PLOT -DNODATPLOT
+CFLAGD = -DHDF5PLOT #-DNODATPLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder

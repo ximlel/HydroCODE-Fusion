@@ -17,7 +17,7 @@ int flu_var_count_line(FILE * fp, const char * add, int * n_x);
 
 int flu_var_read(FILE * fp, double * U, const int num);
 
-void time_plot_read(const char * add_in, int * N_plot, double * time_plot[]);
+int time_plot_read(const char * add_in, const int N_max, int * N_plot, double * time_plot[]);
 
 //////////////////////////
 // terminal_io.c
@@ -34,11 +34,11 @@ void config_write(const char * add_out, const double * cpu_time, const char * na
 //////////////////////////
 // file_1D_in.c
 //////////////////////////
-struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot[]);
+struct flu_var initialize_1D(const char * name, int * N, int * N_plot, double * time_plot[]);
 //////////////////////////
 // file_2D_in.c
 //////////////////////////
-struct flu_var initialize_2D(const char * name, int * N_plot, double * time_plot[]);
+struct flu_var initialize_2D(const char * name, int * N, int * N_plot, double * time_plot[]);
 
 //////////////////////////
 // file_1D_out.c

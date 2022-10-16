@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -std=c99 -Wall -pedantic -Og -g -fopenmp #-fopenacc
 CFLAGR = -std=c99 -O2 -fopenmp
 #C compiler options
-CFLAGD = -DMULTIFLUID_BASICS -DNOVTKPLOT
+CFLAGD = -DMULTIFLUID_BASICS #-DNOVTKPLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder

@@ -13,8 +13,6 @@ DI=../../data_in/two-dim
 
 ## RP2D_Positive
 #:<<!
-   cd $DI/RP2D_Positive/Config3
-   echo "value_start" | $MRun
-   cd $CPath
+   echo "cd $DI/RP2D_Positive/Config3; value_start" | $MRun
 # $EXE 
 #!

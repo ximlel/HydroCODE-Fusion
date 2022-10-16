@@ -10,7 +10,7 @@ CFLAGR = -std=c99 -O2 -fopenmp
 #CC = /opt/intel/oneapi/compiler/latest/linux/bin/intel64/icc
 #CFLAGR = -std=c99 -O2 -qopenmp -shared-intel
 #Intel C compiler options
-CFLAGD = -DNODATPLOT -DHDF5PLOT
+CFLAGD = -DHDF5PLOT #-DNODATPLOT -DNOTECPLOT
 #Macro definition
 INCLUDE_FOLDER = include
 #Inclued folder

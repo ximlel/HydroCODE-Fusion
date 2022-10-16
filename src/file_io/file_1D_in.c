@@ -12,6 +12,8 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 
+#define N_MAX_1D 1000
+
 
 /**
  * @brief Count out and read in 1-D data of the initial fluid variable 'sfv'.
@@ -84,7 +86,7 @@
   * @return  \b FV0:  Structure of initial fluid variable data array pointer.
   * @note This function contains the function procedures 'time_plot_read()' and 'configurate()'.
   */
-struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot[])
+struct flu_var initialize_1D(const char * name, int * N, int * N_plot, double * time_plot[])
 {
     struct flu_var FV0 = {NULL}; // Structure of initial data array pointer.
 
@@ -101,7 +103,7 @@ struct flu_var initialize_1D(const char * name, int * N_plot, double * time_plot
     printf("  delta_x\t= %g\n", config[10]);
     printf("  bondary\t= %d\n", (int)config[17]);
 
-    time_plot_read(add_in, N_plot, time_plot);
+    (*N) = time_plot_read(add_in, N_MAX_1D, N_plot, time_plot);
 
     char add[FILENAME_MAX+40]; // The address of the velocity/pressure/density file to read in.
     FILE * fp;      // The pointer to the above data files.

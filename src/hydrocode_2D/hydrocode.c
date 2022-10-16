@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
   config[0] = (double)2; // Dimensionality = 2
 
   // The number of times steps of the fluid data stored for plotting.
-  int N; // (int)(config[5]) + 1;
+  int N, N_plot; // (int)(config[5]) + 1;
   double * time_plot;
     /* 
      * We read the initial data files.
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
      * The value of first array element of these variables is m.
      * The following m variables are the initial value.
      */
-  struct flu_var FV0 = initialize_2D(argv[1], &N, &time_plot); // Structure of initial data array pointer.
+  struct flu_var FV0 = initialize_2D(argv[1], &N, &N_plot, &time_plot); // Structure of initial data array pointer.
     /* 
      * m is the number of initial value as well as the number of grids.
      * As m is frequently use to represent the number of grids,
@@ -258,9 +258,9 @@ int main(int argc, char *argv[])
 		  config[41] = 0.0; // alpha = 0.0
 	      case 2:
 		  if (dim_split)
-		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, cpu_time, &N, time_plot);
+		      GRP_solver_2D_split_EUL_source(n_x, n_y, CV, X, Y, cpu_time, argv[2], N, &N_plot, time_plot);
 		  else
-		      GRP_solver_2D_EUL_source(n_x, n_y, CV, cpu_time, &N, time_plot);
+		      GRP_solver_2D_EUL_source(n_x, n_y, CV, X, Y, cpu_time, argv[2], N, &N_plot, time_plot);
 		  break;
 	      default:
 		  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -277,13 +277,13 @@ int main(int argc, char *argv[])
 
   // Write the final data down.
 #ifndef NODATPLOT
-  file_2D_write(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+  file_2D_write(n_x, n_y, N_plot, CV, X, Y, cpu_time, argv[2], time_plot);
 #endif
 #ifdef HDF5PLOT
-  file_2D_write_HDF5(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+  file_2D_write_HDF5(n_x, n_y, N_plot, CV, X, Y, cpu_time, argv[2], time_plot);
 #endif
 #ifndef NOTECPLOT
-  file_2D_write_POINT_TEC(n_x, n_y, N, CV, X, Y, cpu_time, argv[2], time_plot);
+  file_2D_write_POINT_TEC(n_x, n_y, 1, CV + N_plot-1, X, Y, cpu_time, argv[2], time_plot + N_plot-1);
 #endif
 
  return_NULL:
