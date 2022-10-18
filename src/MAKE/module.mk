@@ -1,5 +1,7 @@
 SRC = ..
 #Directory of sources
+COPY_SRC = ../../src~
+#Temporary directory of sources
 INCLUDE = $(addprefix -I, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 #Inclued folder
 
@@ -11,6 +13,8 @@ RM = rm -vf
 #Delete command
 CP = cp -vur
 #Copy command
+MKDIR = mkdir -pv
+#Make directory command
 
 DIR_NAME = $(shell basename `pwd`)
 #Current folder
@@ -21,8 +25,7 @@ FILES_O  = $(FILES_C:$(C_SUF)=.o)
 #All .o files
 FILES_SLO = $(FILES_C:$(C_SUF)=.slo)
 #All .slo files
-COPY_SRC = ../tmp/src
-#Temporary source folder
+
 
 define compile_c_file #Compile all .c/.cpp files
 @echo "$(CC) $(CFLAGS) $(CFLAGD)-c {"
@@ -37,7 +40,7 @@ endef
 
 define copy_c_file #Copy all .c/.cpp files
 @for file in $(FILES_C); do \
-	( $(CP) $$file $(COPY_SRC) ) \
+	( $(CP) $$file $(COPY_SRC)/$(DIR_NAME) ) \
 done;
 endef
 
@@ -61,8 +64,12 @@ lib$(DIR_NAME).a lib$(DIR_NAME).so all: *.o
 
 copy:
 	@echo "******************Copying********************"
-	@mkdir -pv $(COPY_SRC)
+	@$(MKDIR) $(COPY_SRC)/include $(COPY_SRC)/include_cpp
+	@$(MKDIR) $(COPY_SRC)/$(DIR_NAME)
 	$(call copy_c_file)
+	$(call copy_cii_h_file)
+	@if [ -f ../include/$(DIR_NAME).h ];       then $(CP) ../include/$(DIR_NAME).h       $(COPY_SRC)/include;     fi
+	@if [ -f ../include_cpp/$(DIR_NAME).hpp ]; then $(CP) ../include_cpp/$(DIR_NAME).hpp $(COPY_SRC)/include_cpp; fi
 
 clean:
 	@echo "******************Cleaning*******************"

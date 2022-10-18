@@ -7,6 +7,8 @@ endif
 #C flags for gcov/lcov/gprof
 SRC = ..
 #Directory of source file
+COPY_SRC = ../../src~
+#Temporary directory of sources
 BIN = ../../bin
 #Directory of binary files
 INCLUDE = $(addprefix -I, $(addprefix $(SRC)/, $(INCLUDE_FOLDER)))
@@ -19,13 +21,19 @@ RM = rm -vf
 #Delete command
 CP = cp -vur
 #Copy command
+MV = mv -vi
+#Move command
+MKDIR = mkdir -pv
+#Make directory command
 
 
 all: modules libscopy $(SOURCE).out
 ifdef RELEASE
-	@mkdir -pv $(BIN)/$(DIR_NAME)
-	@$(CP) lib $(BIN)/$(DIR_NAME)
+	@$(MKDIR) $(BIN)/$(DIR_NAME)
 	@$(CP) $(SOURCE).out shell/*_run.sh $(BIN)/$(DIR_NAME)
+ifndef STATIC
+	@$(CP) lib $(BIN)/$(DIR_NAME)
+endif
 endif
 .PHONYP:all
 
@@ -55,12 +63,23 @@ endif
 .PHONYP:modules
 
 lib/*.so liba/*.a libscopy:
-	@mkdir -pv lib liba
+	@$(MKDIR) lib liba
 	@$(CP) $(addsuffix /*.a,  $(addprefix $(SRC)/, $(HEAD))) liba/
 	@$(CP) $(addsuffix /*.so, $(addprefix $(SRC)/, $(HEAD))) lib/
 .PHONY: libscopy
 
-get: 
+doxygen:
+	@for n in $(HEAD); do \
+	( $(MAKE) SRC_LIST='$(SRC_LIST)' --directory=$(SRC)/$$n copy ) \
+	done
+	@$(CP) $(SRC)/include/var_struc.h $(COPY_SRC)/include
+	@$(MKDIR) $(COPY_SRC)/$(DIR_NAME)
+	@$(CP) $(SOURCE).c $(COPY_SRC)/$(DIR_NAME)
+	@$(MV) $(COPY_SRC) ./
+	@echo "*********Generate Doxygen documents**********"
+	@doxygen
+
+get:
 #Generate GCOV code coverage report
 	gcov $(SOURCE).c
 .PHONY: get
@@ -76,7 +95,7 @@ html:
 clean_all: clean
 #Clean in the directory
 	@$(RM) $(SOURCE).out
-	@$(RM) -R lib gcovdir
+	@$(RM) -R lib gcovdir src~
 	@$(RM) pg.png callgrind.png
 	@$(RM) perf_flame.svg
 	@$(RM) $(SOURCE).exe

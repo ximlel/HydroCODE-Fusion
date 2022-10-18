@@ -8,7 +8,7 @@
 
 #include "../include/var_struc.h"
 #include "../include/tools.h"
-#include "../include_cpp/inter_process.hpp"
+#include "../include_cpp/inter_process_cpp.hpp"
 
 
 /**

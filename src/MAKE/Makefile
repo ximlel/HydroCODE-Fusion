@@ -28,6 +28,7 @@ clean_all: clean
 	@for n in $(FOLDER_hydro) ; do \
 	( $(MAKE) --directory=$$n clean_all ) \
 	done;
+	@$(RM) -R ../../src~
 .PHONYP:clean_all
 
 modules:

@@ -29,6 +29,7 @@ struct RI_var {
 	double z_s, rho_s, u_s, Q, P, H, eta_g;
 };
 
+
 //variables at cell centers (including staggered solid cells)
 struct center_var {
 	//solid cell
@@ -45,6 +46,7 @@ struct center_var {
 	double **Q_yd, **P_yd, **H_yd, **eta_g_yd;
 };
 
+
 //slopes at centers of cells (including staggered solid cells)
 struct slope_var {
 	double **Z_sx, **Z_sy;
@@ -58,6 +60,7 @@ struct slope_var {
 	double **Q_y, **P_y, **H_y, **eta_g_y;
         double **idx; // idx=1.0 说明这里是孔隙率间断
 };
+
 
 //left and right variables for GRO solver (both Edir and BN-Riemann-invariant solver)
 struct GRP_LR_var {

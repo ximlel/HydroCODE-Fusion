@@ -1,5 +1,5 @@
-#ifndef _INTER_PROCESS_HPP_
-#define _INTER_PROCESS_HPP_
+#ifndef _INTER_PROCESS_CPP_HPP_
+#define _INTER_PROCESS_CPP_HPP_
 
 
 #ifdef __cplusplus

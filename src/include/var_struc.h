@@ -35,6 +35,7 @@
 
 extern double config[]; //!< Initial configuration data array.
 
+
 //! pointer structure of FLUid VARiables array.
 typedef struct flu_var {
 	double * RHO,   * U,   * V,   * P;
@@ -46,6 +47,7 @@ typedef struct flu_var {
 #endif
 #endif
 } Fluid_Variable;
+
 
 //! pointer structure of VARiables on STRUctural computational grid CELLs.
 typedef struct cell_var_stru {
@@ -62,6 +64,7 @@ typedef struct cell_var_stru {
 	double ** gamma;
 #endif
 } Cell_Variable_Structured;
+
 
 //! pointer structure of VARiables on unstructured computational grid CELLs.
 typedef struct cell_var {
@@ -100,6 +103,7 @@ typedef struct cell_var {
 #endif
 } Cell_Variable;
 
+
 //! Interfacial Fluid VARiables.
 typedef struct i_f_var {
 	double     n_x,     n_y;             //!< x- and y-coordinates of the interfacial unit normal vector.
@@ -129,6 +133,7 @@ typedef struct i_f_var {
 #endif
 } Interface_Fluid_Variable;
 
+
 //! Fluid VARiables at Boundary in one direction.
 typedef struct b_f_var {
 	double    H;              //!< cell width of the ghost grid at boundary.
@@ -136,6 +141,7 @@ typedef struct b_f_var {
 	double SRHO, SP, SU, SV;  //!< spatial derivatives in coordinate x (slopes).
 	double TRHO, TP, TU, TV;  //!< spatial derivatives in coordinate y (slopes).
 } Boundary_Fluid_Variable;
+
 
 //! MESHing VARiables.
 typedef struct mesh_var {
@@ -163,6 +169,7 @@ typedef struct mesh_var {
 } Mesh_Variable;
 
 
+#ifdef RADIAL_BASICS
 //! RADIALly symmetric MESHing VARiables.
 typedef struct radial_mesh_var {
     double * Rb;
@@ -174,5 +181,6 @@ typedef struct radial_mesh_var {
     double * dRc;
     double * vol;
 } Radial_Mesh_Variable;
+#endif
 
 #endif
