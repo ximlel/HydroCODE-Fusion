@@ -52,30 +52,30 @@ double Riemann_solver_exact_Toro(double * U_star, double * P_star, const double 
 // linear_grp_solver_LAG.c
 //////////////////////////////////////
 /* 1-D GRP solver (Lagrangian, two-component flow) */
-void linear_GRP_solver_LAG (double *D, double *U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double  atc);
+void linear_GRP_solver_LAG (double *D, double *U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double atc);
 //////////////////////////////////////
 // linear_grp_solver_Edir.c
 //////////////////////////////////////
 /* 1-D GRP solver (Eulerian, single-component flow) */
-void linear_GRP_solver_Edir(double *D, double *U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double  atc);
+void linear_GRP_solver_Edir(double *D, double *U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double atc);
 
 /* 2-D GRP solver (ALE, two-component flow) */
 //////////////////////////////////////
 // linear_grp_solver_Edir_Q1D.c
 //////////////////////////////////////
-void linear_GRP_solver_Edir_Q1D(double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double  eps, const double  atc);
+void linear_GRP_solver_Edir_Q1D(double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double  eps, const double atc);
 //////////////////////////////////////
 // linear_grp_solver_Edir_G2D.c
 //////////////////////////////////////
-void linear_GRP_solver_Edir_G2D(double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double  eps, const double  atc);
+void linear_GRP_solver_Edir_G2D(double *wave_speed, double *D, double *U, double *U_star, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double  eps, const double atc);
 
 //////////////////////////////////////
 // linear_grp_solver_radial_LAG.c
 //////////////////////////////////////
 void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
-			 double r, double M, const double eps);
+			 const double r, const double M, const double eps);
 void GRPsolverRLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
-		   double r, double M, const double eps, const double  atc);
+		   const double r, const double M, const double eps, const double atc);
 
 
 /* HLL solver (single-component flow) */
@@ -94,7 +94,7 @@ void Roe_solver   (double *F, double *lambda_max, const struct i_f_var *ifv_L, c
 //////////////////////////////////////
 void Roe_2D_solver(double *F, double *lambda_max, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double delta);
 //////////////////////////////////////
-// roe_HLL_solver.c
+// roe_hll_solver.c
 //////////////////////////////////////
 void Roe_HLL_solver(double *V_mk, double *F, double *lambda_max, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double delta);
 

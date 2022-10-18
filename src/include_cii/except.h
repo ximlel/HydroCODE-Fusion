@@ -1,6 +1,7 @@
 /**
  * @file except.h
- * @brief Source codes in the book 'C Interfaces and Implementations'.
+ * @brief This file is a header file of source codes in the book 'C Interfaces and Implementations'.
+ * @details This header file declares functions in the source file 'src_cii/except.c'.
  */
 
 #ifndef EXCEPT_INCLUDED

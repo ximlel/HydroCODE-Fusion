@@ -122,6 +122,7 @@ octave-workspace
 
 # ============================Doxygen=========================
 
+# Doxygen output folders
 latex/
 html/
 

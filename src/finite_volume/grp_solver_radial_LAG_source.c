@@ -34,7 +34,7 @@
  * @param[in,out] N_plot: Pointer to the number of time steps for plotting.
  * @param[in,out] time_plot: Array of the plotting time recording.
  * @sa    Theory is found in Reference [1]. \n
- *        [1] R. Chen, J. Li & B. Tian, Application of the GRP Scheme for Cylindrical Compressible Fluid Flows,
+ *        [1] R. Chen, J. Li & B. Tian, Application of the GRP Scheme for Cylindrical Compressible Fluid Flows.
  *            COMMUNICATIONS IN COMPUTATIONAL PHYSICS, 24.5: 1523-1555, 2018.
  */
 void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * rmv, double * R[], const int M,

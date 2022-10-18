@@ -2,7 +2,7 @@
  * @file  riemann_solver_exact_Ben.c
  * @brief There are exact Riemann solvers in Ben-Artzi's book.
  * @sa   Theory is found in Appendix C of Reference [1]. \n
- *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics", 
+ *       [1] M. Ben-Artzi & J. Falcovitz, "Generalized Riemann problems in computational fluid dynamics". 
  *           Cambridge University Press, 2003
  */
 

@@ -12,9 +12,9 @@
 
 /**
  * @brief A Lagrangian GRP solver for unsteady compressible inviscid two-component flow in one space dimension.
- * @param[out] D: the temporal derivative of fluid variables. \n
+ * @param[out] D: the temporal derivative of fluid variables in the Star Region. \n
  *                   [rho_L, u, p, rho_R]_t
- * @param[out] U:  the Riemann solutions. \n
+ * @param[out] U:  the Riemann solutions in the Star Region. \n
  *                   [rho_star_L, u_star, p_star, rho_star_R]
  * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, s_rho_L, s_u_L, s_p_L, gammaL).
  * @param[in] ifv_R: Right States (rho_R, u_R, p_R, s_rho_R, s_u_R, s_p_R, gammaR).
@@ -29,7 +29,7 @@
  *       [1] M. Ben-Artzi & J. Falcovitz, A second-order Godunov-type scheme for compressible fluid dynamics,
  *           Journal of Computational Physics, 55.1: 1-32, 1984
  */
-void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double  atc)
+void linear_GRP_solver_LAG(double * D, double * U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double atc)
 {
   const double   rho_L = ifv_L->RHO,     rho_R = ifv_R->RHO;
   const double s_rho_L = ifv_L->t_rho, s_rho_R = ifv_R->t_rho;

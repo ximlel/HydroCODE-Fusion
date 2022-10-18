@@ -27,7 +27,7 @@
  *              - eps:      1D GRP solver(nonlinear + acoustic case)
  *              - -0.0:     1D GRP solver(only nonlinear case)
  * @sa   Theory is found in Reference [1]. \n
- *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows,
+ *       [1] M. Ben-Artzi, J. Li & G. Warnecke, A direct Eulerian GRP scheme for compressible fluid flows.
  *           Journal of Computational Physics, 218.1: 19-43, 2006.
  */
 void linear_GRP_solver_Edir(double * D, double * U, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double eps, const double atc)

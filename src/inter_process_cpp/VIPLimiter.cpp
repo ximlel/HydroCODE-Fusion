@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////
-/// @file VIPLimiter.cpp
+/// @file   VIPLimiter.cpp
 /// @brief  The subroutin implements the VIP limiter for simulations of 2D flows on structured grids.
 /// @note   Note, this is only a limiter to limit the velocity vector V=(u,v) for 2D flows. 
-/// @sa     The specific implementation is mainly based on section 2.1-2.3 of the following paper: \n
-///         G.Luttwak, J.Falcovitz, Slope limiting for vectors, A novel vector limiting algorithm,
-///         Int. J. Numer. Meth. Fluids., 2011 (65)1365-1375.
+/// @sa     The specific implementation is mainly based on Section 2.1-2.3 of the paper [1]: \n
+///         [1] G. Luttwak & J. Falcovitz, Slope limiting for vectors, A novel vector limiting algorithm,
+///             Int. J. Numer. Meth. Fluids., 65:1365-1375, 2011.
 /// @date   Apr 11, 2018
 /// @author Jian Cheng @ IAPCM
 ///////////////////////////////////////////////////

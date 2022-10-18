@@ -1,5 +1,5 @@
 /**
- * @file  bound_cond_slope_limiter_x.c
+ * @file  bound_cond_slope_limiter_y.c
  * @brief This is a function to set boundary conditions and use the slope limiter in y-direction of two dimension.
  */
 #include <stdio.h>

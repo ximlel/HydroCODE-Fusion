@@ -1,3 +1,8 @@
+/**
+ * @file  radial_mesh.c
+ * @brief There are some handler functions of radially symmetric mesh.
+ */
+
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -6,6 +11,11 @@
 #include "../include/var_struc.h"
 
 
+/**
+ * @brief This function initializes radially symmetric meshing variables.
+ * @param[in]  example: Name of the test example.
+ * @return  \b rmv:     Structure of radially symmetric meshing variable data.
+ */
 struct radial_mesh_var radial_mesh_init(const char *example)
 {
     double const dr     = config[10];       // initial d_raidus
@@ -40,6 +50,10 @@ struct radial_mesh_var radial_mesh_init(const char *example)
 }
 
 
+/**
+ * @brief This function updates radially symmetric meshing variables after each time step update.
+ * @param[in,out] rmv: Structure of radially symmetric meshing variable data.
+ */
 void radial_mesh_update(struct radial_mesh_var *rmv)
 {
     int const Ncell = (int)config[3]; // Number of computing cells in r direction
@@ -73,6 +87,10 @@ void radial_mesh_update(struct radial_mesh_var *rmv)
 }
 
 
+/**
+ * @brief This function free memory for storing radially symmetric meshing variables.
+ * @param[out] rmv: Structure of radially symmetric meshing variable data.
+ */
 void radial_mesh_mem_free(struct radial_mesh_var *rmv)
 {
     FREE(rmv->Rb);

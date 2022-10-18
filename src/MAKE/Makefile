@@ -7,6 +7,8 @@ CFLAGD = -D_Bool=bool
 #Macro definition
 SRC = ..
 #Directory of sources
+COPY_SRC = ../../src~
+#Temporary directory of sources
 RM = rm -vf
 #Delete command
 
@@ -28,7 +30,7 @@ clean_all: clean
 	@for n in $(FOLDER_hydro) ; do \
 	( $(MAKE) --directory=$$n clean_all ) \
 	done;
-	@$(RM) -R ../../src~
+	@$(RM) -R $(COPY_SRC)
 .PHONYP:clean_all
 
 modules:

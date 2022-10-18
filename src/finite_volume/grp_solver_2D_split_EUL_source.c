@@ -64,6 +64,8 @@
  * @param[in] m:          Number of the x-grids: n_x.
  * @param[in] n:          Number of the y-grids: n_y.
  * @param[in,out] CV:     Structure of cell variable data.
+ * @param[in] X:          Array of the x-coordinate data.
+ * @param[in] Y:          Array of the y-coordinate data.
  * @param[out] cpu_time:  Array of the CPU time recording.
  * @param[in]  problem:   Name of the numerical results for the test problem.
  * @param[in]  N_T:       Number of 2-D data dimension storing fluid variables in memory.

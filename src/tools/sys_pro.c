@@ -102,7 +102,7 @@ int CreateDir(const char * pPath)
  * @brief This is a function that initializes memory for double-precision floating-point data.
  * @param[out] p: Pointer of data.
  * @param[in]  n: Number of grid cells.
- * @param[in] cell_pt[][0]: Number of grid node on a grid cell in the clockwise direction..
+ * @param[in] cell_pt[]: cell_pt[k][0] is the number of grid node on the k-th grid cell in the clockwise direction..
  */
 void init_mem(double * p[], const int n, int ** cell_pt)
 {
@@ -127,7 +127,7 @@ void init_mem(double * p[], const int n, int ** cell_pt)
  * @brief This is a function that initializes memory for integer data.
  * @param[out] p: Pointer of data.
  * @param[in]  n: Number of grid cells.
- * @param[in] cell_pt[][0]: Number of grid node on a grid cell in the clockwise direction..
+ * @param[in] cell_pt[]: cell_pt[k][0] is the number of grid node on the k-th grid cell in the clockwise direction..
  */
 void init_mem_int(int * p[], const int n, int ** cell_pt)
 {

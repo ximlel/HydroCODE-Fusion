@@ -1,3 +1,8 @@
+/**
+ * @file  hll_2D_solver.c
+ * @brief This is a two-dimensional HLL solver for compressible inviscid flow.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -5,6 +10,18 @@
 #include "../include/var_struc.h"
 
 
+/**
+ * @brief A HLL approxiamate Riemann solver for unsteady compressible inviscid single-component flow in two space dimension.
+ * @param[out] F:          All four fluxes.
+ * @param[out] lambda_max: Maximum characteristic velocity.
+ * @param[in] ifv_L: Left  States (rho_L, u_L, v_L, p_L, gamma, n_x, n_y).
+ * @param[in] ifv_R: Right States (rho_R, u_R, v_R, p_R).
+ *                   - gamma: the constant of the perfect gas.
+ *                   - (n_x, n_y): unit normal vector coordinates.
+ * @sa   Theory is found in Chapter 10 of Reference [1]. \n
+ *       [1] E. F. Toro, "Riemann Solvers and Numerical Methods for Fluid Dynamics". 
+ *           Springer-Verlag, Second Edition, 1999
+ */
 void HLL_2D_solver(double * F, double * lambda_max, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R)
 {
 	const double gamma = ifv_L->gamma;

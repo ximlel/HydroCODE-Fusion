@@ -1,6 +1,6 @@
 /**
  * @file except.c
- * @brief Source codes in the book 'C Interfaces and Implementations'.
+ * @brief This file is the source codes in the book 'C Interfaces and Implementations'.
  */
 
 #include <stdlib.h>

@@ -1,3 +1,8 @@
+/**
+ * @file  linear_GRP_solver_radial_LAG.c
+ * @brief This is a Lagrangian GRP solver for compressible inviscid cylindrical flow in Li's paper.
+ */
+
 #include <stdio.h>
 #include <math.h>
 
@@ -5,10 +10,25 @@
 #include "../include/riemann_solver.h"
 
 /**
- * @brief GRP solver for tangential case. Lagrangian version(moving mesh) for cylindrical case.
+ * @brief A GRP solver for unsteady compressible inviscid two-component flow in tangential case.
+ *        Lagrangian version (moving mesh) for cylindrical case.
+ * @param[out] dire:   the temporal derivative of fluid variables in the Star Region. \n
+ *                        [*, u, p]_t
+ * @param[out] U_star: the Riemann solutions in the Star Region. \n
+ *                        [*, u_star, p_star]
+ * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, d_u_L, d_p_L, gammaL).
+ * @param[in] ifv_R: Right States (rho_R, u_R, p_R, d_u_R, d_p_R, gammaR).
+ *                   - d_u, d_p: spatial derivatives in coordinate r.
+ *                   - gamma: the constant of the perfect gas.
+ * @param[in] r: the r-coordinate value.
+ * @param[in] M: Spatial dimension number for radially symmetric flow.
+ *             - M=1: planar flow.
+ *             - M=2: cylindrical flow. (√)
+ *             - M=3: spherical flow.
+ * @param[in] eps: the largest value could be seen as zero.
  */
 void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
-			 double r, double M, const double eps)
+			 const double r, const double M, const double eps)
 {
 	double GammaL = ifv_L->gamma, GammaR = ifv_R->gamma;
 	double DL = ifv_L->RHO, DR = ifv_R->RHO;
@@ -44,10 +64,33 @@ void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * if
 
 
 /**
- * @brief Lagrangian version(moving mesh) cylindrical case.
+ * @brief A GRP solver for unsteady compressible inviscid two-component flow.
+ *        Lagrangian version (moving mesh) cylindrical case.
+ * @param[out] wave_speed: the velocity of left and right waves.
+ * @param[out] dire:   the temporal derivative of fluid variables in the Star Region. \n
+ *                        [rho_L, u, p, rho_R]_t
+ * @param[out] U_star: the Riemann solutions in the Star Region. \n
+ *                        [rho_star_L, u_star, p_star, rho_star_R]
+ * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, d_rho_L, d_u_L, d_p_L, gammaL).
+ * @param[in] ifv_R: Right States (rho_R, u_R, p_R, d_rho_R, d_u_R, d_p_R, gammaR).
+ *                   - d_rho, d_u, d_p: r-spatial derivatives.
+ *                   - gamma: the constant of the perfect gas.
+ * @param[in] r: the r-coordinate value.
+ * @param[in] M: Spatial dimension number for radially symmetric flow.
+ *             - M=1: planar flow.
+ *             - M=2: cylindrical flow. (√)
+ *             - M=3: spherical flow.
+ * @param[in] eps: the largest value could be seen as zero.
+ * @param[in] atc: Parameter that determines the solver type.
+ *              - INFINITY: acoustic approximation
+ *              - eps:      GRP solver(nonlinear + acoustic case)
+ *              - -0.0:     GRP solver(only nonlinear case)
+ * @sa   Theory is found in Reference [1]. \n
+ *       [1] J. Li, T. Liu & Z. Sun, Implementation of the GRP scheme for computing radially symmetric compressible fluid flows.
+ *           Journal of Computational Physics, 228.16: 5867–5887, 2009
  */
 void GRPsolverRLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
-		   double r, double M, const double eps, const double  atc)
+		   const double r, const double M, const double eps, const double atc)
 {
 	const double GammaL = ifv_L->gamma, GammaR = ifv_R->gamma;
 	const double DL = ifv_L->RHO,    DR = ifv_R->RHO;

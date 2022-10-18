@@ -106,7 +106,7 @@ static void PreFun(double *F, double *FD, const double P, const double DK, const
  * @author E. F. Toro
  * @date February 1st 1999
  * @sa   Theory is found in Chapter 4 of Reference [1]. \n
- *       [1] Toro, E. F., "Riemann Solvers and Numerical Methods for Fluid Dynamics", 
+ *       [1] E. F. Toro, "Riemann Solvers and Numerical Methods for Fluid Dynamics". 
  *           Springer-Verlag, Second Edition, 1999
  * @copyright This program is part of NUMERICA —— \n
  *            A Library of Source Codes for Teaching, Research and Applications, by E. F. Toro \n

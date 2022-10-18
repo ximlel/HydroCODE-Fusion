@@ -1,3 +1,8 @@
+/**
+ * @file  roe_HLL_solver.c
+ * @brief This is a two-dimensional Roe-HLL solver with for compressible inviscid flow.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -5,6 +10,21 @@
 #include "../include/var_struc.h"
 
 
+/**
+ * @brief An approxiamate Riemann solver hybridizing the Roe flux and the HLL flux for
+ *        unsteady compressible inviscid single-component flow in two space dimension.
+ * @param[out] V_mk:       ?
+ * @param[out] F:          All four fluxes.
+ * @param[out] lambda_max: Maximum characteristic velocity.
+ * @param[in] ifv_L: Left  States (rho_L, u_L, v_L, p_L, gamma).
+ * @param[in] ifv_R: Right States (rho_R, u_R, v_R, p_R).
+ *                   - gamma: the constant of the perfect gas.
+ * @param[in] delta: Parameter to modify the modulus of the eigenvalues.
+ * @todo the Roe-HLL solver is WHAT?
+ * @sa   Theory is found in Reference [1]. \n
+ *       [1] H. Nishikawa & K. Kitamura, Very simple, carbuncle-free, boundary-layer-resolving, rotated-hybrid Riemann solvers.
+ *           Journal of Computational Physics, 227.4: 2560-2581, 2008.
+ */
 void Roe_HLL_solver(double *V_mk, double *F, double * lambda_max, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double delta)
 {
 	const double gamma = ifv_L->gamma;

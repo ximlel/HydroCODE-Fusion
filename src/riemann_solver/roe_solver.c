@@ -1,3 +1,8 @@
+/**
+ * @file  roe_solver.c
+ * @brief This is a one-dimensional Roe solver for compressible inviscid flow.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -5,6 +10,18 @@
 #include "../include/var_struc.h"
 
 
+/**
+ * @brief An approxiamate Riemann solver of Roe for unsteady compressible inviscid single-component flow in one space dimension.
+ * @param[out] F:          All three fluxes.
+ * @param[out] lambda_max: Maximum characteristic velocity.
+ * @param[in] ifv_L: Left  States (rho_L, u_L, p_L, gamma).
+ * @param[in] ifv_R: Right States (rho_R, u_R, p_R).
+ *                   - gamma: the constant of the perfect gas.
+ * @param[in] delta: Parameter to modify the modulus of the eigenvalues. (NOT USED!)
+ * @sa   Theory is found in Chapter 11 of Reference [1]. \n
+ *       [1] E. F. Toro, "Riemann Solvers and Numerical Methods for Fluid Dynamics". 
+ *           Springer-Verlag, Second Edition, 1999
+ */
 void Roe_solver(double * F, double * lambda_max, const struct i_f_var *ifv_L, const struct i_f_var *ifv_R, const double delta)
 {
 	const double gamma = ifv_L->gamma;

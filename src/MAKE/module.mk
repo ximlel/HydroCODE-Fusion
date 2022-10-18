@@ -68,8 +68,8 @@ copy:
 	@$(MKDIR) $(COPY_SRC)/$(DIR_NAME)
 	$(call copy_c_file)
 	$(call copy_cii_h_file)
-	@if [ -f ../include/$(DIR_NAME).h ];       then $(CP) ../include/$(DIR_NAME).h       $(COPY_SRC)/include;     fi
-	@if [ -f ../include_cpp/$(DIR_NAME).hpp ]; then $(CP) ../include_cpp/$(DIR_NAME).hpp $(COPY_SRC)/include_cpp; fi
+	@if [ -f $(SRC)/include/$(DIR_NAME).h ];       then $(CP) $(SRC)/include/$(DIR_NAME).h       $(COPY_SRC)/include;     fi
+	@if [ -f $(SRC)/include_cpp/$(DIR_NAME).hpp ]; then $(CP) $(SRC)/include_cpp/$(DIR_NAME).hpp $(COPY_SRC)/include_cpp; fi
 
 clean:
 	@echo "******************Cleaning*******************"
