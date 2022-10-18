@@ -31,12 +31,12 @@ void minmod_limiter_2D_x(const _Bool NO_h, const int m, const int i, const _Bool
 // slope_limiter_radial.c
 ///////////////////////////////////
 void minmod_limiter_radial(const int Ncell, const _Bool i_f_var_get, double s[],
-			  const double U[], struct radial_mesh_var *smv);
+			  const double U[], struct radial_mesh_var *rmv);
 ///////////////////////////////////
 // slope_VIP_limiter_radial.c
 ///////////////////////////////////
 void VIP_limiter_radial(const int Ncell, const _Bool i_f_var_get, double DmU[], double TmV[],
-		       const double UU[], struct radial_mesh_var *smv);
+		       const double UU[], struct radial_mesh_var *rmv);
 
 
 /* Set boundary conditions & Use the slope limiter */

@@ -5,7 +5,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-double useVIPLimiter(int neigh_cell_num, double Vave[][2], double* V0, double* Vp);
+///////////////////////////////////
+// VIPLimiter.cpp
+///////////////////////////////////
+double useVIPLimiter(const int neigh_cell_num, const double Vave[][2], double* V0, double* Vp);
 #ifdef __cplusplus
 }
 #endif

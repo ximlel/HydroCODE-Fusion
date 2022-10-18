@@ -1,3 +1,8 @@
+/**
+ * @file except.c
+ * @brief Source codes in the book 'C Interfaces and Implementations'.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>

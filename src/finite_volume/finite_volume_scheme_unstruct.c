@@ -1,3 +1,8 @@
+/**
+ * @file  finite_volume_scheme_unstruct.c
+ * @brief This is an Eulerian finite volume scheme to solve (augmented) Euler equations for single-/two-component fluid on unstructured grids.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,11 +21,11 @@
  * @brief  This function use various finite volume schemes to solve (augmented) Euler equations for single-/two-component fluid
  *         motion on unstructured grids in Eulerian coordinate.
  * @param[in,out] FV:     Structure of initial fluid variable data array pointer.
- * @param[in] mv:         Structure of meshing variable data.
+ * @param[in]     mv:     Structure of meshing variable data.
  * @param[in] scheme:     Scheme name.
  * @param[in] problem:    Name of the numerical results for the test problem.
- * @param[in] N_plot:     Number of time steps for plotting.
- * @param[in] time_plot:  Array of the plotting time recording.
+ * @param[in,out] N_plot: Pointer to the number of time steps for plotting.
+ * @param[in,out] time_plot: Array of the plotting time recording.
  */
 void finite_volume_scheme_unstruct(struct flu_var * FV, const struct mesh_var * mv, const char * scheme,
 				   const char * problem, int * N_plot, double time_plot[])

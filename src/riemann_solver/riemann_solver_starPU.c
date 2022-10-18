@@ -1,11 +1,24 @@
+/**
+ * @file  riemann_solver_starPU.c
+ * @brief This is an exact two-component Riemann solver in Toro's book.
+ */
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
 
 
+/**
+ * @brief Provide a guess value for pressure PM in the Star Region.
+ * @details The choice is made according to adaptive Riemann solver using the
+ *          PVRS (or TRRS or TSRS) ApproxImate Riemann Solvers (AIRS).
+ * @param[in]  DL, UL, PL, CL: Initial Density/Velocity/Pressure/Sound_speed on left  state.
+ * @param[in]  DR, UR, PR, CR: Initial Density/Velocity/Pressure/Sound_speed on right state.
+ * @param[in]  GammaL, GammaR: Ratio of specific heats.
+ * @param[in]  eps: The largest value can be seen as zero.
+ * @return   \b PM: A guess value for pressure in the Star Region.
+ */
 static double GuessP(const double DL, const double DR, const double UL, const double UR, const double PL, const double PR,
 		     const double CL, const double CR, const double GammaL, const double GammaR, const double eps)
-//provide a guess value for pressure PM in the star region.AIRS approximate Riemann solvers.
 {
 	double PM;
 	double CUP,GEL,GER,PMAX,PMIN,PPV,QMAX;
@@ -45,8 +58,17 @@ static double GuessP(const double DL, const double DR, const double UL, const do
 }
 
 
+/**
+ * @brief Evaluate the pressure functions FL and FR in exact Riemann solver.
+ * @param[out] F:    Pressure function FL or FR.
+ * @param[out] FD:   First derivative of F with respect to pressure P.
+ * @param[in]  P:    Pressure.
+ * @param[in]  DK:   Density.
+ * @param[in]  PK:   Pressure.
+ * @param[in]  CK:   Sound speed.
+ * @param[in] Gamma: Ratio of specific heats.
+ */
 static void PreFun(double *F, double *FD, const double P, const double DK, const double PK, const double CK, const double Gamma)
-// evaluate the pressure functions FL and FR in exact Riemann solver
 {
 	double AK,BK,PRAT,QRT;
 	if(P<=PK)//Rarefaction wave
@@ -65,12 +87,35 @@ static void PreFun(double *F, double *FD, const double P, const double DK, const
 		}
 }
 
-// NRITER=100
+
+/**
+ * @brief EXACT RIEMANN SOLVER FOR Two-Component γ-Law Gas
+ * @details The purpose of this function is to compute the Riemann solution for pressure and velocity in the Star Region,
+ *          for the time dependent one dimensional Euler equations for two-component γ-law gas.
+ * @param[out] U_star, P_star: Velocity/Pressure in star region.
+ * @param[in]  UL, PL, CL:     Initial Velocity/Pressure/Sound_speed on left  state.
+ * @param[in]  UR, PR, CR:     Initial Velocity/Pressure/Sound_speed on right state.
+ * @param[in]  GammaL, GammaR: Ratio of specific heats.
+ * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
+ *                  - true: CRW
+ *                  - false: Shock wave
+ * @param[in]  eps:    The largest value can be seen as zero.
+ * @param[in]  TOLPRE: Condition value of 'gap' at the end of the iteration.
+ * @param[in]  NRITER: Maximum iteration step (Recommended Value: 100).
+ * @return  \b change: Relative pressure change after the last iteration.
+ * @author E. F. Toro
+ * @date February 1st 1999
+ * @sa   Theory is found in Chapter 4 of Reference [1]. \n
+ *       [1] Toro, E. F., "Riemann Solvers and Numerical Methods for Fluid Dynamics", 
+ *           Springer-Verlag, Second Edition, 1999
+ * @copyright This program is part of NUMERICA —— \n
+ *            A Library of Source Codes for Teaching, Research and Applications, by E. F. Toro \n
+ *            Published by NUMERITEK LTD
+ */
 double Riemann_solver_starPU(double * U_star, double * P_star, const double GammaL, const double GammaR,
 	    const double UL, const double UR, const double PL, const double PR,
 	    const double CL, const double CR, _Bool * CRW,
 	    const double eps, const double TOLPRE, const int NRITER)
-// compute the solution for pressure and velocity in the star region
 {
 	if((2.0*CL/(GammaL-1.0)+2.0*CR/(GammaR-1.0)) <= (UR-UL))
 		printf("Error: Vacuum is generated in Riemann solver!\n");

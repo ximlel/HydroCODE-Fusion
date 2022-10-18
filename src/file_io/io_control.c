@@ -283,6 +283,7 @@ static int compare_double(const void *a,const void *b)
  * @param[in]  N_max:     The maximum number of data dimension storing fluid variables in memory.
  * @param[out] N_plot:    Pointer to the number of time steps for plotting.
  * @param[out] time_plot: Pointer to the array of the plotting time recording.
+ * @return  It returns the proper number of data dimension storing fluid variables in memory.
  */
 int time_plot_read(const char * add_in, const int N_max, int * N_plot, double * time_plot[])
 {

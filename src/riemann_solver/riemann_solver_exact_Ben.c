@@ -16,8 +16,8 @@
  * @details The purpose of this function is to solve the Riemann problem exactly,
  *          for the time dependent one dimensional Euler equations for two-component γ-law gas.
  * @param[out] U_star, P_star: Velocity/Pressure in star region.
- * @param[in]  u_L, p_L, c_L: Initial Velocity/Pressure/sound_speed on left  state.
- * @param[in]  u_R, p_R, c_R: Initial Velocity/Pressure/sound_speed on right state.
+ * @param[in]  u_L, p_L, c_L:  Initial Velocity/Pressure/sound_speed on left  state.
+ * @param[in]  u_R, p_R, c_R:  Initial Velocity/Pressure/sound_speed on right state.
  * @param[in]  gammaL, gammaR: Ratio of specific heats.
  * @param[out] CRW: Centred Rarefaction Wave (CRW) Indicator of left and right waves.
  *                  - true: CRW
@@ -25,7 +25,7 @@
  * @param[in]  eps: The largest value can be seen as zero.
  * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
  * @param[in]  N:   Maximum iteration step.
- * @return \b gap: Relative pressure change after the last iteration.
+ * @return  \b gap: Relative pressure change after the last iteration.
  */
 double Riemann_solver_exact(double * U_star, double * P_star, const double gammaL, const double gammaR,
 			    const double u_L, const double u_R, const double p_L, const double p_R, 

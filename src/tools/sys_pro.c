@@ -38,7 +38,7 @@ void DispPro(const double pro, const int step)
 {
 	int j;
 	static double pro_print = 0.0;
-	const double dpro_print = 0.1;
+	const double dpro_print = 0.1; // Print-out interval of percentage point.
 	if (pro >= pro_print)
 	    {
 		for (j = 0; j < 77; j++)
@@ -98,6 +98,12 @@ int CreateDir(const char * pPath)
 }
 
 
+/**
+ * @brief This is a function that initializes memory for double-precision floating-point data.
+ * @param[out] p: Pointer of data.
+ * @param[in]  n: Number of grid cells.
+ * @param[in] cell_pt[][0]: Number of grid node on a grid cell in the clockwise direction..
+ */
 void init_mem(double * p[], const int n, int ** cell_pt)
 {
 	for(int k = 0; k < n; ++k)
@@ -117,6 +123,12 @@ void init_mem(double * p[], const int n, int ** cell_pt)
 }
 
 
+/**
+ * @brief This is a function that initializes memory for integer data.
+ * @param[out] p: Pointer of data.
+ * @param[in]  n: Number of grid cells.
+ * @param[in] cell_pt[][0]: Number of grid node on a grid cell in the clockwise direction..
+ */
 void init_mem_int(int * p[], const int n, int ** cell_pt)
 {
 	for(int k = 0; k < n; ++k)

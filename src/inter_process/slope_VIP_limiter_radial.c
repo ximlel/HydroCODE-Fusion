@@ -1,3 +1,7 @@
+/**
+ * @file  slope_VIP_limiter_radial.c
+ * @brief This is a function of the VIP/minmod slope limiter of the fluid velocity in radially symmetric case.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,8 +11,20 @@
 #include "../include_cpp/inter_process.hpp"
 
 
+/**
+ * @brief This function apply the VIP/minmod limiter to the slope of the fluid velocity in radially symmetric case.
+ * @param[in] Ncell:      Number of the r-grids.
+ * @param[in] i_f_var_get: Whether the cell interfacial variables have been obtained.
+ *                        - true: interfacial variables at t_{n+1} are available, 
+ *                                and then trivariate minmod3()/useVIPLimiter() functions are used.
+ *                        - false: bivariate minmod2()/useVIPLimiter() functions are used.
+ * @param[in,out] DmU[]:  Radially spatial derivatives of the fluid velocity are stored here.
+ * @param[in,out] TmV[]:  Transversely spatial derivatives of the fluid velocity are stored here.
+ * @param[in] UU[]: Array to store fluid velocity values.
+ * @param[in] rmv:  Structure of radially symmetric meshing variable data.
+ */
 void VIP_limiter_radial(const int Ncell, const _Bool i_f_var_get, double DmU[], double TmV[],
-		       const double UU[], struct radial_mesh_var *smv)
+		       const double UU[], struct radial_mesh_var *rmv)
 {
     double const dtheta = config[11]; //initial d_angle
     double const Alpha  = config[41]; // the paramater in slope limiters.
@@ -19,11 +35,11 @@ void VIP_limiter_radial(const int Ncell, const _Bool i_f_var_get, double DmU[], 
      * - abs(LIMITER)=2: VIP-like minmod limiter.
      */
     int const LIMITER_VIP = (int)config[42];
-    double * Rb   = smv->Rb;
-    double * RR   = smv->RR;
-    double * DdrL = smv->DdrL;
-    double * DdrR = smv->DdrR;
-    double * dRc  = smv->dRc;
+    double * Rb   = rmv->Rb;
+    double * RR   = rmv->RR;
+    double * DdrL = rmv->DdrL;
+    double * DdrR = rmv->DdrR;
+    double * dRc  = rmv->dRc;
 
     double sU, sV;
     double VIP_lim, Vave[4][2], V0[2], Vp1[2], Vp2[2], Vp3[2];//VIP limiter

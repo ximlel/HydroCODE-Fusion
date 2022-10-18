@@ -1,3 +1,8 @@
+/**
+ * @file mem.c
+ * @brief Source codes in the book 'C Interfaces and Implementations'.
+ */
+
 #include <stdlib.h>
 #include <stddef.h>
 #include <assert.h>

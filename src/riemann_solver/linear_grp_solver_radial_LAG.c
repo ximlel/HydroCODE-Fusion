@@ -4,8 +4,9 @@
 #include "../include/var_struc.h"
 #include "../include/riemann_solver.h"
 
-
-//GRP solver for tangential case. Lagrangian version(moving mesh) for cylindrical case.
+/**
+ * @brief GRP solver for tangential case. Lagrangian version(moving mesh) for cylindrical case.
+ */
 void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
 			 double r, double M, const double eps)
 {
@@ -42,7 +43,9 @@ void AcousticRLagTangent(double *dire, double *U_star, const struct i_f_var * if
 }
 
 
-// Lagrangian version(moving mesh) cylindrical case.
+/**
+ * @brief Lagrangian version(moving mesh) cylindrical case.
+ */
 void GRPsolverRLag(double *wave_speed, double *dire, double *U_star, const struct i_f_var * ifv_L, const struct i_f_var * ifv_R,
 		   double r, double M, const double eps, const double  atc)
 {

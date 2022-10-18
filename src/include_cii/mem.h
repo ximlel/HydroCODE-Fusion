@@ -1,3 +1,8 @@
+/**
+ * @file mem.h
+ * @brief Source codes in the book 'C Interfaces and Implementations'.
+ */
+
 #ifndef MEM_INCLUDED
 #define MEM_INCLUDED
 #include "except.h"

@@ -65,7 +65,10 @@
  * @param[in] n:          Number of the y-grids: n_y.
  * @param[in,out] CV:     Structure of cell variable data.
  * @param[out] cpu_time:  Array of the CPU time recording.
- * @param[out] time_plot: Array of the plotting time recording.
+ * @param[in]  problem:   Name of the numerical results for the test problem.
+ * @param[in]  N_T:       Number of 2-D data dimension storing fluid variables in memory.
+ * @param[in,out] N_plot: Pointer to the number of time steps for plotting.
+ * @param[in,out] time_plot: Array of the plotting time recording.
  */
 void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double ** X, double **Y, 
                                     double * cpu_time, const char * problem, int N_T, int * N_plot, double time_plot[])

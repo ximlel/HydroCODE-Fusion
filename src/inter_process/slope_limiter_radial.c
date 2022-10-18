@@ -1,3 +1,7 @@
+/**
+ * @file  slope_limiter_radial.c
+ * @brief This is a function of the minmod slope limiter in radially symmetric case.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,8 +9,19 @@
 #include "../include/tools.h"
 
 
+/**
+ * @brief This function apply the minmod limiter to the slope in radially symmetric case.
+ * @param[in] Ncell:      Number of the r-grids.
+ * @param[in] i_f_var_get: Whether the cell interfacial variables have been obtained.
+ *                        - true: interfacial variables at t_{n+1} are available, 
+ *                                and then trivariate minmod3() function is used.
+ *                        - false: bivariate minmod2() function is used.
+ * @param[in,out] s[]:    Spatial derivatives of the fluid variable are stored here.
+ * @param[in] U[]: Array to store fluid variable values.
+ * @param[in] rmv: Structure of radially symmetric meshing variable data.
+ */
 void minmod_limiter_radial(const int Ncell, const _Bool i_f_var_get, double s[],
-			  const double U[], struct radial_mesh_var *smv)
+			  const double U[], struct radial_mesh_var *rmv)
 {
     double const Alpha       =      config[41]; // the paramater in slope limiters.
     int    const LIMITER_VIP = (int)config[42];
@@ -17,13 +32,13 @@ void minmod_limiter_radial(const int Ncell, const _Bool i_f_var_get, double s[],
 	{
 	    if (abs(LIMITER_VIP)==1)
 		{
-		    s_L = (U[j]   - U[j-1]) / smv->dRc[j];
-		    s_R = (U[j+1] - U[j])   / smv->dRc[j+1];
+		    s_L = (U[j]   - U[j-1]) / rmv->dRc[j];
+		    s_R = (U[j+1] - U[j])   / rmv->dRc[j+1];
 		}
 	    else if (abs(LIMITER_VIP)==2)
 		{
-		    s_L = (U[j]   - U[j-1]) / 2.0 / smv->DdrR[j];
-		    s_R = (U[j+1] - U[j])   / 2.0 / smv->DdrL[j];
+		    s_L = (U[j]   - U[j-1]) / 2.0 / rmv->DdrR[j];
+		    s_R = (U[j+1] - U[j])   / 2.0 / rmv->DdrL[j];
 		}
 	    else
 		{

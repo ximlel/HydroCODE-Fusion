@@ -19,6 +19,13 @@ void Godunov_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[
 //////////////////////////////////////
 void     GRP_solver_LAG_source(const int m, struct cell_var_stru CV, double * X[], double * cpu_time, int * N_plot, double time_plot[]);
 
+/* radially symmertric Godunov/GRP scheme (Lagrangian, two-component flow, radial structured grid) */
+//////////////////////////////////////
+// grp_solver_radial_LAG_source.c
+//////////////////////////////////////
+void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * rmv, double * R[], const int M,
+				  double * cpu_time, const char * problem, int N_T, int * N_plot , double time_plot[]);
+
 /* 1-D Godunov/GRP scheme (Eulerian, single-component flow) */
 //////////////////////////////////////
 // godunov_solver_EUL_source.c
@@ -40,12 +47,6 @@ void GRP_solver_2D_EUL_source(const int m, const int n, struct cell_var_stru * C
 //////////////////////////////////////
 void GRP_solver_2D_split_EUL_source(const int m, const int n, struct cell_var_stru * CV, double ** X, double **Y, 
                                     double * cpu_time, const char * problem, int N_T, int * N_plot, double time_plot[]);
-
-//////////////////////////////////////
-// grp_solver_radial_LAG_source.c
-//////////////////////////////////////
-void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[], const int M,
-				  const char * problem, double * cpu_time, int N_T, int * N_plot , double time_plot[]);
 
 /* 2-D Godunov/GRP scheme (Eulerian, two-component flow, unstructured grid) */
 //////////////////////////////////////

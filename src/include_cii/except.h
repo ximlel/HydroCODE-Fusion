@@ -1,3 +1,8 @@
+/**
+ * @file except.h
+ * @brief Source codes in the book 'C Interfaces and Implementations'.
+ */
+
 #ifndef EXCEPT_INCLUDED
 #define EXCEPT_INCLUDED
 #include <setjmp.h>

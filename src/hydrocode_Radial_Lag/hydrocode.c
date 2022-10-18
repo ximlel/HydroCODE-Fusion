@@ -189,8 +189,8 @@ int main(int argc, char *argv[])
 	  exit(4);
       }
 
-  struct radial_mesh_var smv = radial_mesh_init(argv[1]);
-  radial_mesh_update(&smv);
+  struct radial_mesh_var rmv = radial_mesh_init(argv[1]);
+  radial_mesh_update(&rmv);
 
   struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
   double ** R = NULL;
@@ -218,7 +218,6 @@ int main(int argc, char *argv[])
       goto return_NULL;
     }
   }
-  memmove(R[0], smv.RR, Md * sizeof(double));
 
   CV_INIT_FV_RESET_MEM(U, N);
   CV_INIT_FV_RESET_MEM(P, N);
@@ -264,7 +263,7 @@ int main(int argc, char *argv[])
       case 1:
 	  config[41] = 0.0; // alpha = 0.0
       case 2:
-	  GRP_solver_radial_LAG_source(CV, &smv, R, M, argv[2], cpu_time, N, &N_plot, time_plot);
+	  GRP_solver_radial_LAG_source(CV, &rmv, R, M, cpu_time, argv[2], N, &N_plot, time_plot);
 	  break;
       default:
 	  printf("NOT appropriate order of the scheme! The order is %d.\n", order);
@@ -272,6 +271,7 @@ int main(int argc, char *argv[])
 	  goto return_NULL;
       }
 
+  memmove(R[N_plot-1], rmv.RR, (Ncell+1) * sizeof(double));
 #ifndef NODATPLOT
   file_1D_write(Ncell+1, N_plot, CV, R, cpu_time, argv[2], time_plot);
 #endif
@@ -282,11 +282,11 @@ int main(int argc, char *argv[])
   FV0.RHO = CV.RHO[N_plot-1];
   FV0.U   = CV.U[N_plot-1];
   FV0.P   = CV.P[N_plot-1];
-  file_radial_write_TEC(FV0, smv.RR, argv[2], time_plot[N_plot-1]);
+  file_radial_write_TEC(FV0, rmv.RR, argv[2], time_plot[N_plot-1]);
 #endif
 
 return_NULL:
-  radial_mesh_mem_free(&smv);
+  radial_mesh_mem_free(&rmv);
 
   FV0.RHO   = NULL;
   FV0.U     = NULL;

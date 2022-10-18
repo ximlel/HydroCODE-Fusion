@@ -1,9 +1,23 @@
+/**
+ * @file  fluid_var_check.c
+ * @brief There are some functions to check whether fluid variables are within the value range.
+ */
 #include <stdio.h>
 #include <math.h>
 
 #include "../include/var_struc.h"
 
 
+/**
+ * @brief This function checks whether interfacial fluid variables are within the value range.
+ * @param[in] ifv_L: Structure pointer of interfacial left state.
+ * @param[in] ifv_R: Structure pointer of interfacial right state.
+ * @param[in] dim:   Spatial dimension.
+ * @return    miscalculation indicator.
+ *   @retval  0: Successful calculation.
+ *   @retval  1: < 0.0 error.
+ *   @retval  2: NAN or INFinite error of Slope.
+ */
 int ifvar_check(struct i_f_var *ifv_L, struct i_f_var *ifv_R, const int dim)
 {
     double const eps = config[4];
@@ -36,6 +50,18 @@ int ifvar_check(struct i_f_var *ifv_L, struct i_f_var *ifv_R, const int dim)
     return 0;
 }
 
+
+/**
+ * @brief This function checks whether fluid variables of mid[] and dire[] are within the value range.
+ * @param[in] mid:  Intermediate Riemann solutions at t-axis OR in star region.
+ * @param[in] dire: Temporal derivative of fluid variables.
+ * @param[in] dim:  Spatial dimension.
+ * @return    miscalculation indicator.
+ *   @retval  0: Successful calculation.
+ *   @retval  1: < 0.0 error of mid[].
+ *   @retval  2: NAN or INFinite error of mid[].
+ *   @retval  3: NAN or INFinite error of dire[].
+ */
 int star_dire_check(double *mid, double *dire, const int dim)
 {
     double const eps = config[4];

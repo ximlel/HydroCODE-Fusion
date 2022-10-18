@@ -1,6 +1,6 @@
 /**
  * @file  grp_solver_radial_LAG_source.c
- * @brief This is a Lagrangian GRP scheme to solve radial/cylindrical symmetric compressible fluid flows.
+ * @brief This is a Lagrangian GRP scheme to solve radial(cylindrically) symmetric compressible fluid flows.
  */
 
 #include <stdio.h>
@@ -20,17 +20,25 @@
 
 
 /**
- * @brief A Lagrangian GRP scheme to solve radially/cylindrically symmetric compressible flows.
- * @param[in] M: Spatial dimension number for radially symmetric flow.
+ * @brief This function use GRP scheme to solve radially(cylindrically) symmetric compressible flows of motion on Lagrangian coordinate.
+ * @param[in,out] CV:  Structure of cell variable data.
+ * @param[in,out] rmv: Structure of radially symmetric meshing variable data.
+ * @param[in]  R: Array of the r-coordinate data.
+ * @param[in]  M: Spatial dimension number for radially symmetric flow.
  *             - M=1: planar flow.
  *             - M=2: cylindrical flow. (√)
  *             - M=3: spherical flow.
+ * @param[out] cpu_time:  Array of the CPU time recording.
+ * @param[in]  problem:   Name of the numerical results for the test problem.
+ * @param[in]  N_T:       Number of data dimension storing fluid variables in memory.
+ * @param[in,out] N_plot: Pointer to the number of time steps for plotting.
+ * @param[in,out] time_plot: Array of the plotting time recording.
  * @sa    Theory is found in Reference [1]. \n
  *        [1] R. Chen, J. Li & B. Tian, Application of the GRP Scheme for Cylindrical Compressible Fluid Flows,
  *            COMMUNICATIONS IN COMPUTATIONAL PHYSICS, 24.5: 1523-1555, 2018.
  */
-void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * smv, double * R[], const int M,
-				  const char * problem, double * cpu_time, int N_T, int * N_plot , double time_plot[])
+void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_var * rmv, double * R[], const int M,
+				  double * cpu_time, const char * problem, int N_T, int * N_plot , double time_plot[])
 {
     int i, k=0;
 
@@ -96,14 +104,14 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
     double *DL_t  = (double*)ALLOC(Md*sizeof(double));
     double *DR_t  = (double*)ALLOC(Md*sizeof(double));
 
-    double *Rb   = smv->Rb;  //radius and length of outer cell boundary
-    double *Lb   = smv->Lb;
-    double *RR   = smv->RR;  //centroidal radius and variable in cells
-    double *DdrL = smv->DdrL;//distance from boundary to center in a cell
-    double *DdrR = smv->DdrR;
-    double *Ddr  = smv->Ddr;
-    double *dRc  = smv->dRc; //(derivative)centers distance
-    double *vol  = smv->vol;
+    double *Rb   = rmv->Rb;  //radius and length of outer cell boundary
+    double *Lb   = rmv->Lb;
+    double *RR   = rmv->RR;  //centroidal radius and variable in cells
+    double *DdrL = rmv->DdrL;//distance from boundary to center in a cell
+    double *DdrR = rmv->DdrR;
+    double *Ddr  = rmv->Ddr;
+    double *dRc  = rmv->dRc; //(derivative)centers distance
+    double *vol  = rmv->vol;
     double *Rbh  = (double*)ALLOC(Md*sizeof(double)); //h: half time step
     double *Lbh  = (double*)ALLOC(Md*sizeof(double));
 
@@ -134,8 +142,9 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 		    nt_plot++;
 		    if (nt < (N_T-1))
 			{
-			    for(i = 0; i < Md; ++i)
+			    for(i = 0; i <= Ncell; ++i)
 				{
+				    R[nt][i] = RR[i];
 				    CV.RHO[nt+1][i] = CV.RHO[nt][i];
 				    CV.U[nt+1][i]   =   CV.U[nt][i];
 				    CV.E[nt+1][i]   =   CV.E[nt][i];  
@@ -151,9 +160,9 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 
 	    Smax_dr = 0.0; // S_max/dr = 0.0
 
-	    VIP_limiter_radial   (Ncell, (_Bool)(k-1), DmU, TmV, UU, smv);
-	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmD,      DD, smv);
-	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmP,      PP, smv);
+	    VIP_limiter_radial   (Ncell, (_Bool)(k-1), DmU, TmV, UU, rmv);
+	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmD,      DD, rmv);
+	    minmod_limiter_radial(Ncell, (_Bool)(k-1), DmP,      PP, rmv);
 
 	    UU[Ncell+1]  = UU[Ncell];
 	    DD[Ncell+1]  = DD[Ncell];
@@ -275,7 +284,7 @@ void GRP_solver_radial_LAG_source(struct cell_var_stru CV, struct radial_mesh_va
 		    DRmin[i+1] += dt * DR_t[i+1];
 		}
 
-	    radial_mesh_update(smv);
+	    radial_mesh_update(rmv);
 
 	    DD[0] = mass[0]/vol[0];
 	    UU[0] = 0.0;

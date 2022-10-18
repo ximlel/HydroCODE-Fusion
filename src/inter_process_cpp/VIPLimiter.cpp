@@ -20,34 +20,34 @@
 ///////////////////////////////////////////////////
 //some subroutines called by useViPLimiter...
 ///////////////////////////////////////////////////
-static double getTriArea(double x0, double y0, double x1, double y1, double xp, double yp);
-static void getPerpendFoot(double x0, double y0, double x1, double y1, double xc, double yc, double* pf);
-static bool obtuseAngle(double x0, double y0, double xa, double ya, double xb, double yb);
-static bool insideSegment(double x0, double y0, double x1, double y1, double xp, double yp);
+static double getTriArea    (double x0, double y0, double x1, double y1, double xp, double yp);
+static void getPerpendFoot  (double x0, double y0, double x1, double y1, double xc, double yc, double* pf);
+static bool obtuseAngle     (double x0, double y0, double xa, double ya, double xb, double yb);
+static bool insideSegment   (double x0, double y0, double x1, double y1, double xp, double yp);
 static double insectionPoint(double x0, double y0, double x1, double y1, double x2, double y2, double x3, double y3, double* Vp);
-static bool insideTriCH(std::vector<std::vector<double> >& CH, bool flag, double* Vp);
-static bool insideQuadCH(std::vector<std::vector<double> >& CH, bool flag, double* Vp);
-static bool insideTriCH(std::vector<std::vector<double> >& CH, bool flag, double* V0, double* Vp, double& lambda);
-static bool insideQuadCH(std::vector<std::vector<double> >& CH, bool flag, double* V0, double* Vp, double& lambda);
+static bool insideTriCH (std::vector<std::vector<double> >& CH, const bool flag, double* Vp);
+static bool insideQuadCH(std::vector<std::vector<double> >& CH, const bool flag, double* Vp);
+static bool insideTriCH (std::vector<std::vector<double> >& CH, const bool flag, double* V0, double* Vp, double& lambda);
+static bool insideQuadCH(std::vector<std::vector<double> >& CH, const bool flag, double* V0, double* Vp, double& lambda);
 
 
 ///////////////////////////////////////////////////
-/// @brief Subroutine of using VIP limiter for 2D velocity vector
-/// @param[in] neigh_cell_num: number of neighbor cells
+/// @brief Subroutine of using VIP limiter for 2D velocity vector.
+/// @param[in] neigh_cell_num: number of neighbor cells.
 ///                            (Note: only 2D face neighbor cells are used here, thus, 0<=neigh_cell_num<=4)
-/// @param[in] Vave: matrix for the average velocity vectors of neighbor cells
+/// @param[in] Vave: matrix for the average velocity vectors of neighbor cells.
 ///                 i.e. [u^0_ave,v^0_ave]
 ///                      [u^1_ave,v^1_ave]
-///                       [u^2_ave,v^2_ave]
+///                      [u^2_ave,v^2_ave]
 ///                       ...
-/// @param[in] V0: vector for the cell average velocity of the target cell
-/// @param[in,out] Vp: vector for the velocity of a given location in the target cell where VIP limiter needs to be applied
-/// @return the limiting coefficient lambda ( in [0, 1] ) for gradient vector
+/// @param[in] V0: vector for the cell average velocity of the target cell.
+/// @param[in,out] Vp: vector for the velocity of a given location in the target cell where VIP limiter needs to be applied.
+/// @return the limiting coefficient lambda ( in [0, 1] ) for gradient vector.
 ///////////////////////////////////////////////////
 #ifdef __cplusplus
 extern "C" {
 #endif
-double useVIPLimiter(int neigh_cell_num, double Vave[][2], double* V0, double* Vp)
+double useVIPLimiter(const int neigh_cell_num, const double Vave[][2], double* V0, double* Vp)
 {
 	double const Alpha = config[41];
 	Vp[0] = V0[0]+(Vp[0]-V0[0])*2.0/Alpha;
@@ -333,7 +333,7 @@ static double insectionPoint(double x0, double y0, double x1, double y1, double 
 	return t;
 }
 
-static bool insideTriCH(std::vector<std::vector<double> >& CH, bool flag, double* Vp)
+static bool insideTriCH(std::vector<std::vector<double> >& CH, const bool flag, double* Vp)
 {
 	bool face0(false), face1(false), face2(false);
 
@@ -433,7 +433,7 @@ static bool insideTriCH(std::vector<std::vector<double> >& CH, bool flag, double
 	return true;
 }
 
-static bool insideQuadCH(std::vector<std::vector<double> >& CH, bool flag, double* Vp)
+static bool insideQuadCH(std::vector<std::vector<double> >& CH, const bool flag, double* Vp)
 {
 	bool face0(false), face1(false), face2(false), face3(false);
 
@@ -555,7 +555,7 @@ static bool insideQuadCH(std::vector<std::vector<double> >& CH, bool flag, doubl
 	return true;
 }
 
-static bool insideTriCH(std::vector<std::vector<double> >& CH, bool flag, double* V0, double* Vp, double& lambda)
+static bool insideTriCH(std::vector<std::vector<double> >& CH, const bool flag, double* V0, double* Vp, double& lambda)
 {
 	bool face0(false), face1(false), face2(false);
 
@@ -648,7 +648,7 @@ static bool insideTriCH(std::vector<std::vector<double> >& CH, bool flag, double
 	}
 }
 
-static bool insideQuadCH(std::vector<std::vector<double> >& CH, bool flag, double* V0, double* Vp, double& lambda)
+static bool insideQuadCH(std::vector<std::vector<double> >& CH, const bool flag, double* V0, double* Vp, double& lambda)
 {
 	bool face0(false), face1(false), face2(false), face3(false);
 

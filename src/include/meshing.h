@@ -41,7 +41,7 @@ void period_ghost(struct cell_var * cv, const struct mesh_var * mv, struct flu_v
 // radial_mesh.c
 //////////////////////////
 struct radial_mesh_var radial_mesh_init(const char *example);
-void radial_mesh_update  (struct radial_mesh_var *smv);
-void radial_mesh_mem_free(struct radial_mesh_var *smv);
+void radial_mesh_update  (struct radial_mesh_var *rmv);
+void radial_mesh_mem_free(struct radial_mesh_var *rmv);
 
 #endif
