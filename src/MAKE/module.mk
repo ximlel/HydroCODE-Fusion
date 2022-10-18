@@ -9,6 +9,8 @@ ARFLAGS = crs
 #AR options
 RM = rm -vf
 #Delete command
+CP = cp -vur
+#Copy command
 
 DIR_NAME = $(shell basename `pwd`)
 #Current folder
@@ -19,6 +21,8 @@ FILES_O  = $(FILES_C:$(C_SUF)=.o)
 #All .o files
 FILES_SLO = $(FILES_C:$(C_SUF)=.slo)
 #All .slo files
+COPY_SRC = ../tmp/src
+#Temporary source folder
 
 define compile_c_file #Compile all .c/.cpp files
 @echo "$(CC) $(CFLAGS) $(CFLAGD)-c {"
@@ -29,6 +33,12 @@ define compile_c_file #Compile all .c/.cpp files
 ) \
 done;
 @echo " } $(INCLUDE)"
+endef
+
+define copy_c_file #Copy all .c/.cpp files
+@for file in $(FILES_C); do \
+	( $(CP) $$file $(COPY_SRC) ) \
+done;
 endef
 
 define rm_o_file #Delete all .o .slo files
@@ -48,6 +58,11 @@ lib$(DIR_NAME).a lib$(DIR_NAME).so all: *.o
 *.o *.slo: *$(C_SUF) $(addsuffix /*, $(addprefix $(SRC)/,$(INCLUDE_FOLDER)))
 	@echo "******************Compiling******************"
 	$(call compile_c_file)
+
+copy:
+	@echo "******************Copying********************"
+	@mkdir -pv $(COPY_SRC)
+	$(call copy_c_file)
 
 clean:
 	@echo "******************Cleaning*******************"

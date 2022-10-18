@@ -127,6 +127,9 @@ html/
 
 # ==========================Tempfiles=========================
 
+# Temporary source folder
+tmp/
+
 # Hidden files
 .fuse_hidden*
 
