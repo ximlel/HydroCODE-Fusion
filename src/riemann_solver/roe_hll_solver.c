@@ -20,7 +20,7 @@
  * @param[in] ifv_R: Right States (rho_R, u_R, v_R, p_R).
  *                   - gamma: the constant of the perfect gas.
  * @param[in] delta: Parameter to modify the modulus of the eigenvalues.
- * @todo the Roe-HLL solver is WHAT?
+ * @bug  the Roe-HLL solver is WHAT?
  * @sa   Theory is found in Reference [1]. \n
  *       [1] H. Nishikawa & K. Kitamura, Very simple, carbuncle-free, boundary-layer-resolving, rotated-hybrid Riemann solvers.
  *           Journal of Computational Physics, 227.4: 2560-2581, 2008.

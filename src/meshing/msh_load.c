@@ -7,10 +7,7 @@
 #include "../include_cii/mem.h"
 #include "../include/var_struc.h"
 
-
-/**
- * @bried Default boundary condition.
- */
+//! Define default boundary condition.
 #define DEFAULT_BC -3
 
 

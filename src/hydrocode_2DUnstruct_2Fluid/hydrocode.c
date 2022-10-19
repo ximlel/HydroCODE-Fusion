@@ -4,9 +4,9 @@
  */
 
 /** 
- * @mainpage 2D Godunov/GRP scheme for Eulerian hydrodynamics
+ * @mainpage 2D Godunov/GRP scheme for Eulerian hydrodynamics on unstructured grids
  * @brief This is an implementation of fully explict forward Euler scheme
- *        for 2-D Euler equations of motion on Eulerian coordinate.
+ *        for 2-D Euler equations of motion on Eulerian unstructured grids.
  * @version 0.3
  *
  * @section File_directories File directories
@@ -20,14 +20,18 @@
  * @section Program_structure Program structure
  * <table>
  * <tr><th> include/                   <td> Header files
+ * <tr><th> include_cii/               <td> Header files in the book 'C Interfaces and Implementations'
+ * <tr><th> src_cii/                   <td> Source codes in the book 'C Interfaces and Implementations'
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> file_io/                   <td> Program reads and writes files
+ * <tr><th> meshing/                   <td> Program handles mesh
  * <tr><th> riemann_solver/            <td> Riemann solver programs
  * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
+ * <tr><th> inter_process_unstruct/    <td> Intermediate processes in finite volume scheme on unstructured grids
  * <tr><th> flux_calc/                 <td> Program for calculating numerical fluxes in finite volume scheme
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
- * <tr><th> hydrocode_2D/hydrocode.c   <td> Main program
- * <tr><th> hydrocode_2D/hydrocode.sh  <td> Bash script compiles and runs programs
+ * <tr><th> hydrocode_2DUnstruct_2Fluid/hydrocode.c   <td> Main program
+ * <tr><th> hydrocode_2DUnstruct_2Fluid/hydrocode.sh  <td> Bash script compiles and runs programs
  * </table>
  *
  * @section Exit_status Program exit status code
@@ -42,47 +46,53 @@
  * 
  * @section Compile_environment Compile environment
  *          - Linux/Unix: gcc, glibc, MATLAB/Octave
- *            - Compile in 'src/hydrocode': Run './make.sh' command on the terminal.
+ *            - Compile in 'src/hydrocode_2DUnstruct_2Fluid': Run './hydrocode.sh' command on the terminal.
  *          - Winodws: Visual Studio, MATLAB/Octave
- *            - Create a C++ Project from Existing Code in 'src/hydrocode_2D/' with ProjectName 'hydrocode'.
+ *            - Create a C++ Project from Existing Code in 'src/hydrocode_2DUnstruct_2Fluid/' with ProjectName 'hydrocode'.
  *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
  *
  * @section Usage_description Usage description
- *          - Input files are stored in folder '/data_in/two-dim/name_of_test_example'.
+ *          - Input files are stored in folder 'data_in/two-dim/name_of_test_example/'.
  *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
- *          - Description of configuration file 'config.txt' refers to 'doc/config.csv'.
+ *          - Description of configuration file 'config.txt/.dat' refers to 'doc/config.csv'.
  *          - Run program:
- *            - Linux/Unix: Run 'hydrocode.sh' command on the terminal. \n
+ *            - Linux/Unix: Run 'shell/hydrocode_run.sh' command on the terminal. \n
  *                          The details are as follows: \n
  *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result order[_scheme]
- *                               coordinate config[n]=(double)C' command on the terminal. \n
- *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 2[_GRP] EUL 5=100' (second-order Eulerian GRP scheme).
+ *                               mesh config[n]=(double)C' command on the terminal. \n
+ *                          e.g. 'hydrocode.out Two_Component/A3_shell/A3_shell_whole Two_Component/A3_shell/A3_shell_whole
+ *                                2[_GRP] free 5=10000' (second-order Eulerian GRP scheme).
  *                          - order: Order of numerical scheme (= 1 or 2).
- *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
- *                          - coordinate: Eulerian coordinate framework (= EUL).
+ *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …).
+ *                          - mesh: Mesh name (= free, Sod or …).
  *            - Windows: Run 'hydrocode.bat' command on the terminal. \n
  *                       The details are as follows: \n
  *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result order[_scheme] 
- *                            coordinate n=C' command on the terminal. \n
+ *                            mesh n=C' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result order[_scheme] coordinate n=C
- *             <tr><th> Working Directory <td> hydrocode_2D
+ *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result order[_scheme] mesh n=C
+ *             <tr><th> Working Directory <td> hydrocode_2DUnstruct_2Fluid
  *             </table>
  *                       [Run] Project -> Properties -> Configuration Properties -> Linker -> System \n
  *             <table>
  *             <tr><th> Subsystem <td> (/SUBSYSTEM:CONSOLE)
  *             </table>
+ *                       [Run] Project -> Properties -> Configuration Properties -> C/C++ -> Language \n
+ *             <table>
+ *             <tr><th> OpenMP Support <td> (/openmp)
+ *             </table>
  * 
- *          - Output files can be found in folder '/data_out/two-dim/'.
+ *          - Output files can be found in folder 'data_out/two-dim/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
- *
+ * 
  * @section Precompiler_options Precompiler options
- *          - NOVTKPLOT: Switch whether to plot without VTK data.
- *          - NOTECPLOT: Switch whether to plot without Tecplot data.
- *          - MULTIFLUID_BASICS: Switch whether to compute multi-fluids. (Default: undef)
+ *          - NODATPLOT: in hydrocode.c. (Default: undef)
+ *          - NOVTKPLOT: in hydrocode.c. (Default: undef)
+ *          - NOTECPLOT: in hydrocode.c. (Default: undef)
+ *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c. (Default: undef)
  *          - Riemann_solver_exact_single: in riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
- *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.
+ *          - MULTIFLUID_BASICS: in var_struc.h.                         (Default: def)
  */
 
 
@@ -97,6 +107,7 @@
 #include "../include/meshing.h"
 #include "../include/finite_volume.h"
 
+
 #ifdef DOXYGEN_PREDEFINED
 /**
  * @def NODATPLOT
@@ -108,13 +119,18 @@
  * @brief Switch whether to plot without Tecplot data.
  */
 #define NOTECPLOT
+/**
+ * @def NOVTKPLOT
+ * @brief Switch whether to plot without VTK data.
+ */
+#define NOVTKPLOT
 #endif
 
 double config[N_CONF]; //!< Initial configuration data array.
 
 /**
  * @brief This is the main function which constructs the
- *        main structure of the Eulerian hydrocode.
+ *        main structure of the Eulerian hydrocode on unstructured grids.
  * @param[in] argc: ARGument Counter.
  * @param[in] argv: ARGument Values.
  *            - argv[1]: Folder name of test example (input path).
@@ -137,14 +153,13 @@ int main(int argc, char *argv[])
   config[0] = (double)2; // Dimensionality = 2
 
   // The number of times steps of the fluid data stored for plotting.
-  int N, N_plot; // (int)(config[5]) + 1;
+  int N, N_plot;
   double * time_plot;
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
-     * of a block of memory consisting (m+1) variables of type double.
-     * The value of first array element of these variables is m.
-     * The following m variables are the initial value.
+     * of a block of memory consisting (num_cell) variables of type double.
+     * The (num_cell) array elements of these variables are the initial value.
      */
   struct flu_var FV0 = initialize_2D(argv[1], &N, &N_plot, &time_plot);
   struct mesh_var mv = mesh_init(argv[1], argv[4]);

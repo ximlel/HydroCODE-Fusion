@@ -13,14 +13,6 @@
 #include "../include/file_io.h"
 
 
-#ifdef DOXYGEN_PREDEFINED
-/**
- * @def RADIAL_BASICS
- * @brief Switch whether to compute radially symmetric compressible flows.
- */
-#define RADIAL_BASICS
-#endif
-
 /**
  * @brief Print out fluid variable 'v' with array data element 'v_print'.
  */

@@ -23,6 +23,7 @@
  * @param[in]  tol: Condition value of 'gap' at the end of the iteration.
  * @param[in]  N:   Maximum iteration step.
  * @return  \b gap: Relative pressure change after the last iteration.
+ * @bug    Some program errors in this exact Riemann solver!
  * @author E. F. Toro
  * @date February 1st 1999
  * @sa   Theory is found in Chapter 4 of Reference [1]. \n

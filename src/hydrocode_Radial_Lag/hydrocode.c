@@ -5,9 +5,8 @@
 
 /** 
  * @mainpage Multi-D Godunov/GRP scheme for radially symmetric Lagrangian hydrodynamics with VIP limiter
- * @brief This is an implementation of fully explict forward Euler scheme
- *        for multi-dimensional radially symmetric compressible flows
- *        of motion on Lagrangian coordinate.
+ * @brief This is an implementation of fully explict forward Euler scheme for multi-dimensional 
+ *        radially symmetric compressible flows of motion on Lagrangian coordinate.
  * @version 0.3
  *
  * @section File_directories File directories
@@ -20,15 +19,19 @@
  * 
  * @section Program_structure Program structure
  * <table>
- * <tr><th> include/                   <td> Header files
+ * <tr><th> include/                   <td> Header files of C
+ * <tr><th> include_cpp/               <td> Header files of C++
+ * <tr><th> include_cii/               <td> Header files in the book 'C Interfaces and Implementations'
+ * <tr><th> src_cii/                   <td> Source codes in the book 'C Interfaces and Implementations'
  * <tr><th> tools/                     <td> Tool functions
  * <tr><th> file_io/                   <td> Program reads and writes files
+ * <tr><th> meshing/                   <td> Program handles mesh
  * <tr><th> riemann_solver/            <td> Riemann solver programs
- * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme
- * <tr><th> flux_calc/                 <td> Program for calculating numerical fluxes in finite volume scheme
+ * <tr><th> inter_process/             <td> Intermediate processes in finite volume scheme with C
+ * <tr><th> inter_process_cpp/         <td> Intermediate processes in finite volume scheme with C++
  * <tr><th> finite_volume/             <td> Finite volume scheme programs
- * <tr><th> hydrocode_2D/hydrocode.c   <td> Main program
- * <tr><th> hydrocode_2D/hydrocode.sh  <td> Bash script compiles and runs programs
+ * <tr><th> hydrocode_Radial_Lag/hydrocode.c   <td> Main program
+ * <tr><th> hydrocode_Radial_Lag/hydrocode.sh  <td> Bash script compiles and runs programs
  * </table>
  *
  * @section Exit_status Program exit status code
@@ -42,54 +45,56 @@
  * </table>
  * 
  * @section Compile_environment Compile environment
- *          - Linux/Unix: gcc, glibc, MATLAB/Octave
- *            - Compile in 'src/hydrocode': Run './make.sh' command on the terminal.
+ *          - Linux/Unix: g++, glibc++, MATLAB/Octave
+ *            - Compile in 'src/hydrocode_Radial_Lag': Run './hydrocode.sh' command on the terminal.
  *          - Winodws: Visual Studio, MATLAB/Octave
- *            - Create a C++ Project from Existing Code in 'src/hydrocode_2D/' with ProjectName 'hydrocode'.
+ *            - Create a C++ Project from Existing Code in 'src/hydrocode_Radial_Lag/' with ProjectName 'hydrocode'.
  *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
  *
  * @section Usage_description Usage description
- *          - Input files are stored in folder '/data_in/two-dim/name_of_test_example'.
+ *          - Input files are stored in folder 'data_in/one-dim/Radial_Symmetry/name_of_test_example/'.
  *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
- *          - Description of configuration file 'config.txt' refers to 'doc/config.csv'.
+ *          - Description of configuration file 'config.txt/.dat' refers to 'doc/config.csv'.
  *          - Run program:
- *            - Linux/Unix: Run 'hydrocode.sh' command on the terminal. \n
+ *            - Linux/Unix: Run 'shell/hydrocode_run.sh' command on the terminal. \n
  *                          The details are as follows: \n
  *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result order[_scheme]
- *                               coordinate config[n]=(double)C' command on the terminal. \n
- *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 2[_GRP] EUL 5=100' (second-order Eulerian GRP scheme).
+ *                               dim config[n]=(double)C' command on the terminal. \n
+ *                          e.g. 'hydrocode.out Radial_Symmetry/Two_Component/A3_shell Radial_Symmetry/Two_Component/A3_shell
+ *                                2[_GRP] 2 42=-2' (second-order Lagrangian GRP scheme).
  *                          - order: Order of numerical scheme (= 1 or 2).
- *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
- *                          - coordinate: Eulerian coordinate framework (= EUL).
+ *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …).
+ *                          - dim: Spatial dimension number (= 2).
  *            - Windows: Run 'hydrocode.bat' command on the terminal. \n
  *                       The details are as follows: \n
  *                       Run 'hydrocode.exe name_of_test_example name_of_numeric_result order[_scheme] 
- *                            coordinate n=C' command on the terminal. \n
+ *                            dim n=C' command on the terminal. \n
  *                       [Debug] Project -> Properties -> Configuration Properties -> Debugging \n
  *             <table>
- *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result order[_scheme] coordinate n=C
- *             <tr><th> Working Directory <td> hydrocode_2D
+ *             <tr><th> Command Arguments <td> name_of_test_example name_of_numeric_result order[_scheme] dim n=C
+ *             <tr><th> Working Directory <td> hydrocode_Radial_Lag
  *             </table>
  *                       [Run] Project -> Properties -> Configuration Properties -> Linker -> System \n
  *             <table>
  *             <tr><th> Subsystem <td> (/SUBSYSTEM:CONSOLE)
  *             </table>
  * 
- *          - Output files can be found in folder '/data_out/two-dim/'.
+ *          - Output files can be found in folder 'data_out/one-dim/Radial_Symmetry/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
- *
+ * 
  * @section Precompiler_options Precompiler options
- *          - NOVTKPLOT: Switch whether to plot without VTK data.
- *          - NOTECPLOT: Switch whether to plot without Tecplot data.
- *          - MULTIFLUID_BASICS: Switch whether to compute multi-fluids. (Default: undef)
- *          - Riemann_solver_exact_single: in riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
- *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.
+ *          - NODATPLOT: in hydrocode.c. (Default: undef)
+ *          - NOTECPLOT: in hydrocode.c. (Default: undef)
+ *          - HDF5PLOT:  in hydrocode.c. (Default: undef)
+ *          - MULTIFLUID_BASICS: in var_struc.h. (Default: def)
+ *          - RADIAL_BASICS:     in var_struc.h. (Default: def)
  */
 
+
 #include <stdio.h>
-#include <math.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
@@ -119,7 +124,7 @@ double config[N_CONF]; //!< Initial configuration data array.
 
 #define CV_INIT_FV_RESET_MEM(v, N)					\
     do {								\
-    	CV.v = (double **)malloc(N * sizeof(double *));			\
+	CV.v = (double **)malloc(N * sizeof(double *));			\
 	if(CV.v == NULL)						\
 	    {								\
 		printf("NOT enough memory! %s\n", #v);			\
@@ -143,7 +148,7 @@ double config[N_CONF]; //!< Initial configuration data array.
 
 /**
  * @brief This is the main function which constructs the
- *        main structure of the Eulerian hydrocode.
+ *        main structure of the radially symmetric Lagrangian hydrocode.
  * @param[in] argc: ARGument Counter.
  * @param[in] argv: ARGument Values.
  *            - argv[1]: Folder name of test example (input path).
@@ -162,6 +167,7 @@ int main(int argc, char *argv[])
   // Initialize configuration data array
   for(k = 1; k < N_CONF; k++)
       config[k] = INFINITY;
+
   char * scheme = NULL; // Riemann_exact(Godunov), GRP
   arg_preprocess(4, argc, argv, scheme);
 
@@ -174,15 +180,15 @@ int main(int argc, char *argv[])
   /* 
    * We read the initial data files.
    * The function initialize return a point pointing to the position
-   * of a block of memory consisting Ncell variables of type double.
-   * The Ncell variables are the initial value.
+   * of a block of memory consisting (Ncell) variables of type double.
+   * The (Ncell) array elements of these variables are the initial value.
    */
   struct flu_var FV0 = initialize_1D(argv[1], &N, &N_plot, &time_plot); // Structure of initial data array pointer.
   const int Ncell = (int)config[3]; // Number of computing cells in r direction
-  const int Md    = Ncell+2;        // max vector dimension
+  const int Md    = Ncell+2;        // Max vector dimension
   const int order = (int)config[9];
   double gamma = config[6];
-  int M = atoi(argv[4]); // M=1 planar; M=2 cylindrical; M=3 spherical
+  int M = atoi(argv[4]);            // M=1 planar; M=2 cylindrical; M=3 spherical
   if(M != 1 && M != 2 && M != 3)
       {
 	  printf("Wrong spatial dimension number!\n");
@@ -192,7 +198,8 @@ int main(int argc, char *argv[])
   struct radial_mesh_var rmv = radial_mesh_init(argv[1]);
   radial_mesh_update(&rmv);
 
-  struct cell_var_stru CV = {NULL}; // Structure of fluid variables in computational cells array pointer.
+  // Structure of fluid variables in computational cells array pointer.
+  struct cell_var_stru CV = {NULL};
   double ** R = NULL;
   double * cpu_time = (double *)malloc(N * sizeof(double));
   R = (double **)malloc(N * sizeof(double *));

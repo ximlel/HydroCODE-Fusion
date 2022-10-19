@@ -10,7 +10,7 @@
 
 /**
  * @brief A function of matrix addition.
- * @param[out] C[]: C_{m×n} = A_{m×n} + B_{m×n}.
+ * @details OUTPUT=> C[]: C_{m×n} = A_{m×n} + B_{m×n}.
  */
 void mat_add(const double A[], const double B[], double C[], const int m, const int n) 
 {
@@ -23,7 +23,7 @@ void mat_add(const double A[], const double B[], double C[], const int m, const 
 
 /**
  * @brief A function of matrix subtraction.
- * @param[out] C[]: C_{m×n} = A_{m×n} - B_{m×n}.
+ * @details OUTPUT=> C[]: C_{m×n} = A_{m×n} - B_{m×n}.
  */
 void mat_sub(const double A[], const double B[], double C[], const int m, const int n)
 {
@@ -36,7 +36,7 @@ void mat_sub(const double A[], const double B[], double C[], const int m, const 
 
 /**
  * @brief A function of matrix multiplication.
- * @param[out] C[]: C_{m×p} = A_{m×n} * B_{n×p}.
+ * @details OUTPUT=> C[]: C_{m×p} = A_{m×n} * B_{n×p}.
  */
 void mat_mul(const double A[], const double B[], double C[], const int m, const int p, const int n)
 {

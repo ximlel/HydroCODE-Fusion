@@ -34,7 +34,7 @@
  * <table>
  * <tr><th> exit(0)  <td> EXIT_SUCCESS
  * <tr><th> exit(1)  <td> File directory error
- * <tr><th> exit(2)  <td> Data reading error
+ * <tr><th> exit(2)  <td> Data reading/writing error
  * <tr><th> exit(3)  <td> Calculation error
  * <tr><th> exit(4)  <td> Arguments error
  * <tr><th> exit(5)  <td> Memory error
@@ -42,23 +42,23 @@
  * 
  * @section Compile_environment Compile environment
  *          - Linux/Unix: gcc, glibc, MATLAB/Octave
- *            - Compile in 'src/hydrocode': Run './make.sh' command on the terminal.
+ *            - Compile in 'src/hydrocode_2D': Run './hydrocode.sh' command on the terminal.
  *          - Winodws: Visual Studio, MATLAB/Octave
  *            - Create a C++ Project from Existing Code in 'src/hydrocode_2D/' with ProjectName 'hydrocode'.
  *            - Compile in 'x64/Debug' using shortcut key 'Ctrl+B' with Visual Studio.
  *
  * @section Usage_description Usage description
- *          - Input files are stored in folder '/data_in/two-dim/name_of_test_example'.
+ *          - Input files are stored in folder 'data_in/two-dim/name_of_test_example/'.
  *          - Input files may be produced by MATLAB/Octave script 'value_start.m'.
- *          - Description of configuration file 'config.txt' refers to 'doc/config.csv'.
+ *          - Description of configuration file 'config.txt/.dat' refers to 'doc/config.csv'.
  *          - Run program:
- *            - Linux/Unix: Run 'hydrocode.sh' command on the terminal. \n
+ *            - Linux/Unix: Run 'shell/hydrocode_run.sh' command on the terminal. \n
  *                          The details are as follows: \n
  *                          Run 'hydrocode.out name_of_test_example name_of_numeric_result order[_scheme]
  *                               coordinate config[n]=(double)C' command on the terminal. \n
  *                          e.g. 'hydrocode.out GRP_Book/6_1 GRP_Book/6_1 2[_GRP] EUL 5=100' (second-order Eulerian GRP scheme).
  *                          - order: Order of numerical scheme (= 1 or 2).
- *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …)
+ *                          - scheme: Scheme name (= Riemann_exact/Godunov, GRP or …).
  *                          - coordinate: Eulerian coordinate framework (= EUL).
  *            - Windows: Run 'hydrocode.bat' command on the terminal. \n
  *                       The details are as follows: \n
@@ -73,16 +73,21 @@
  *             <table>
  *             <tr><th> Subsystem <td> (/SUBSYSTEM:CONSOLE)
  *             </table>
+ *                       [Run] Project -> Properties -> Configuration Properties -> C/C++ -> Language \n
+ *             <table>
+ *             <tr><th> OpenMP Support <td> (/openmp)
+ *             </table>
  * 
- *          - Output files can be found in folder '/data_out/two-dim/'.
+ *          - Output files can be found in folder 'data_out/two-dim/'.
  *          - Output files may be visualized by MATLAB/Octave script 'value_plot.m'.
- *
+ * 
  * @section Precompiler_options Precompiler options
- *          - NODATPLOT: Switch whether to plot without Matrix data.
- *          - NOTECPLOT: Switch whether to plot without Tecplot data.
- *          - MULTIFLUID_BASICS: Switch whether to compute multi-fluids. (Default: undef)
- *          - Riemann_solver_exact_single: in riemann_solver.h.          (Default: Riemann_solver_exact_Ben)
- *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.
+ *          - NODATPLOT: in hydrocode.c. (Default: undef)
+ *          - NOTECPLOT: in hydrocode.c. (Default: undef)
+ *          - HDF5PLOT:  in hydrocode.c. (Default: undef)
+ *          - EXACT_TANGENT_DERIVATIVE: in linear_GRP_solver_Edir_G2D.c.   (Default: undef)
+ *          - Riemann_solver_exact_single: in riemann_solver.h.            (Default: Riemann_solver_exact_Ben)
+ *          - MULTIFLUID_BASICS: 'Switch whether to compute multi-fluids.' (Default: undef)
  */
 
 
@@ -95,6 +100,7 @@
 #include "../include/var_struc.h"
 #include "../include/file_io.h"
 #include "../include/finite_volume.h"
+
 
 #ifdef DOXYGEN_PREDEFINED
 /**
@@ -145,7 +151,7 @@ double config[N_CONF]; //!< Initial configuration data array.
 
 /**
  * @brief This is the main function which constructs the
- *        main structure of the Eulerian hydrocode.
+ *        main structure of the 2-D Eulerian hydrocode.
  * @param[in] argc: ARGument Counter.
  * @param[in] argv: ARGument Values.
  *            - argv[1]: Folder name of test example (input path).
@@ -168,20 +174,19 @@ int main(int argc, char *argv[])
   config[0] = (double)2; // Dimensionality = 2
 
   // The number of times steps of the fluid data stored for plotting.
-  int N, N_plot; // (int)(config[5]) + 1;
+  int N, N_plot;
   double * time_plot;
     /* 
      * We read the initial data files.
      * The function initialize return a point pointing to the position
-     * of a block of memory consisting (m+1) variables of type double.
-     * The value of first array element of these variables is m.
-     * The following m variables are the initial value.
+     * of a block of memory consisting (n_x*n_y) variables of type double.
+     * The (n_x*n_y) array elements of these variables are the initial value.
      */
   struct flu_var FV0 = initialize_2D(argv[1], &N, &N_plot, &time_plot); // Structure of initial data array pointer.
     /* 
-     * m is the number of initial value as well as the number of grids.
-     * As m is frequently use to represent the number of grids,
-     * we do not use the name such as num_grid here to correspond to
+     * (n_x*n_y) is the number of initial value as well as the number of grids.
+     * As (n_x*n_y) is frequently use to represent the number of grids,
+     * we do not use the name such as num_cell here to correspond to
      * notation in the math theory.
      */
   const int n_x = (int)config[13], n_y = (int)config[14];
@@ -254,7 +259,6 @@ int main(int argc, char *argv[])
 	  switch(order)
 	      {
 	      case 1:
-		  // Godunov_solver_2D_EUL_source(n_x, n_y, CV, cpu_time);
 		  config[41] = 0.0; // alpha = 0.0
 	      case 2:
 		  if (dim_split)

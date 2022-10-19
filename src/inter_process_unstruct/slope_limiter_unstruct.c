@@ -126,9 +126,7 @@ static void lsq_limiter(const struct cell_var * cv, const struct mesh_var * mv,
 }
 
 
-/**
-  * @param[in] isUorV: (U:1,V:-1,NO:0)
-  */
+// @param[in] isUorV: (U:1,V:-1,NO:0)
 static void minmod_limiter_2D(const struct cell_var * cv, const struct mesh_var * mv, 
 							  double * gradx_W, double * grady_W, const double * W, const int isUorV)
 {

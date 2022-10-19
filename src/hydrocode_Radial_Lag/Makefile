@@ -9,7 +9,7 @@ CFLAGR = -std=c++20 -O2
 #Intel C++ compiler options
 CFLAGD = -DRADIAL_BASICS -DMULTIFLUID_BASICS -DHDF5PLOT -D_Bool=bool #-DNODATPLOT -DNOTECPLOT 
 #Macro definition
-INCLUDE_FOLDER = include include_cii
+INCLUDE_FOLDER = include 
 #Inclued folder
 LDFLAGS = -lm -lhdf5
 #Library files

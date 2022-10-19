@@ -7,20 +7,28 @@
 #define VARSTRUC_H
 
 #ifdef  MULTIFLUID_BASICS
+#undef  MULTIFLUID_BASICS
 /**
  * @def MULTIFLUID_BASICS
  * @brief Switch whether to compute multi-fluids.
  */
-#undef  MULTIFLUID_BASICS
 #define MULTIFLUID_BASICS
 #endif
 #ifdef  LAGRANGIAN_MAIRE
+#undef  LAGRANGIAN_MAIRE
 /**
  * @def LAGRANGIAN_MAIRE
  * @brief Switch whether to use Maire's cell-centered schemes for Lagrangian hydrodynamics.
  */
-#undef  LAGRANGIAN_MAIRE
 #define LAGRANGIAN_MAIRE
+#endif
+#ifdef  RADIAL_BASICS
+#undef  RADIAL_BASICS
+/**
+ * @def RADIAL_BASICS
+ * @brief Switch whether to compute radially symmetric compressible flows.
+ */
+#define RADIAL_BASICS
 #endif
 
 //! If the system does not set, the default largest value can be seen as zero is EPS.
@@ -161,7 +169,7 @@ typedef struct mesh_var {
 	 *  @arg  border_cond[i] > 0, serial number of the ghost grid cell at the periodic boundary is i.
 	 */
 	int *border_cond;
-	int *period_cell;   //!< Serial number of ghost grid cells at the periodic boundary.
+	int *period_cell; //!< Serial number of ghost grid cells at the periodic boundary.
 	double *normal_v; //!< @todo Normal velocity on grid cell interfaces at the boundary.
 	double *X, *Y;    //!< x- and y-coordinates of the grid nodes with fixed serial number.
 	//! Pointer to the boundary condition function.
@@ -172,14 +180,14 @@ typedef struct mesh_var {
 #ifdef RADIAL_BASICS
 //! RADIALly symmetric MESHing VARiables.
 typedef struct radial_mesh_var {
-    double * Rb;
-    double * Lb;
-    double * RR;
-    double * DdrL;
-    double * DdrR;
-    double * Ddr;
-    double * dRc;
-    double * vol;
+    double * Rb;   //!< Radius of proximal grid cell boundary(interface).
+    double * Lb;   //!< Length of proximal grid cell boundary(interface).
+    double * RR;   //!< centRoidal Radius of each grid cell.
+    double * DdrL; //!< Distance from Right interface to center in grid cell.
+    double * DdrR; //!< Distance from Left  interface to center in grid cell.
+    double * Ddr;  //!< Distance between two interfaces of each grid cell.
+    double * dRc;  //!< centRoidal distance of two adjacent grid cells.
+    double * vol;  //!< area(volume) of each grid cell.
 } Radial_Mesh_Variable;
 #endif
 
