@@ -16,14 +16,14 @@ Run the following command on the terminal.
 
 ```shell
 cd src/hydrocode_*
-doxygen Doxyfile
-cd doc/hydrocode_*/latex
+make doxygen
+cd doc/Doxygen/hydrocode_*/latex
 make
-cd doc/hydrocode_*/Specification
+cd doc/Specification/hydrocode_*
 xelatex Specification.tex
 ```
 
-Open `doc/hydrocode_*/html/index.html` in a browser to view the specific instructions of this program.
+Open `doc/Doxygen/hydrocode_*/html/index.html` in a browser to view the specific instructions of this program.
 
 Processing tools
 ---------
