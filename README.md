@@ -3,14 +3,14 @@
 What is it?
 -----------
 
-This is a implementation of fully explict forward Euler scheme for single/multi-fluid Euler equations of motion on Lagrangian/Eulerian coordinate.
+This is an implementation of a fully explicit forward Euler scheme for single/multi-fluid Euler equations of motion on the Lagrangian/Eulerian coordinate.
 
 How to use it?
 -----------
 
-*Programer's Guide* can be found in folder `doc`.
+*Programer's Guide* can be found in the folder `doc`.
 
-It is made by Doxygen and LaTeX,
+It is made of Doxygen and LaTeX,
 
 Run the following command on the terminal.
 
@@ -24,6 +24,11 @@ xelatex Specification.tex
 ```
 
 Open `doc/Doxygen/hydrocode_*/html/index.html` in a browser to view the specific instructions of this program.
+
+- **Online Version**
+  > [1D-HydroCODE](https://ximlel.github.io/zh-CN/2022/10/09/Radial-Lag-HydroCODE/1D-HydroCODE/html/index.html) &ensp;
+  [2D-HydroCODE](https://ximlel.github.io/zh-CN/2022/10/09/Radial-Lag-HydroCODE/2D-HydroCODE/html/index.html) &ensp;
+  [Radial-Lag-HydroCODE](https://ximlel.github.io/zh-CN/2022/10/09/Radial-Lag-HydroCODE/html/index.html)
 
 Processing tools
 ---------
@@ -72,9 +77,11 @@ Please see the file called `LICENSE`.
 Clone/Download HTTPS
 --------
 
-<https://gitee.com/ximlel/HydroCODE.git>
-<https://github.com/ximlel/HydroCODE.git>
-<https://osredm.com/p16943850/HydroCODE.git>
+> <https://gitee.com/ximlel/HydroCODE.git>
+> 
+> <https://github.com/ximlel/HydroCODE.git>
+> 
+> <https://osredm.com/p16943850/HydroCODE.git>
 
 Contacts
 --------
@@ -85,6 +92,7 @@ Copyright
 --------
 
 > Part of this code is modified from the provision of Zhifang Du, Rui Chen & Jian Cheng @ IAPCM.
-> Some source codes in the book *C Interfaces and Implementations* designed by David Hanson and 《常用算法程序及》 designed by 徐士良 are used.
+> 
+> Some source codes in the book *C Interfaces and Implementations* designed by David Hanson and 《常用算法程序集》 designed by 徐士良 are used.
 
 Copyright © 2022 Xin Lei.
